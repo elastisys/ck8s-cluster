@@ -17,10 +17,6 @@ unset HELM_TLS_KEY
 unset HELM_TLS_CA_CERT
 unset HELM_TLS_ENABLE
 
-
-# Create RBAC resources for tiller
-kubectl -n $NAMESPACE apply -R -f ${HELM_RBAC_DIR}
-
 if [ "$NAMESPACE" == "kube-system" ]
 then
     # Cluster wide tiller
@@ -28,6 +24,8 @@ then
         --serviceaccount=$NAMESPACE:tiller \
         --dry-run -o yaml | kubectl apply -f -
 else
+    # Create RBAC resources for tiller
+    kubectl -n $NAMESPACE apply -R -f ${HELM_RBAC_DIR}
     kubectl -n $NAMESPACE create rolebinding tiller --role=tiller-role \
         --serviceaccount=$NAMESPACE:tiller \
         --dry-run -o yaml | kubectl apply -f -
