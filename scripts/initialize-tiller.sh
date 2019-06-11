@@ -20,6 +20,8 @@ unset HELM_TLS_ENABLE
 if [ "$NAMESPACE" == "kube-system" ]
 then
     # Cluster wide tiller
+    kubectl -n $NAMESPACE create sa tiller --dry-run -o yaml \
+        | kubectl apply -f -
     kubectl create clusterrolebinding tiller --clusterrole=cluster-admin \
         --serviceaccount=$NAMESPACE:tiller \
         --dry-run -o yaml | kubectl apply -f -
