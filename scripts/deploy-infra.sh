@@ -20,9 +20,10 @@ kubectl -n falco create rolebinding falco-privileged-psp \
 # Nginx-ingress
 #
 
-https://github.com/helm/charts/tree/master/stable/nginx-ingress
+# https://github.com/helm/charts/tree/master/stable/nginx-ingress
 helm upgrade nginx-ingress stable/nginx-ingress --install \
-    --namespace nginx-ingress --version 1.6.16
+    --namespace nginx-ingress --version 1.6.16 \
+    -f ${WORKSPACE}/helm-values/nginx-ingress.yaml
 
 #
 # Cert-manager

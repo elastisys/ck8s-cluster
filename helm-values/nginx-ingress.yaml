@@ -1,0 +1,5 @@
+controller:
+  hostNetwork: true
+  kind: DaemonSet
+podSecurityPolicy:
+  enabled: true
