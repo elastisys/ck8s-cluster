@@ -2,3 +2,4 @@ virtenv
 .ssh
 kubeconfig
 certs
+.env

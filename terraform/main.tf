@@ -56,6 +56,12 @@ resource "exoscale_security_group_rules" "master-rules" {
     cidr_list = ["0.0.0.0/0"]
     ports     = ["22"]
   }
+  # HTTP(S)
+  ingress {
+    protocol  = "TCP"
+    cidr_list = ["0.0.0.0/0"]
+    ports     = ["80", "443"]
+  }
   # Allow all internal communication
   ingress {
     protocol                 = "TCP"
