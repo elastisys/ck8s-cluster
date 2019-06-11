@@ -11,6 +11,11 @@ WORKSPACE="${SCRIPT_DIR}/../"
 # https://github.com/helm/charts/tree/master/stable/falco
 helm upgrade falco stable/falco --install --namespace falco --version 0.7.6
 
+# Faclo requires privileged PSP and does not include its own policy in the chart
+kubectl -n falco create rolebinding falco-privileged-psp \
+    --clusterrole=psp:privileged --serviceaccount=falco:falco \
+    --dry-run -o yaml | kubectl apply -f -
+
 #
 # Nginx-ingress
 #
