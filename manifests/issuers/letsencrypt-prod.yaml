@@ -8,6 +8,9 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-prod
     server: https://acme-v02.api.letsencrypt.org/directory
+    # Old syntax
+    http01: {}
+    # New syntax
     solvers:
     # An empty selector will 'match' all Certificate resources that
     # reference this Issuer.
