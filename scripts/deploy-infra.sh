@@ -46,3 +46,21 @@ helm upgrade cert-manager jetstack/cert-manager \
 # Create letsencrypt-staging and prod ClusterIssuers
 kubectl apply -f ${WORKSPACE}/manifests/issuers/letsencrypt-staging.yaml
 kubectl apply -f ${WORKSPACE}/manifests/issuers/letsencrypt-prod.yaml
+
+#
+# Dex
+#
+
+# https://github.com/helm/charts/tree/master/stable/dex
+helm upgrade dex ${WORKSPACE}/charts/dex --install --namespace dex \
+    -f ${WORKSPACE}/helm-values/dex-values.yaml
+
+#
+# Dashboard and Oauth2 proxy
+#
+
+# https://github.com/helm/charts/tree/master/stable/oauth2-proxy
+helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
+    -f ${WORKSPACE}/helm-values/oauth2-proxy-values.yaml
+
+kubectl apply -f ${WORKSPACE}/manifests/dashboard.yaml
