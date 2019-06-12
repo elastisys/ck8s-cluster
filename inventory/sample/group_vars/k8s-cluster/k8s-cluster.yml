@@ -52,7 +52,7 @@ kube_users:
       - system:masters
 
 ## It is possible to activate / deactivate selected authentication methods (basic auth, static token auth)
-# kube_oidc_auth: false
+kube_oidc_auth: true
 # kube_basic_auth: false
 # kube_token_auth: false
 
@@ -60,13 +60,13 @@ kube_users:
 ## Variables for OpenID Connect Configuration https://kubernetes.io/docs/admin/authentication/
 ## To use OpenID you have to deploy additional an OpenID Provider (e.g Dex, Keycloak, ...)
 
-# kube_oidc_url: https:// ...
-# kube_oidc_client_id: kubernetes
+kube_oidc_url: https://dex.demo.compliantk8s.com
+kube_oidc_client_id: kubernetes
 ## Optional settings for OIDC
 # kube_oidc_ca_file: "{{ kube_cert_dir }}/ca.pem"
-# kube_oidc_username_claim: sub
+kube_oidc_username_claim: email
 # kube_oidc_username_prefix: oidc:
-# kube_oidc_groups_claim: groups
+kube_oidc_groups_claim: groups
 # kube_oidc_groups_prefix: oidc:
 
 
