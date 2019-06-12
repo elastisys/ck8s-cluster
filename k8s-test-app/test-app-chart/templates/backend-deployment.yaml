@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name  }}-backend
+  labels:
+    app.kubernetes.io/name: {{ include "charts.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    component: backend
+  namespace: {{ .Values.backend.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "charts.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      component: backend
+  replicas: {{ .Values.backend.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "charts.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        component: backend
+    spec:
+      initContainers:
+      - name: check-db-ready
+        image: mongo
+        securityContext:
+          runAsUser: 1000
+        command: ['sh', '-c',
+         'until mongo mongodb://{{ .Release.Name }}-mongo.{{ .Values.mongo.namespace }} --eval "print(\"waited for connection\")";
+         do sleep 5; done;']
+      containers:
+        - name: {{ .Release.Name  }}-backend 
+          image: "{{ .Values.backend.image }}:{{ .Values.backend.tag }}"
+          imagePullPolicy: "{{ .Values.backend.imagePullPolicy }}"
+          securityContext:
+            runAsUser: 1000
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+          env:
+            - name: DB_DNS
+              value: "mongodb://{{ .Release.Name }}-mongo.{{ .Values.mongo.namespace }}:27017/jelotest"
+              #value: "mongodb://mongo:27017/jelotest"
+          #livenessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: http
+          #  timeoutSeconds: 10
+          #  initialDelaySeconds: 60
+              
+          #livenessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
+          #readinessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
