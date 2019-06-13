@@ -10,31 +10,16 @@ metadata:
   annotations:
 {{ toYaml $ingress.annotations | indent 4 }}
 spec:
-  {{- if $tls.enabled }}
+{{- if .Values.ingress.tls }}
   tls:
-    {{- if $tls.secretName }}
-  - secretName: {{ $tls.secretName }}
-    {{- else }}
-  - secretName: "{{ template "harbor.ingress" . }}"
-    {{- end }}
-    {{- if $ingress.hosts.core }}
-    hosts:
-    - {{ $ingress.hosts.core }}
-    {{- end }}
-  {{- if .Values.notary.enabled }}
-    {{- if $tls.notarySecretName }}
-  - secretName: {{ $tls.notarySecretName }}
-    {{- else if $tls.secretName }}
-  - secretName: {{ $tls.secretName }}
-    {{- else }}
-  - secretName: "{{ template "harbor.ingress" . }}"
-    {{- end }}
-    {{- if $ingress.hosts.notary }}
-    hosts:
-    - {{ $ingress.hosts.notary }}
-    {{- end }}
+  {{- range .Values.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
   {{- end }}
-  {{- end }}
+{{- end }}
 {{- if  eq .Values.expose.ingress.controller "gce" }}
   rules:
   - http:
