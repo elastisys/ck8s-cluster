@@ -64,3 +64,53 @@ helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
     -f ${WORKSPACE}/helm-values/oauth2-proxy-values.yaml
 
 kubectl apply -f ${WORKSPACE}/manifests/dashboard.yaml
+
+
+#
+# OPA
+#
+
+kubectl create namespace opa
+kubectl create namespace opa-test
+
+openssl genrsa -out ca.key 2048
+openssl req -x509 -new -nodes -key ca.key -days 100000 -out ca.crt -subj "/CN=admission_ca"
+
+
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr -subj "/CN=opa.opa.svc" -config ${WORKSPACE}/manifests/opa/server.conf
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 100000 -extensions v3_req -extfile server.conf
+
+kubectl create secret tls opa-server --cert=server.crt --key=server.key -n opa
+kubectl apply -f ${WORKSPACE}/manifests/opa/admission-controller.yaml
+
+cat > webhook-configuration.yaml <<EOF
+kind: ValidatingWebhookConfiguration
+apiVersion: admissionregistration.k8s.io/v1beta1
+metadata:
+  name: opa-validating-webhook
+  namespace: opa
+webhooks:
+  - name: validating-webhook.openpolicyagent.org
+    namespaceSelector:
+      matchExpressions:
+      - key: openpolicyagent.org/webhook
+        operator: NotIn
+        values:
+        - ignore
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["*"]
+    clientConfig:
+      caBundle: $(cat ca.crt | base64 | tr -d '\n')
+      service:
+        namespace: opa
+        name: opa
+EOF
+
+kubectl label ns kube-system openpolicyagent.org/webhook=ignore
+kubectl label ns opa openpolicyagent.org/webhook=ignore
+kubectl apply -f ${WORKSPACE}/manifests/opa/webhook-configuration.yaml
+kubectl create configmap network-policy --from-file=${WORKSPACE}/manifests/opa/policy.rego -n opa

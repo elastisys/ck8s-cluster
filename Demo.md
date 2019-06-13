@@ -56,9 +56,9 @@ kubectl -n kube-system exec -it tiller-deploy-5dffbf79b7-kv6t -- sh
 
 ## Enforce network policies with OPA
 
-- Try to create a deployment without a network policy.
-- Create a network policy
-- Try again to create the same deployment
+- Try to create a deployment without a network policy: `kubectl apply -f manifests/opa/deployment.yaml`
+- Create a network policy: `kubectl apply -f manifests/opa/networkpolicy.yaml`
+- Try again to create the same deployment: `kubectl apply -f manifests/opa/deployment.yaml`
 
 **What happened?**
 - OPA is programmed with a rule that prevents deployments not selected by any network policy.
