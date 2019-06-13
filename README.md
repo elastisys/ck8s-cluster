@@ -43,12 +43,14 @@ Prepare the Harbor demo in the following way.
 - Login with `admin:Elastisys123`
 - Create a project named `test`
 - Push nginx to the private registry:
-    ```shell
-    docker pull nginx
-    docker tag nginx:latest core.harbor.demo.compliantk8s.com/test/nginx:test-01
-    docker login core.harbor.demo.compliantk8s.com
-    docker push core.harbor.demo.compliantk8s.com/test/nginx:test-01
-    ```
+
+```shell
+docker pull nginx
+docker tag nginx:latest core.harbor.demo.compliantk8s.com/test/nginx:test-01
+docker login core.harbor.demo.compliantk8s.com
+docker push core.harbor.demo.compliantk8s.com/test/nginx:test-01
+```
+
 - Select the container image in harbor and scan it.
 
 To take this container image for a test drive in the cluster do the following:
