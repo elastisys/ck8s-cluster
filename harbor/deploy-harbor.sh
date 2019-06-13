@@ -8,7 +8,10 @@ kubectl create ns harbor --dry-run -o yaml | kubectl apply -f -
 kubectl -n harbor create rolebinding harbor-privileged-psp \
     --clusterrole=psp:privileged --serviceaccount=harbor:default \
     --dry-run -o yaml | kubectl apply -f -
-helm upgrade harbor harbor/harbor \
-  --install \
+helm upgrade harbor ${WORKSPACE}/charts/harbor \
+  --install --version 1.1.0 \
   --namespace harbor \
   --values ${SCRIPT_DIR}/harbor-values.yaml
+
+# The harbor chart modifies the ingress annotations, so we do it with this hack instead
+kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
