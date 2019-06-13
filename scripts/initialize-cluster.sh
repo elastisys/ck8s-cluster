@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Usage:
-# ./initialize.sh staging-certs "Jenkins admin1 admin2" staging
+# ./initialize-cluster.sh staging-certs "Jenkins admin1 admin2"
 
 # Dir where this script is located
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
