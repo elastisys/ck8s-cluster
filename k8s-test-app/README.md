@@ -2,11 +2,7 @@
 
 A simple test application for kubernetes.
 
-## Quick start kubernetes
-Prereq helm installed in kubernetes cluster.
-
-`helm install --name test-app-chart`
-
+See `manifests/k8s-test-app`.
 
 ## Quick start locally
 
@@ -25,4 +21,3 @@ At this point, you may have to start a new terminal or log out and in again to g
 4. Start frontend: `npm start`
 
 To build an optimized version of the (static) frontend, run `npm run build`.
-

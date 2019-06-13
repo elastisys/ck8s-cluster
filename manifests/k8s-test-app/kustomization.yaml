@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+  - frontend
+  - backend
+  - mongo
+
+commonLabels:
+  app.kubernetes.io/part-of: test-app

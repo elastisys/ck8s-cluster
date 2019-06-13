@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  template:
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          securityContext:
+            runAsUser: 1000
+          ports:
+            - name: mongo
+              containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+          - mountPath: /data/db
+            name: mongo-data
+      volumes:
+      - name: mongo-data
+        emptyDir: {}
