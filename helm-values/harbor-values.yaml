@@ -6,6 +6,7 @@ expose:
     hosts:
       core: core.harbor.demo.compliantk8s.com
       notary: notary.harbor.demo.compliantk8s.com
+    # The chart interferes with this annotation so we have to add it later
     # annotations:
     #   certmanager.k8s.io/cluster-issuer: letsencrypt-staging
 ingress:
