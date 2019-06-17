@@ -1,0 +1,50 @@
+apiVersion: templates.gatekeeper.sh/v1alpha1
+kind: ConstraintTemplate
+metadata:
+  name: k8scheckpermissions
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sCheckPermissions
+        listKind: K8sCheckPermissionsList
+        plural: k8scheckpermissions
+        singular: k8scheckpermissions
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            resources:
+              type: array
+              items: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8scheckpermissions
+
+        deny[{"msg": msg, "details": {"Bindingghghgh": "name"}}] {
+          kind := input.review.object.roleRef.kind
+          role := input.review.object.roleRef.name
+          
+          roleData := info(kind, role)
+          resources := ["secrets", "*"]
+          apiGroups := ["", "*"]
+          verbs := [x | roleData[rule].resources[_] == resources[_]; roleData[rule].apiGroups[_] == apiGroups[_];x := [verb | verb := roleData[rule].verbs[_]]]
+          count(verbs) != 0
+          groups := [name | input.review.object.subjects[group].kind == "Group"; name := input.review.object.subjects[group].name]
+          users := [name | input.review.object.subjects[user].kind == "User"; name := input.review.object.subjects[user].name]
+          serviceAccounts := [name | input.review.object.subjects[sAccount].kind == "ServiceAccount"; name := input.review.object.subjects[sAccount].name]
+
+          msg := sprintf("Groups: %v, users: %v, serviceAccounts: %v, verbs: %v", [groups, users, serviceAccounts, verbs])
+        }
+
+        info(kind, name) = res {
+          kind == "Role"
+          namespace := input.review.object.metadata.namespace
+          res := data.inventory.namespace[namespace]["rbac.authorization.k8s.io/v1"]["Role"][name].rules
+        }
+
+        info(kind, name) = res {
+          kind == "ClusterRole"
+          res := data.inventory.cluster[_]["ClusterRole"][name].rules
+        }
