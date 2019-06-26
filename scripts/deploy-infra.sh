@@ -61,7 +61,7 @@ helm upgrade dex ${WORKSPACE}/charts/dex --install --namespace dex \
 
 # https://github.com/helm/charts/tree/master/stable/oauth2-proxy
 helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
-    -f ${WORKSPACE}/helm-values/oauth2-proxy-values.yaml
+    -f ${WORKSPACE}/helm-values/oauth2-proxy-values.yaml --version 0.12.3
 
 kubectl apply -f ${WORKSPACE}/manifests/dashboard.yaml
 
