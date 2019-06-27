@@ -1,15 +1,16 @@
 expose:
   type: ingress
   tls:
-    enabled: true
+    enabled: false
   ingress:
     hosts:
-      core: core.harbor.demo.compliantk8s.com
-      notary: notary.harbor.demo.compliantk8s.com
-    annotations:
-      certmanager.k8s.io/cluster-issuer: letsencrypt-staging
+      core: harbor.emil.elastisys.com
+      notary: notary.emil.elastisys.com
+      #annotations:
+      #certmanager.k8s.io/cluster-issuer: letsencrypt-staging
+    controller: gce
 persistence:
   enabled: false
   resourcePolicy: ""
     #externalURL: https://core.harbor.harbor
-externalURL: https://core.harbor.demo.compliantk8s.com
+externalURL: http://harbor.emil.elastisys.com

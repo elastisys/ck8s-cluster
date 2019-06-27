@@ -17,3 +17,18 @@ be able to pull image.
 4. `docker login`
 5. `docker tag <image> core.harbor.demo.compliantk8s.com/<REGISTRY_NAME>/<IMAGE>[:tag]`
 6. `docker push core.harbor.demo.compliantk8s.com/<REGISTRY_NAME>/<IMAGE>[:tag]`
+
+
+## Auth
+* Can authenticate with LDAP, oidc and uaa.
+* with oidc you can not add groups to projects https://github.com/goharbor/harbor/issues/8017
+* Set up example with google oauth2.
+
+parameters:
+```
+OIDC Provider Name: `google`
+OIDC Endpoint: `https://accounts.google.com`
+OIDC Client ID: see emils-lab at elastisys google account.
+OIDC Client Secret: see emils-lab
+OIDC Scope: `openid,email,profile`
+``` 
