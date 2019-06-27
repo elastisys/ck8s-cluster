@@ -61,10 +61,25 @@ helm upgrade dex ${WORKSPACE}/charts/dex --install --namespace dex \
 
 # https://github.com/helm/charts/tree/master/stable/oauth2-proxy
 helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
-    -f ${WORKSPACE}/helm-values/oauth2-proxy-values.yaml
+    -f ${WORKSPACE}/helm-values/oauth2-proxy-values.yaml --version 0.12.3
 
 kubectl apply -f ${WORKSPACE}/manifests/dashboard.yaml
 
+#
+# Harbor
+#
+
+kubectl create ns harbor --dry-run -o yaml | kubectl apply -f -
+kubectl -n harbor create rolebinding harbor-privileged-psp \
+    --clusterrole=psp:privileged --serviceaccount=harbor:default \
+    --dry-run -o yaml | kubectl apply -f -
+helm upgrade harbor ${WORKSPACE}/charts/harbor \
+  --install \
+  --namespace harbor \
+  --values ${WORKSPACE}/helm-values/harbor-values.yaml
+
+# The harbor chart modifies the ingress annotations, so we do it with this hack instead
+kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
 
 #
 # OPA

@@ -1,0 +1,13 @@
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sCheckNoHostNetwork
+metadata:
+  name: check-no-host-network-constraint
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet"]
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    message: "Host network should not be used"

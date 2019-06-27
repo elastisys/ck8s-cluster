@@ -1,0 +1,23 @@
+expose:
+  type: ingress
+  tls:
+    enabled: false
+  ingress:
+    hosts:
+      core: core.harbor.demo.compliantk8s.com
+      notary: notary.harbor.demo.compliantk8s.com
+    # The chart interferes with this annotation so we have to add it later
+    # annotations:
+    #   certmanager.k8s.io/cluster-issuer: letsencrypt-staging
+ingress:
+  tls:
+    - secretName: harbor-certs
+      hosts:
+        - core.harbor.demo.compliantk8s.com
+        - notary.harbor.demo.compliantk8s.com
+
+persistence:
+  enabled: false
+  resourcePolicy: ""
+    #externalURL: https://core.harbor.harbor
+externalURL: https://core.harbor.demo.compliantk8s.com
