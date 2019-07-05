@@ -1,0 +1,18 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    email: lennart.jern@elastisys.com
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Old syntax
+    http01: {}
+    # New syntax
+    solvers:
+    # An empty selector will 'match' all Certificate resources that
+    # reference this Issuer.
+    - selector: {}
+      http01: {}

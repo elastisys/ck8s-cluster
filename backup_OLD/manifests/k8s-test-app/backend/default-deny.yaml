@@ -1,0 +1,16 @@
+# Explicitly deny all ingress traffic that is not explictly allowed by any
+# other NetworkPolicy.
+#
+# This is just to prevent developers from shooting themselves in the foot
+# by adding a component and forgetting to also write a NetworkPolicy for
+# it. Already existing policies limit incoming traffic correctly, and
+# do not need a "default deny" policy.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
