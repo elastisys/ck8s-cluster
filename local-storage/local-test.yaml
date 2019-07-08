@@ -1,0 +1,28 @@
+# Can be deployed in kubernetes to debug networking issues.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-debug-deployment
+  labels:
+    app: ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+        - image: lindqvist/ubuntu-debug
+          command:
+            - sleep
+          args: ["99999"]
+          name: ubuntu
+          ports:
+            - containerPort: 80
