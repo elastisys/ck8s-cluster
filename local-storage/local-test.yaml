@@ -7,10 +7,6 @@ metadata:
   labels:
     app: ubuntu
 spec:
-  volumes:
-    - name: example-pv-storage
-      persistentVolumeClaim:
-        claimName: example-pvc
   replicas: 1
   selector:
     matchLabels:
@@ -20,6 +16,10 @@ spec:
       labels:
         app: ubuntu
     spec:
+      volumes:
+          - name: task-pv-storage
+            persistentVolumeClaim:
+              claimName: task-pv-claim
       securityContext:
         runAsUser: 1000
       containers:
