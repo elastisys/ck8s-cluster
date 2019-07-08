@@ -18,13 +18,13 @@ spec:
     spec:
       affinity:
         nodeAffinity:
-          required:
+          requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - example-node
+                - minikube
       volumes:
           - name: task-pv-storage
             persistentVolumeClaim:
