@@ -29,8 +29,6 @@ spec:
           - name: task-pv-storage
             persistentVolumeClaim:
               claimName: example-pvc
-      securityContext:
-        runAsUser: 1000
       containers:
         - image: lindqvist/ubuntu-debug
           command:
