@@ -29,8 +29,6 @@ spec:
           - name: task-pv-storage
             persistentVolumeClaim:
               claimName: example-pvc
-      securityContext:
-        runAsUser: 1000
       containers:
         - image: lindqvist/ubuntu-debug
           command:
@@ -39,3 +37,6 @@ spec:
           name: ubuntu
           ports:
             - containerPort: 80
+          volumeMounts:
+          - mountPath: "/home2"
+            name: task-pv-example
