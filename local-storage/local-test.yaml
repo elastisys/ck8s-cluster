@@ -1,0 +1,42 @@
+# Can be deployed in kubernetes to debug networking issues.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-debug-deployment
+  labels:
+    app: ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - minikube
+      volumes:
+          - name: task-pv-storage
+            persistentVolumeClaim:
+              claimName: example-pvc
+      containers:
+        - image: lindqvist/ubuntu-debug
+          command:
+            - sleep
+          args: ["99999"]
+          name: ubuntu
+          ports:
+            - containerPort: 80
+          volumeMounts:
+          - mountPath: "/home2"
+            name: task-pv-example
