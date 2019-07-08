@@ -18,12 +18,13 @@ spec:
     spec:
       affinity:
         nodeAffinity:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-              - example-node
+          required:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - example-node
       volumes:
           - name: task-pv-storage
             persistentVolumeClaim:
