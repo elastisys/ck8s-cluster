@@ -7,3 +7,7 @@ output "worker1-ip" {
 output "worker2-ip" {
   value = "${exoscale_compute.worker2.ip_address}"
 }
+
+output "elastic-ip" {
+  value = "${exoscale_ipaddress.e_ip.ip_address}"
+}

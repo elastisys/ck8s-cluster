@@ -1,4 +1,3 @@
-cat <<EOF > ../rke/cluster.yaml
 
 cluster_name: rancher-rke-test
 
@@ -6,13 +5,13 @@ cluster_name: rancher-rke-test
 ssh_key_path: ../.ssh/id_rsa
 
 nodes:
-  - address: $(terraform output master-ip)
+  - address: 89.145.160.216
     user: rancher
     role: [controlplane,etcd]
-  - address: $(terraform output worker1-ip)
+  - address: 89.145.163.61
     user: rancher
     role: [worker]
-  - address: $(terraform output worker2-ip)
+  - address: 89.145.160.179
     user: rancher
     role: [worker]
 
@@ -51,4 +50,3 @@ addons: |-
     name: ingress-default-cert
     namespace: ingress-nginx
   type: kubernetes.io/tls
-EOF

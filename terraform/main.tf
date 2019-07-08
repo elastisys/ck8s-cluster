@@ -117,13 +117,23 @@ resource "exoscale_security_group_rules" "worker-rules" {
 }
 
 
-resource "exoscale_ipaddress" "e_ip" {
-  zone = "de-fra-1"
-  tags = {
-    usage = "load-balancer"
-  }
-}
+# resource "exoscale_ipaddress" "e_ip" {
+#   zone = "de-fra-1"
+#   tags = {
+#     usage = "load-balancer"
+#   }
+# }
 
+resource "exoscale_ipaddress" "e_ip" {
+  zone                     = "de-fra-1"
+  healthcheck_mode         = "http"
+  healthcheck_port         = 10254
+  healthcheck_path         = "/healthz"
+  healthcheck_interval     = 10
+  healthcheck_timeout      = 2
+  healthcheck_strikes_ok   = 2
+  healthcheck_strikes_fail = 3
+}
 
 resource "exoscale_secondary_ipaddress" "e_ip_1" {
   compute_id = "${exoscale_compute.worker1.id}"
