@@ -1,0 +1,18 @@
+# Run stuff in terraform first.
+
+# Create the roles and bindings to use the default pod security policy
+
+# Generate certificate for ingress. Common name should be the elastic ip used in the ingress. 
+openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout key.pem -out cert.pem -subj "/CN=$(terraform output -state=../terraform/terraform.tfstate elastic-ip)" -days 365
+
+# Genereate the yaml file for deploying the ingress tls secret.
+kubectl -n ingress-nginx create secret tls ingress-default-cert --cert=cert.pem --key=key.pem -o yaml --dry-run=true > ingress-default-cert.yaml
+
+# Create the secret from the generated file.
+kubectl	apply -f ingress-default-cert.yaml
+
+
+
+
+
+# curl -L --cacert cert.pem  https://89.145.162.176:443/banana
