@@ -1,0 +1,87 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: default:default-psp
+  namespace: default
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - restricted-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: default:default-psp
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: default:default-psp
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ingress-nginx:default-psp
+  namespace: ingress-nginx
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - default-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ingress-nginx:default-psp
+  namespace: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ingress-nginx:default-psp
+subjects:
+- kind: ServiceAccount
+  name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kube-system:default-psp
+  namespace: kube-system
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - default-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kube-system:default-psp
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kube-system:default-psp
+subjects:
+- kind: ServiceAccount
+  name: rke-job-deployer
+  namespace: kube-system
