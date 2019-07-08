@@ -16,6 +16,15 @@ spec:
       labels:
         app: ubuntu
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - example-node
       volumes:
           - name: task-pv-storage
             persistentVolumeClaim:
