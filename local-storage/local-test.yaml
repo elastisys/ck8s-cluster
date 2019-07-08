@@ -18,17 +18,16 @@ spec:
     spec:
       affinity:
         nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                - example-node
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - example-node
       volumes:
           - name: task-pv-storage
             persistentVolumeClaim:
-              claimName: task-pv-claim
+              claimName: example-pvc
       securityContext:
         runAsUser: 1000
       containers:
