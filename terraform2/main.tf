@@ -7,48 +7,48 @@ provider "exoscale" {
 }
 
 
-resource "exoscale_compute" "master" {
-  display_name    = "master"
+resource "exoscale_compute" "storagemaster" {
+  display_name    = "storagemaster"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.tfkey2.name}"
+  key_pair        = "${exoscale_ssh_keypair.storagetfkey.name}"
   state           = "Running"
   zone            = "de-fra-1"
-  security_groups = ["${exoscale_security_group.mastersgt.name}"]
+  security_groups = ["${exoscale_security_group.storagemastersgt.name}"]
 }
 
-resource "exoscale_compute" "worker1" {
-  display_name    = "worker1"
+resource "exoscale_compute" "storageworker1" {
+  display_name    = "storageworker1"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.tfkey2.name}"
+  key_pair        = "${exoscale_ssh_keypair.storagetfkey.name}"
   state           = "Running"
   zone            = "de-fra-1"
-  security_groups = ["${exoscale_security_group.workersg2.name}"]
-  user_data       = "${file("/home/erik/a1-demo/terraform2/cloud.txt")}"
+  security_groups = ["${exoscale_security_group.storageworkersg.name}"]
+  #user_data       = "${file("/home/erik/a1-demo/terraform2/cloud.txt")}"
 }
 
-resource "exoscale_compute" "worker2" {
-  display_name    = "worker2"
+resource "exoscale_compute" "storageworker2" {
+  display_name    = "storageworker2"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.tfkey2.name}"
+  key_pair        = "${exoscale_ssh_keypair.storagetfkey.name}"
   state           = "Running"
   zone            = "de-fra-1"
-  security_groups = ["${exoscale_security_group.workersg2.name}"]
-  user_data       = "${file("cloud.txt")}"
+  security_groups = ["${exoscale_security_group.storageworkersg.name}"]
+  #user_data       = "${file("cloud.txt")}"
 }
 
-resource "exoscale_security_group" "mastersgt" {
-  name        = "mastersgt"
+resource "exoscale_security_group" "storagemastersgt" {
+  name        = "storagemastersgt"
   description = "security group for kubernetes masters"
 }
 
 resource "exoscale_security_group_rules" "master-rules" {
-  security_group_id = "${exoscale_security_group.mastersgt.id}"
+  security_group_id = "${exoscale_security_group.storagemastersgt.id}"
 
   # SSH
   ingress {
@@ -60,12 +60,12 @@ resource "exoscale_security_group_rules" "master-rules" {
   ingress {
     protocol                 = "TCP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["mastersgt", "workersg2"]
+    user_security_group_list = ["storagemastersgt", "storageworkersg"]
   }
   ingress {
     protocol                 = "UDP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["mastersgt", "workersg2"]
+    user_security_group_list = ["storagemastersgt", "storageworkersg"]
   }
 
   # Master specific ports
@@ -77,13 +77,13 @@ resource "exoscale_security_group_rules" "master-rules" {
 }
 
 
-resource "exoscale_security_group" "workersg2" {
-  name        = "workersg2"
+resource "exoscale_security_group" "storageworkersg" {
+  name        = "storageworkersg"
   description = "security group for kubernetes worker nodes"
 }
 
 resource "exoscale_security_group_rules" "worker-rules" {
-  security_group_id = "${exoscale_security_group.workersg2.id}"
+  security_group_id = "${exoscale_security_group.storageworkersg.id}"
 
   # SSH
   ingress {
@@ -107,12 +107,12 @@ resource "exoscale_security_group_rules" "worker-rules" {
   ingress {
     protocol                 = "TCP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["mastersgt", "workersg2"]
+    user_security_group_list = ["storagemastersgt", "storageworkersg"]
   }
   ingress {
     protocol                 = "UDP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["mastersgt", "workersg2"]
+    user_security_group_list = ["storagemastersgt", "storageworkersg"]
   }
 }
 
@@ -136,16 +136,16 @@ resource "exoscale_ipaddress" "e_ip" {
 }
 
 resource "exoscale_secondary_ipaddress" "e_ip_1" {
-  compute_id = "${exoscale_compute.worker1.id}"
+  compute_id = "${exoscale_compute.storageworker1.id}"
   ip_address = "${exoscale_ipaddress.e_ip.ip_address}"
 }
 
 resource "exoscale_secondary_ipaddress" "e_ip_2" {
-  compute_id = "${exoscale_compute.worker2.id}"
+  compute_id = "${exoscale_compute.storageworker2.id}"
   ip_address = "${exoscale_ipaddress.e_ip.ip_address}"
 }
 
-resource "exoscale_ssh_keypair" "tfkey2" {
-  name       = "tfkey2"
+resource "exoscale_ssh_keypair" "storagetfkey" {
+  name       = "storagetfkey"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXVVRRglwnNbnhqsFcMCnQUVO172AiU0WNSwN7RVzjHtS4LxWaq2hmz2af/wE1+ysxHuyWJmV7RkOP1PtLC1vjDI0ly0xjqW9oZovqezF7M/p++ofD8iMTHs66FINgjP85i0G8Twu9pc1akdGSAJ314isAAzO3ojcSf2G4DGGTTUaZG2tgoZYx4x4mEXRznBu3dYeA3/sbAtrPmWaXryq0wt9lg1Y5cp7k1H9n6q76t8UXgGJ/T/EOU8AAPZElPhBzcFXWwvtQn5qcUh/G8sGgbKtKAJ13e2FFR3tMZb1qKl9JCpu/UNuKp/vO5K87tXbwUPFw/qrRygzHBHX9Uc3j erik@erik-XPS-13-9380"
 }

@@ -3,16 +3,16 @@ cat <<EOF > ../rke/cluster.yaml
 cluster_name: rancher-rke-test
 
 # Maybe change this path later.
-ssh_key_path: ../.ssh/id_rsa
+ssh_key_path: /home/erik/.ssh/id_rsa
 
 nodes:
-  - address: $(terraform output master-ip)
+  - address: $(terraform output storagemaster-ip)
     user: rancher
     role: [controlplane,etcd]
-  - address: $(terraform output worker1-ip)
+  - address: $(terraform output storageworker1-ip)
     user: rancher
     role: [worker]
-  - address: $(terraform output worker2-ip)
+  - address: $(terraform output storageworker2-ip)
     user: rancher
     role: [worker]
 
