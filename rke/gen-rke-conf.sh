@@ -2,8 +2,8 @@ cat <<EOF > cluster.yaml
 
 cluster_name: rancher-rke-test
 
-# Maybe change this path later. EDIT
-ssh_key_path: ../terraform/.ssh/
+# Change this path later
+ssh_key_path: ../.ssh/id_rsa
 
 nodes:
   - address: $(terraform output -state=../terraform/terraform.tfstate master-ip)

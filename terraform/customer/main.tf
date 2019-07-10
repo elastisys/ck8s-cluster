@@ -117,13 +117,6 @@ resource "exoscale_security_group_rules" "worker-rules" {
 }
 
 
-# resource "exoscale_ipaddress" "e_ip" {
-#   zone = "de-fra-1"
-#   tags = {
-#     usage = "load-balancer"
-#   }
-# }
-
 resource "exoscale_ipaddress" "e_ip" {
   zone                     = "de-fra-1"
   healthcheck_mode         = "http"
