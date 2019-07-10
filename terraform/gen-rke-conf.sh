@@ -1,18 +1,18 @@
-cat <<EOF > ../rke/cluster.yaml
+cat <<EOF > cluster.yaml
 
 cluster_name: rancher-rke-test
 
-# Maybe change this path later.
-ssh_key_path: ../.ssh/id_rsa
+# Maybe change this path later. EDIT
+ssh_key_path: ../terraform/.ssh/
 
 nodes:
-  - address: $(terraform output master-ip)
+  - address: $(terraform output -state=../terraform/terraform.tfstate master-ip)
     user: rancher
     role: [controlplane,etcd]
-  - address: $(terraform output worker1-ip)
+  - address: $(terraform output -state=../terraform/terraform.tfstate worker1-ip)
     user: rancher
     role: [worker]
-  - address: $(terraform output worker2-ip)
+  - address: $(terraform output -state=../terraform/terraform.tfstate worker2-ip)
     user: rancher
     role: [worker]
 
@@ -33,4 +33,10 @@ services:
     snapshot: true
     creation: 6h
     retention: 24h
+
+ingress: 
+  provider: "nginx"
+  extra_args:
+    default-ssl-certificate: "ingress-nginx/ingress-default-cert"
+
 EOF

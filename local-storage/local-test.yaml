@@ -24,9 +24,9 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - minikube
+                - 89.145.163.4
       volumes:
-          - name: task-pv-storage
+          - name: task-pv-example
             persistentVolumeClaim:
               claimName: example-pvc
       containers:

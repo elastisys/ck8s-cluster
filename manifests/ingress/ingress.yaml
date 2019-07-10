@@ -1,0 +1,47 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: banana-app
+  labels:
+    app: banana
+spec:
+  containers:
+    - name: banana-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=banana"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: banana-service
+spec:
+  selector:
+    app: banana
+  ports:
+    - port: 5678 # Default port for image
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - secretName: ingress-default-cert
+  rules:
+  - http:
+      paths:
+        - path: /hostnames
+          backend:
+            serviceName: hostnames
+            servicePort: 80
+        - path: /banana
+          backend:
+            serviceName: banana-service
+            servicePort: 5678

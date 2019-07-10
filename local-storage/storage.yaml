@@ -12,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   storageClassName: local-storage
   local:
-    path: /mnt/disks/vol1
+    path: /home
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -20,4 +20,4 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - minikube
+          - 89.145.163.4

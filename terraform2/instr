@@ -1,0 +1,21 @@
+# Set TF_VAR_exoscale_api_key och TF_VAR_exoscale_secret_key.
+
+# In terraform folder
+terraform apply
+./gen-rke-conf.sh 
+
+# Need to have installed and configured the rke binary, see https://rancher.com/docs/rke/latest/en/installation/
+
+# In rke folder
+rke up --config ./cluster.yaml
+
+# A kubeconfig file will be created.
+# rke will need to have access to the kubeconfig during the setup and for consequent rke commands.
+
+
+
+---
+Ingress
+---
+# Mayhaps..
+ip addr add <elastic-ip> dev lo
