@@ -3,3 +3,7 @@ virtenv
 kubeconfig
 certs
 .env
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/cluster.yaml
+**/cluster.rkestate
