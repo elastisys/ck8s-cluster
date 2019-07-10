@@ -1,13 +1,13 @@
-output "master-ip" {
-  value = "${exoscale_compute.master.ip_address}"
+output "ss-master-ip" {
+  value = "${exoscale_compute.ss-master.ip_address}"
 }
-output "worker1-ip" {
-  value = "${exoscale_compute.worker1.ip_address}"
+output "ss-worker1-ip" {
+  value = "${exoscale_compute.ss-worker1.ip_address}"
 }
-output "worker2-ip" {
-  value = "${exoscale_compute.worker2.ip_address}"
+output "ss-worker2-ip" {
+  value = "${exoscale_compute.ss-worker2.ip_address}"
 }
 
-output "elastic-ip" {
-  value = "${exoscale_ipaddress.e_ip.ip_address}"
+output "ss-elastic-ip" {
+  value = "${exoscale_ipaddress.ss-e-ip.ip_address}"
 }

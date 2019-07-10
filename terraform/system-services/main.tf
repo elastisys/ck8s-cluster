@@ -1,3 +1,14 @@
+terraform {
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "elastisys"
+
+    workspaces {
+      name = "a1-demo-system-services"
+    }
+  }
+}
+
 provider "exoscale" {
   version = "~> 0.11"
   key     = "${var.exoscale_api_key}"
@@ -7,48 +18,48 @@ provider "exoscale" {
 }
 
 
-resource "exoscale_compute" "master" {
-  display_name    = "master"
+resource "exoscale_compute" "ss-master" {
+  display_name    = "ss-master"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.tf-key2.name}"
+  key_pair        = "${exoscale_ssh_keypair.ss-tf-key.name}"
   state           = "Running"
   zone            = "de-fra-1"
-  security_groups = ["${exoscale_security_group.master-sg2.name}"]
+  security_groups = ["${exoscale_security_group.ss-master-sg.name}"]
 }
 
-resource "exoscale_compute" "worker1" {
-  display_name    = "worker1"
+resource "exoscale_compute" "ss-worker1" {
+  display_name    = "ss-worker1"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.tf-key2.name}"
+  key_pair        = "${exoscale_ssh_keypair.ss-tf-key.name}"
   state           = "Running"
   zone            = "de-fra-1"
-  security_groups = ["${exoscale_security_group.worker-sg2.name}"]
+  security_groups = ["${exoscale_security_group.ss-worker-sg.name}"]
 }
 
-resource "exoscale_compute" "worker2" {
-  display_name    = "worker2"
+resource "exoscale_compute" "ss-worker2" {
+  display_name    = "ss-worker2"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.tf-key2.name}"
+  key_pair        = "${exoscale_ssh_keypair.ss-tf-key.name}"
   state           = "Running"
   zone            = "de-fra-1"
-  security_groups = ["${exoscale_security_group.worker-sg2.name}"]
+  security_groups = ["${exoscale_security_group.ss-worker-sg.name}"]
 }
 
 
 
-resource "exoscale_security_group" "master-sg2" {
-  name        = "master-sg2"
+resource "exoscale_security_group" "ss-master-sg" {
+  name        = "ss-master-sg"
   description = "security group for kubernetes masters"
 }
 
-resource "exoscale_security_group_rules" "master-rules" {
-  security_group_id = "${exoscale_security_group.master-sg2.id}"
+resource "exoscale_security_group_rules" "ss-master-rules" {
+  security_group_id = "${exoscale_security_group.ss-master-sg.id}"
 
   # SSH
   ingress {
@@ -60,12 +71,12 @@ resource "exoscale_security_group_rules" "master-rules" {
   ingress {
     protocol                 = "TCP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["master-sg2", "worker-sg2"]
+    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
   }
   ingress {
     protocol                 = "UDP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["master-sg2", "worker-sg2"]
+    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
   }
 
   # Master specific ports
@@ -77,13 +88,13 @@ resource "exoscale_security_group_rules" "master-rules" {
 }
 
 
-resource "exoscale_security_group" "worker-sg2" {
-  name        = "worker-sg2"
+resource "exoscale_security_group" "ss-worker-sg" {
+  name        = "ss-worker-sg"
   description = "security group for kubernetes worker nodes"
 }
 
-resource "exoscale_security_group_rules" "worker-rules" {
-  security_group_id = "${exoscale_security_group.worker-sg2.id}"
+resource "exoscale_security_group_rules" "ss-worker-rules" {
+  security_group_id = "${exoscale_security_group.ss-worker-sg.id}"
 
   # SSH
   ingress {
@@ -107,17 +118,17 @@ resource "exoscale_security_group_rules" "worker-rules" {
   ingress {
     protocol                 = "TCP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["master-sg2", "worker-sg2"]
+    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
   }
   ingress {
     protocol                 = "UDP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["master-sg2", "worker-sg2"]
+    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
   }
 }
 
 
-resource "exoscale_ipaddress" "e_ip" {
+resource "exoscale_ipaddress" "ss-e-ip" {
   zone                     = "de-fra-1"
   healthcheck_mode         = "http"
   healthcheck_port         = 10254
@@ -128,17 +139,17 @@ resource "exoscale_ipaddress" "e_ip" {
   healthcheck_strikes_fail = 3
 }
 
-resource "exoscale_secondary_ipaddress" "e_ip_1" {
-  compute_id = "${exoscale_compute.worker1.id}"
-  ip_address = "${exoscale_ipaddress.e_ip.ip_address}"
+resource "exoscale_secondary_ipaddress" "ss-e-ip-1" {
+  compute_id = "${exoscale_compute.ss-worker1.id}"
+  ip_address = "${exoscale_ipaddress.ss-e-ip.ip_address}"
 }
 
-resource "exoscale_secondary_ipaddress" "e_ip_2" {
-  compute_id = "${exoscale_compute.worker2.id}"
-  ip_address = "${exoscale_ipaddress.e_ip.ip_address}"
+resource "exoscale_secondary_ipaddress" "ss-e-ip-2" {
+  compute_id = "${exoscale_compute.ss-worker2.id}"
+  ip_address = "${exoscale_ipaddress.ss-e-ip.ip_address}"
 }
 
-resource "exoscale_ssh_keypair" "tf-key2" {
-  name       = "tf-key2"
+resource "exoscale_ssh_keypair" "ss-tf-key" {
+  name       = "ss-tf-key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDWB9CPyyrL2AS/WpMw+4MQ6IUT7dOyC/48Rv1xhNAcUYUetBa7IuSv3E6sF4qaVOYfyWu6zZstj+JwOlJd0l7vIg4Eu/wjc1A8IdEfBDQwRCTXDub5yRUtlSGWlygy0lhSJXOnWhMspSVefJ6VxSCK6Lvwg0wtwZrC8Zm1tBnHOC+tGBQ9ibiPySMaIzGkUttA0Tc71HfwuYVDdmRhjlUJ5UJdJrvdGk3ApLCR6/4xiQKL1ht9fv0sAB7V3o3tWvGOWjQQwFyF41E3FV0X5f03pOx3nRVb4MNJ5/sZaXsMUKLlalHfPoVDoakRVIqf4myz4TnvXeBE7uv+oB+CmzzN"
 }
