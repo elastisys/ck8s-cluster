@@ -85,3 +85,103 @@ subjects:
 - kind: ServiceAccount
   name: rke-job-deployer
   namespace: kube-system
+- kind: ServiceAccount
+  name: fluentd
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cert-manager:default-psp
+  namespace: cert-manager
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - default-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cert-manager:default-psp
+  namespace: cert-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cert-manager:default-psp
+subjects:
+- kind: ServiceAccount
+  name: cert-manager
+  namespace: cert-manager
+- kind: ServiceAccount
+  name: cert-manager-cainjector
+  namespace: cert-manager
+- kind: ServiceAccount
+  name: cert-manager-webhook
+  namespace: cert-manager
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: elastic-system:default-psp
+  namespace: elastic-system
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - default-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: elastic-system:default-psp
+  namespace: elastic-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: elastic-system:default-psp
+subjects:
+- kind: ServiceAccount
+  name: elastic-operator
+  namespace: elastic-system
+- kind: ServiceAccount
+  name: default
+  namespace: elastic-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: harbor:default-psp
+  namespace: harbor
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - default-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: harbor:default-psp
+  namespace: harbor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: harbor:default-psp
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: harbor
+  
