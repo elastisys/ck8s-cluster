@@ -27,7 +27,6 @@ resource "exoscale_compute" "storageworker1" {
   state           = "Running"
   zone            = "de-fra-1"
   security_groups = ["${exoscale_security_group.storageworkersg.name}"]
-  #user_data       = "${file("/home/erik/a1-demo/terraform2/cloud.txt")}"
 }
 
 resource "exoscale_compute" "storageworker2" {
@@ -39,7 +38,6 @@ resource "exoscale_compute" "storageworker2" {
   state           = "Running"
   zone            = "de-fra-1"
   security_groups = ["${exoscale_security_group.storageworkersg.name}"]
-  #user_data       = "${file("cloud.txt")}"
 }
 
 resource "exoscale_security_group" "storagemastersgt" {

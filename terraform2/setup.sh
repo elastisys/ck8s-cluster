@@ -1,0 +1,2 @@
+export TF_VAR_exoscale_api_key=
+export TF_VAR_exoscale_secret_key=$

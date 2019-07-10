@@ -5,13 +5,13 @@ cluster_name: rancher-rke-test
 ssh_key_path: /home/erik/.ssh/id_rsa
 
 nodes:
-  - address: 89.145.162.112
+  - address: 89.145.162.35
     user: rancher
     role: [controlplane,etcd]
-  - address: 89.145.160.132
+  - address: 89.145.163.4
     user: rancher
     role: [worker]
-  - address: 89.145.161.71
+  - address: 89.145.161.165
     user: rancher
     role: [worker]
 
