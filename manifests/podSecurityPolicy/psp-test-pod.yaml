@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hostname-pod
+  labels:
+    app: hostnames
+spec:
+  containers:
+  - name: hostnames
+    image: k8s.gcr.io/serve_hostname
+    ports:
+    - containerPort: 9376
+      protocol: TCP
+    securityContext:
+      runAsUser: 0
