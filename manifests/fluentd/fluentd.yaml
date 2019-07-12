@@ -1,91 +1,45 @@
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: fluentd
-  namespace: kube-system
-
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: fluentd
-  namespace: kube-system
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: fluentd
-roleRef:
-  kind: ClusterRole
-  name: fluentd
-  apiGroup: rbac.authorization.k8s.io
-subjects:
-- kind: ServiceAccount
-  name: fluentd
-  namespace: kube-system
----
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: fluentd
-  namespace: kube-system
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"extensions/v1beta1","kind":"DaemonSet","metadata":{"annotations":{},"labels":{"k8s-app":"fluentd-logging","kubernetes.io/cluster-service":"true","version":"v1"},"name":"fluentd","namespace":"kube-system"},"spec":{"template":{"metadata":{"labels":{"k8s-app":"fluentd-logging","kubernetes.io/cluster-service":"true","version":"v1"}},"spec":{"containers":[{"env":[{"name":"FLUENT_UID","value":"0"},{"name":"FLUENT_ELASTICSEARCH_HOST","value":"elastic.test.super.com"},{"name":"FLUENT_ELASTICSEARCH_PORT","value":"443"},{"name":"FLUENT_ELASTICSEARCH_SCHEME","value":"https"},{"name":"FLUENT_ELASTICSEARCH_USER","value":"elastic"},{"name":"FLUENT_ELASTICSEARCH_PASSWORD","value":"gp2jbhkt82vdzznh2bchnsmf"},{"name":"FLUENT_ELASTICSEARCH_SSL_VERIFY","value":"false"},{"name":"FLUENT_ELASTICSEARCH_SSL_VERSION","value":"TLSv1_2"}],"image":"fluent/fluentd-kubernetes-daemonset:v1.4.2-debian-elasticsearch-1.0","name":"fluentd","resources":{"limits":{"memory":"200Mi"},"requests":{"cpu":"100m","memory":"200Mi"}},"volumeMounts":[{"mountPath":"/var/log","name":"varlog"},{"mountPath":"/var/log/journal","name":"varlogjournal"},{"mountPath":"/var/lib/docker/containers","name":"varlibdockercontainers","readOnly":true}]}],"hostAliases":[{"hostnames":["elastic.test.super.com"],"ip":"89.145.162.70"}],"serviceAccount":"fluentd","serviceAccountName":"fluentd","terminationGracePeriodSeconds":30,"tolerations":[{"effect":"NoSchedule","key":"node-role.kubernetes.io/master"}],"volumes":[{"hostPath":{"path":"/var/log"},"name":"varlog"},{"hostPath":{"path":"/var/log/journal"},"name":"varlogjournal"},{"hostPath":{"path":"/var/lib/docker/containers"},"name":"varlibdockercontainers"}]}}}}
+  creationTimestamp: null
   labels:
     k8s-app: fluentd-logging
-    version: v1
     kubernetes.io/cluster-service: "true"
+    version: v1
+  name: fluentd
+  namespace: kube-system
 spec:
   template:
     metadata:
+      creationTimestamp: null
       labels:
         k8s-app: fluentd-logging
-        version: v1
         kubernetes.io/cluster-service: "true"
+        version: v1
     spec:
-      hostAliases:
-      - ip: "89.145.162.70"
-        hostnames:
-        - "elastic.test.super.com"
-      serviceAccount: fluentd
-      serviceAccountName: fluentd
-      tolerations:
-      - key: node-role.kubernetes.io/master
-        effect: NoSchedule
       containers:
-      - name: fluentd
+      - env:
+        - name: FLUENT_UID
+          value: "0"
+        - name: FLUENT_ELASTICSEARCH_HOST
+          value: elastic.test.super.com
+        - name: FLUENT_ELASTICSEARCH_PORT
+          value: "443"
+        - name: FLUENT_ELASTICSEARCH_SCHEME
+          value: https
+        - name: FLUENT_ELASTICSEARCH_USER
+          value: elastic
+        - name: FLUENT_ELASTICSEARCH_PASSWORD
+          value: 6k2bsh8zpt7kbtwbh62vbczh
+        - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
+          value: "false"
+        - name: FLUENT_ELASTICSEARCH_SSL_VERSION
+          value: TLSv1_2
         image: fluent/fluentd-kubernetes-daemonset:v1.4.2-debian-elasticsearch-1.0
-        env:
-          - name: FLUENT_UID
-            value: "0"
-          - name:  FLUENT_ELASTICSEARCH_HOST
-            value: "elastic.test.super.com"
-          - name:  FLUENT_ELASTICSEARCH_PORT
-            value: "443"
-          - name: FLUENT_ELASTICSEARCH_SCHEME
-            value: "https"
-          # X-Pack Authentication
-          # =====================
-          - name: FLUENT_ELASTICSEARCH_USER
-            value: "elastic"
-          - name: FLUENT_ELASTICSEARCH_PASSWORD
-            value: "gp2jbhkt82vdzznh2bchnsmf"
-          # Option to configure elasticsearch plugin with self signed certs
-          # ================================================================
-          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
-            value: "false"
-          - name: FLUENT_ELASTICSEARCH_SSL_VERSION
-            value: "TLSv1_2"
+        name: fluentd
         resources:
           limits:
             memory: 200Mi
@@ -93,21 +47,36 @@ spec:
             cpu: 100m
             memory: 200Mi
         volumeMounts:
-        - name: varlog
-          mountPath: /var/log
-        - name: varlogjournal
-          mountPath: /var/log/journal
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
+        - mountPath: /var/log
+          name: varlog
+        - mountPath: /var/log/journal
+          name: varlogjournal
+        - mountPath: /var/lib/docker/containers
+          name: varlibdockercontainers
           readOnly: true
+      hostAliases:
+      - hostnames:
+        - elastic.test.super.com
+        ip: 89.145.162.70
+      serviceAccount: fluentd
+      serviceAccountName: fluentd
       terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
       volumes:
-      - name: varlog
-        hostPath:
+      - hostPath:
           path: /var/log
-      - name: varlogjournal
-        hostPath:
+        name: varlog
+      - hostPath:
           path: /var/log/journal
-      - name: varlibdockercontainers
-        hostPath:
+        name: varlogjournal
+      - hostPath:
           path: /var/lib/docker/containers
+        name: varlibdockercontainers
+  updateStrategy: {}
+status:
+  currentNumberScheduled: 0
+  desiredNumberScheduled: 0
+  numberMisscheduled: 0
+  numberReady: 0

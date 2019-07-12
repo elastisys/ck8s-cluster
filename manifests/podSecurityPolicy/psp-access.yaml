@@ -161,6 +161,9 @@ subjects:
 - kind: ServiceAccount
   name: elasticsearch-data
   namespace: elastic-system
+- kind: ServiceAccount
+  name: elastic-operator
+  namespace: elastic-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role

@@ -1,6 +1,10 @@
 #!/bin/bash
 
 # terraform apply
+
+# Can be done better! Just making sure that this is a clean install.
+rm kube_config_cluster-ss.yaml cluster-ss.rkestate
+
 ./gen-rke-conf-ss.sh
 
 rke up --config cluster-ss.yaml
@@ -39,12 +43,11 @@ kubectl	apply -f ingress-default-cert.yaml
 
 # HELM, TILLER
 
-mkdir -p ../certs/system-services/kube-system/certs
+mkdir -p ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs
 
-../scripts/initialize-cluster.sh ../certs/system-services "admin1"
+${SCRIPTS_PATH}/../scripts/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "admin1"
 
-source ../scripts/helm-env.sh kube-system ../certs/system-services/kube-system/certs admin1
-
+source ${SCRIPTS_PATH}/../scripts/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs admin1
 
 
 # CERT-MANAGER
@@ -57,7 +60,7 @@ kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
-# FIX
+# FIX/do better at a later point in time...
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
 
 
@@ -68,3 +71,20 @@ helm repo update
 
 helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
+
+
+# Elasticsearch and kibana.
+
+
+kubectl create ns elastic-system
+
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml 
+
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
+sleep 5
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch.yaml
+sleep 5
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
+
+# Ingresses
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml
