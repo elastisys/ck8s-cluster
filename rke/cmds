@@ -11,3 +11,7 @@ kubectl -n ingress-nginx create secret tls ingress-default-cert --cert=cert.pem 
 
 Create the secret from the generated file.
 kubectl	apply -f ingress-default-cert.yaml
+
+For helm
+source ./helm-env.sh kube-system staging-certs/kube-system/certs admin1
+

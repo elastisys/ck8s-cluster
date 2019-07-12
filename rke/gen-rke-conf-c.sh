@@ -1,18 +1,31 @@
-cat <<EOF > cluster.yaml
+#!/bin/bash
 
-cluster_name: rancher-rke-test
+SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+cd ${SCRIPTS_PATH}/../terraform/customer/
+
+w1_ip=$(terraform output c-worker1-ip)
+w2_ip=$(terraform output c-worker2-ip)
+m_ip=$(terraform output c-master-ip)
+
+cd ${SCRIPTS_PATH}
+
+
+
+cat <<EOF > cluster-c.yaml
+
+cluster_name: rke-customer
 
 # Change this path later
 ssh_key_path: ../.ssh/id_rsa
 
 nodes:
-  - address: $(terraform output -state=../terraform/terraform.tfstate master-ip)
+  - address: $m_ip
     user: rancher
     role: [controlplane,etcd]
-  - address: $(terraform output -state=../terraform/terraform.tfstate worker1-ip)
+  - address: $w1_ip
     user: rancher
     role: [worker]
-  - address: $(terraform output -state=../terraform/terraform.tfstate worker2-ip)
+  - address: $w2_ip
     user: rancher
     role: [worker]
 
@@ -38,5 +51,6 @@ ingress:
   provider: "nginx"
   extra_args:
     default-ssl-certificate: "ingress-nginx/ingress-default-cert"
+    enable-ssl-passthrough: ""
 
 EOF

@@ -1,47 +1,66 @@
-kind: Pod
-apiVersion: v1
-metadata:
-  name: banana-app
-  labels:
-    app: banana
-spec:
-  containers:
-    - name: banana-app
-      image: hashicorp/http-echo
-      args:
-        - "-text=banana"
+# kind: Pod
+# apiVersion: v1
+# metadata:
+#   name: banana-app
+#   labels:
+#     app: banana
+# spec:
+#   containers:
+#     - name: banana-app
+#       image: hashicorp/http-echo
+#       args:
+#         - "-text=banana"
 
----
+# ---
 
-kind: Service
-apiVersion: v1
-metadata:
-  name: banana-service
-spec:
-  selector:
-    app: banana
-  ports:
-    - port: 5678 # Default port for image
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: banana-service
+# spec:
+#   selector:
+#     app: banana
+#   ports:
+#     - port: 5678 # Default port for image
 
----
+# ---
 
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: example-ingress
+  namespace: elastic-system
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+  - secretName: ingress-default-cert
+  rules:
+  - host: elastic.test.super.com
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: quickstart-es
+            servicePort: 9200
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: example-ingress-kib
+  namespace: elastic-system
   annotations:
     ingress.kubernetes.io/rewrite-target: /
 spec:
   tls:
   - secretName: ingress-default-cert
   rules:
-  - http:
+  - host: kibana.test.com
+    http:
       paths:
-        - path: /hostnames
+        - path: /
           backend:
-            serviceName: hostnames
-            servicePort: 80
-        - path: /banana
-          backend:
-            serviceName: banana-service
-            servicePort: 5678
+            serviceName: quickstart-kibana
+            servicePort: 5601
