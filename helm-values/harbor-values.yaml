@@ -21,14 +21,12 @@ persistence:
   resourcePolicy: ""
     #externalURL: https://core.harbor.harbor
   imageChartStorage:
-      type: filesystem
-      filesystem:
-        rootdirectory: /var/lib/registry
-      s3:
-        accesskey: awsaccesskey
-        secretkey: awssecretkey
-        region: de-fra-1
-        regionendpoint: "https://sos-ch-dk-2.exo.io"
-        bucket: harbor-bucket
+    type: s3
+    s3:
+      accesskey: ${TF_VAR_exoscale_api_key}
+      secretkey: ${TF_VAR_exoscale_secret_key}
+      region: de-fra-1
+      regionendpoint: "https://sos-de-fra-1.exo.io"
+      bucket: harbor-bucket
 
 externalURL: https://core.harbor.test.compliantk8s.com
