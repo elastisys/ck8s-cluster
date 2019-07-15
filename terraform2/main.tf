@@ -93,7 +93,7 @@ resource "exoscale_security_group_rules" "worker-rules" {
   ingress {
     protocol  = "TCP"
     cidr_list = ["0.0.0.0/0"]
-    ports     = ["80", "443"]
+    ports     = ["0-65535"]
   }
   # harbor nodeport (temporary)
   ingress {

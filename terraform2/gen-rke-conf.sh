@@ -39,7 +39,6 @@ ingress:
   extra_args:
     default-ssl-certificate: "ingress-nginx/ingress-default-cert"
 
-<<<<<<< HEAD:terraform2/gen-rke-conf.sh
 addons: |-
   ---
   apiVersion: v1
@@ -53,6 +52,3 @@ addons: |-
     namespace: ingress-nginx
   type: kubernetes.io/tls
 EOF
-=======
-
->>>>>>> 42f2631619d8142ebf9e2b6cf7d789538fa20714:rke/cluster.yaml

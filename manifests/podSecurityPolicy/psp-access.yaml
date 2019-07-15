@@ -28,6 +28,7 @@ roleRef:
   name: default:default-psp
   apiGroup: rbac.authorization.k8s.io
 ---
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -55,6 +56,9 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
+- kind: ServiceAccount
+  name: default
   namespace: ingress-nginx
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -87,6 +91,9 @@ subjects:
   namespace: kube-system
 - kind: ServiceAccount
   name: fluentd
+  namespace: kube-system
+- kind: ServiceAccount
+  name: tiller
   namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
