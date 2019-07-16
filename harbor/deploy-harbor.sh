@@ -110,7 +110,9 @@ kubectl -n harbor create rolebinding harbor-privileged-psp \
 helm upgrade harbor ${WORKSPACE}/charts/harbor \
   --install \
   --namespace harbor \
-  --values ${WORKSPACE}/helm-values/harbor-values.yaml
+  --values ${WORKSPACE}/helm-values/harbor-values.yaml \
+  --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
+  --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key
 
 kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
 

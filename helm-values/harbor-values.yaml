@@ -17,14 +17,43 @@ ingress:
         - notary.harbor.test.compliantk8s.com
 
 persistence:
-  enabled: false
-  resourcePolicy: ""
+  enabled: true
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+    chartmuseum:
+      existingClaim: "example-pvc"
+      accessModes: ReadWriteOnce
+      storageClass: "local-storage"
+      subPath: "chartmuseum"
+      size: 5Gi
+    registry:
+      existingClaim: "example-pvc"
+      accessModes: ReadWriteOnce
+      storageClass: "local-storage"
+      subPath: "registry"
+      size: 5Gi
+    jobservice:
+      existingClaim: "example-pvc"
+      accessModes: ReadWriteOnce
+      storageClass: "local-storage"
+      subPath: "jobservice"
+      size: 1Gi
+    database:
+      existingClaim: "example-pvc"
+      accessModes: ReadWriteOnce
+      storageClass: "local-storage"
+      subPath: "database"
+      size: 1Gi
+    redis: 
+      existingClaim: "example-pvc"
+      accessModes: ReadWriteOnce
+      storageClass: "local-storage"
+      subPath: "redis"
+      size: 1Gi
     #externalURL: https://core.harbor.harbor
   imageChartStorage:
     type: s3
     s3:
-      accesskey: ${TF_VAR_exoscale_api_key}
-      secretkey: ${TF_VAR_exoscale_secret_key}
       region: de-fra-1
       regionendpoint: "https://sos-de-fra-1.exo.io"
       bucket: harbor-bucket
