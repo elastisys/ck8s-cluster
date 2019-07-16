@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: example-pvc
+  name: harbor-pvc
   namespace: harbor
 spec:
   storageClassName: local-storage
@@ -10,68 +10,3 @@ spec:
   resources:
     requests:
       storage: 20Gi
----
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#   name: chartmuseum-pvc
-#   namespace: harbor
-# spec:
-#   storageClassName: local-storage
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 3Gi
-# ---
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#   name: registry-pvc
-#   namespace: harbor
-# spec:
-#   storageClassName: local-storage
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 3Gi
-# ---
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#   name: jobservice-pvc
-#   namespace: harbor
-# spec:
-#   storageClassName: local-storage
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 3Gi
-# ---
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#   name: database-pvc
-#   namespace: harbor
-# spec:
-#   storageClassName: local-storage
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 3Gi
-# ---
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#   name: redis-pvc
-#   namespace: harbor
-# spec:
-#   storageClassName: local-storage
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 3Gi

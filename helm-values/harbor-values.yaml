@@ -21,31 +21,31 @@ persistence:
   resourcePolicy: "keep"
   persistentVolumeClaim:
     chartmuseum:
-      existingClaim: "example-pvc"
+      existingClaim: "harbor-pvc"
       accessModes: ReadWriteOnce
       storageClass: "local-storage"
       subPath: "chartmuseum"
       size: 5Gi
     registry:
-      existingClaim: "example-pvc"
+      existingClaim: "harbor-pvc"
       accessModes: ReadWriteOnce
       storageClass: "local-storage"
       subPath: "registry"
       size: 5Gi
     jobservice:
-      existingClaim: "example-pvc"
+      existingClaim: "harbor-pvc"
       accessModes: ReadWriteOnce
       storageClass: "local-storage"
       subPath: "jobservice"
       size: 1Gi
     database:
-      existingClaim: "example-pvc"
+      existingClaim: "harbor-pvc"
       accessModes: ReadWriteOnce
       storageClass: "local-storage"
       subPath: "database"
       size: 1Gi
     redis: 
-      existingClaim: "example-pvc"
+      existingClaim: "harbor-pvc"
       accessModes: ReadWriteOnce
       storageClass: "local-storage"
       subPath: "redis"
