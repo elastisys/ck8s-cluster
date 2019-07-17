@@ -1,6 +1,6 @@
 terraform {
   backend "remote" {
-    hostname = "app.terraform.io"
+    hostname     = "app.terraform.io"
     organization = "elastisys"
 
     workspaces {
@@ -73,16 +73,16 @@ resource "exoscale_security_group_rules" "ss-master-rules" {
   }
   # Allow all internal communication
   ingress {
-    protocol                 = "TCP"
-    ports                    = ["0-65535"]
+    protocol = "TCP"
+    ports    = ["0-65535"]
     user_security_group_list = [
       "${local.master_security_group_name}",
       "${local.worker_security_group_name}",
     ]
   }
   ingress {
-    protocol                 = "UDP"
-    ports                    = ["0-65535"]
+    protocol = "UDP"
+    ports    = ["0-65535"]
     user_security_group_list = [
       "${local.master_security_group_name}",
       "${local.worker_security_group_name}",
@@ -126,16 +126,16 @@ resource "exoscale_security_group_rules" "ss-worker-rules" {
   }
   # Allow all internal communication
   ingress {
-    protocol                 = "TCP"
-    ports                    = ["0-65535"]
+    protocol = "TCP"
+    ports    = ["0-65535"]
     user_security_group_list = [
       "${local.master_security_group_name}",
       "${local.worker_security_group_name}",
     ]
   }
   ingress {
-    protocol                 = "UDP"
-    ports                    = ["0-65535"]
+    protocol = "UDP"
+    ports    = ["0-65535"]
     user_security_group_list = [
       "${local.master_security_group_name}",
       "${local.worker_security_group_name}",
