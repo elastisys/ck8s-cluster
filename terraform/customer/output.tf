@@ -1,13 +1,15 @@
 output "c-master-ip" {
-  value = "${exoscale_compute.c-master.ip_address}"
+  value = "${module.kubernetes_cluster.master_ip_address}"
 }
+
 output "c-worker1-ip" {
-  value = "${exoscale_compute.c-worker1.ip_address}"
+  value = "${module.kubernetes_cluster.worker1_ip_address}"
 }
+
 output "c-worker2-ip" {
-  value = "${exoscale_compute.c-worker2.ip_address}"
+  value = "${module.kubernetes_cluster.worker2_ip_address}"
 }
 
 output "c-elastic-ip" {
-  value = "${exoscale_ipaddress.c-e-ip.ip_address}"
+  value = "${module.kubernetes_cluster.elastic_ip_address}"
 }
