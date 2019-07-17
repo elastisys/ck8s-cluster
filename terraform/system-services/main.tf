@@ -151,5 +151,5 @@ resource "exoscale_secondary_ipaddress" "ss-e-ip-2" {
 
 resource "exoscale_ssh_keypair" "ss-tf-key" {
   name       = "ss-tf-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDWB9CPyyrL2AS/WpMw+4MQ6IUT7dOyC/48Rv1xhNAcUYUetBa7IuSv3E6sF4qaVOYfyWu6zZstj+JwOlJd0l7vIg4Eu/wjc1A8IdEfBDQwRCTXDub5yRUtlSGWlygy0lhSJXOnWhMspSVefJ6VxSCK6Lvwg0wtwZrC8Zm1tBnHOC+tGBQ9ibiPySMaIzGkUttA0Tc71HfwuYVDdmRhjlUJ5UJdJrvdGk3ApLCR6/4xiQKL1ht9fv0sAB7V3o3tWvGOWjQQwFyF41E3FV0X5f03pOx3nRVb4MNJ5/sZaXsMUKLlalHfPoVDoakRVIqf4myz4TnvXeBE7uv+oB+CmzzN"
+  public_key = file(pathexpand("${var.ssh_pub_key_file}"))
 }
