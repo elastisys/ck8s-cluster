@@ -4,7 +4,7 @@ terraform {
     organization = "elastisys"
 
     workspaces {
-      name = "a1-demo-system-services"
+      prefix = "a1-demo-system-services-"
     }
   }
 }
@@ -17,9 +17,13 @@ provider "exoscale" {
   timeout = 120 # default: waits 60 seconds in total for a resource
 }
 
+locals {
+  master_security_group_name = "${terraform.workspace}-ss-master-sg"
+  worker_security_group_name = "${terraform.workspace}-ss-worker-sg"
+}
 
 resource "exoscale_compute" "ss-master" {
-  display_name    = "ss-master"
+  display_name    = "${terraform.workspace}-ss-master"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
@@ -30,7 +34,7 @@ resource "exoscale_compute" "ss-master" {
 }
 
 resource "exoscale_compute" "ss-worker1" {
-  display_name    = "ss-worker1"
+  display_name    = "${terraform.workspace}-ss-worker1"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
@@ -41,7 +45,7 @@ resource "exoscale_compute" "ss-worker1" {
 }
 
 resource "exoscale_compute" "ss-worker2" {
-  display_name    = "ss-worker2"
+  display_name    = "${terraform.workspace}-ss-worker2"
   template        = "Linux RancherOS 1.5.1 64-bit"
   size            = "Large"
   disk_size       = 50
@@ -54,7 +58,7 @@ resource "exoscale_compute" "ss-worker2" {
 
 
 resource "exoscale_security_group" "ss-master-sg" {
-  name        = "ss-master-sg"
+  name        = "${local.master_security_group_name}"
   description = "security group for kubernetes masters"
 }
 
@@ -71,12 +75,18 @@ resource "exoscale_security_group_rules" "ss-master-rules" {
   ingress {
     protocol                 = "TCP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
+    user_security_group_list = [
+      "${local.master_security_group_name}",
+      "${local.worker_security_group_name}",
+    ]
   }
   ingress {
     protocol                 = "UDP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
+    user_security_group_list = [
+      "${local.master_security_group_name}",
+      "${local.worker_security_group_name}",
+    ]
   }
 
   # Master specific ports
@@ -89,7 +99,7 @@ resource "exoscale_security_group_rules" "ss-master-rules" {
 
 
 resource "exoscale_security_group" "ss-worker-sg" {
-  name        = "ss-worker-sg"
+  name        = "${local.worker_security_group_name}"
   description = "security group for kubernetes worker nodes"
 }
 
@@ -118,12 +128,18 @@ resource "exoscale_security_group_rules" "ss-worker-rules" {
   ingress {
     protocol                 = "TCP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
+    user_security_group_list = [
+      "${local.master_security_group_name}",
+      "${local.worker_security_group_name}",
+    ]
   }
   ingress {
     protocol                 = "UDP"
     ports                    = ["0-65535"]
-    user_security_group_list = ["ss-master-sg", "ss-worker-sg"]
+    user_security_group_list = [
+      "${local.master_security_group_name}",
+      "${local.worker_security_group_name}",
+    ]
   }
 }
 
@@ -150,6 +166,6 @@ resource "exoscale_secondary_ipaddress" "ss-e-ip-2" {
 }
 
 resource "exoscale_ssh_keypair" "ss-tf-key" {
-  name       = "ss-tf-key"
+  name       = "${terraform.workspace}-ss-tf-key"
   public_key = file(pathexpand("${var.ssh_pub_key_file}"))
 }
