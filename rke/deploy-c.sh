@@ -171,5 +171,5 @@ spec:
 EOF
 
 echo "User/PW for elasticsearch/kibana"
-echo "User: elastic" 
+echo "User: elastic"
 echo "Pw: " ${ES_PW}

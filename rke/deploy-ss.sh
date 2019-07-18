@@ -78,7 +78,7 @@ helm upgrade cert-manager jetstack/cert-manager \
 
 kubectl create ns elastic-system
 
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml 
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
 sleep 5
