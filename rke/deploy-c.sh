@@ -1,30 +1,22 @@
 #!/bin/bash
 
-# terraform apply
-
-# Can be done better! Just making sure that this is a clean install.
-rm kube_config_cluster-c.yaml cluster-c.rkestate
-
-
-./gen-rke-conf-c.sh
-
-rke up --config cluster-c.yaml
+set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-export KUBECONFIG=kube_config_cluster-c.yaml
 
-cd ${SCRIPTS_PATH}/../terraform/customer/
+pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
 
 # Elastic ip for the customer cluster.
 E_IP=$(terraform output c-elastic-ip)
 
-cd ${SCRIPTS_PATH}/../terraform/system-services/
+popd > /dev/null
+
+pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 
 # Elastic ip for the system services cluster.
-SS_E_IP=$(terraform output ss-elastic-ip) 
+SS_E_IP=$(terraform output ss-elastic-ip)
 
-cd ${SCRIPTS_PATH}
-
+popd > /dev/null
 
 # PSP
 
