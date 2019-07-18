@@ -10,7 +10,7 @@ w2_ip=$(terraform output ss-worker2-ip)
 m_ip=$(terraform output ss-master-ip)
 
 cat <<EOF
-cluster_name: rke-system-services
+cluster_name: eck-system-services
 
 # Change this path later
 ssh_key_path: ../.ssh/id_rsa
