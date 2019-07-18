@@ -44,9 +44,9 @@ kubectl	apply -f ingress-default-cert.yaml
 
 mkdir -p ${SCRIPTS_PATH}/../certs/customer/kube-system/certs
 
-${SCRIPTS_PATH}/../scripts/initialize-cluster.sh ../certs/customer "admin1"
+${SCRIPTS_PATH}/initialize-cluster.sh ../certs/customer "admin1"
 
-source ${SCRIPTS_PATH}/../scripts/helm-env.sh kube-system ../certs/customer/kube-system/certs admin1
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ../certs/customer/kube-system/certs admin1
 
 
 
