@@ -18,11 +18,14 @@ SS_E_IP=$(terraform output ss-elastic-ip)
 
 popd > /dev/null
 
+# NAMESPACES
+
+kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
+
 # PSP
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-
 
 # INGRESS
 
@@ -44,9 +47,9 @@ kubectl	apply -f ingress-default-cert.yaml
 
 mkdir -p ${SCRIPTS_PATH}/../certs/customer/kube-system/certs
 
-${SCRIPTS_PATH}/initialize-cluster.sh ../certs/customer "admin1"
+${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "admin1"
 
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ../certs/customer/kube-system/certs admin1
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs admin1
 
 
 
@@ -55,14 +58,8 @@ source ${SCRIPTS_PATH}/helm-env.sh kube-system ../certs/customer/kube-system/cer
 # Install the cert-manager CRDs **before** installing the chart
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 # https://docs.cert-manager.io/en/latest/getting-started/install.html#installing-with-helm
-# Create the namespace for cert-manager
-kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
-
-# Should be made into several files. to avoind warings everytime :O
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-
 
 # Add the Jetstack Helm repository
 helm repo add jetstack https://charts.jetstack.io
@@ -76,7 +73,10 @@ helm upgrade cert-manager jetstack/cert-manager \
 
 # FLUENTD
 
-# Get the password for elasticsearch - in sestem-services cluster!
+# TODO: This needs to be reworked so that the password is not stored as
+#       plain-text in the daemonset spec.
+exit
+
 ES_PW=$(kubectl --kubeconfig=kube_config_cluster-ss.yaml get secret quickstart-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 #kubectl apply -f ${SCRIPTS_PATH}/../manifests/fluentd/fluentd-base.yaml --dry-run -o yaml | kubectl set env --local -f - 'FLUENT_ELASTICSEARCH_PASSWORD'=$ES_PW -o yaml > ${SCRIPTS_PATH}/../manifests/fluentd/fluentd.yaml
 
