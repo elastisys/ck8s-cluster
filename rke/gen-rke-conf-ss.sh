@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/sh
+
+set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 cd ${SCRIPTS_PATH}/../terraform/system-services/
@@ -7,12 +9,7 @@ w1_ip=$(terraform output ss-worker1-ip)
 w2_ip=$(terraform output ss-worker2-ip)
 m_ip=$(terraform output ss-master-ip)
 
-cd ${SCRIPTS_PATH}
-
-
-
-cat <<EOF > cluster-ss.yaml
-
+cat <<EOF
 cluster_name: rke-system-services
 
 # Change this path later
@@ -54,10 +51,9 @@ services:
     creation: 6h
     retention: 24h
 
-ingress: 
+ingress:
   provider: "nginx"
   extra_args:
     default-ssl-certificate: "ingress-nginx/ingress-default-cert"
     enable-ssl-passthrough: ""
-    
 EOF
