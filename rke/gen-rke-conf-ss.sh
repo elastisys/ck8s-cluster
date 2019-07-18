@@ -35,6 +35,10 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_args:
+      oidc-issuer-url: https://dex.demo.compliantk8s.com
+      oidc-client-id: kubernetes
+      oidc-username-claim: admin
+      oidc-groups-claim: groups
       # Enable audit log to stdout
       audit-log-path: "-"
       # Increase number of delete workers
