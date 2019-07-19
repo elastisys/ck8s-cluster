@@ -59,8 +59,15 @@ Terraform created.
 
 Lastly, create all of the Kubernetes resources in the clusters.
 
+    export ECK_DOMAIN=a1demo.compliantk8s.com
+
     export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
     ./scripts/deploy-ss.sh
 
+    export ECK_SS_KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
     export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
     ./scripts/deploy-c.sh
+
+## DNS
+
+Point `*.$ECK_DOMAIN` to the system services elastic IP.
