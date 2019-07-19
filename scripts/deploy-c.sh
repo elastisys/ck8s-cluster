@@ -6,6 +6,8 @@ set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
+source "${SCRIPTS_PATH}/deploy-common.sh"
+
 pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
 
 # Elastic ip for the customer cluster.
@@ -100,10 +102,6 @@ spec:
         version: v1
         kubernetes.io/cluster-service: "true"
     spec:
-      hostAliases:
-      - ip: "${SS_E_IP}"
-        hostnames:
-        - "elastic.test.super.com"
       serviceAccount: fluentd
       serviceAccountName: fluentd
       tolerations:
@@ -116,7 +114,7 @@ spec:
           - name: FLUENT_UID
             value: "0"
           - name:  FLUENT_ELASTICSEARCH_HOST
-            value: "elastic.test.super.com"
+            value: "elastic.${ECK_DOMAIN}"
           - name:  FLUENT_ELASTICSEARCH_PORT
             value: "443"
           - name: FLUENT_ELASTICSEARCH_SCHEME

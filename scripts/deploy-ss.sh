@@ -4,6 +4,8 @@ set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
+source "${SCRIPTS_PATH}/deploy-common.sh"
+
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 
 E_IP=$(terraform output ss-elastic-ip)
@@ -76,4 +78,4 @@ sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 
 # Ingresses
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml
+cat ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml | envsubst | kubectl apply -f -
