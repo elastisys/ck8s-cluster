@@ -16,24 +16,33 @@ cat <<EOF > cluster-c.yaml
 cluster_name: rke-customer
 
 # Change this path later
-ssh_key_path: ../.ssh/id_rsa
+ssh_key_path: ~/.ssh/id_rsa
 
 nodes:
   - address: $m_ip
     user: rancher
     role: [controlplane,etcd]
+    labels: 
+      env: master
   - address: $w1_ip
     user: rancher
     role: [worker]
+    labels: 
+      env: worker
   - address: $w2_ip
     user: rancher
     role: [worker]
+    labels: 
+      env: worker
 
 services:
   kube-api:
     pod_security_policy: true
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
+    extra_binds:
+      - "/home/rancher/admission-control-config.yaml:/etc/kubernetes/conf/admission-control-config.yaml"
+      - "/home/rancher/podnodeselector.yaml:/etc/kubernetes/conf/podnodeselector.yaml"
     extra_args:
       # Enable audit log to stdout
       audit-log-path: "-"
@@ -41,6 +50,8 @@ services:
       delete-collection-workers: 3
       # Set the level of log output to debug-level
       v: 4
+      enable-admission-plugins: "PodNodeSelector,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy,PodSecurityPolicy"
+      admission-control-config-file: "/etc/kubernetes/conf/admission-control-config.yaml"
 
   etcd:
     snapshot: true

@@ -17,7 +17,6 @@ provider "exoscale" {
   timeout = 120 # default: waits 60 seconds in total for a resource
 }
 
-
 resource "exoscale_compute" "c-master" {
   display_name    = "c-master"
   template        = "Linux RancherOS 1.5.1 64-bit"
@@ -27,6 +26,28 @@ resource "exoscale_compute" "c-master" {
   state           = "Running"
   zone            = "de-fra-1"
   security_groups = ["${exoscale_security_group.c-master-sg.name}"]
+
+  provisioner "file" {
+    source      = "${path.module}/../../manifests/pod-node-restriction/admission-control-config.yaml"
+    destination = "/home/rancher/admission-control-config.yaml"
+
+    connection {
+      type     = "ssh"
+      user     = "rancher"
+      host     = "${self.ip_address}"
+    }
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/../../manifests/pod-node-restriction/podnodeselector.yaml"
+    destination = "/home/rancher/podnodeselector.yaml"
+
+    connection {
+      type     = "ssh"
+      user     = "rancher"
+      host     = "${self.ip_address}"
+    }
+  }
 }
 
 resource "exoscale_compute" "c-worker1" {
@@ -50,8 +71,6 @@ resource "exoscale_compute" "c-worker2" {
   zone            = "de-fra-1"
   security_groups = ["${exoscale_security_group.c-worker-sg.name}"]
 }
-
-
 
 resource "exoscale_security_group" "c-master-sg" {
   name        = "c-master-sg"
@@ -151,5 +170,5 @@ resource "exoscale_secondary_ipaddress" "c-e-ip-2" {
 
 resource "exoscale_ssh_keypair" "c-tf-key" {
   name       = "c-tf-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDWB9CPyyrL2AS/WpMw+4MQ6IUT7dOyC/48Rv1xhNAcUYUetBa7IuSv3E6sF4qaVOYfyWu6zZstj+JwOlJd0l7vIg4Eu/wjc1A8IdEfBDQwRCTXDub5yRUtlSGWlygy0lhSJXOnWhMspSVefJ6VxSCK6Lvwg0wtwZrC8Zm1tBnHOC+tGBQ9ibiPySMaIzGkUttA0Tc71HfwuYVDdmRhjlUJ5UJdJrvdGk3ApLCR6/4xiQKL1ht9fv0sAB7V3o3tWvGOWjQQwFyF41E3FV0X5f03pOx3nRVb4MNJ5/sZaXsMUKLlalHfPoVDoakRVIqf4myz4TnvXeBE7uv+oB+CmzzN"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXVVRRglwnNbnhqsFcMCnQUVO172AiU0WNSwN7RVzjHtS4LxWaq2hmz2af/wE1+ysxHuyWJmV7RkOP1PtLC1vjDI0ly0xjqW9oZovqezF7M/p++ofD8iMTHs66FINgjP85i0G8Twu9pc1akdGSAJ314isAAzO3ojcSf2G4DGGTTUaZG2tgoZYx4x4mEXRznBu3dYeA3/sbAtrPmWaXryq0wt9lg1Y5cp7k1H9n6q76t8UXgGJ/T/EOU8AAPZElPhBzcFXWwvtQn5qcUh/G8sGgbKtKAJ13e2FFR3tMZb1qKl9JCpu/UNuKp/vO5K87tXbwUPFw/qrRygzHBHX9Uc3j erik@erik-XPS-13-9380"
 }
