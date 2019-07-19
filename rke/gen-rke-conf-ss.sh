@@ -37,7 +37,7 @@ services:
     extra_args:
       oidc-issuer-url: https://dex.demo.compliantk8s.com
       oidc-client-id: kubernetes
-      oidc-username-claim: admin
+      oidc-username-claim: email
       oidc-groups-claim: groups
       # Enable audit log to stdout
       audit-log-path: "-"
