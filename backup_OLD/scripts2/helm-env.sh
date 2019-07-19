@@ -7,18 +7,18 @@
 #
 # Defaults:
 # - namespace: kube-system
-# - cert-dir: ./certs
+# - cert-dir: certs
 # - client prefix: helm
 
 NAMESPACE=${1:-kube-system}
-CERT_DIR=${2:-$(pwd)/certs}
+CERT_DIR=${2:-certs}
 CLIENT_PREFIX=${3:-helm}
 
 export TILLER_NAMESPACE=$NAMESPACE
 
-export HELM_TLS_CA_CERT="${CERT_DIR}/ca.pem"
-export HELM_TLS_CERT="${CERT_DIR}/${CLIENT_PREFIX}.pem"
-export HELM_TLS_KEY="${CERT_DIR}/${CLIENT_PREFIX}-key.pem"
+export HELM_TLS_CA_CERT="$(pwd)/${CERT_DIR}/ca.pem"
+export HELM_TLS_CERT="$(pwd)/${CERT_DIR}/${CLIENT_PREFIX}.pem"
+export HELM_TLS_KEY="$(pwd)/${CERT_DIR}/${CLIENT_PREFIX}-key.pem"
 export HELM_TLS_ENABLE=true
 
 # This seems problematic

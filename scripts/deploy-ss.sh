@@ -1,28 +1,27 @@
 #!/bin/bash
 
-# terraform apply
-
-# Can be done better! Just making sure that this is a clean install.
-rm kube_config_cluster-ss.yaml cluster-ss.rkestate
-
-./gen-rke-conf-ss.sh
-
-rke up --config cluster-ss.yaml
+set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-export KUBECONFIG=kube_config_cluster-ss.yaml
 
-cd ${SCRIPTS_PATH}/../terraform/system-services/
+pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 
 E_IP=$(terraform output ss-elastic-ip)
 
-cd ${SCRIPTS_PATH}
+popd > /dev/null
 
+# NAMESPACES
+
+kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace elastic-system --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace dex --dry-run -o yaml | kubectl apply -f -
 
 # PSP
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-ss.yaml
 
 
 # INGRESS
@@ -45,9 +44,9 @@ kubectl	apply -f ingress-default-cert.yaml
 
 mkdir -p ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs
 
-${SCRIPTS_PATH}/../scripts/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "admin1"
+${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "admin1"
 
-source ${SCRIPTS_PATH}/../scripts/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs admin1
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs admin1
 
 
 # CERT-MANAGER
@@ -60,10 +59,6 @@ kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
-# FIX/do better at a later point in time...
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-
-
 # Add the Jetstack Helm repository
 helm repo add jetstack https://charts.jetstack.io
 # Update your local Helm chart repository cache
@@ -72,13 +67,7 @@ helm repo update
 helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
 
-
 # Elasticsearch and kibana.
-
-
-kubectl create ns elastic-system
-
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml 
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
 sleep 5

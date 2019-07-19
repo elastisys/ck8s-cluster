@@ -1,19 +1,16 @@
-#!/bin/bash
+#!/bin/sh
+
+set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-cd ${SCRIPTS_PATH}/../terraform/customer/
+cd ${SCRIPTS_PATH}/../terraform/system-services/
 
-w1_ip=$(terraform output c-worker1-ip)
-w2_ip=$(terraform output c-worker2-ip)
-m_ip=$(terraform output c-master-ip)
+w1_ip=$(terraform output ss-worker1-ip)
+w2_ip=$(terraform output ss-worker2-ip)
+m_ip=$(terraform output ss-master-ip)
 
-cd ${SCRIPTS_PATH}
-
-
-
-cat <<EOF > cluster-c.yaml
-
-cluster_name: rke-customer
+cat <<EOF
+cluster_name: eck-system-services
 
 # Change this path later
 ssh_key_path: ../.ssh/id_rsa
@@ -35,22 +32,27 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_args:
+      oidc-issuer-url: https://dex.demo.compliantk8s.com
+      oidc-client-id: kubernetes
+      oidc-username-claim: email
+      oidc-groups-claim: groups
       # Enable audit log to stdout
       audit-log-path: "-"
       # Increase number of delete workers
       delete-collection-workers: 3
       # Set the level of log output to debug-level
       v: 4
+      enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
+
 
   etcd:
     snapshot: true
     creation: 6h
     retention: 24h
 
-ingress: 
+ingress:
   provider: "nginx"
   extra_args:
     default-ssl-certificate: "ingress-nginx/ingress-default-cert"
     enable-ssl-passthrough: ""
-
 EOF

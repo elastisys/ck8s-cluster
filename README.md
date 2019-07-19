@@ -1,64 +1,66 @@
-# README
+Elastisys Compliant Kubernetes A1 demo
+======================================
 
-```shell
-# Fetch submodules
-git submodule init
-git submodule update
+# Overview
 
-# Set up virtual env with requirements for kubespray
-python3 -m virtualenv virtenv
-source virtenv/bin/activate
-pip install -r requirements.txt
-```
+The Elastisys Compliant Kubernetes (ECK) A1 demo platform runs two Kubernetes
+clusters. One called "system services" and one called "customer".
 
-See [terraform](/terraform) for how to create virtual machines and other resources needed to install Kubernetes.
+The system service cluster provides observability, log aggregation,
+private container registry with vulnerability scanning and authentication using
+the following services:
+* Prometheus and Grafana
+* Elasticsearch and Kibana
+* Harbor
+* Dex
 
-Update `inventory/sample/inventory.ini` as needed and run kubespray:
+The customer cluster manages the customer applications as well as providing
+intrusion detection, security policies, log forwarding and monitoring using the
+following services:
+* Falco
+* Open Policy Agent
+* Fluentd
+* Prometheus
 
-```shell
-ansible-playbook --become -i inventory/sample/inventory.ini kubespray/cluster.yml
-```
+# Setup
 
-Set up cluster wide helm/tiller:
+The management of the ECK A1 demo platform is separated into different stages,
+Exoscale cloud infrastructure (terraform), Kubernetes cluster (rke) and
+Kubernetes resources (helm, kubectl).
 
-```shell
-# Generate certs in `certs` for admin1 and admin2 and deploy tiller
-./scripts/initialize-cluster.sh certs "admin1 admin2"
-# Check that you can access tiller
-source scripts/helm-env.sh kube-system certs/kube-system/certs admin1
-helm version
-```
+When first setting up the demo environment each stage needs to be done in
+sequential order since they are dependent on each other. Once the initial
+installation is done, each stage can be updated independently.
 
-Deploy infrastructure applications:
+## Cloud infrastructure
 
-```shell
-./scripts/deploy-infra.sh
-```
+Begin with setting up the cloud infrastructure using Terraform.
 
-## Harbor
+    cd ./terraform/system-services
+    terraform init
+    terraform apply
 
-Prepare the Harbor demo in the following way.
+    cd ./terraform/customer
+    terraform init
+    terraform apply
 
-- Go to the [harbor GUI](https://core.harbor.demo.compliantk8s.com).
-- Login with `admin:Elastisys123`
-- Create a project named `test`
-- Push nginx to the private registry:
+## Kubernetes clusters
 
-```shell
-docker pull nginx
-docker tag nginx:latest core.harbor.demo.compliantk8s.com/test/nginx:test-01
-docker login core.harbor.demo.compliantk8s.com
-docker push core.harbor.demo.compliantk8s.com/test/nginx:test-01
-```
+Next, install the Kubernetes clusters on the cloud infrastructure that
+Terraform created.
 
-- Select the container image in harbor and scan it.
+    ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
+    ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
 
-To take this container image for a test drive in the cluster do the following:
+    rke up --config ./eck-ss.yaml
+    rke up --config ./eck-c.yaml
 
-```shell
-kubectl create ns test
-kubectl -n test create secret docker-registry regcred \
-  --docker-server=core.harbor.demo.compliantk8s.com --docker-username=admin \
-  --docker-password=Elastisys123 --docker-email=admin@example.com
-kubectl apply -f manifests private-reg-pod.yaml
-```
+## Kubernetes resources
+
+Lastly, create all of the Kubernetes resources in the clusters.
+
+    export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
+    ./scripts/deploy-ss.sh
+
+    export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
+    ./scripts/deploy-c.sh
