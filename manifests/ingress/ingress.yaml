@@ -26,6 +26,7 @@ metadata:
   namespace: elastic-system
   annotations:
     ingress.kubernetes.io/rewrite-target: /
+    certmanager.k8s.io/cluster-issuer: letsencrypt-staging
 spec:
   tls:
   - hosts:

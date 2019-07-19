@@ -60,6 +60,7 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
 
 # Add the Jetstack Helm repository
 helm repo add jetstack https://charts.jetstack.io
