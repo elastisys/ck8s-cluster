@@ -2,7 +2,11 @@
 
 set -e
 
+: "${ECK_SS_KUBECONFIG:?Missing ECK_SS_KUBECONFIG}"
+
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+
+source "${SCRIPTS_PATH}/deploy-common.sh"
 
 pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
 
@@ -17,6 +21,8 @@ pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 SS_E_IP=$(terraform output ss-elastic-ip)
 
 popd > /dev/null
+
+ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret quickstart-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
 # NAMESPACES
 
@@ -73,18 +79,12 @@ helm upgrade cert-manager jetstack/cert-manager \
 
 # FLUENTD
 
-# TODO: This needs to be reworked so that the password is not stored as
-#       plain-text in the daemonset spec.
-exit
-
-ES_PW=$(kubectl --kubeconfig=kube_config_cluster-ss.yaml get secret quickstart-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
-#kubectl apply -f ${SCRIPTS_PATH}/../manifests/fluentd/fluentd-base.yaml --dry-run -o yaml | kubectl set env --local -f - 'FLUENT_ELASTICSEARCH_PASSWORD'=$ES_PW -o yaml > ${SCRIPTS_PATH}/../manifests/fluentd/fluentd.yaml
-
-
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/fluentd/sa-rbac.yaml
 
-cat <<EOF | kubectl apply -f -
+kubectl -n kube-system create secret generic elasticsearch \
+    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
 
+cat <<EOF | kubectl apply -f -
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
@@ -102,10 +102,6 @@ spec:
         version: v1
         kubernetes.io/cluster-service: "true"
     spec:
-      hostAliases:
-      - ip: "${SS_E_IP}"
-        hostnames:
-        - "elastic.test.super.com"
       serviceAccount: fluentd
       serviceAccountName: fluentd
       tolerations:
@@ -118,7 +114,7 @@ spec:
           - name: FLUENT_UID
             value: "0"
           - name:  FLUENT_ELASTICSEARCH_HOST
-            value: "elastic.test.super.com"
+            value: "elastic.${ECK_DOMAIN}"
           - name:  FLUENT_ELASTICSEARCH_PORT
             value: "443"
           - name: FLUENT_ELASTICSEARCH_SCHEME
@@ -128,7 +124,10 @@ spec:
           - name: FLUENT_ELASTICSEARCH_USER
             value: "elastic"
           - name: FLUENT_ELASTICSEARCH_PASSWORD
-            value: $ES_PW
+            valueFrom:
+              secretKeyRef:
+                name: elasticsearch
+                key: password
           # Option to configure elasticsearch plugin with self signed certs
           # ================================================================
           - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
@@ -161,7 +160,3 @@ spec:
         hostPath:
           path: /var/lib/docker/containers
 EOF
-
-echo "User/PW for elasticsearch/kibana"
-echo "User: elastic"
-echo "Pw: " ${ES_PW}

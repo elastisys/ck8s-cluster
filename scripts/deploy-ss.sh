@@ -4,6 +4,8 @@ set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
+source "${SCRIPTS_PATH}/deploy-common.sh"
+
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 
 E_IP=$(terraform output ss-elastic-ip)
@@ -58,6 +60,7 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
 
 # Add the Jetstack Helm repository
 helm repo add jetstack https://charts.jetstack.io
@@ -76,4 +79,4 @@ sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 
 # Ingresses
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml
+cat ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml | envsubst | kubectl apply -f -

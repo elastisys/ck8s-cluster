@@ -7,6 +7,28 @@ resource "exoscale_compute" "master" {
   state           = "Running"
   zone            = "de-fra-1"
   security_groups = ["${exoscale_security_group.master-sg.name}"]
+
+  provisioner "file" {
+    source      = "${path.module}/../../manifests/pod-node-restriction/admission-control-config.yaml"
+    destination = "/home/rancher/admission-control-config.yaml"
+
+    connection {
+      type     = "ssh"
+      user     = "rancher"
+      host     = "${self.ip_address}"
+    }
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/../../manifests/pod-node-restriction/podnodeselector.yaml"
+    destination = "/home/rancher/podnodeselector.yaml"
+
+    connection {
+      type     = "ssh"
+      user     = "rancher"
+      host     = "${self.ip_address}"
+    }
+  }
 }
 
 resource "exoscale_compute" "worker1" {
