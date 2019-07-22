@@ -16,6 +16,7 @@ echo "credentials \"app.terraform.io\" {
 * Set ~/.ssh/exoscale.pub specific for your cluster 
     * Can be created by following this link
     https://community.exoscale.com/documentation/compute/ssh-keypairs/
+    * Run ssh-add ~/.ssh/exoscale to add exoscale as a identity
 * Set env
 ```
 TF_VAR_exoscale_api_key=xxx
