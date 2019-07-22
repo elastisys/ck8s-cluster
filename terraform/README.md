@@ -8,7 +8,9 @@
 `customer`)
 * Set terraform token in ~/.terraformrc 
 ```
-echo "xxx" > ~/.terraformrc
+echo "credentials \"app.terraform.io\" {
+ token = \"xxx\"
+}" > ~/.terraformrc
 ```
 * Run `terraform init`
 * Set env
