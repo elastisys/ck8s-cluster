@@ -46,7 +46,20 @@ ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "admin1"
 
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs admin1
 
+# FLUENTD
 
+kubectl -n kube-system create secret generic elasticsearch \
+    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
+
+# TODO: Use upstream chart once https://github.com/kiwigrid/helm-charts/pull/147
+#       is merged.
+# helm repo add kiwigrid https://kiwigrid.github.io
+# helm repo update
+# helm upgrade fluentd kiwigrid/fluentd-elasticsearch \
+helm upgrade fluentd ${SCRIPTS_PATH}/../charts/fluentd-elasticsearch \
+    --install --values "${SCRIPTS_PATH}/../helm-values/fluentd-values.yaml" \
+    --set "elasticsearch.host=elastic.${ECK_DOMAIN}" \
+    --namespace kube-system --version 4.3.2
 
 # CERT-MANAGER
 
@@ -63,89 +76,3 @@ helm repo update
 
 helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
-
-
-
-# FLUENTD
-
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/fluentd/sa-rbac.yaml
-
-kubectl -n kube-system create secret generic elasticsearch \
-    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
-
-cat <<EOF | kubectl apply -f -
-apiVersion: extensions/v1beta1
-kind: DaemonSet
-metadata:
-  name: fluentd
-  namespace: kube-system
-  labels:
-    k8s-app: fluentd-logging
-    version: v1
-    kubernetes.io/cluster-service: "true"
-spec:
-  template:
-    metadata:
-      labels:
-        k8s-app: fluentd-logging
-        version: v1
-        kubernetes.io/cluster-service: "true"
-    spec:
-      serviceAccount: fluentd
-      serviceAccountName: fluentd
-      tolerations:
-      - key: node-role.kubernetes.io/master
-        effect: NoSchedule
-      containers:
-      - name: fluentd
-        image: fluent/fluentd-kubernetes-daemonset:v1.4.2-debian-elasticsearch-1.0
-        env:
-          - name: FLUENT_UID
-            value: "0"
-          - name:  FLUENT_ELASTICSEARCH_HOST
-            value: "elastic.${ECK_DOMAIN}"
-          - name:  FLUENT_ELASTICSEARCH_PORT
-            value: "443"
-          - name: FLUENT_ELASTICSEARCH_SCHEME
-            value: "https"
-          # X-Pack Authentication
-          # =====================
-          - name: FLUENT_ELASTICSEARCH_USER
-            value: "elastic"
-          - name: FLUENT_ELASTICSEARCH_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: elasticsearch
-                key: password
-          # Option to configure elasticsearch plugin with self signed certs
-          # ================================================================
-          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
-            value: "false"
-          - name: FLUENT_ELASTICSEARCH_SSL_VERSION
-            value: "TLSv1_2"
-        resources:
-          limits:
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 200Mi
-        volumeMounts:
-        - name: varlog
-          mountPath: /var/log
-        - name: varlogjournal
-          mountPath: /var/log/journal
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
-          readOnly: true
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - name: varlog
-        hostPath:
-          path: /var/log
-      - name: varlogjournal
-        hostPath:
-          path: /var/log/journal
-      - name: varlibdockercontainers
-        hostPath:
-          path: /var/lib/docker/containers
-EOF
