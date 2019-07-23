@@ -111,7 +111,7 @@ helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
 kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
 
 
-helm upgrade harbor ./backup_OLD/charts/harbor \
+helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
   --install \
   --namespace harbor \
   --values ./helm-values/harbor-values.yaml \

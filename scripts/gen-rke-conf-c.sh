@@ -9,7 +9,7 @@ w1_ip=$(terraform output c-worker1-ip)
 w2_ip=$(terraform output c-worker2-ip)
 m_ip=$(terraform output c-master-ip)
 
-cat <<EOF > cluster-c.yaml
+cat <<EOF
 cluster_name: eck-customer
 
 # Change this path later
@@ -38,6 +38,7 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_binds:
+    # Adds file from node into docker container running api-server
       - "/home/rancher/admission-control-config.yaml:/etc/kubernetes/conf/admission-control-config.yaml"
       - "/home/rancher/podnodeselector.yaml:/etc/kubernetes/conf/podnodeselector.yaml"
     extra_args:
@@ -47,7 +48,8 @@ services:
       delete-collection-workers: 3
       # Set the level of log output to debug-level
       v: 4
-      enable-admission-plugins: "PodTolerationRestriction, PodNodeSelector,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy,PodSecurityPolicy"
+      # Enables PodTolerationRestriction and PodNodeSelector admission plugin in apiserver
+      enable-admission-plugins: "PodTolerationRestriction,PodNodeSelector,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy,PodSecurityPolicy"
       admission-control-config-file: "/etc/kubernetes/conf/admission-control-config.yaml"
 
   etcd:

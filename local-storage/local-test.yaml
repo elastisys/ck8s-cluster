@@ -45,7 +45,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ubuntu-debug-deployment
-  namespace: harbor
+  namespace: restricted-namespace
   labels:
     app: ubuntu
 spec:
@@ -68,16 +68,16 @@ spec:
             - containerPort: 80
       nodeSelector: 
         env: worker
-      tolerations:
-      - key: "key"
-        operator: "Equal"
-        value: "value"
-        effect: "NoSchedule"
-      - key: node-role.kubernetes.io/controlplane
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
-      - key: node-role.kubernetes.io/etcd
-        operator: "Equal"
-        value: "true"
-        effect: "NoExecute"
+      # tolerations:
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+      # - key: node-role.kubernetes.io/controlplane
+      #   operator: "Equal"
+      #   value: "true"
+      #   effect: "NoSchedule"
+      # - key: node-role.kubernetes.io/etcd
+      #   operator: "Equal"
+      #   value: "true"
+      #   effect: "NoExecute"

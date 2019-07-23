@@ -1,5 +1,3 @@
 podNodeSelectorPluginConfig:
   clusterDefaultNodeSelector:
-  namespace1: env=worker
-  namespace2: env=worker
-  namespace3: env=worker
+    restricted-namespace: env=worker
