@@ -59,8 +59,6 @@ source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-s
 # Install the cert-manager CRDs **before** installing the chart
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 # https://docs.cert-manager.io/en/latest/getting-started/install.html#installing-with-helm
-# Create the namespace for cert-manager
-kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
