@@ -6,6 +6,9 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 source "${SCRIPTS_PATH}/deploy-common.sh"
 
+: "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
+: "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
+
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 
 E_IP=$(terraform output ss-elastic-ip)
@@ -98,7 +101,7 @@ kubectl -n harbor create rolebinding harbor-privileged-psp \
     --clusterrole=psp:privileged --serviceaccount=harbor:default \
     --dry-run -o yaml | kubectl apply -f -
 
-# Deploying harbor 
+# Deploying harbor
 # NOTE: TF_VAR_exoscale_api_key and TF_VAR_exoscale_secret_key have to be set in your environment
 helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
   --install \
@@ -107,7 +110,7 @@ helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
   --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
   --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key
 
-# Annotate certmanager for harbor 
+# Annotate certmanager for harbor
 kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
 
 
