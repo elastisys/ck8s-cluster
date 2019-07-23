@@ -62,8 +62,7 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch
 sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 
-# Ingresses
-cat ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml | envsubst | kubectl apply -f -
+cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | kubectl apply -f -
 
 # HARBOR
 
