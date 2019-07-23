@@ -39,8 +39,7 @@ services:
     # This WILL OVERRIDE any existing defaults
     extra_binds:
     # Adds file from node into docker container running api-server
-      - "/home/rancher/admission-control-config.yaml:/etc/kubernetes/conf/admission-control-config.yaml"
-      - "/home/rancher/podnodeselector.yaml:/etc/kubernetes/conf/podnodeselector.yaml"
+      - "/etc/kubernetes/conf:/etc/kubernetes/conf"
     extra_args:
       # Enable audit log to stdout
       audit-log-path: "-"
