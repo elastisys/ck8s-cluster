@@ -27,6 +27,7 @@ ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret quickstart-elasti
 # NAMESPACES
 
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace restricted-namespace --dry-run -o yaml | kubectl apply -f -
 
 # Node restriction
 sh ${SCRIPTS_PATH}/node-restriction.sh
@@ -35,6 +36,7 @@ sh ${SCRIPTS_PATH}/node-restriction.sh
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-c.yaml
 
 # INGRESS
 
