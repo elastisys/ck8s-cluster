@@ -43,6 +43,17 @@ resource "exoscale_compute" "master" {
     }
   }
 
+  provisioner "file" {
+    source      = "${path.module}/../../../manifests/audit-policy.yaml"
+    destination = "/etc/kubernetes/conf/audit-policy.yaml"
+
+    connection {
+      type     = "ssh"
+      user     = "rancher"
+      host     = "${self.ip_address}"
+    }
+  }
+
   provisioner "remote-exec" {
     inline = [
        "sudo chown -R root:root /etc/kubernetes/conf"

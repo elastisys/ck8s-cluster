@@ -40,9 +40,10 @@ services:
     extra_binds:
     # Adds file from node into docker container running api-server
       - "/etc/kubernetes/conf:/etc/kubernetes/conf"
+      - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
-      # Enable audit log to stdout
-      audit-log-path: "-"
+      audit-policy-file: "/etc/kubernetes/conf/audit-policy.yaml"
+      audit-log-path: "/var/log/kube-audit/kube-apiserver.log"
       # Increase number of delete workers
       delete-collection-workers: 3
       # Set the level of log output to debug-level
