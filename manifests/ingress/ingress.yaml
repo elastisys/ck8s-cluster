@@ -7,9 +7,12 @@ metadata:
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-staging
 spec:
   tls:
-  - secretName: elastic-cert
+  - hosts:
+    - elastic.${ECK_DOMAIN}
+    secretName: elastic-cert
   rules:
   - host: elastic.${ECK_DOMAIN}
     http:
