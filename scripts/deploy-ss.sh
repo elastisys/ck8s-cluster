@@ -84,12 +84,6 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 # Ingresses
 cat ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml | envsubst | kubectl apply -f -
 
-
-# Create letsencrypt-staging and prod ClusterIssuers
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
-
-
 # HARBOR
 
 sh ${SCRIPTS_PATH}/harbor-storage-setup.sh > ${SCRIPTS_PATH}/../harbor/storage.yaml
