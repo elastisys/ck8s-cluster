@@ -53,6 +53,5 @@ services:
 ingress:
   provider: "nginx"
   extra_args:
-    default-ssl-certificate: "ingress-nginx/ingress-default-cert"
     enable-ssl-passthrough: ""
 EOF

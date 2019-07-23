@@ -28,23 +28,6 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.y
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-ss.yaml
 
-
-# INGRESS
-
-# Genereate certifiacte for ingress
-openssl req -x509 -nodes -newkey rsa:4096 \
-    -sha256 -keyout ss-key.pem -out ss-cert.pem \
-    -subj "/CN=${E_IP}" -days 365
-
-# Genereate the yaml file for deploying the ingress tls secret.
-kubectl -n ingress-nginx create secret tls ingress-default-cert \
-    --cert=ss-cert.pem --key=ss-key.pem -o yaml \
-    --dry-run=true > ingress-default-cert.yaml
-
-# Create the secret from the generated file.
-kubectl	apply -f ingress-default-cert.yaml
-
-
 # HELM, TILLER
 
 mkdir -p ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs

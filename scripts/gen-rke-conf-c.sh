@@ -19,17 +19,17 @@ nodes:
   - address: $m_ip
     user: rancher
     role: [controlplane,etcd]
-    labels: 
+    labels:
       env: master
   - address: $w1_ip
     user: rancher
     role: [worker]
-    labels: 
+    labels:
       env: worker
   - address: $w2_ip
     user: rancher
     role: [worker]
-    labels: 
+    labels:
       env: worker
 
 services:
@@ -60,6 +60,5 @@ services:
 ingress:
   provider: "nginx"
   extra_args:
-    default-ssl-certificate: "ingress-nginx/ingress-default-cert"
     enable-ssl-passthrough: ""
 EOF
