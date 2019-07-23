@@ -9,7 +9,7 @@ resource "exoscale_compute" "master" {
   security_groups = ["${exoscale_security_group.master-sg.name}"]
 
   provisioner "file" {
-    source      = "${path.module}/../../manifests/pod-node-restriction/admission-control-config.yaml"
+    source      = "${path.module}/../../../manifests/pod-node-restriction/admission-control-config.yaml"
     destination = "/home/rancher/admission-control-config.yaml"
 
     connection {
@@ -20,7 +20,7 @@ resource "exoscale_compute" "master" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/../../manifests/pod-node-restriction/podnodeselector.yaml"
+    source      = "${path.module}/../../../manifests/pod-node-restriction/podnodeselector.yaml"
     destination = "/home/rancher/podnodeselector.yaml"
 
     connection {

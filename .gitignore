@@ -7,3 +7,7 @@ certs
 **/terraform.tfstate.*
 **/cluster.yaml
 **/cluster.rkestate
+**/.terraform
+**/*.tfstate
+**/*.state
+**/*.rkestate

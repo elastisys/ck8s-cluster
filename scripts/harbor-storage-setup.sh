@@ -1,3 +1,15 @@
+#!/bin/sh
+
+set -e
+
+SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+cd ${SCRIPTS_PATH}/../terraform/system-services/
+
+w1_ip=$(terraform output ss-worker1-ip)
+w2_ip=$(terraform output ss-worker2-ip)
+m_ip=$(terraform output ss-master-ip)
+
+cat <<EOF
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -19,6 +31,7 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - 89.145.161.41
-          - 89.145.161.10
-          - 89.145.160.92
+          - $w1_ip
+          - $w2_ip
+          - $m_ip
+EOF

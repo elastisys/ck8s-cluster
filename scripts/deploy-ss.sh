@@ -80,3 +80,40 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 
 # Ingresses
 cat ${SCRIPTS_PATH}/../manifests/ingress/ingress.yaml | envsubst | kubectl apply -f -
+
+
+# Create letsencrypt-staging and prod ClusterIssuers
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
+
+
+# HARBOR
+
+sh ${SCRIPTS_PATH}/harbor-storage-setup.sh > ${SCRIPTS_PATH}/../harbor/storage.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../harbor/storage.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../harbor/pv-claim.yaml
+
+# Create rolebindings for harbor
+kubectl -n harbor create rolebinding harbor-privileged-psp \
+    --clusterrole=psp:privileged --serviceaccount=harbor:default \
+    --dry-run -o yaml | kubectl apply -f -
+
+# Deploying harbor 
+# NOTE: TF_VAR_exoscale_api_key and TF_VAR_exoscale_secret_key have to be set in your environment
+helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
+  --install \
+  --namespace harbor \
+  --values ${SCRIPTS_PATH}/../helm-values/harbor-values.yaml \
+  --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
+  --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key
+
+# Annotate certmanager for harbor 
+kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
+
+
+helm upgrade harbor ./backup_OLD/charts/harbor \
+  --install \
+  --namespace harbor \
+  --values ./helm-values/harbor-values.yaml \
+  --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
+  --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key

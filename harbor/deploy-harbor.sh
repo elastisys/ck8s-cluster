@@ -71,7 +71,7 @@ kubectl -n harbor create rolebinding harbor-privileged-psp \
 
 # Deploying harbor 
 # NOTE: TF_VAR_exoscale_api_key and TF_VAR_exoscale_secret_key have to be set in your environment
-helm upgrade harbor ${WORKSPACE}/charts/harbor \
+helm upgrade harbor ./../backup_OLD/charts/harbor \
   --install \
   --namespace harbor \
   --values ${WORKSPACE}/helm-values/harbor-values.yaml \

@@ -13,7 +13,7 @@ cat <<EOF
 cluster_name: eck-system-services
 
 # Change this path later
-ssh_key_path: ../.ssh/id_rsa
+ssh_key_path: ~/.ssh/id_rsa
 
 nodes:
   - address: $m_ip
