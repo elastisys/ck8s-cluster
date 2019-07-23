@@ -33,6 +33,10 @@ kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 # Node restriction
 sh ${SCRIPTS_PATH}/node-restriction.sh
 
+# DASHBOARD
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta1/aio/deploy/recommended.yaml
+
 # PSP
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
