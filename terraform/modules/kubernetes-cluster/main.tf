@@ -76,6 +76,7 @@ resource "exoscale_compute" "worker1" {
   state           = "Running"
   zone            = "de-fra-1"
   security_groups = ["${exoscale_security_group.worker-sg.name}"]
+  user_data       = "${file("${path.module}/../../../falco/cloud.cfg")}"
 }
 
 resource "exoscale_compute" "worker2" {
@@ -87,6 +88,7 @@ resource "exoscale_compute" "worker2" {
   state           = "Running"
   zone            = "de-fra-1"
   security_groups = ["${exoscale_security_group.worker-sg.name}"]
+  user_data       = "${file("${path.module}/../../../falco/cloud.cfg")}"
 }
 
 resource "exoscale_security_group" "master-sg" {

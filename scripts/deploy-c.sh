@@ -27,7 +27,7 @@ ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret quickstart-elasti
 # NAMESPACES
 
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace restricted-namespace --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
 
 # Node restriction
 sh ${SCRIPTS_PATH}/node-restriction.sh
@@ -76,3 +76,7 @@ helm repo update
 
 helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
+
+# FALCO
+
+helm upgrade falco stable/falco --install --namespace falco --version 0.7.6
