@@ -7,8 +7,8 @@ cd ${SCRIPTS_PATH}/../terraform/customer/
 
 m_ip=$(terraform output c-master-ip)
 
-kubectl taint node $m_ip key=value:NoSchedule
+# Taint master node with NoSchedule
+kubectl taint node $m_ip restrictednode=true:NoSchedule
 
-
+# Create namespace with whitelisting only default tolerations and worker node selectors
 kubectl apply -f ${SCRIPTS_PATH}/../local-storage/restricted-namespace.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../local-storage/local-test.yaml

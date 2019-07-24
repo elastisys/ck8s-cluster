@@ -76,7 +76,6 @@ kubectl -n harbor create rolebinding harbor-privileged-psp \
     --dry-run -o yaml | kubectl apply -f -
 
 # Deploying harbor
-# NOTE: TF_VAR_exoscale_api_key and TF_VAR_exoscale_secret_key have to be set in your environment
 helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
   --install \
   --namespace harbor \
@@ -86,11 +85,3 @@ helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
 
 # Annotate certmanager for harbor
 kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
-
-
-helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
-  --install \
-  --namespace harbor \
-  --values ./helm-values/harbor-values.yaml \
-  --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
-  --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key
