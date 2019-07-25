@@ -40,8 +40,9 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_args:
-      oidc-issuer-url: https://accounts.google.com
-      oidc-client-id: 556379655797-vk5gi6cn9onkfmjuiug4or3dngq0nhld.apps.googleusercontent.com
+      oidc-issuer-url: https://dex.compliantk8s.com
+      oidc-client-id: test-app
+      oidc-ca-file: /etc/kubernetes/ssl/dex-ca.pem
       oidc-username-claim: email
       oidc-groups-claim: groups
       # Enable audit log to stdout

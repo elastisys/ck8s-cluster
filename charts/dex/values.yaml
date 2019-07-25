@@ -50,7 +50,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   path: /
   hosts:
-    - dex.example.com
+    - dex.compliantk8s.com
   tls: []
   #  - secretName: dex-example-tls
   #    hosts:

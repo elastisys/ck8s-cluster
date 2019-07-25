@@ -38,6 +38,14 @@ ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "
 
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs admin1
 
+# DEX, OAUTH2, DASHBOARD
+helm upgrade dex ../charts/dex --install --namespace dex \
+ -f ../helm-values/dex-values.yaml --debug
+
+helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
+    -f ../helm-values/oauth2-proxy-values.yaml --version 0.12.3
+
+kubectl apply -f ../manifests/dashboard.yaml
 
 # CERT-MANAGER
 

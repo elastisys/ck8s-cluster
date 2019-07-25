@@ -33,9 +33,12 @@ kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 # Node restriction
 sh ${SCRIPTS_PATH}/node-restriction.sh
 
-# DASHBOARD
+# DASHBOARD, OAUTH2
 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta1/aio/deploy/recommended.yaml
+helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
+    -f ../helm-values/oauth2-proxy-values.yaml --version 0.12.3
+
+kubectl apply -f ../manifests/dashboard.yaml
 
 # PSP
 
