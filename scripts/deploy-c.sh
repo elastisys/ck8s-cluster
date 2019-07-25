@@ -28,6 +28,7 @@ ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret quickstart-elasti
 
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 
 # Node restriction
 sh ${SCRIPTS_PATH}/node-restriction.sh
@@ -81,3 +82,12 @@ helm upgrade cert-manager jetstack/cert-manager \
 
 helm upgrade falco stable/falco --install --namespace falco --version 0.7.6
 
+# OPA
+
+helm upgrade opa stable/opa --install \
+    --values "${SCRIPTS_PATH}/../helm-values/opa-values.yaml" \
+    --namespace opa --version 1.6.0
+
+kubectl -n opa create cm policies -o yaml --dry-run \
+    --from-file="${SCRIPTS_PATH}/../policies" | kubectl apply -f -
+kubectl -n opa label cm policies openpolicyagent.org/policy=rego

@@ -55,3 +55,32 @@ subjects:
 - kind: ServiceAccount
   name: falco
   namespace: falco
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: opa:default-psp
+  namespace: opa
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - default-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: opa:default-psp
+  namespace: opa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: opa:default-psp
+subjects:
+- kind: ServiceAccount
+  name: opa
+  namespace: opa
