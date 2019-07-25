@@ -45,7 +45,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ubuntu-debug-deployment
-  namespace: restricted-namespace
   labels:
     app: ubuntu
 spec:
@@ -66,9 +65,17 @@ spec:
           name: ubuntu
           ports:
             - containerPort: 80
+          volumeMounts:
+            - name: nfs-pvc
+              mountPath: "/mnt2"
+      # tolerations:
       nodeSelector: 
         env: worker
-      # tolerations:
+      volumes:
+        - name: nfs-pvc
+          persistentVolumeClaim:
+            claimName: test-claim
+          
       # - key: "key"
       #   operator: "Equal"
       #   value: "value"

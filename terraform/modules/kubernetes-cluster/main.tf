@@ -91,6 +91,27 @@ resource "exoscale_compute" "worker2" {
   user_data       = "${file("${path.module}/../../../falco/cloud.cfg")}"
 }
 
+resource "exoscale_compute" "nfs" {
+  display_name    = "${terraform.workspace}-nfs-storage"
+  template        = "Linux Ubuntu 18.04 LTS 64-bit"
+  size            = "Large"
+  disk_size       = 50
+  key_pair        = "${exoscale_ssh_keypair.ssh_key.name}"
+  state           = "Running"
+  zone            = "de-fra-1"
+  security_groups = ["${exoscale_security_group.worker-sg.name}"]
+  user_data       = <<EOF
+#cloud-config
+runcmd:
+  - sudo apt-get install nfs-kernel-server -y
+  - sudo mkdir -p /nfs && sudo chown nobody:nogroup /nfs
+  - echo "/nfs ${exoscale_compute.worker1.ip_address}(rw,sync,no_subtree_check) ${exoscale_compute.worker2.ip_address}(rw,sync,no_subtree_check)" > /etc/exports
+  - sudo exportfs -ra
+  - sudo ufw allow 2049
+EOF
+
+}
+
 resource "exoscale_security_group" "master-sg" {
   name        = "${var.master_security_group_name}"
   description = "Security group for Kubernetes masters"

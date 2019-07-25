@@ -13,3 +13,6 @@ output "c-worker2-ip" {
 output "c-elastic-ip" {
   value = "${module.kubernetes_cluster.elastic_ip_address}"
 }
+output "c-nfs-ip" {
+  value = "${module.kubernetes_cluster.nfs_storage_ip_address}"
+}

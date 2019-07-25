@@ -12,6 +12,7 @@ pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
 
 # Elastic ip for the customer cluster.
 E_IP=$(terraform output c-elastic-ip)
+NFS_SERVER_IP=$(terraform output c-nfs-ip)
 
 popd > /dev/null
 
@@ -28,6 +29,7 @@ ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret quickstart-elasti
 
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace nfs-provisioner --dry-run -o yaml | kubectl apply -f -
 
 # Node restriction
 sh ${SCRIPTS_PATH}/node-restriction.sh
@@ -80,3 +82,6 @@ helm upgrade cert-manager jetstack/cert-manager \
 # FALCO
 
 helm upgrade falco stable/falco --install --namespace falco --version 0.7.6
+
+helm install stable/nfs-client-provisioner --set nfs.server=${NFS_SERVER_IP} --set nfs.path=/nfs \
+ --namespace nfs-provisioner --set serviceAccount.name=nfs-client-provisioner

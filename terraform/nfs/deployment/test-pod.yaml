@@ -1,0 +1,25 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test-pod2
+spec:
+  containers:
+  - name: test-pod2
+    image: lindqvist/ubuntu-debug
+    command:
+      - sleep
+    args: ["99999"]
+    volumeMounts:
+      - name: nfs-pvc
+        mountPath: "/mnt"
+      - name: new-pvc
+        mountPath: "/mnt2"
+  restartPolicy: "Never"
+  volumes:
+    - name: nfs-pvc
+      persistentVolumeClaim:
+        claimName: test-claim
+    - name: new-pvc
+      persistentVolumeClaim:
+        claimName: new-claim
+          
