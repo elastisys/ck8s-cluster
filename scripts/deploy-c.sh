@@ -33,13 +33,6 @@ kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 # Node restriction
 sh ${SCRIPTS_PATH}/node-restriction.sh
 
-# DASHBOARD, OAUTH2
-
-helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
-    -f ../helm-values/oauth2-proxy-values.yaml --version 0.12.3
-
-kubectl apply -f ../manifests/dashboard.yaml
-
 # PSP
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
@@ -53,6 +46,14 @@ mkdir -p ${SCRIPTS_PATH}/../certs/customer/kube-system/certs
 ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "admin1"
 
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs admin1
+
+# DASHBOARD, OAUTH2
+
+helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
+    -f ../helm-values/oauth2-proxy-values-c.yaml --version 0.12.3
+
+kubectl apply -f ../manifests/dashboard.yaml
+
 
 # FLUENTD
 

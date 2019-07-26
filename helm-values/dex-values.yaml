@@ -88,6 +88,7 @@ config:
       redirectURIs:
         - 'http://localhost:8000'
         - 'https://dashboard.compliantk8s.com/oauth2/callback'
+        - 'https://dashboard-customer.compliantk8s.com/oauth2/callback'
       name: 'Kubernetes dashboard'
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 
