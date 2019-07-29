@@ -1,0 +1,37 @@
+# Oauth client configuration specifics
+config:
+  # OAuth client ID
+  clientID: "kubernetes"
+  # OAuth client secret
+  clientSecret: "ZXhhbXBsZS1hcHAtc2VjcmV0"
+  # Create a new secret with the following command
+  # openssl rand -base64 32 | head -c 32 | base64
+  # Use an existing secret for OAuth2 credentials (see secret.yaml for required fields)
+  # Example:
+  # existingSecret: secret
+  cookieSecret: "0oOQEbX9wB+VlaTBMO4KMw=="
+  configFile: |
+    cookie_secure = false
+
+extraArgs:
+  email-domain: "example.com" # Can be changed to gmail.com
+  http-address: "0.0.0.0:4180"
+  provider: oidc
+  redirect-url: https://dashboard-customer.compliantk8s.com/oauth2/callback
+  oidc-issuer-url: https://dex.compliantk8s.com
+  upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
+  pass-authorization-header: true
+  ssl-insecure-skip-verify: true # remove this when letsencrypt works
+
+ingress:
+  enabled: true
+  #annotations:
+  #  certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+  path: /
+  # Used to create an Ingress record.
+  hosts:
+    - dashboard-customer.compliantk8s.com
+  tls:
+    - secretName: dashboard-certs
+      hosts:
+        -  dashboard-customer.compliantk8s.com
