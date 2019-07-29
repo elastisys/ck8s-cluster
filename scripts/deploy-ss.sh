@@ -64,8 +64,6 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch
 sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 
-cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | kubectl apply -f -
-
 # NFS client provisioner
 
 helm install stable/nfs-client-provisioner --set nfs.server=${NFS_SERVER_IP} --set nfs.path=/nfs \
@@ -76,11 +74,6 @@ helm install stable/nfs-client-provisioner --set nfs.server=${NFS_SERVER_IP} --s
 # HARBOR
 
 kubectl apply -f ${SCRIPTS_PATH}/../harbor/harbor-claim.yaml
-
-# Deprecated, replaced with nfs 
-#sh ${SCRIPTS_PATH}/harbor-storage-setup.sh > ${SCRIPTS_PATH}/../harbor/storage.yaml
-#kubectl apply -f ${SCRIPTS_PATH}/../harbor/storage.yaml
-#kubectl apply -f ${SCRIPTS_PATH}/../harbor/pv-claim.yaml
 
 # Create rolebindings for harbor
 kubectl -n harbor create rolebinding harbor-privileged-psp \
