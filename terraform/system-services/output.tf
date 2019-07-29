@@ -13,3 +13,7 @@ output "ss-worker2-ip" {
 output "ss-elastic-ip" {
   value = "${module.kubernetes_cluster.elastic_ip_address}"
 }
+
+output "ss-nfs-ip" {
+  value = "${module.kubernetes_cluster.nfs_storage_ip_address}"
+}

@@ -135,7 +135,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: nfs-provisioner:default-psp
-  namespace: nfs-provisioner
+  namespace: harbor
 rules:
 - apiGroups:
   - extensions
@@ -150,7 +150,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: nfs-provisioner:default-psp
-  namespace: nfs-provisioner
+  namespace: harbor
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -158,4 +158,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: nfs-client-provisioner
-  namespace: nfs-provisioner
+  namespace: harbor

@@ -12,6 +12,7 @@ source "${SCRIPTS_PATH}/deploy-common.sh"
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 
 E_IP=$(terraform output ss-elastic-ip)
+NFS_SERVER_IP=$(terraform output ss-nfs-ip)
 
 popd > /dev/null
 
@@ -21,6 +22,7 @@ kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace elastic-system --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace dex --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace nfs-provisioner --dry-run -o yaml | kubectl apply -f -
 
 # PSP
 
@@ -57,18 +59,28 @@ helm upgrade cert-manager jetstack/cert-manager \
 # Elasticsearch and kibana.
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
-sleep 5
+sleep 5 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch.yaml
 sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 
 cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | kubectl apply -f -
 
+# NFS client provisioner
+
+helm install stable/nfs-client-provisioner --set nfs.server=${NFS_SERVER_IP} --set nfs.path=/nfs \
+ --namespace harbor --set serviceAccount.name=nfs-client-provisioner
+
+ kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
+
 # HARBOR
 
-sh ${SCRIPTS_PATH}/harbor-storage-setup.sh > ${SCRIPTS_PATH}/../harbor/storage.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../harbor/storage.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../harbor/pv-claim.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../nfs/harbor-claim.yaml
+
+# Deprecated, replaced with nfs 
+#sh ${SCRIPTS_PATH}/harbor-storage-setup.sh > ${SCRIPTS_PATH}/../harbor/storage.yaml
+#kubectl apply -f ${SCRIPTS_PATH}/../harbor/storage.yaml
+#kubectl apply -f ${SCRIPTS_PATH}/../harbor/pv-claim.yaml
 
 # Create rolebindings for harbor
 kubectl -n harbor create rolebinding harbor-privileged-psp \

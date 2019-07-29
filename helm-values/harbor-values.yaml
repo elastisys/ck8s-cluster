@@ -16,38 +16,39 @@ ingress:
         - core.harbor.test.compliantk8s.com
         - notary.harbor.test.compliantk8s.com
 
+
 persistence:
   enabled: true
   resourcePolicy: "keep"
   persistentVolumeClaim:
     chartmuseum:
-      existingClaim: "harbor-pvc"
+      existingClaim: "harbor-chartmuseum-claim"
       accessModes: ReadWriteOnce
-      storageClass: "local-storage"
+      storageClass: "nfs-client"
       subPath: "chartmuseum"
       size: 5Gi
     registry:
-      existingClaim: "harbor-pvc"
+      existingClaim: "harbor-registry-claim"
       accessModes: ReadWriteOnce
-      storageClass: "local-storage"
+      storageClass: "nfs-client"
       subPath: "registry"
       size: 5Gi
     jobservice:
-      existingClaim: "harbor-pvc"
+      existingClaim: "harbor-jobservice-claim"
       accessModes: ReadWriteOnce
-      storageClass: "local-storage"
+      storageClass: "nfs-client"
       subPath: "jobservice"
       size: 1Gi
     database:
-      existingClaim: "harbor-pvc"
+      existingClaim: "harbor-database-claim"
       accessModes: ReadWriteOnce
-      storageClass: "local-storage"
+      storageClass: "nfs-client"
       subPath: "database"
       size: 1Gi
     redis: 
-      existingClaim: "harbor-pvc"
+      existingClaim: "harbor-redis-claim"
       accessModes: ReadWriteOnce
-      storageClass: "local-storage"
+      storageClass: "nfs-client"
       subPath: "redis"
       size: 1Gi
     #externalURL: https://core.harbor.harbor

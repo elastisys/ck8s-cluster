@@ -105,8 +105,8 @@ resource "exoscale_compute" "nfs" {
 runcmd:
   - sudo apt-get install nfs-kernel-server -y
   - sudo mkdir -p /nfs && sudo chown nobody:nogroup /nfs
-  - echo "/nfs ${exoscale_compute.worker1.ip_address}(rw,sync,no_subtree_check) ${exoscale_compute.worker2.ip_address}(rw,sync,no_subtree_check)" > /etc/exports
-  - sudo exportfs -ra
+  - echo "/nfs ${exoscale_compute.worker1.ip_address}(rw,sync,no_subtree_check,no_root_squash) ${exoscale_compute.master.ip_address}(rw,sync,no_subtree_check,no_root_squash) ${exoscale_compute.worker2.ip_address}(rw,sync,no_subtree_check,no_root_squash)" > /etc/exports
+  - sudo exportfs -rav
   - sudo ufw allow 2049
 EOF
 
