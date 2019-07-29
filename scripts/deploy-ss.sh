@@ -75,7 +75,7 @@ helm install stable/nfs-client-provisioner --set nfs.server=${NFS_SERVER_IP} --s
 
 # HARBOR
 
-kubectl apply -f ${SCRIPTS_PATH}/../nfs/harbor-claim.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../harbor/harbor-claim.yaml
 
 # Deprecated, replaced with nfs 
 #sh ${SCRIPTS_PATH}/harbor-storage-setup.sh > ${SCRIPTS_PATH}/../harbor/storage.yaml
