@@ -70,4 +70,15 @@ Lastly, create all of the Kubernetes resources in the clusters.
 
 ## DNS
 
-Point `*.$ECK_DOMAIN` to the system services elastic IP.
+Point `*.$ECK_DOMAIN` to the system services ~~elastic IP~~ worker IPs.
+
+## Issues and limitations
+
+Currently there is an issue where instances, that have been added to the EIP
+loadbalancer pool (i.e. when they are no longer seen as unhealthy by the
+healthchecks), can't reach the EIP.
+See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030138
+
+Sometimes EIPs are not possible to delete due to still being seen as having
+attached instances.
+See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030112
