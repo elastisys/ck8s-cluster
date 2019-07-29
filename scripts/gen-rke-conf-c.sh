@@ -42,6 +42,11 @@ services:
       - "/etc/kubernetes/conf:/etc/kubernetes/conf"
       - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
+      oidc-issuer-url: https://dex.compliantk8s.com
+      oidc-client-id: kubernetes
+      oidc-ca-file: /etc/kubernetes/ssl/dex-ca.pem # TODO remove when letsencrypt works.
+      oidc-username-claim: email
+      oidc-groups-claim: groups
       audit-policy-file: "/etc/kubernetes/conf/audit-policy.yaml"
       audit-log-path: "/var/log/kube-audit/kube-apiserver.log"
       # Increase number of delete workers

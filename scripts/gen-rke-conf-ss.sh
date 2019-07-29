@@ -42,7 +42,7 @@ services:
     extra_args:
       oidc-issuer-url: https://dex.compliantk8s.com
       oidc-client-id: kubernetes
-      oidc-ca-file: /etc/kubernetes/ssl/dex-ca.pem
+      oidc-ca-file: /etc/kubernetes/ssl/dex-ca.pem # TODO remove when letsencrypt works.
       oidc-username-claim: email
       oidc-groups-claim: groups
       # Enable audit log to stdout
