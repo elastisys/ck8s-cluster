@@ -67,6 +67,10 @@ If manuel provision of a CA file was done a secret has to be created with the ce
         export ECK_SS_KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
         export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
         ./scripts/deploy-c.sh    
+7. **Give permissions to admin@example.com**
+
+        kubectl apply -f ./manifests/rbac.yaml
+
 
 ###Manuel provision of CA file
 

@@ -41,7 +41,7 @@ services:
     # This WILL OVERRIDE any existing defaults
     extra_args:
       oidc-issuer-url: https://dex.compliantk8s.com
-      oidc-client-id: test-app
+      oidc-client-id: kubernetes
       oidc-ca-file: /etc/kubernetes/ssl/dex-ca.pem
       oidc-username-claim: email
       oidc-groups-claim: groups

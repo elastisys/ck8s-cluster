@@ -31,57 +31,13 @@ config:
       # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
       issuer: https://accounts.google.com
 
-      # Connector config values starting with a "$" will read from the environment.
+      # Connector config values starting with a "$" will read from the environment. 
+      # Change this to a new google cloud project.
       clientID: 556379655797-vdbk7mmj1ggro13v4q4eivsd65mvs3d2.apps.googleusercontent.com
       clientSecret: 19g7vy1e9zEAlO6hf7jhYEkJ 
 
       # Dex's issuer URL + "/callback"
       redirectURI: https://dex.compliantk8s.com/callback
-
-
-      # Some providers require passing client_secret via POST parameters instead
-      # of basic auth, despite the OAuth2 RFC discouraging it. Many of these
-      # cases are caught internally, but some may need to uncommented the
-      # following field.
-      #
-      # basicAuthUnsupported: true
-      
-      # Google supports whitelisting allowed domains when using G Suite
-      # (Google Apps). The following field can be set to a list of domains
-      # that can log in:
-      #
-      # hostedDomains:
-      #  - example.com
-
-      # List of additional scopes to request in token response
-      # Default is profile and email
-      # Full list at https://github.com/dexidp/dex/blob/master/Documentation/custom-scopes-claims-clients.md
-      # scopes:
-      #  - profile
-      #  - email
-      #  - groups
-
-      # Some providers return claims without "email_verified", when they had no usage of emails verification in enrollement process
-      # or if they are acting as a proxy for another IDP etc AWS Cognito with an upstream SAML IDP
-      # This can be overridden with the below option
-      # insecureSkipEmailVerified: true 
-
-      # When enabled, the OpenID Connector will query the UserInfo endpoint for additional claims. UserInfo claims
-      # take priority over claims returned by the IDToken. This option should be used when the IDToken doesn't contain
-      # all the claims requested.
-      # https://openid.net/specs/openid-connect-core-1_0.html#UserInfo
-      # getUserInfo: true
-
-      # The set claim is used as user id.
-      # Default: sub
-      # Claims list at https://openid.net/specs/openid-connect-core-1_0.html#Claims
-      #
-      # userIDKey: nickname
-      
-      # The set claim is used as user name.
-      # Default: name
-      # userNameKey: nickname
-
   
   staticClients:
     - id: kubernetes
