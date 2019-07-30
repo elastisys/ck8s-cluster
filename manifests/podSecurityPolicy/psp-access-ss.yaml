@@ -71,7 +71,6 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-<<<<<<< HEAD
   name: nfs-provisioner:default-psp
   namespace: harbor
 rules:
@@ -101,8 +100,6 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-=======
->>>>>>> 0e22144... Added dashboard to customer
   name: dex:default-psp
   namespace: dex
 rules:

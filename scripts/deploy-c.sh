@@ -2,6 +2,7 @@
 
 set -e
 
+
 : "${ECK_SS_KUBECONFIG:?Missing ECK_SS_KUBECONFIG}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
@@ -23,6 +24,7 @@ SS_E_IP=$(terraform output ss-elastic-ip)
 popd > /dev/null
 
 ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret quickstart-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+echo "hello"
 
 # NAMESPACES
 
@@ -84,7 +86,6 @@ helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
 
 # FALCO
-
 helm upgrade falco stable/falco --install --namespace falco --version 0.7.6
 
 # OPA

@@ -39,6 +39,9 @@ ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs admin1
 
 # DEX, OAUTH2, DASHBOARD
+
+kubectl create secret tls dex-tls --cert=${SCRIPTS_PATH}/../dashboard/ssl/cert.pem --key=${SCRIPTS_PATH}/../dashboard/ssl/key.pem -n dex
+
 helm upgrade dex ../charts/dex --install --namespace dex \
  -f ../helm-values/dex-values.yaml --debug
 
