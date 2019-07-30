@@ -1,16 +1,16 @@
 elasticsearch:
   scheme: https
   port: 443
-  # TODO: Remove when EIP issue is resolved
-  sslVerify: false
   auth:
     enabled: true
     user: elastic
     password: ""
+
 secret:
 - name: OUTPUT_PASSWORD
   secret_name: elasticsearch
   secret_key: password
+
 extraConfigMaps:
   10-kube-components.conf: |-
     <source>
@@ -54,14 +54,17 @@ extraConfigMaps:
         </pattern>
       </parse>
     </source>
+
 extraVolumes:
   - name: rkelogs
     hostPath:
       path: /var/lib/rancher/rke/log
+
 extraVolumeMounts:
   - name: rkelogs
     mountPath: /var/lib/rancher/rke/log
     readOnly: true
+
 tolerations:
 - effect: NoExecute
   key: "node-role.kubernetes.io/etcd"
