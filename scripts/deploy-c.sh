@@ -52,15 +52,12 @@ source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer
 kubectl -n kube-system create secret generic elasticsearch \
     --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
 
-# TODO: Use upstream chart once https://github.com/kiwigrid/helm-charts/pull/147
-#       is merged.
-# helm repo add kiwigrid https://kiwigrid.github.io
-# helm repo update
-# helm upgrade fluentd kiwigrid/fluentd-elasticsearch \
-helm upgrade fluentd ${SCRIPTS_PATH}/../charts/fluentd-elasticsearch \
+helm repo add kiwigrid https://kiwigrid.github.io
+helm repo update
+helm upgrade fluentd kiwigrid/fluentd-elasticsearch \
     --install --values "${SCRIPTS_PATH}/../helm-values/fluentd-values.yaml" \
     --set "elasticsearch.host=elastic.${ECK_DOMAIN}" \
-    --namespace kube-system --version 4.3.2
+    --namespace kube-system --version 4.5.1
 
 # CERT-MANAGER
 
