@@ -13,15 +13,7 @@ cat <<EOF
 cluster_name: eck-system-services
 
 # Change this path later
-<<<<<<< HEAD
-<<<<<<< HEAD
 ssh_key_path: ~/.ssh/id_rsa
-=======
-ssh_key_path: ~/.ssh/exoscale
->>>>>>> 44c6463... psp and dashboard test
-=======
-ssh_key_path: ~/.ssh/id_rsa
->>>>>>> 0e22144... Added dashboard to customer
 
 nodes:
   - address: $m_ip
