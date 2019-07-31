@@ -40,7 +40,8 @@ source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-s
 
 # DEX, OAUTH2, DASHBOARD
 
-kubectl create secret tls dex-tls --cert=${SCRIPTS_PATH}/../dashboard/ssl/cert.pem --key=${SCRIPTS_PATH}/../dashboard/ssl/key.pem -n dex
+kubectl create secret tls dex-tls --cert=${SCRIPTS_PATH}/../dashboard/ssl/cert.pem \
+     --key=${SCRIPTS_PATH}/../dashboard/ssl/key.pem -n dex --dry-run -o yaml | kubectl apply -f -
 
 helm upgrade dex ../charts/dex --install --namespace dex \
  -f ../helm-values/dex-values.yaml --debug
