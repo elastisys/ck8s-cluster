@@ -45,6 +45,8 @@ helm upgrade dex ${SCRIPTS_PATH}/../charts/dex --install --namespace dex \
     --set "ingress.tls[0].hosts={dex.${ECK_DOMAIN}}" \
     --set "config.issuer=https://dex.${ECK_DOMAIN}" \
     --set "config.connectors[0].config.redirectURI=https://dex.${ECK_DOMAIN}/callback" \
+    --set "config.connectors[0].config.clientID=${GOOGLE_CLIENT_ID}" \
+    --set "config.connectors[0].config.clientSecret=${GOOGLE_CLIENT_SECRET}" \
     --set "config.staticClients[0].redirectURIs={http://localhost:8000,https://dashboard.${ECK_DOMAIN}/oauth2/callback,https://dashboard.${ECK_C_DOMAIN}/oauth2/callback}" \
     -f ${SCRIPTS_PATH}/../helm-values/dex-values.yaml
 

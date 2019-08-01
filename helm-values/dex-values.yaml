@@ -25,11 +25,6 @@ config:
       #
       # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
       issuer: https://accounts.google.com
-
-      # Connector config values starting with a "$" will read from the environment. 
-      # Change this to a new google cloud project.
-      clientID: 556379655797-vdbk7mmj1ggro13v4q4eivsd65mvs3d2.apps.googleusercontent.com
-      clientSecret: 19g7vy1e9zEAlO6hf7jhYEkJ 
   
   staticClients:
     - id: kubernetes  
