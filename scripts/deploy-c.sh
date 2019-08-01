@@ -108,4 +108,4 @@ helm upgrade opa stable/opa --install \
 
 kubectl -n opa create cm policies -o yaml --dry-run \
     --from-file="${SCRIPTS_PATH}/../policies" | kubectl apply -f -
-kubectl -n opa label cm policies openpolicyagent.org/policy=rego
+kubectl -n opa label cm policies openpolicyagent.org/policy=rego --overwrite
