@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: elastic
+  name: elasticsearch
   namespace: elastic-system
   annotations:
     ingress.kubernetes.io/rewrite-target: /
@@ -19,7 +19,7 @@ spec:
       paths:
         - path: /
           backend:
-            serviceName: quickstart-es
+            serviceName: elasticsearch-es-http
             servicePort: 9200
 ---
 apiVersion: extensions/v1beta1
@@ -41,5 +41,5 @@ spec:
       paths:
         - path: /
           backend:
-            serviceName: quickstart-kibana
+            serviceName: kibana-kb-http
             servicePort: 5601

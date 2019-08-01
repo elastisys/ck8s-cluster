@@ -1,10 +1,10 @@
 apiVersion: kibana.k8s.elastic.co/v1alpha1
 kind: Kibana
 metadata:
-  name: quickstart
+  name: kibana
   namespace: elastic-system
 spec:
   version: 7.1.0
   nodeCount: 1
   elasticsearchRef:
-    name: quickstart
+    name: elasticsearch
