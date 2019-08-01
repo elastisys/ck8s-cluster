@@ -14,7 +14,7 @@ config:
     cookie_secure = false
 
 extraArgs:
-  email-domain: "example.com" # Can be changed to gmail.com
+  email-domain: "*" # Can be changed to gmail.com
   http-address: "0.0.0.0:4180"
   provider: oidc
   upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
