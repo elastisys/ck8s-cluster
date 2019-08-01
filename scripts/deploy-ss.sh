@@ -25,6 +25,7 @@ kubectl create namespace elastic-system --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace dex --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace nfs-provisioner --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace influxdb-prometheus --dry-run -o yaml | kubectl apply -f -
 
 # PSP
 
@@ -113,3 +114,17 @@ helm upgrade harbor harbor/harbor --version 1.1.1 \
   --set "expose.ingress.hosts.core=habor.${ECK_DOMAIN}" \
   --set "expose.ingress.hosts.notary=notary.habor.${ECK_DOMAIN}" \
   --set "externalURL=https://harbor.${ECK_DOMAIN}"
+
+#INFLUXDB
+helm upgrade influxdb-prometheus stable/influxdb \
+  --install --namespace influxdb-prometheus \
+  -f ../helm-values/influxdb-values.yaml \
+  --set ingress.hostname=influxdb-prometheus.$ECK_DOMAIN
+
+# Deploy prometheus operator and grafana
+helm upgrade prometheus-operator stable/prometheus-operator \
+  --install --namespace monitoring \
+  -f ../helm-values/prometheus-ss.yaml \
+  --version 6.2.1 \
+  --set grafana.ingress.hosts={grafana.${ECK_DOMAIN}} \
+  --set granafa.ingress.tls.hosts={grafana.${ECK_DOMAIN}}
