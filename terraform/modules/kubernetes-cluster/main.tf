@@ -43,32 +43,6 @@ resource "exoscale_compute" "master" {
     }
   }
 
-  #TODO Remove when letsencrypt works.
-  provisioner "file" {
-    source      = "${path.module}/../../../dashboard/ssl/ca.pem"
-    destination = "/home/rancher/dex-ca.pem"
-
-    connection {
-      type     = "ssh"
-      user     = "rancher"
-      host     = "${self.ip_address}"
-    }
-  }
-  #TODO Remove when letsencrypt works.
-  provisioner "remote-exec" {
-    inline = [
-       "sudo mkdir -p /opt/rke/etc/kubernetes/ssl",
-       "sudo mv /home/rancher/dex-ca.pem /opt/rke/etc/kubernetes/ssl/"
-    ]
-
-    connection {
-      type     = "ssh"
-      user     = "rancher"
-      host     = "${self.ip_address}"
-    }
-  }
-
-
   provisioner "file" {
     source      = "${path.module}/../../../manifests/audit-policy.yaml"
     destination = "/etc/kubernetes/conf/audit-policy.yaml"

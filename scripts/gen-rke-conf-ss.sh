@@ -32,9 +32,8 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_args:
-      oidc-issuer-url: https://dex.compliantk8s.com
+      oidc-issuer-url: https://dex.${ECK_DOMAIN}
       oidc-client-id: kubernetes
-      oidc-ca-file: /etc/kubernetes/ssl/dex-ca.pem # TODO remove when letsencrypt works.
       oidc-username-claim: email
       oidc-groups-claim: groups
       # Enable audit log to stdout

@@ -42,9 +42,8 @@ services:
       - "/etc/kubernetes/conf:/etc/kubernetes/conf"
       - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
-      oidc-issuer-url: https://dex.compliantk8s.com
+      oidc-issuer-url: https://dex.${ECK_DOMAIN}
       oidc-client-id: kubernetes
-      oidc-ca-file: /etc/kubernetes/ssl/dex-ca.pem # TODO remove when letsencrypt works.
       oidc-username-claim: email
       oidc-groups-claim: groups
       audit-policy-file: "/etc/kubernetes/conf/audit-policy.yaml"

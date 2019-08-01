@@ -51,9 +51,13 @@ source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer
 # DASHBOARD, OAUTH2
 
 helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
-    -f ../helm-values/oauth2-proxy-values-c.yaml --version 0.12.3
+    --set "extraArgs.oidc-issuer-url=https://dex.$ECK_DOMAIN" \
+    --set "extraArgs.redirect-url=https://dashboard.$ECK_C_DOMAIN/oauth2/callback" \
+    --set "ingress.hosts={dashboard.$ECK_C_DOMAIN}" \
+    --set "ingress.tls[0].hosts={dashboard.$ECK_C_DOMAIN}" \
+    -f ${SCRIPTS_PATH}/../helm-values/oauth2-proxy-values-c.yaml --version 0.12.3
 
-kubectl apply -f ../manifests/dashboard.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 
 
 # FLUENTD

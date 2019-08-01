@@ -1,14 +1,10 @@
 ingress:
   enabled: true
-  #annotations:
-  #  certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+  annotations:
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
   path: /
-  hosts:
-    - dex.compliantk8s.com
   tls:
     - secretName: dex-tls
-      hosts:
-        - dex.compliantk8s.com
 
 certs:
   web:
@@ -17,7 +13,6 @@ certs:
     create: true
 
 config:
-  issuer: https://dex.compliantk8s.com
   web:
     http: 0.0.0.0:8080
   connectors:
@@ -35,16 +30,9 @@ config:
       # Change this to a new google cloud project.
       clientID: 556379655797-vdbk7mmj1ggro13v4q4eivsd65mvs3d2.apps.googleusercontent.com
       clientSecret: 19g7vy1e9zEAlO6hf7jhYEkJ 
-
-      # Dex's issuer URL + "/callback"
-      redirectURI: https://dex.compliantk8s.com/callback
   
   staticClients:
-    - id: kubernetes
-      redirectURIs:
-        - 'http://localhost:8000'
-        - 'https://dashboard.compliantk8s.com/oauth2/callback'
-        - 'https://dashboard-customer.compliantk8s.com/oauth2/callback'
+    - id: kubernetes  
       name: 'Kubernetes dashboard'
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 
