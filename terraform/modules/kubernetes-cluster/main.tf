@@ -10,14 +10,14 @@ resource "exoscale_compute" "master" {
 
   provisioner "remote-exec" {
     inline = [
-       "sudo mkdir -p /etc/kubernetes/conf",
-       "sudo chown rancher:rancher /etc/kubernetes/conf"
+      "sudo mkdir -p /etc/kubernetes/conf",
+      "sudo chown rancher:rancher /etc/kubernetes/conf"
     ]
 
     connection {
-      type     = "ssh"
-      user     = "rancher"
-      host     = "${self.ip_address}"
+      type = "ssh"
+      user = "rancher"
+      host = "${self.ip_address}"
     }
   }
 
@@ -26,9 +26,9 @@ resource "exoscale_compute" "master" {
     destination = "/etc/kubernetes/conf/admission-control-config.yaml"
 
     connection {
-      type     = "ssh"
-      user     = "rancher"
-      host     = "${self.ip_address}"
+      type = "ssh"
+      user = "rancher"
+      host = "${self.ip_address}"
     }
   }
 
@@ -37,9 +37,9 @@ resource "exoscale_compute" "master" {
     destination = "/etc/kubernetes/conf/podnodeselector.yaml"
 
     connection {
-      type     = "ssh"
-      user     = "rancher"
-      host     = "${self.ip_address}"
+      type = "ssh"
+      user = "rancher"
+      host = "${self.ip_address}"
     }
   }
 
@@ -48,21 +48,21 @@ resource "exoscale_compute" "master" {
     destination = "/etc/kubernetes/conf/audit-policy.yaml"
 
     connection {
-      type     = "ssh"
-      user     = "rancher"
-      host     = "${self.ip_address}"
+      type = "ssh"
+      user = "rancher"
+      host = "${self.ip_address}"
     }
   }
 
   provisioner "remote-exec" {
     inline = [
-       "sudo chown -R root:root /etc/kubernetes/conf"
+      "sudo chown -R root:root /etc/kubernetes/conf"
     ]
 
     connection {
-      type     = "ssh"
-      user     = "rancher"
-      host     = "${self.ip_address}"
+      type = "ssh"
+      user = "rancher"
+      host = "${self.ip_address}"
     }
   }
 }
