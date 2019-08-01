@@ -14,6 +14,8 @@ pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
 # Elastic ip for the customer cluster.
 E_IP=$(terraform output c-elastic-ip)
 
+NFS_SERVER_IP=$(terraform output c-nfs-ip)
+
 popd > /dev/null
 
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
@@ -47,6 +49,13 @@ mkdir -p ${SCRIPTS_PATH}/../certs/customer/kube-system/certs
 ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "admin1"
 
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs admin1
+
+# NFS client provisioner
+
+helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
+  --install --namespace kube-system --version 1.2.6 \
+  --values ${SCRIPTS_PATH}/../helm-values/nfs-client-provisioner-values.yaml \
+  --set nfs.server=${NFS_SERVER_IP}
 
 # DASHBOARD, OAUTH2
 
