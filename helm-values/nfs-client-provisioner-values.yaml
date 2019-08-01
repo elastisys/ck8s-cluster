@@ -1,3 +1,5 @@
+storageClass:
+  defaultClass: true
 serviceAccount:
   name: nfs-client-provisioner
 nfs:
