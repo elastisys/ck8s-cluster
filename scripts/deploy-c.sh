@@ -98,9 +98,16 @@ helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
 
 # FALCO
+
 helm upgrade falco stable/falco --install --namespace falco --version 0.7.6
 
 # OPA
+
+# TODO: This appears to unfortunately take a while. Might want to use the cert
+#       generation in the chart instead of cert-manager.
+echo Waiting for cert-manager webhook to become ready
+kubectl -n cert-manager wait --for=condition=Ready --timeout=300s \
+    certificate cert-manager-webhook-webhook-tls
 
 helm upgrade opa stable/opa --install \
     --values "${SCRIPTS_PATH}/../helm-values/opa-values.yaml" \
