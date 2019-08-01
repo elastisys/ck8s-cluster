@@ -19,7 +19,6 @@ extraArgs:
   provider: oidc
   upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
   pass-authorization-header: true
-  ssl-insecure-skip-verify: true # remove this when letsencrypt works
 
 ingress:
   enabled: true
