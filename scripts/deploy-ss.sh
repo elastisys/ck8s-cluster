@@ -81,7 +81,7 @@ helm upgrade cert-manager jetstack/cert-manager \
 # Elasticsearch and kibana.
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
-sleep 5 
+sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch.yaml
 sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
@@ -90,8 +90,10 @@ cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | 
 
 # NFS client provisioner
 
-helm install stable/nfs-client-provisioner --set nfs.server=${NFS_SERVER_IP} --set nfs.path=/nfs \
- --namespace harbor --set serviceAccount.name=nfs-client-provisioner
+helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
+  --install --namespace kube-system --version 1.2.6 \
+  --values ${SCRIPTS_PATH}/../helm-values/nfs-client-provisioner-values.yaml \
+  --set nfs.server=${NFS_SERVER_IP}
 
 # HARBOR
 

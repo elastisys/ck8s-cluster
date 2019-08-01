@@ -1,0 +1,4 @@
+serviceAccount:
+  name: nfs-client-provisioner
+nfs:
+  path: "/nfs"
