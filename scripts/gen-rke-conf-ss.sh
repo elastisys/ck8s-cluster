@@ -15,8 +15,7 @@ m_ip=$(terraform output ss-master-ip)
 cat <<EOF
 cluster_name: eck-system-services
 
-# Change this path later
-ssh_key_path: ~/.ssh/exoscale
+ssh_agent_auth: true
 
 nodes:
   - address: $m_ip
