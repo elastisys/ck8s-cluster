@@ -47,6 +47,63 @@ spec:
           type: object
         spec:
           properties:
+            config:
+              description: Config represents the APM configuration.
+              type: object
+            elasticsearch:
+              description: Elasticsearch configures how the APM server connects to
+                Elasticsearch
+              properties:
+                auth:
+                  description: Auth configures authentication for APM Server to use.
+                  properties:
+                    inline:
+                      description: Inline is auth provided as plaintext inline credentials.
+                      properties:
+                        password:
+                          description: Password is the password to use.
+                          type: string
+                        username:
+                          description: User is the username to use.
+                          type: string
+                      required:
+                      - username
+                      - password
+                      type: object
+                    secret:
+                      description: SecretKeyRef is a secret that contains the credentials
+                        to use.
+                      type: object
+                  type: object
+                hosts:
+                  description: Hosts are the URLs of the output Elasticsearch nodes.
+                  items:
+                    type: string
+                  type: array
+                ssl:
+                  description: SSL configures TLS-related configuration for Elasticsearch
+                  properties:
+                    certificateAuthorities:
+                      description: CertificateAuthorities is a secret that contains
+                        a `tls.crt` entry that contain certificates for server verifications.
+                      properties:
+                        secretName:
+                          type: string
+                      type: object
+                  type: object
+              type: object
+            elasticsearchRef:
+              description: ElasticsearchRef references an Elasticsearch resource in
+                the Kubernetes cluster. If the namespace is not specified, the current
+                resource namespace will be used.
+              properties:
+                name:
+                  type: string
+                namespace:
+                  type: string
+              required:
+              - name
+              type: object
             featureFlags:
               description: FeatureFlags are apm-specific flags that enable or disable
                 specific experimental features
@@ -58,43 +115,40 @@ spec:
                   description: Service is a template for the Kubernetes Service
                   properties:
                     metadata:
-                      description: Metadata is metadata for the HTTP Service.
-                      properties:
-                        annotations:
-                          description: 'Annotations is an unstructured key value map
-                            stored with a resource that may be set by external tools
-                            to store and retrieve arbitrary metadata. They are not
-                            queryable and should be preserved when modifying objects.
-                            More info: http://kubernetes.io/docs/user-guide/annotations'
-                          type: object
+                      description: ObjectMeta is metadata for the service. The name
+                        and namespace provided here is managed by ECK and will be
+                        ignored.
                       type: object
                     spec:
-                      description: Spec contains user-provided settings for the HTTP
-                        Service.
-                      properties:
-                        type:
-                          description: 'Type determines which service type to use
-                            for this workload. The options are: `ClusterIP|LoadBalancer|NodePort`.
-                            Defaults to ClusterIP.'
-                          enum:
-                          - ClusterIP
-                          - LoadBalancer
-                          - NodePort
-                          type: string
+                      description: Spec defines the behavior of the service.
                       type: object
                   type: object
                 tls:
                   description: TLS describe additional options to consider when generating
-                    nodes TLS certificates.
+                    HTTP TLS certificates.
                   properties:
+                    certificate:
+                      description: 'Certificate is a reference to a secret that contains
+                        the certificate and private key to be used.  The secret should
+                        have the following content:  - `tls.crt`: The certificate
+                        (or a chain). - `tls.key`: The private key to the first certificate
+                        in the certificate chain.'
+                      properties:
+                        secretName:
+                          type: string
+                      type: object
                     selfSignedCertificate:
                       description: SelfSignedCertificate define options to apply to
                         self-signed certificate managed by the operator.
                       properties:
+                        disabled:
+                          description: Disabled turns off the provisioning of self-signed
+                            HTTP TLS certificates.
+                          type: boolean
                         subjectAltNames:
                           description: 'SubjectAlternativeNames is a list of SANs
-                            to include in the nodes certificates. For example: a wildcard
-                            DNS to expose the cluster.'
+                            to include in the HTTP TLS certificates. For example:
+                            a wildcard DNS to expose the cluster.'
                           items:
                             properties:
                               dns:
@@ -114,62 +168,21 @@ spec:
                 must have.
               format: int32
               type: integer
-            output:
-              properties:
-                elasticsearch:
-                  description: Elasticsearch configures the Elasticsearch output
-                  properties:
-                    auth:
-                      description: Auth configures authentication for APM Server to
-                        use.
-                      properties:
-                        inline:
-                          description: Inline is auth provided as plaintext inline
-                            credentials.
-                          properties:
-                            password:
-                              description: Password is the password to use.
-                              type: string
-                            username:
-                              description: User is the username to use.
-                              type: string
-                          type: object
-                        secret:
-                          description: SecretKeyRef is a secret that contains the
-                            credentials to use.
-                          type: object
-                      type: object
-                    hosts:
-                      description: Hosts are the URLs of the output Elasticsearch
-                        nodes.
-                      items:
-                        type: string
-                      type: array
-                    ref:
-                      description: ElasticsearchRef allows users to reference a Elasticsearch
-                        cluster inside k8s to automatically derive the other fields.
-                      properties:
-                        name:
-                          type: string
-                        namespace:
-                          type: string
-                      required:
-                      - name
-                      type: object
-                    ssl:
-                      description: SSL configures TLS-related configuration for Elasticsearch
-                      properties:
-                        certificateAuthoritiesSecret:
-                          description: CertificateAuthoritiesSecret names a secret
-                            that contains a CA file entry to use.
-                          type: string
-                      type: object
-                  type: object
-              type: object
             podTemplate:
               description: PodTemplate can be used to propagate configuration to APM
-                pods. So far, only labels, Affinity and `Containers["apm"].Resources.Limits`
-                are applied.
+                Server pods. This allows specifying custom annotations, labels, environment
+                variables, affinity, resources, etc. for the pods created from this
+                NodeSpec.
+              type: object
+            secureSettings:
+              description: SecureSettings reference a secret containing secure settings,
+                to be injected into the APM keystore on each node. Each individual
+                key/value entry in the referenced secret is considered as an individual
+                secure setting to be injected. The secret must exist in the same namespace
+                as the APM resource.
+              properties:
+                secretName:
+                  type: string
               type: object
             version:
               description: Version represents the version of the APM Server
@@ -177,6 +190,10 @@ spec:
           type: object
         status:
           properties:
+            controllerVersion:
+              description: ControllerVersion is the version of the controller that
+                last updated the ApmServer instance
+              type: string
             health:
               type: string
             secretTokenSecret:
@@ -187,76 +204,6 @@ spec:
               description: ExternalService is the name of the service the agents should
                 connect to.
               type: string
-          type: object
-  version: v1alpha1
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  creationTimestamp: null
-  labels:
-    controller-tools.k8s.io: "1.0"
-  name: clusterlicenses.elasticsearch.k8s.elastic.co
-spec:
-  group: elasticsearch.k8s.elastic.co
-  names:
-    kind: ClusterLicense
-    plural: clusterlicenses
-    shortNames:
-    - cl
-  scope: Namespaced
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            expiryDateInMillis:
-              format: int64
-              type: integer
-            issueDateInMillis:
-              format: int64
-              type: integer
-            issuedTo:
-              type: string
-            issuer:
-              type: string
-            maxNodes:
-              format: int64
-              type: integer
-            signatureRef:
-              type: object
-            startDateInMillis:
-              format: int64
-              type: integer
-            type:
-              type: string
-            uid:
-              description: UID is the license UID not the k8s API UID (!)
-              type: string
-          required:
-          - maxNodes
-          - type
-          - signatureRef
           type: object
   version: v1alpha1
 status:
@@ -333,43 +280,40 @@ spec:
                   description: Service is a template for the Kubernetes Service
                   properties:
                     metadata:
-                      description: Metadata is metadata for the HTTP Service.
-                      properties:
-                        annotations:
-                          description: 'Annotations is an unstructured key value map
-                            stored with a resource that may be set by external tools
-                            to store and retrieve arbitrary metadata. They are not
-                            queryable and should be preserved when modifying objects.
-                            More info: http://kubernetes.io/docs/user-guide/annotations'
-                          type: object
+                      description: ObjectMeta is metadata for the service. The name
+                        and namespace provided here is managed by ECK and will be
+                        ignored.
                       type: object
                     spec:
-                      description: Spec contains user-provided settings for the HTTP
-                        Service.
-                      properties:
-                        type:
-                          description: 'Type determines which service type to use
-                            for this workload. The options are: `ClusterIP|LoadBalancer|NodePort`.
-                            Defaults to ClusterIP.'
-                          enum:
-                          - ClusterIP
-                          - LoadBalancer
-                          - NodePort
-                          type: string
+                      description: Spec defines the behavior of the service.
                       type: object
                   type: object
                 tls:
                   description: TLS describe additional options to consider when generating
-                    nodes TLS certificates.
+                    HTTP TLS certificates.
                   properties:
+                    certificate:
+                      description: 'Certificate is a reference to a secret that contains
+                        the certificate and private key to be used.  The secret should
+                        have the following content:  - `tls.crt`: The certificate
+                        (or a chain). - `tls.key`: The private key to the first certificate
+                        in the certificate chain.'
+                      properties:
+                        secretName:
+                          type: string
+                      type: object
                     selfSignedCertificate:
                       description: SelfSignedCertificate define options to apply to
                         self-signed certificate managed by the operator.
                       properties:
+                        disabled:
+                          description: Disabled turns off the provisioning of self-signed
+                            HTTP TLS certificates.
+                          type: boolean
                         subjectAltNames:
                           description: 'SubjectAlternativeNames is a list of SANs
-                            to include in the nodes certificates. For example: a wildcard
-                            DNS to expose the cluster.'
+                            to include in the HTTP TLS certificates. For example:
+                            a wildcard DNS to expose the cluster.'
                           items:
                             properties:
                               dns:
@@ -392,14 +336,21 @@ spec:
                   config:
                     description: Config represents Elasticsearch configuration.
                     type: object
+                  name:
+                    description: Name is a logical name for this set of nodes. Used
+                      as a part of the managed Elasticsearch node.name setting.
+                    maxLength: 12
+                    pattern: '[a-zA-Z0-9-]*'
+                    type: string
                   nodeCount:
                     description: NodeCount defines how many nodes have this topology
                     format: int32
                     type: integer
                   podTemplate:
                     description: PodTemplate can be used to propagate configuration
-                      to Elasticsearch pods. So far, only labels, Affinity and `Containers["elasticsearch"].Resources.Limits`
-                      are applied.
+                      to Elasticsearch pods. This allows specifying custom annotations,
+                      labels, environment variables, volumes, affinity, resources,
+                      etc. for the pods created from this NodeSpec.
                     type: object
                   volumeClaimTemplates:
                     description: 'VolumeClaimTemplates is a list of claims that pods
@@ -415,6 +366,20 @@ spec:
                     type: array
                 type: object
               type: array
+            podDisruptionBudget:
+              description: PodDisruptionBudget allows full control of the default
+                pod disruption budget.  The default budget selects all cluster pods
+                and sets maxUnavailable to 1. To disable it entirely, set to the empty
+                value (`{}` in YAML).
+              properties:
+                metadata:
+                  description: ObjectMeta is metadata for the service. The name and
+                    namespace provided here is managed by ECK and will be ignored.
+                  type: object
+                spec:
+                  description: Spec of the desired behavior of the PodDisruptionBudget
+                  type: object
+              type: object
             secureSettings:
               description: SecureSettings reference a secret containing secure settings,
                 to be injected into Elasticsearch keystore on each node. Each individual
@@ -424,8 +389,6 @@ spec:
               properties:
                 secretName:
                   type: string
-              required:
-              - secretName
               type: object
             setVmMaxMapCount:
               description: SetVMMaxMapCount indicates whether an init container should
@@ -498,14 +461,16 @@ spec:
           properties:
             clusterUUID:
               type: string
+            controllerVersion:
+              description: ControllerVersion is the version of the controller that
+                last updated the Elasticsearch cluster
+              type: string
             health:
               type: string
             masterNode:
               type: string
             phase:
               type: string
-            remoteClusters:
-              type: object
             service:
               type: string
             zenDiscovery:
@@ -514,186 +479,6 @@ spec:
                   format: int64
                   type: integer
               type: object
-          type: object
-  version: v1alpha1
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  creationTimestamp: null
-  labels:
-    controller-tools.k8s.io: "1.0"
-  name: enterpriselicenses.elasticsearch.k8s.elastic.co
-spec:
-  additionalPrinterColumns:
-  - JSONPath: .status
-    name: status
-    type: string
-  group: elasticsearch.k8s.elastic.co
-  names:
-    kind: EnterpriseLicense
-    plural: enterpriselicenses
-    shortNames:
-    - el
-  scope: Namespaced
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            clusterLicenses:
-              items:
-                properties:
-                  expiryDateInMillis:
-                    format: int64
-                    type: integer
-                  issueDateInMillis:
-                    format: int64
-                    type: integer
-                  issuedTo:
-                    type: string
-                  issuer:
-                    type: string
-                  maxNodes:
-                    format: int64
-                    type: integer
-                  signatureRef:
-                    type: object
-                  startDateInMillis:
-                    format: int64
-                    type: integer
-                  type:
-                    type: string
-                  uid:
-                    description: UID is the license UID not the k8s API UID (!)
-                    type: string
-                required:
-                - maxNodes
-                - type
-                - signatureRef
-                type: object
-              type: array
-            eula:
-              properties:
-                accepted:
-                  type: boolean
-              required:
-              - accepted
-              type: object
-            expiryDateInMillis:
-              format: int64
-              type: integer
-            issueDateInMillis:
-              format: int64
-              type: integer
-            issuedTo:
-              type: string
-            issuer:
-              type: string
-            maxInstances:
-              format: int64
-              type: integer
-            signatureRef:
-              type: object
-            startDateInMillis:
-              format: int64
-              type: integer
-            type:
-              type: string
-            uid:
-              description: UID is the license UID not the k8s API UID (!)
-              type: string
-          required:
-          - type
-          - eula
-          type: object
-        status:
-          type: string
-  version: v1alpha1
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  creationTimestamp: null
-  labels:
-    controller-tools.k8s.io: "1.0"
-  name: remoteclusters.elasticsearch.k8s.elastic.co
-spec:
-  additionalPrinterColumns:
-  - JSONPath: .status.phase
-    name: status
-    type: string
-  group: elasticsearch.k8s.elastic.co
-  names:
-    kind: RemoteCluster
-    plural: remoteclusters
-  scope: Namespaced
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            remote:
-              type: object
-          required:
-          - remote
-          type: object
-        status:
-          properties:
-            clusterName:
-              type: string
-            localTrustRelationship:
-              type: string
-            phase:
-              type: string
-            seedHosts:
-              items:
-                type: string
-              type: array
           type: object
   version: v1alpha1
 status:
@@ -738,93 +523,6 @@ spec:
             caCert:
               description: CaCert contains the PEM-encoded CA certificate for the
                 remote cluster.
-              type: string
-            trustRestrictions:
-              description: TrustRestrictions contains configuration for the trust
-                restrictions feature of Elasticsearch for this relationship
-              properties:
-                trust:
-                  description: Trust contains configuration for the Elasticsearch
-                    trust restrictions.
-                  properties:
-                    subjectName:
-                      description: SubjectName is a list of patterns that incoming
-                        TLS client certificates must match.
-                      items:
-                        type: string
-                      type: array
-                  type: object
-              type: object
-          type: object
-  version: v1alpha1
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  creationTimestamp: null
-  labels:
-    controller-tools.k8s.io: "1.0"
-  name: users.elasticsearch.k8s.elastic.co
-spec:
-  additionalPrinterColumns:
-  - JSONPath: .spec.name
-    name: username
-    type: string
-  - JSONPath: .status.phase
-    name: status
-    type: string
-  group: elasticsearch.k8s.elastic.co
-  names:
-    categories:
-    - elastic
-    kind: User
-    plural: users
-  scope: Namespaced
-  subresources:
-    status: {}
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            name:
-              type: string
-            passwordHash:
-              type: string
-            userRoles:
-              items:
-                type: string
-              type: array
-          required:
-          - name
-          - passwordHash
-          - userRoles
-          type: object
-        status:
-          properties:
-            phase:
-              type: string
-            reason:
               type: string
           type: object
   version: v1alpha1
@@ -888,6 +586,9 @@ spec:
           type: object
         spec:
           properties:
+            config:
+              description: Config represents Kibana configuration.
+              type: object
             elasticsearch:
               description: Elasticsearch configures how Kibana connects to Elasticsearch
               properties:
@@ -908,12 +609,17 @@ spec:
                       - password
                       type: object
                     secret:
+                      description: SecretKeyRef is a secret that contains the credentials
+                        to use.
                       type: object
                   type: object
-                caCertSecret:
-                  description: CaCertSecret names a secret that contains a CA file
-                    entry to use.
-                  type: string
+                certificateAuthorities:
+                  description: CertificateAuthorities names a secret that contains
+                    a CA file entry to use.
+                  properties:
+                    secretName:
+                      type: string
+                  type: object
                 url:
                   description: ElasticsearchURL is the URL to the target Elasticsearch
                   type: string
@@ -943,43 +649,40 @@ spec:
                   description: Service is a template for the Kubernetes Service
                   properties:
                     metadata:
-                      description: Metadata is metadata for the HTTP Service.
-                      properties:
-                        annotations:
-                          description: 'Annotations is an unstructured key value map
-                            stored with a resource that may be set by external tools
-                            to store and retrieve arbitrary metadata. They are not
-                            queryable and should be preserved when modifying objects.
-                            More info: http://kubernetes.io/docs/user-guide/annotations'
-                          type: object
+                      description: ObjectMeta is metadata for the service. The name
+                        and namespace provided here is managed by ECK and will be
+                        ignored.
                       type: object
                     spec:
-                      description: Spec contains user-provided settings for the HTTP
-                        Service.
-                      properties:
-                        type:
-                          description: 'Type determines which service type to use
-                            for this workload. The options are: `ClusterIP|LoadBalancer|NodePort`.
-                            Defaults to ClusterIP.'
-                          enum:
-                          - ClusterIP
-                          - LoadBalancer
-                          - NodePort
-                          type: string
+                      description: Spec defines the behavior of the service.
                       type: object
                   type: object
                 tls:
                   description: TLS describe additional options to consider when generating
-                    nodes TLS certificates.
+                    HTTP TLS certificates.
                   properties:
+                    certificate:
+                      description: 'Certificate is a reference to a secret that contains
+                        the certificate and private key to be used.  The secret should
+                        have the following content:  - `tls.crt`: The certificate
+                        (or a chain). - `tls.key`: The private key to the first certificate
+                        in the certificate chain.'
+                      properties:
+                        secretName:
+                          type: string
+                      type: object
                     selfSignedCertificate:
                       description: SelfSignedCertificate define options to apply to
                         self-signed certificate managed by the operator.
                       properties:
+                        disabled:
+                          description: Disabled turns off the provisioning of self-signed
+                            HTTP TLS certificates.
+                          type: boolean
                         subjectAltNames:
                           description: 'SubjectAlternativeNames is a list of SANs
-                            to include in the nodes certificates. For example: a wildcard
-                            DNS to expose the cluster.'
+                            to include in the HTTP TLS certificates. For example:
+                            a wildcard DNS to expose the cluster.'
                           items:
                             properties:
                               dns:
@@ -1001,8 +704,19 @@ spec:
               type: integer
             podTemplate:
               description: PodTemplate can be used to propagate configuration to Kibana
-                pods. So far, only labels, Affinity and `Containers["kibana"].Resources.Limits`
-                are applied.
+                pods. This allows specifying custom annotations, labels, environment
+                variables, affinity, resources, etc. for the pods created from this
+                NodeSpec.
+              type: object
+            secureSettings:
+              description: SecureSettings reference a secret containing secure settings,
+                to be injected into Kibana keystore on each node. Each individual
+                key/value entry in the referenced secret is considered as an individual
+                secure setting to be injected. The secret must exist in the same namespace
+                as the Kibana resource.
+              properties:
+                secretName:
+                  type: string
               type: object
             version:
               description: Version represents the version of Kibana
@@ -1011,6 +725,10 @@ spec:
         status:
           properties:
             associationStatus:
+              type: string
+            controllerVersion:
+              description: ControllerVersion is the version of the controller that
+                last updated the Kibana instance
               type: string
             health:
               type: string
@@ -1073,18 +791,25 @@ rules:
   - patch
   - delete
 - apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
   - elasticsearch.k8s.elastic.co
   resources:
   - elasticsearches
   - elasticsearches/status
-  - clusterlicenses
+  - elasticsearches/finalizers
   - enterpriselicenses
   - enterpriselicenses/status
-  - trustrelationships
-  - users
-  - users/status
-  - remoteclusters
-  - remoteclusters/status
   verbs:
   - get
   - list
@@ -1098,6 +823,7 @@ rules:
   resources:
   - kibanas
   - kibanas/status
+  - kibanas/finalizers
   verbs:
   - get
   - list
@@ -1111,6 +837,7 @@ rules:
   resources:
   - apmservers
   - apmservers/status
+  - apmservers/finalizers
   verbs:
   - get
   - list
@@ -1161,6 +888,12 @@ subjects:
   name: elastic-operator
   namespace: elastic-system
 
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elastic-system
 
 ---
 
@@ -1183,9 +916,9 @@ spec:
     spec:
       serviceAccountName: elastic-operator
       containers:
-      - image: docker.elastic.co/eck/eck-operator:0.8.1
+      - image: docker.elastic.co/eck/eck-operator:0.9.0
         name: manager
-        args: ["manager", "--operator-roles", "all"]
+        args: ["manager", "--operator-roles", "all", "--enable-debug-logs=false"]
         env:
           - name: OPERATOR_NAMESPACE
             valueFrom:
@@ -1196,7 +929,7 @@ spec:
           - name: WEBHOOK_PODS_LABEL
             value: elastic-operator
           - name: OPERATOR_IMAGE
-            value: docker.elastic.co/eck/eck-operator:0.8.1
+            value: docker.elastic.co/eck/eck-operator:0.9.0
         resources:
           limits:
             cpu: 1
