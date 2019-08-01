@@ -1,8 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+
+source "${SCRIPTS_PATH}/common.sh"
+
 cd ${SCRIPTS_PATH}/../terraform/system-services/
 
 w1_ip=$(terraform output ss-worker1-ip)

@@ -4,10 +4,12 @@ set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
-source "${SCRIPTS_PATH}/deploy-common.sh"
+source "${SCRIPTS_PATH}/common.sh"
 
 : "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
 : "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
+: "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
+: "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
 
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 

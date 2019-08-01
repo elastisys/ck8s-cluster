@@ -7,7 +7,7 @@ set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
-source "${SCRIPTS_PATH}/deploy-common.sh"
+source "${SCRIPTS_PATH}/common.sh"
 
 pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
 
