@@ -50,6 +50,12 @@ ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "admin1"
 
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs admin1
 
+# Add Helm repositories and update repository cache
+
+helm repo add jetstack https://charts.jetstack.io
+helm repo add kiwigrid https://kiwigrid.github.io
+helm repo update
+
 # NFS client provisioner
 
 helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
@@ -74,8 +80,6 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 kubectl -n kube-system create secret generic elasticsearch \
     --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
 
-helm repo add kiwigrid https://kiwigrid.github.io
-helm repo update
 helm upgrade fluentd kiwigrid/fluentd-elasticsearch \
     --install --values "${SCRIPTS_PATH}/../helm-values/fluentd-values.yaml" \
     --set "elasticsearch.host=elastic.${ECK_DOMAIN}" \
@@ -89,11 +93,6 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
-
-# Add the Jetstack Helm repository
-helm repo add jetstack https://charts.jetstack.io
-# Update your local Helm chart repository cache
-helm repo update
 
 helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0

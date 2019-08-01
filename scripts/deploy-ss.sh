@@ -40,6 +40,11 @@ ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "
 
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs admin1
 
+# Add Helm repositories and update repository cache
+
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
 # DEX, OAUTH2, DASHBOARD
 
 helm upgrade dex ${SCRIPTS_PATH}/../charts/dex --install --namespace dex \
@@ -69,11 +74,6 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 # Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
-
-# Add the Jetstack Helm repository
-helm repo add jetstack https://charts.jetstack.io
-# Update your local Helm chart repository cache
-helm repo update
 
 helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
