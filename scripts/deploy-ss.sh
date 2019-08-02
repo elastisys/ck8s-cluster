@@ -127,4 +127,4 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   -f ../helm-values/prometheus-ss.yaml \
   --version 6.2.1 \
   --set grafana.ingress.hosts={grafana.${ECK_DOMAIN}} \
-  --set granafa.ingress.tls.hosts={grafana.${ECK_DOMAIN}}
+  --set grafana.ingress.tls[0].hosts={grafana.${ECK_DOMAIN}}
