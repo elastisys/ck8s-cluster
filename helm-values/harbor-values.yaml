@@ -12,36 +12,15 @@ persistence:
   resourcePolicy: "keep"
   persistentVolumeClaim:
     chartmuseum:
-      existingClaim: "harbor-chartmuseum-claim"
-      accessModes: ReadWriteOnce
-      storageClass: "nfs-client"
-      subPath: "chartmuseum"
       size: 5Gi
     registry:
-      existingClaim: "harbor-registry-claim"
-      accessModes: ReadWriteOnce
-      storageClass: "nfs-client"
-      subPath: "registry"
       size: 5Gi
     jobservice:
-      existingClaim: "harbor-jobservice-claim"
-      accessModes: ReadWriteOnce
-      storageClass: "nfs-client"
-      subPath: "jobservice"
       size: 1Gi
     database:
-      existingClaim: "harbor-database-claim"
-      accessModes: ReadWriteOnce
-      storageClass: "nfs-client"
-      subPath: "database"
       size: 1Gi
     redis:
-      existingClaim: "harbor-redis-claim"
-      accessModes: ReadWriteOnce
-      storageClass: "nfs-client"
-      subPath: "redis"
       size: 1Gi
-    #externalURL: https://core.harbor.harbor
   imageChartStorage:
     type: s3
     s3:

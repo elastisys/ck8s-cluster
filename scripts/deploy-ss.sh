@@ -98,8 +98,6 @@ helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
 
 # HARBOR
 
-#kubectl apply -f ${SCRIPTS_PATH}/../harbor/harbor-claim.yaml
-
 # Create rolebindings for harbor
 kubectl -n harbor create rolebinding harbor-privileged-psp \
     --clusterrole=psp:privileged --serviceaccount=harbor:default \
