@@ -114,7 +114,7 @@ helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
   --set "expose.ingress.core=habor.${ECK_DOMAIN}" \
   --set "expose.ingress.notary=notary.habor.${ECK_DOMAIN}" \
   --set "ingress.tls[0].hosts={habor.${ECK_DOMAIN},notary.harbor.${ECK_DOMAIN}}" \
-  --set "externalURL=https://harbor.${ECK_DOMAIN}" --debug
+  --set "externalURL=https://harbor.${ECK_DOMAIN}"
 
 # Annotate certmanager for harbor
 kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod
