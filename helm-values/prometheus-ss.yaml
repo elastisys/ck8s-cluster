@@ -369,6 +369,7 @@ grafana:
   ##
   defaultDashboardsEnabled: false
 
+  # admin username is "admin"
   adminPassword: prom-operator
 
   ingress:

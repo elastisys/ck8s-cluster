@@ -118,13 +118,13 @@ helm upgrade harbor harbor/harbor --version 1.1.1 \
 #INFLUXDB
 helm upgrade influxdb-prometheus stable/influxdb \
   --install --namespace influxdb-prometheus \
-  -f ../helm-values/influxdb-values.yaml \
+  -f ${SCRIPTS_PATH}/../helm-values/influxdb-values.yaml \
   --set ingress.hostname=influxdb-prometheus.$ECK_DOMAIN
 
 # Deploy prometheus operator and grafana
 helm upgrade prometheus-operator stable/prometheus-operator \
   --install --namespace monitoring \
-  -f ../helm-values/prometheus-ss.yaml \
+  -f ${SCRIPTS_PATH}/../helm-values/prometheus-ss.yaml \
   --version 6.2.1 \
   --set grafana.ingress.hosts={grafana.${ECK_DOMAIN}} \
   --set grafana.ingress.tls[0].hosts={grafana.${ECK_DOMAIN}}

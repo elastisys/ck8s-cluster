@@ -25,9 +25,9 @@ service:
 ## Persist data to a persistent volume
 ##
 persistence:
-  enabled: false #TODO Set to true when persistence volume works.
+  enabled: true
   ## If true will use an existing PVC instead of creating one
-  # useExisting: false
+  useExisting: false
   ## Name of existing PVC to be used in the influx deployment
   # name:
   ## influxdb data Persistent Volume Storage Class
@@ -37,7 +37,7 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
+  storageClass: "nfs-client"
   accessMode: ReadWriteOnce
   size: 8Gi
 
