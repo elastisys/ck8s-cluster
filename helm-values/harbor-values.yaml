@@ -3,6 +3,7 @@ expose:
   tls:
     enabled: true
     secretName: harbor-certs
+    notarySecretName: harbor-notary-certs
   ingress:
     annotations:
       certmanager.k8s.io/cluster-issuer: letsencrypt-prod
