@@ -110,7 +110,11 @@ helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
   --namespace harbor \
   --values ${SCRIPTS_PATH}/../helm-values/harbor-values.yaml \
   --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
-  --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key
+  --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key  \
+  --set "expose.ingress.core=core.habor.${ECK_DOMAIN}" \
+  --set "expose.ingress.notary=notary.habor.${ECK_DOMAIN}" \
+  --set "ingress.tls[0].hosts={core.habor.${ECK_DOMAIN},notary.harbor.${ECK_DOMAIN}}" \
+  --set "externalURL=https://core.harbor.${ECK_DOMAIN}" --debug 
 
 # Annotate certmanager for harbor
 kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod

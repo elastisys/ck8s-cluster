@@ -2,19 +2,12 @@ expose:
   type: ingress
   tls:
     enabled: true
-  ingress:
-    hosts:
-      core: core.harbor.test.compliantk8s.com
-      notary: notary.harbor.test.compliantk8s.com
     # The chart interferes with this annotation so we have to add it later
     # annotations:
     #   certmanager.k8s.io/cluster-issuer: letsencrypt-staging
 ingress:
   tls:
     - secretName: harbor-certs
-      hosts:
-        - core.harbor.test.compliantk8s.com
-        - notary.harbor.test.compliantk8s.com
 
 
 persistence:
@@ -58,5 +51,3 @@ persistence:
       region: de-fra-1
       regionendpoint: "https://sos-de-fra-1.exo.io"
       bucket: harbor-bucket
-
-externalURL: https://core.harbor.test.compliantk8s.com
