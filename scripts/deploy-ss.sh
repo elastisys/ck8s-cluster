@@ -42,6 +42,7 @@ source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-s
 
 # Add Helm repositories and update repository cache
 
+helm repo add harbor https://helm.goharbor.io
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 
@@ -105,16 +106,12 @@ kubectl -n harbor create rolebinding harbor-privileged-psp \
     --dry-run -o yaml | kubectl apply -f -
 
 # Deploying harbor
-helm upgrade harbor ${SCRIPTS_PATH}/../harbor/charts/harbor \
+helm upgrade harbor harbor/harbor --version 1.1.1 \
   --install \
   --namespace harbor \
   --values ${SCRIPTS_PATH}/../helm-values/harbor-values.yaml \
   --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
   --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key  \
-  --set "expose.ingress.core=habor.${ECK_DOMAIN}" \
-  --set "expose.ingress.notary=notary.habor.${ECK_DOMAIN}" \
-  --set "ingress.tls[0].hosts={habor.${ECK_DOMAIN},notary.harbor.${ECK_DOMAIN}}" \
+  --set "expose.ingress.hosts.core=habor.${ECK_DOMAIN}" \
+  --set "expose.ingress.hosts.notary=notary.habor.${ECK_DOMAIN}" \
   --set "externalURL=https://harbor.${ECK_DOMAIN}"
-
-# Annotate certmanager for harbor
-kubectl -n harbor annotate ingress harbor-harbor-ingress certmanager.k8s.io/cluster-issuer=letsencrypt-prod

@@ -2,13 +2,10 @@ expose:
   type: ingress
   tls:
     enabled: true
-    # The chart interferes with this annotation so we have to add it later
-    # annotations:
-    #   certmanager.k8s.io/cluster-issuer: letsencrypt-staging
-ingress:
-  tls:
-    - secretName: harbor-certs
-
+    secretName: harbor-certs
+  ingress:
+    annotations:
+      certmanager.k8s.io/cluster-issuer: letsencrypt-prod
 
 persistence:
   enabled: true
@@ -38,7 +35,7 @@ persistence:
       storageClass: "nfs-client"
       subPath: "database"
       size: 1Gi
-    redis: 
+    redis:
       existingClaim: "harbor-redis-claim"
       accessModes: ReadWriteOnce
       storageClass: "nfs-client"
