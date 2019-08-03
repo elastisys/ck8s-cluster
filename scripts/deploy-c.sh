@@ -120,7 +120,7 @@ kubectl -n opa label cm policies openpolicyagent.org/policy=rego --overwrite
 # Deploy prometheus operator
 helm upgrade prometheus-operator stable/prometheus-operator \
   --install --namespace monitoring \
-  -f helm-values/prometheus-c.yaml \
+  -f ${SCRIPTS_PATH}/../helm-values/prometheus-c.yaml \
   --version 6.2.1 \
   --set "prometheus.prometheusSpec.remoteRead[0].url=https://influxdb-prometheus.${ECK_DOMAIN}/api/v1/prom/read?db\=customer&u\=demo&p\=demo-pass" \
   --set "prometheus.prometheusSpec.remoteWrite[0].url=https://influxdb-prometheus.${ECK_DOMAIN}/api/v1/prom/write?db\=customer&u\=demo&p\=demo-pass"
