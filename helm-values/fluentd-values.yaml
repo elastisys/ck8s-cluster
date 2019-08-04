@@ -54,6 +54,13 @@ extraConfigMaps:
         </pattern>
       </parse>
     </source>
+    # Remove keys that include raw data causing errors
+    # See: https://github.com/uken/fluent-plugin-elasticsearch/issues/452
+    <filter kubeaudit.**>
+      @id kube_api_audit_normalize
+      @type record_transformer
+      remove_keys responseObject,requestObject
+    </filter>
 
 extraVolumes:
   - name: rkelogs
