@@ -5,6 +5,9 @@ import data.kubernetes.namespaces
 operations = {"CREATE", "UPDATE"}
 
 deny[msg] {
+    namespace := input.request.object.metadata.namespace
+    namespace == "opa-restricted-ingress"
+
     input.request.kind.kind == "Ingress"
     operations[input.request.operation]
     host := input.request.object.spec.rules[_].host
