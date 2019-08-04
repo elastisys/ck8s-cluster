@@ -34,7 +34,7 @@ kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 
 # Node restriction
-sh ${SCRIPTS_PATH}/node-restriction.sh
+# sh ${SCRIPTS_PATH}/node-restriction.sh
 
 # PSP
 
