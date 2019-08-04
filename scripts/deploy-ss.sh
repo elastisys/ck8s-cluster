@@ -111,8 +111,8 @@ helm upgrade harbor harbor/harbor --version 1.1.1 \
   --values ${SCRIPTS_PATH}/../helm-values/harbor-values.yaml \
   --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
   --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key  \
-  --set "expose.ingress.hosts.core=habor.${ECK_DOMAIN}" \
-  --set "expose.ingress.hosts.notary=notary.habor.${ECK_DOMAIN}" \
+  --set "expose.ingress.hosts.core=harbor.${ECK_DOMAIN}" \
+  --set "expose.ingress.hosts.notary=notary.harbor.${ECK_DOMAIN}" \
   --set "externalURL=https://harbor.${ECK_DOMAIN}"
 
 #INFLUXDB
