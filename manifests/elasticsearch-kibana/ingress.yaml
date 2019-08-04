@@ -8,6 +8,9 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    # TODO: Set an appropriate size, probably in synergy with fluentd buffer
+    #       and elasticsearch size limits
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
 spec:
   tls:
   - hosts:
