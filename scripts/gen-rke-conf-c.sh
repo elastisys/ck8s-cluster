@@ -67,4 +67,10 @@ ingress:
   provider: "nginx"
   extra_args:
     enable-ssl-passthrough: ""
+
+
+private_registries:
+    - url: harbor.${ECK_DOMAIN}
+      user: admin
+      password: Harbor12345
 EOF
