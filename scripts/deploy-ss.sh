@@ -159,5 +159,5 @@ curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' -
     "enable_content_trust": false,
     "prevent_vulnerable_images_from_running": false,
     "prevent_vulnerable_images_from_running_severity": "",
-    "automatically_scan_images_on_push": false
+    "automatically_scan_images_on_push": true
 }'
