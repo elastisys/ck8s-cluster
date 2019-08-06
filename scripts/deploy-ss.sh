@@ -155,9 +155,11 @@ curl -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_DOMAIN}/api/projects
 echo Creating new private project
 curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_DOMAIN}/api/projects --data '{
     "project_name": "default",
-    "public": 0,
-    "enable_content_trust": false,
-    "prevent_vulnerable_images_from_running": false,
-    "prevent_vulnerable_images_from_running_severity": "",
-    "automatically_scan_images_on_push": true
+    "metadata": {
+      "public": "0",
+      "enable_content_trust": "false",
+      "prevent_vul": "false",
+      "severity": "low",
+      "auto_scan": "true"
+    }
 }'
