@@ -87,7 +87,7 @@ resources: {}
 #    cpu: 8
 
 ingress:
-  enabled: true
+  enabled: false
   tls: true
   secretName: influxdb-prometheus-tls # only needed if tls above is true
   annotations:

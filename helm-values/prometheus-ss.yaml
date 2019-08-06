@@ -367,7 +367,7 @@ grafana:
 
   ## Deploy default dashboards.
   ##
-  defaultDashboardsEnabled: false
+  defaultDashboardsEnabled: true
 
   # admin username is "admin"
   adminPassword: prom-operator
@@ -447,553 +447,7 @@ grafana:
   ## dashboards per provider, use provider name as key.
   ##
   dashboards:
-    default:
-      some-dashboard:
-        json: |
-          {
-            "annotations": {
-              "list": [
-                {
-                  "builtIn": 1,
-                  "datasource": "-- Grafana --",
-                  "enable": true,
-                  "hide": true,
-                  "iconColor": "rgba(0, 211, 255, 1)",
-                  "name": "Annotations & Alerts",
-                  "type": "dashboard"
-                }
-              ]
-            },
-            "editable": true,
-            "gnetId": null,
-            "graphTooltip": 0,
-            "links": [],
-            "panels": [
-              {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": "influxDB-c",
-                "fill": 1,
-                "gridPos": {
-                  "h": 8,
-                  "w": 12,
-                  "x": 0,
-                  "y": 0
-                },
-                "id": 4,
-                "legend": {
-                  "avg": false,
-                  "current": false,
-                  "max": false,
-                  "min": false,
-                  "show": true,
-                  "total": false,
-                  "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {},
-                "percentage": false,
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                  {
-                    "alias": "Node: $tag_node",
-                    "groupBy": [
-                      {
-                        "params": [
-                          "node"
-                        ],
-                        "type": "tag"
-                      }
-                    ],
-                    "measurement": "node:node_cpu_utilisation:avg1m",
-                    "orderByTime": "ASC",
-                    "policy": "default",
-                    "refId": "A",
-                    "resultFormat": "time_series",
-                    "select": [
-                      [
-                        {
-                          "params": [
-                            "value"
-                          ],
-                          "type": "field"
-                        }
-                      ]
-                    ],
-                    "tags": []
-                  }
-                ],
-                "thresholds": [],
-                "timeFrom": null,
-                "timeRegions": [],
-                "timeShift": null,
-                "title": "CPU Utilization",
-                "tooltip": {
-                  "shared": true,
-                  "sort": 0,
-                  "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                  "buckets": null,
-                  "mode": "time",
-                  "name": null,
-                  "show": true,
-                  "values": []
-                },
-                "yaxes": [
-                  {
-                    "format": "percentunit",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                  },
-                  {
-                    "format": "percentunit",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                  }
-                ],
-                "yaxis": {
-                  "align": false,
-                  "alignLevel": null
-                }
-              },
-              {
-                "datasource": "influxDB-c",
-                "gridPos": {
-                  "h": 8,
-                  "w": 12,
-                  "x": 12,
-                  "y": 0
-                },
-                "id": 6,
-                "links": [],
-                "options": {
-                  "fieldOptions": {
-                    "calcs": [
-                      "last"
-                    ],
-                    "defaults": {
-                      "max": 1,
-                      "min": 0,
-                      "unit": "percentunit"
-                    },
-                    "mappings": [],
-                    "override": {},
-                    "thresholds": [
-                      {
-                        "color": "green",
-                        "index": 0,
-                        "value": null
-                      },
-                      {
-                        "color": "red",
-                        "index": 1,
-                        "value": 0.8
-                      }
-                    ],
-                    "values": false
-                  },
-                  "orientation": "auto",
-                  "showThresholdLabels": false,
-                  "showThresholdMarkers": true
-                },
-                "pluginVersion": "6.2.5",
-                "targets": [
-                  {
-                    "alias": "Node: $tag_node",
-                    "groupBy": [
-                      {
-                        "params": [
-                          "node"
-                        ],
-                        "type": "tag"
-                      }
-                    ],
-                    "measurement": "node:node_cpu_utilisation:avg1m",
-                    "orderByTime": "ASC",
-                    "policy": "default",
-                    "query": "SELECT \"value\" FROM \"node:node_cpu_utilisation:avg1m\" WHERE $timeFilter GROUP BY \"node\"",
-                    "rawQuery": true,
-                    "refId": "A",
-                    "resultFormat": "time_series",
-                    "select": [
-                      [
-                        {
-                          "params": [
-                            "value"
-                          ],
-                          "type": "field"
-                        }
-                      ]
-                    ],
-                    "tags": []
-                  }
-                ],
-                "timeFrom": null,
-                "timeShift": null,
-                "title": "CPU Utilization",
-                "type": "gauge"
-              },
-              {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": "influxDB-c",
-                "fill": 1,
-                "gridPos": {
-                  "h": 8,
-                  "w": 12,
-                  "x": 0,
-                  "y": 8
-                },
-                "id": 8,
-                "legend": {
-                  "avg": false,
-                  "current": false,
-                  "max": false,
-                  "min": false,
-                  "show": true,
-                  "total": false,
-                  "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {},
-                "percentage": false,
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                  {
-                    "alias": "Node: $tag_node",
-                    "groupBy": [
-                      {
-                        "params": [
-                          "node"
-                        ],
-                        "type": "tag"
-                      }
-                    ],
-                    "measurement": "node:node_memory_utilisation:",
-                    "orderByTime": "ASC",
-                    "policy": "default",
-                    "query": "SELECT \"value\" FROM \"node_memory_MemTotal_bytes\" WHERE $timeFilter GROUP BY \"instance\"",
-                    "rawQuery": false,
-                    "refId": "A",
-                    "resultFormat": "time_series",
-                    "select": [
-                      [
-                        {
-                          "params": [
-                            "value"
-                          ],
-                          "type": "field"
-                        },
-                        {
-                          "params": [
-                            "*8400000000"
-                          ],
-                          "type": "math"
-                        }
-                      ]
-                    ],
-                    "tags": []
-                  }
-                ],
-                "thresholds": [],
-                "timeFrom": null,
-                "timeRegions": [],
-                "timeShift": null,
-                "title": "Memory Usage",
-                "tooltip": {
-                  "shared": true,
-                  "sort": 0,
-                  "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                  "buckets": null,
-                  "mode": "time",
-                  "name": null,
-                  "show": true,
-                  "values": []
-                },
-                "yaxes": [
-                  {
-                    "format": "decbytes",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                  },
-                  {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                  }
-                ],
-                "yaxis": {
-                  "align": false,
-                  "alignLevel": null
-                }
-              },
-              {
-                "datasource": "influxDB-c",
-                "gridPos": {
-                  "h": 8,
-                  "w": 12,
-                  "x": 12,
-                  "y": 8
-                },
-                "id": 10,
-                "links": [],
-                "options": {
-                  "fieldOptions": {
-                    "calcs": [
-                      "mean"
-                    ],
-                    "defaults": {
-                      "max": 8400000000,
-                      "min": 0,
-                      "unit": "decbytes"
-                    },
-                    "mappings": [],
-                    "override": {},
-                    "thresholds": [
-                      {
-                        "color": "green",
-                        "index": 0,
-                        "value": null
-                      },
-                      {
-                        "color": "red",
-                        "index": 1,
-                        "value": 7600000000
-                      }
-                    ],
-                    "values": false
-                  },
-                  "orientation": "auto",
-                  "showThresholdLabels": false,
-                  "showThresholdMarkers": true
-                },
-                "pluginVersion": "6.2.5",
-                "targets": [
-                  {
-                    "alias": "Node: $tag_node",
-                    "groupBy": [
-                      {
-                        "params": [
-                          "node"
-                        ],
-                        "type": "tag"
-                      }
-                    ],
-                    "measurement": "node:node_memory_utilisation:",
-                    "orderByTime": "ASC",
-                    "policy": "default",
-                    "refId": "A",
-                    "resultFormat": "time_series",
-                    "select": [
-                      [
-                        {
-                          "params": [
-                            "value"
-                          ],
-                          "type": "field"
-                        },
-                        {
-                          "params": [
-                            "*8400000000"
-                          ],
-                          "type": "math"
-                        }
-                      ]
-                    ],
-                    "tags": []
-                  }
-                ],
-                "timeFrom": null,
-                "timeShift": null,
-                "title": "Memory Usage",
-                "type": "gauge"
-              },
-              {
-                "aliasColors": {},
-                "bars": false,
-                "dashLength": 10,
-                "dashes": false,
-                "datasource": "influxDB-c",
-                "fill": 1,
-                "gridPos": {
-                  "h": 8,
-                  "w": 12,
-                  "x": 0,
-                  "y": 16
-                },
-                "id": 14,
-                "legend": {
-                  "avg": false,
-                  "current": false,
-                  "max": false,
-                  "min": false,
-                  "show": true,
-                  "total": false,
-                  "values": false
-                },
-                "lines": true,
-                "linewidth": 1,
-                "links": [],
-                "nullPointMode": "null",
-                "options": {},
-                "percentage": false,
-                "pointradius": 2,
-                "points": false,
-                "renderer": "flot",
-                "seriesOverrides": [],
-                "spaceLength": 10,
-                "stack": false,
-                "steppedLine": false,
-                "targets": [
-                  {
-                    "alias": "Node: $tag_instance",
-                    "groupBy": [
-                      {
-                        "params": [
-                          "instance"
-                        ],
-                        "type": "tag"
-                      }
-                    ],
-                    "measurement": "node:node_filesystem_usage:",
-                    "orderByTime": "ASC",
-                    "policy": "default",
-                    "refId": "A",
-                    "resultFormat": "time_series",
-                    "select": [
-                      [
-                        {
-                          "params": [
-                            "value"
-                          ],
-                          "type": "field"
-                        }
-                      ]
-                    ],
-                    "tags": []
-                  }
-                ],
-                "thresholds": [],
-                "timeFrom": null,
-                "timeRegions": [],
-                "timeShift": null,
-                "title": "Disk space usage",
-                "tooltip": {
-                  "shared": true,
-                  "sort": 0,
-                  "value_type": "individual"
-                },
-                "type": "graph",
-                "xaxis": {
-                  "buckets": null,
-                  "mode": "time",
-                  "name": null,
-                  "show": true,
-                  "values": []
-                },
-                "yaxes": [
-                  {
-                    "format": "percentunit",
-                    "label": null,
-                    "logBase": 1,
-                    "max": "1",
-                    "min": "0",
-                    "show": true
-                  },
-                  {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                  }
-                ],
-                "yaxis": {
-                  "align": false,
-                  "alignLevel": null
-                }
-              }
-            ],
-            "schemaVersion": 18,
-            "style": "dark",
-            "tags": [],
-            "templating": {
-              "list": []
-            },
-            "time": {
-              "from": "now-1h",
-              "to": "now"
-            },
-            "timepicker": {
-              "refresh_intervals": [
-                "5s",
-                "10s",
-                "30s",
-                "1m",
-                "5m",
-                "15m",
-                "30m",
-                "1h",
-                "2h",
-                "1d"
-              ],
-              "time_options": [
-                "5m",
-                "15m",
-                "1h",
-                "6h",
-                "12h",
-                "24h",
-                "2d",
-                "7d",
-                "30d"
-              ]
-            },
-            "timezone": "",
-            "title": "Customer Dashboard",
-            "uid": "e4Us2DvZk",
-            "version": 1
-          }
+    default: {}
 
   extraConfigmapMounts: []
   # - name: certs-configmap
@@ -1004,33 +458,51 @@ grafana:
   ## Configure additional grafana datasources
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
   additionalDataSources:
-  - name: influxDB-c
+  # - name: influxDB-c
+  #   access: proxy
+  #   database: customer
+  #   basicAuth: false
+  #   editable: false
+  #   user: demo 
+  #   secureJsonData:
+  #     password: demo-pass
+  #   jsonData:
+  #     httpMode: GET
+  #   orgId: 1
+  #   type: influxdb
+  #   url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086
+  #   version: 1
+  # - name: influxDB-ss
+  #   access: proxy
+  #   database: system-services
+  #   basicAuth: false
+  #   editable: false
+  #   user: demo 
+  #   secureJsonData:
+  #     password: demo-pass
+  #   jsonData:
+  #     httpMode: GET
+  #   orgId: 1
+  #   type: influxdb
+  #   url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086
+  #   version: 1
+  - name: prometheus-c
     access: proxy
-    database: customer
     basicAuth: false
     editable: false
-    user: demo 
-    secureJsonData:
-      password: demo-pass
-    jsonData:
-      httpMode: GET
+    isDefault: true
     orgId: 1
-    type: influxdb
-    url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086
+    type: prometheus
+    url: http://prometheus-operator-c-prometheus.customer-monitoring.svc.cluster.local:9090
     version: 1
-  - name: influxDB-ss
+  - name: prometheus-ss
     access: proxy
-    database: system-services
     basicAuth: false
     editable: false
-    user: demo 
-    secureJsonData:
-      password: demo-pass
-    jsonData:
-      httpMode: GET
+    isDefault: false
     orgId: 1
-    type: influxdb
-    url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086
+    type: prometheus
+    url: http://prometheus-operator-prometheus:9090
     version: 1
 
   ## If true, create a serviceMonitor for grafana

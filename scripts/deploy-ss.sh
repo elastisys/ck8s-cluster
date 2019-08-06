@@ -118,8 +118,7 @@ helm upgrade harbor harbor/harbor --version 1.1.1 \
 #INFLUXDB
 helm upgrade influxdb-prometheus stable/influxdb \
   --install --namespace influxdb-prometheus \
-  -f ${SCRIPTS_PATH}/../helm-values/influxdb-values.yaml \
-  --set ingress.hostname=influxdb-prometheus.$ECK_DOMAIN
+  -f ${SCRIPTS_PATH}/../helm-values/influxdb-values.yaml
 
 # Deploy prometheus operator and grafana
 helm upgrade prometheus-operator stable/prometheus-operator \
@@ -168,3 +167,9 @@ curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' -
       "auto_scan": "true"
     }
 }'
+
+# Deploy prometheus that will scrape customer prometheus
+helm upgrade prometheus-operator-c stable/prometheus-operator \
+  --install --namespace customer-monitoring \
+  -f ${SCRIPTS_PATH}/../helm-values/prometheus-c-reader.yaml \
+  --version 6.2.1

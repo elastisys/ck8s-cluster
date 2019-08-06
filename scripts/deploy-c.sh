@@ -109,6 +109,8 @@ echo Waiting for cert-manager webhook to become ready
 kubectl -n cert-manager wait --for=condition=Ready --timeout=300s \
     certificate cert-manager-webhook-webhook-tls
 
+sleep 3
+
 helm upgrade opa stable/opa --install \
     --values "${SCRIPTS_PATH}/../helm-values/opa-values.yaml" \
     --namespace opa --version 1.6.0
@@ -123,4 +125,6 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   -f ${SCRIPTS_PATH}/../helm-values/prometheus-c.yaml \
   --version 6.2.1 \
   --set "prometheus.prometheusSpec.remoteRead[0].url=https://influxdb-prometheus.${ECK_DOMAIN}/api/v1/prom/read?db\=customer&u\=demo&p\=demo-pass" \
-  --set "prometheus.prometheusSpec.remoteWrite[0].url=https://influxdb-prometheus.${ECK_DOMAIN}/api/v1/prom/write?db\=customer&u\=demo&p\=demo-pass"
+  --set "prometheus.prometheusSpec.remoteWrite[0].url=https://influxdb-prometheus.${ECK_DOMAIN}/api/v1/prom/write?db\=customer&u\=demo&p\=demo-pass" \
+  --set "prometheus.ingress.hosts={prometheus.${ECK_C_DOMAIN}}" \
+  --set "prometheus.ingress.tls[0].hosts={prometheus.${ECK_C_DOMAIN}}"

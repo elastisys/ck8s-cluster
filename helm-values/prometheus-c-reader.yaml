@@ -19,7 +19,7 @@ commonLabels: {}
 ## Create default rules for monitoring the cluster
 ##
 defaultRules:
-  create: true
+  create: false
   rules:
     alertmanager: true
     etcd: true
@@ -476,7 +476,7 @@ grafana:
 ## Component scraping the kube api server
 ##
 kubeApiServer:
-  enabled: true
+  enabled: false
   tlsConfig:
     serverName: kubernetes
     insecureSkipVerify: false
@@ -513,7 +513,7 @@ kubeApiServer:
 ## Component scraping the kubelet and kubelet-hosted cAdvisor
 ##
 kubelet:
-  enabled: true
+  enabled: false
   namespace: kube-system
 
   serviceMonitor:
@@ -575,7 +575,7 @@ kubelet:
 ## Component scraping the kube controller manager
 ##
 kubeControllerManager:
-  enabled: true
+  enabled: false
 
   ## If your kube controller manager is not deployed as a pod, specify IPs it can be found on
   ##
@@ -628,7 +628,7 @@ kubeControllerManager:
 ## Component scraping coreDns. Use either this or kubeDns
 ##
 coreDns:
-  enabled: true
+  enabled: false
   service:
     port: 9153
     targetPort: 9153
@@ -702,7 +702,7 @@ kubeDns:
 ## Component scraping etcd
 ##
 kubeEtcd:
-  enabled: true
+  enabled: false
 
   ## If your etcd is not deployed as a pod, specify IPs it can be found on
   ##
@@ -762,7 +762,7 @@ kubeEtcd:
 ## Component scraping kube scheduler
 ##
 kubeScheduler:
-  enabled: true
+  enabled: false
 
   ## If your kube scheduler is not deployed as a pod, specify IPs it can be found on
   ##
@@ -815,7 +815,7 @@ kubeScheduler:
 ## Component scraping kube proxy
 ##
 kubeProxy:
-  enabled: true
+  enabled: false
 
   service:
     port: 10249
@@ -851,7 +851,7 @@ kubeProxy:
 ## Component scraping kube state metrics
 ##
 kubeStateMetrics:
-  enabled: true
+  enabled: false
   serviceMonitor:
     ## Scrape interval. If not set, the Prometheus default scrape interval is used.
     ##
@@ -885,7 +885,7 @@ kube-state-metrics:
 ## Deploy node exporter as a daemonset to all nodes
 ##
 nodeExporter:
-  enabled: true
+  enabled: false
 
   ## Use the value configured in prometheus-node-exporter.podLabels
   ##
@@ -973,7 +973,7 @@ prometheusOperator:
 
   ## Deploy CRDs used by Prometheus Operator.
   ##
-  createCustomResource: true
+  createCustomResource: false
 
   ## Customize CRDs API Group
   crdApiGroup: monitoring.coreos.com
@@ -1007,7 +1007,7 @@ prometheusOperator:
   ## ref: https://github.com/coreos/prometheus-operator/blob/master/helm/prometheus-operator/README.md
   ##
   kubeletService:
-    enabled: true
+    enabled: false
     namespace: kube-system
 
   ## Create a servicemonitor for the operator
@@ -1016,7 +1016,7 @@ prometheusOperator:
     ## Scrape interval. If not set, the Prometheus default scrape interval is used.
     ##
     interval: ""
-    selfMonitor: true
+    selfMonitor: false
 
     ## 	metric relabel configs to apply to samples before ingestion.
     ##
@@ -1166,7 +1166,7 @@ prometheus:
     maxUnavailable: ""
 
   ingress:
-    enabled: true
+    enabled: false
     annotations:
       ingress.kubernetes.io/rewrite-target: /
     labels: {}
@@ -1187,6 +1187,8 @@ prometheus:
     ##
     tls:
     - secretName: prometheus-general-tls
+      hosts:
+      - prometheus-customer.$(ECK_DOMAIN)
 
   ## Configure additional options for default pod security policy for Prometheus
   ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
@@ -1422,16 +1424,17 @@ prometheus:
 
     ## The remote_read spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotereadspec
-    remoteRead: []
-    # - url: https://influxdb-prometheus.$(ECK_DOMAIN)/api/v1/prom/read?db=customer&u=demo&p=demo-pass
-
+    remoteRead: 
+    - url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=customer2&u=demo&p=demo-pass
+      read_recent: true
+    
     # - url: http://remote1/read
 
     ## The remote_write spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotewritespec
-    remoteWrite: []
-    # - url: https://influxdb-prometheus.$(ECK_DOMAIN)/api/v1/prom/write?db=customer&u=demo&p=demo-pass
-        
+    remoteWrite: 
+    - url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=customer2&u=demo&p=demo-pass
+
     # - url: http://remote1/push
 
     ## Resource limits & requests
@@ -1464,7 +1467,34 @@ prometheus:
     ## The scrape configuraiton example below will find master nodes, provided they have the name .*mst.*, relabel the
     ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     ##
-    additionalScrapeConfigs: []
+    additionalScrapeConfigs: 
+    - job_name: 'federate'
+      scrape_interval: 15s
+
+      honor_labels: true
+      metrics_path: '/federate'
+
+      scheme: https
+
+      params:
+        'match[]':
+          - '{job="kubelet"}'
+          - '{job="kube-state-metrics"}'
+          - '{job="node-exporter"}'
+          - '{job="coredns"}'
+          - '{job="apiserver"}'
+          - '{__name__=~"job:.*"}'
+          - '{__name__=~"namespace(_|:).*"}'
+
+      tls_config:
+        insecure_skip_verify: true
+
+      static_configs:
+        - targets:
+          - 'prometheus.viktor-c.compliantkubernetes.com'
+          labels:
+            cluster: customer
+
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
     #     - role: node
