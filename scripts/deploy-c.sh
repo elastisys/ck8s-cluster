@@ -2,8 +2,6 @@
 
 set -e
 
-: "${ECK_DOMAIN:?Missing ECK_DOMAIN}"
-: "${ECK_C_DOMAIN:?Missing ECK_C_DOMAIN}"
 : "${ECK_SS_KUBECONFIG:?Missing ECK_SS_KUBECONFIG}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"

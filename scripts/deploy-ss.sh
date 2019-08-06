@@ -6,8 +6,6 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 source "${SCRIPTS_PATH}/common.sh"
 
-: "${ECK_DOMAIN:?Missing ECK_DOMAIN}"
-: "${ECK_C_DOMAIN:?Missing ECK_C_DOMAIN}"
 : "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
 : "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
 : "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
