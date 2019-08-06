@@ -128,3 +128,36 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   --version 6.2.1 \
   --set grafana.ingress.hosts={grafana.${ECK_DOMAIN}} \
   --set grafana.ingress.tls[0].hosts={grafana.${ECK_DOMAIN}}
+
+echo Waiting for harbor to become ready
+
+
+# Waiting for "Clair" to be ready.
+# We cannot use `--wait` due to this: https://github.com/helm/helm/issues/5170
+ready_pods=$(kubectl get deployment -n harbor harbor-harbor-clair -o jsonpath='{.status.readyReplicas}')
+# Set default 0 (output is empty if no pod is ready)
+until [ ${ready_pods:=0} -eq 1 ]
+do
+    echo "Waiting for harbor to become ready..."
+    sleep 5s
+    ready_pods=$(kubectl get deployment -n harbor harbor-harbor-clair -o jsonpath='{.status.readyReplicas}')
+done
+
+#
+#REMEBER TO REMOVE "-k" from curl! Just here for now because of the let's encrypt certificate limitation!
+#
+
+# Deletes the default project "library"
+echo Removing old project from harbor
+curl -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_DOMAIN}/api/projects/1
+
+# Creates new private project "default"
+echo Creating new private project
+curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_DOMAIN}/api/projects --data '{
+    "project_name": "default",
+    "public": 0,
+    "enable_content_trust": false,
+    "prevent_vulnerable_images_from_running": false,
+    "prevent_vulnerable_images_from_running_severity": "",
+    "automatically_scan_images_on_push": false
+}'
