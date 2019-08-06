@@ -1487,12 +1487,10 @@ prometheus:
           - '{__name__=~"namespace(_|:).*"}'
 
       tls_config:
-        insecure_skip_verify: true
+        insecure_skip_verify: true #TODO: remove this later when we have stable certs/when in production
 
       static_configs:
-        - targets:
-          - 'prometheus.viktor-c.compliantkubernetes.com'
-          labels:
+        - labels:
             cluster: customer
 
     # - job_name: kube-etcd

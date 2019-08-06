@@ -6,6 +6,8 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 source "${SCRIPTS_PATH}/common.sh"
 
+: "${ECK_DOMAIN:?Missing ECK_DOMAIN}"
+: "${ECK_C_DOMAIN:?Missing ECK_C_DOMAIN}"
 : "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
 : "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
 : "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
@@ -172,4 +174,5 @@ curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' -
 helm upgrade prometheus-operator-c stable/prometheus-operator \
   --install --namespace customer-monitoring \
   -f ${SCRIPTS_PATH}/../helm-values/prometheus-c-reader.yaml \
-  --version 6.2.1
+  --version 6.2.1 \
+  --set prometheus.prometheusSpec.additionalScrapeConfigs[0].static_configs[0].targets={prometheus.${ECK_C_DOMAIN}}
