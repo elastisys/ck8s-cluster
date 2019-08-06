@@ -132,6 +132,11 @@ helm upgrade prometheus-operator stable/prometheus-operator \
 echo Waiting for harbor to become ready
 
 
+# TODO: This doesn't handle a second run. The Clair pod gets re-created so the
+#       wait thinks it's fine because the old Clair pod is still there but the
+#       new Clair pod is not ready yet causing an internal server error
+#       response when executing the DELETE request.
+
 # Waiting for "Clair" to be ready.
 # We cannot use `--wait` due to this: https://github.com/helm/helm/issues/5170
 ready_pods=$(kubectl get deployment -n harbor harbor-harbor-clair -o jsonpath='{.status.readyReplicas}')
