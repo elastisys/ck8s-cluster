@@ -34,7 +34,7 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_args:
-      oidc-issuer-url: https://dex.${ECK_DOMAIN}
+      oidc-issuer-url: https://dex.${ECK_SS_DOMAIN}
       oidc-client-id: kubernetes
       oidc-username-claim: email
       oidc-groups-claim: groups

@@ -44,7 +44,7 @@ services:
       - "/etc/kubernetes/conf:/etc/kubernetes/conf"
       - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
-      oidc-issuer-url: https://dex.${ECK_DOMAIN}
+      oidc-issuer-url: https://dex.${ECK_SS_DOMAIN}
       oidc-client-id: kubernetes
       oidc-username-claim: email
       oidc-groups-claim: groups
@@ -70,7 +70,7 @@ ingress:
 
 
 private_registries:
-    - url: harbor.${ECK_DOMAIN}
+    - url: harbor.${ECK_SS_DOMAIN}
       user: admin
       password: Harbor12345
 EOF

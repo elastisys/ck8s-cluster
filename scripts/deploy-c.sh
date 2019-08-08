@@ -2,8 +2,6 @@
 
 set -e
 
-: "${ECK_SS_KUBECONFIG:?Missing ECK_SS_KUBECONFIG}"
-
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 source "${SCRIPTS_PATH}/common.sh"
@@ -65,7 +63,7 @@ helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
 # DASHBOARD, OAUTH2
 
 helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
-    --set "extraArgs.oidc-issuer-url=https://dex.$ECK_DOMAIN" \
+    --set "extraArgs.oidc-issuer-url=https://dex.$ECK_SS_DOMAIN" \
     --set "extraArgs.redirect-url=https://dashboard.$ECK_C_DOMAIN/oauth2/callback" \
     --set "ingress.hosts={dashboard.$ECK_C_DOMAIN}" \
     --set "ingress.tls[0].hosts={dashboard.$ECK_C_DOMAIN}" \
@@ -81,7 +79,7 @@ kubectl -n kube-system create secret generic elasticsearch \
 
 helm upgrade fluentd kiwigrid/fluentd-elasticsearch \
     --install --values "${SCRIPTS_PATH}/../helm-values/fluentd-values.yaml" \
-    --set "elasticsearch.host=elastic.${ECK_DOMAIN}" \
+    --set "elasticsearch.host=elastic.${ECK_SS_DOMAIN}" \
     --namespace kube-system --version 4.5.1
 
 # CERT-MANAGER
@@ -123,7 +121,7 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   --install --namespace monitoring \
   -f ${SCRIPTS_PATH}/../helm-values/prometheus-c.yaml \
   --version 6.2.1 \
-  --set "prometheus.prometheusSpec.remoteRead[0].url=https://influxdb-prometheus.${ECK_DOMAIN}/api/v1/prom/read?db\=customer&u\=demo&p\=demo-pass" \
-  --set "prometheus.prometheusSpec.remoteWrite[0].url=https://influxdb-prometheus.${ECK_DOMAIN}/api/v1/prom/write?db\=customer&u\=demo&p\=demo-pass" \
+  --set "prometheus.prometheusSpec.remoteRead[0].url=https://influxdb-prometheus.${ECK_SS_DOMAIN}/api/v1/prom/read?db\=customer&u\=demo&p\=demo-pass" \
+  --set "prometheus.prometheusSpec.remoteWrite[0].url=https://influxdb-prometheus.${ECK_SS_DOMAIN}/api/v1/prom/write?db\=customer&u\=demo&p\=demo-pass" \
   --set "prometheus.ingress.hosts={prometheus.${ECK_C_DOMAIN}}" \
   --set "prometheus.ingress.tls[0].hosts={prometheus.${ECK_C_DOMAIN}}"
