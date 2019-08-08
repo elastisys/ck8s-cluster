@@ -35,19 +35,30 @@ installation is done, each stage can be updated independently.
 ## Cloud infrastructure
 
 Begin with setting up the cloud infrastructure using Terraform.
-
+    export TF_VAR_exoscale_api_key=<xxx>
+    export TF_VAR_exoscale_secret_key=<xxx>
+    export TF_VAR_ssh_pub_key_file=<Path to pub key>
+        
     cd ./terraform/system-services
+    terraform workspace select <Name>
     terraform init
     terraform apply
 
     cd ./terraform/customer
+    terraform workspace select <Name>
     terraform init
     terraform apply
+
+Obs if using a new workspace visit https://app.terraform.io -> settings -> general setting
+and change executing mode from "Remote" to "Local"
 
 ## Kubernetes clusters
 
 Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
+
+    export ECK_SS_DOMAIN=<name-ss>.compliantkubernetes.com
+    export ECK_C_DOMAIN=<name-c>.compliantkubernetes.com
 
     ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
     ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
@@ -58,8 +69,11 @@ Terraform created.
 ## Kubernetes resources
 
 Lastly, create all of the Kubernetes resources in the clusters.
-
-    export ECK_DOMAIN=a1demo.compliantk8s.com
+If the Oauth2 is to work a OAuth2 client need to be created in google under
+APIs & Services -> credentials.
+    
+    export GOOGLE_CLIENT_ID=<xxx>
+    export GOOGLE_CLIENT_SECRET=<xxx>
 
     export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
     ./scripts/deploy-ss.sh
