@@ -85,7 +85,12 @@ APIs & Services -> credentials.
 
 ## DNS
 
-Point `*.$ECK_DOMAIN` to the system services ~~elastic IP~~ worker IPs.
+The Domain name for the SS/C-cluster need to be registered. For "compliantkubernetes.com"
+or "compliantk8s.com" this can be done in aws route 53. Create a A record with 
+`*.<name-ss>.compliantkubernetes.com` and add the worker nodes IPs as values. 
+(do the same for the C-cluster)
+ 
+The values should be replaces with the elastic IP once thats working correctly.
 
 ## Issues and limitations
 
