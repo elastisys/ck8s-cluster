@@ -11,3 +11,4 @@ certs
 **/*.tfstate
 **/*.state
 **/*.rkestate
+env.sh

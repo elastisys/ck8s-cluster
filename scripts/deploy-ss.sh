@@ -50,20 +50,20 @@ helm repo update
 # DEX, OAUTH2, DASHBOARD
 
 helm upgrade dex ${SCRIPTS_PATH}/../charts/dex --install --namespace dex \
-    --set "ingress.hosts={dex.${ECK_DOMAIN}}" \
-    --set "ingress.tls[0].hosts={dex.${ECK_DOMAIN}}" \
-    --set "config.issuer=https://dex.${ECK_DOMAIN}" \
-    --set "config.connectors[0].config.redirectURI=https://dex.${ECK_DOMAIN}/callback" \
+    --set "ingress.hosts={dex.${ECK_SS_DOMAIN}}" \
+    --set "ingress.tls[0].hosts={dex.${ECK_SS_DOMAIN}}" \
+    --set "config.issuer=https://dex.${ECK_SS_DOMAIN}" \
+    --set "config.connectors[0].config.redirectURI=https://dex.${ECK_SS_DOMAIN}/callback" \
     --set "config.connectors[0].config.clientID=${GOOGLE_CLIENT_ID}" \
     --set "config.connectors[0].config.clientSecret=${GOOGLE_CLIENT_SECRET}" \
-    --set "config.staticClients[0].redirectURIs={http://localhost:8000,https://dashboard.${ECK_DOMAIN}/oauth2/callback,https://dashboard.${ECK_C_DOMAIN}/oauth2/callback}" \
+    --set "config.staticClients[0].redirectURIs={http://localhost:8000,https://dashboard.${ECK_SS_DOMAIN}/oauth2/callback,https://dashboard.${ECK_C_DOMAIN}/oauth2/callback}" \
     -f ${SCRIPTS_PATH}/../helm-values/dex-values.yaml
 
 helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
-    --set "extraArgs.redirect-url=https://dashboard.${ECK_DOMAIN}/oauth2/callback" \
-    --set "extraArgs.oidc-issuer-url=https://dex.${ECK_DOMAIN}" \
-    --set "ingress.hosts={dashboard.${ECK_DOMAIN}}" \
-    --set "ingress.tls[0].hosts={dashboard.${ECK_DOMAIN}}" \
+    --set "extraArgs.redirect-url=https://dashboard.${ECK_SS_DOMAIN}/oauth2/callback" \
+    --set "extraArgs.oidc-issuer-url=https://dex.${ECK_SS_DOMAIN}" \
+    --set "ingress.hosts={dashboard.${ECK_SS_DOMAIN}}" \
+    --set "ingress.tls[0].hosts={dashboard.${ECK_SS_DOMAIN}}" \
     -f ${SCRIPTS_PATH}/../helm-values/oauth2-proxy-values-ss.yaml --version 0.12.3 --debug
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
@@ -111,9 +111,9 @@ helm upgrade harbor harbor/harbor --version 1.1.1 \
   --values ${SCRIPTS_PATH}/../helm-values/harbor-values.yaml \
   --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
   --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key  \
-  --set "expose.ingress.hosts.core=harbor.${ECK_DOMAIN}" \
-  --set "expose.ingress.hosts.notary=notary.harbor.${ECK_DOMAIN}" \
-  --set "externalURL=https://harbor.${ECK_DOMAIN}"
+  --set "expose.ingress.hosts.core=harbor.${ECK_SS_DOMAIN}" \
+  --set "expose.ingress.hosts.notary=notary.harbor.${ECK_SS_DOMAIN}" \
+  --set "externalURL=https://harbor.${ECK_SS_DOMAIN}"
 
 #INFLUXDB
 helm upgrade influxdb-prometheus stable/influxdb \
@@ -125,8 +125,8 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   --install --namespace monitoring \
   -f ${SCRIPTS_PATH}/../helm-values/prometheus-ss.yaml \
   --version 6.2.1 \
-  --set grafana.ingress.hosts={grafana.${ECK_DOMAIN}} \
-  --set grafana.ingress.tls[0].hosts={grafana.${ECK_DOMAIN}}
+  --set grafana.ingress.hosts={grafana.${ECK_SS_DOMAIN}} \
+  --set grafana.ingress.tls[0].hosts={grafana.${ECK_SS_DOMAIN}}
 
 echo Waiting for harbor to become ready
 
@@ -153,11 +153,11 @@ done
 
 # Deletes the default project "library"
 echo Removing old project from harbor
-curl -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_DOMAIN}/api/projects/1
+curl -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1
 
 # Creates new private project "default"
 echo Creating new private project
-curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_DOMAIN}/api/projects --data '{
+curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SS_DOMAIN}/api/projects --data '{
     "project_name": "default",
     "metadata": {
       "public": "0",
