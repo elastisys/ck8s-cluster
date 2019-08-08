@@ -35,6 +35,7 @@ installation is done, each stage can be updated independently.
 ## Cloud infrastructure
 
 Begin with setting up the cloud infrastructure using Terraform.
+
     export TF_VAR_exoscale_api_key=<xxx>
     export TF_VAR_exoscale_secret_key=<xxx>
     export TF_VAR_ssh_pub_key_file=<Path to pub key>
