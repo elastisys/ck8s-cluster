@@ -12,10 +12,7 @@ source "${SCRIPTS_PATH}/common.sh"
 : "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
 
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
-
-E_IP=$(terraform output ss-elastic-ip)
-NFS_SERVER_IP=$(terraform output ss-nfs-ip)
-
+NFS_SERVER_IP=$(terraform output ss_nfs_internal_ip_address)
 popd > /dev/null
 
 # NAMESPACES

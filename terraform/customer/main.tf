@@ -20,12 +20,18 @@ provider "exoscale" {
 module "kubernetes_cluster" {
   source = "../modules/kubernetes-cluster"
 
-  master_name   = "${terraform.workspace}-c-master"
-  worker_1_name = "${terraform.workspace}-c-worker1"
-  worker_2_name = "${terraform.workspace}-c-worker2"
+  network_name = "${terraform.workspace}-c-network"
+
+  master_name = "${terraform.workspace}-c-master"
+
+  worker_name  = "${terraform.workspace}-c-worker"
+  worker_count = "${var.worker_count}"
+
+  nfs_name = "${terraform.workspace}-c-nfs"
 
   master_security_group_name = "${terraform.workspace}-c-master-sg"
   worker_security_group_name = "${terraform.workspace}-c-worker-sg"
+  nfs_security_group_name    = "${terraform.workspace}-c-nfs-sg"
 
   ssh_key_name     = "${terraform.workspace}-c-ssh-key"
   ssh_pub_key_file = "${var.ssh_pub_key_file}"

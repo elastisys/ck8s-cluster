@@ -1,19 +1,27 @@
-output "ss-master-ip" {
+output "ss_master_ip_address" {
   value = "${module.kubernetes_cluster.master_ip_address}"
 }
 
-output "ss-worker1-ip" {
-  value = "${module.kubernetes_cluster.worker1_ip_address}"
+output "ss_master_internal_ip_address" {
+  value = "${module.kubernetes_cluster.master_internal_ip_address}"
 }
 
-output "ss-worker2-ip" {
-  value = "${module.kubernetes_cluster.worker2_ip_address}"
+output "ss_worker_ip_addresses" {
+  value = "${module.kubernetes_cluster.worker_ip_addresses}"
 }
 
-output "ss-elastic-ip" {
+output "ss_worker_internal_ip_addresses" {
+  value = "${module.kubernetes_cluster.worker_internal_ip_addresses}"
+}
+
+output "ss_nfs_ip_address" {
+  value = "${module.kubernetes_cluster.nfs_ip_address}"
+}
+
+output "ss_nfs_internal_ip_address" {
+  value = "${module.kubernetes_cluster.nfs_internal_ip_address}"
+}
+
+output "ss_elastic_ip" {
   value = "${module.kubernetes_cluster.elastic_ip_address}"
-}
-
-output "ss-nfs-ip" {
-  value = "${module.kubernetes_cluster.nfs_storage_ip_address}"
 }

@@ -8,9 +8,15 @@ source "${SCRIPTS_PATH}/common.sh"
 
 cd ${SCRIPTS_PATH}/../terraform/customer/
 
-w1_ip=$(terraform output c-worker1-ip)
-w2_ip=$(terraform output c-worker2-ip)
-m_ip=$(terraform output c-master-ip)
+tf_out=$(terraform output -json)
+
+master_ip_address=$(echo ${tf_out} | jq -r '.c_master_ip_address.value')
+master_internal_ip_addresses=$(echo ${tf_out} | jq -r \
+                               '.c_master_internal_ip_address.value')
+
+worker_ip_address=($(echo ${tf_out} | jq -r '.c_worker_ip_addresses.value[]'))
+worker_internal_ip_addresses=($(echo ${tf_out} | jq -r \
+                               '.c_worker_internal_ip_addresses.value[]'))
 
 cat <<EOF
 cluster_name: eck-customer
@@ -18,21 +24,20 @@ cluster_name: eck-customer
 ssh_agent_auth: true
 
 nodes:
-  - address: $m_ip
+  - address: ${master_ip_address}
+    internal_address: ${master_internal_ip_addresses}
     user: rancher
     role: [controlplane,etcd]
-    labels:
-      env: master
-  - address: $w1_ip
+EOF
+for i in $(seq 0 $((${#worker_ip_address[@]} - 1))); do
+cat <<EOF
+  - address: ${worker_ip_address[${i}]}
+    internal_address: ${worker_internal_ip_addresses[${i}]}
     user: rancher
     role: [worker]
-    labels:
-      env: worker
-  - address: $w2_ip
-    user: rancher
-    role: [worker]
-    labels:
-      env: worker
+EOF
+done
+cat <<EOF
 
 services:
   kube-api:
@@ -67,7 +72,6 @@ ingress:
   provider: "nginx"
   extra_args:
     enable-ssl-passthrough: ""
-
 
 private_registries:
     - url: harbor.${ECK_SS_DOMAIN}

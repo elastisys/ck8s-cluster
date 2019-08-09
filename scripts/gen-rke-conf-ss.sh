@@ -8,9 +8,15 @@ source "${SCRIPTS_PATH}/common.sh"
 
 cd ${SCRIPTS_PATH}/../terraform/system-services/
 
-w1_ip=$(terraform output ss-worker1-ip)
-w2_ip=$(terraform output ss-worker2-ip)
-m_ip=$(terraform output ss-master-ip)
+tf_out=$(terraform output -json)
+
+master_ip_address=$(echo ${tf_out} | jq -r '.ss_master_ip_address.value')
+master_internal_ip_addresses=$(echo ${tf_out} | jq -r \
+                               '.ss_master_internal_ip_address.value')
+
+worker_ip_address=($(echo ${tf_out} | jq -r '.ss_worker_ip_addresses.value[]'))
+worker_internal_ip_addresses=($(echo ${tf_out} | jq -r \
+                               '.ss_worker_internal_ip_addresses.value[]'))
 
 cat <<EOF
 cluster_name: eck-system-services
@@ -18,15 +24,20 @@ cluster_name: eck-system-services
 ssh_agent_auth: true
 
 nodes:
-  - address: $m_ip
+  - address: ${master_ip_address}
+    internal_address: ${master_internal_ip_addresses}
     user: rancher
     role: [controlplane,etcd]
-  - address: $w1_ip
+EOF
+for i in $(seq 0 $((${#worker_ip_address[@]} - 1))); do
+cat <<EOF
+  - address: ${worker_ip_address[${i}]}
+    internal_address: ${worker_internal_ip_addresses[${i}]}
     user: rancher
     role: [worker]
-  - address: $w2_ip
-    user: rancher
-    role: [worker]
+EOF
+done
+cat <<EOF
 
 services:
   kube-api:
@@ -45,7 +56,6 @@ services:
       # Set the level of log output to debug-level
       v: 4
       enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
-
 
   etcd:
     snapshot: true

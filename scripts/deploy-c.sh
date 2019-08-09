@@ -9,20 +9,9 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
 pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
-
-# Elastic ip for the customer cluster.
-E_IP=$(terraform output c-elastic-ip)
-
-NFS_SERVER_IP=$(terraform output c-nfs-ip)
-
+NFS_SERVER_IP=$(terraform output c_nfs_internal_ip_address)
 popd > /dev/null
 
-pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
-
-# Elastic ip for the system services cluster.
-SS_E_IP=$(terraform output ss-elastic-ip)
-
-popd > /dev/null
 
 ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
