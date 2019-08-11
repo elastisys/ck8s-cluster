@@ -1,6 +1,23 @@
 locals {
   internal_cidr_prefix  = "172.16.0.0/24"
   internal_network_size = 100
+
+  # TODO: Remove when managed virtual router/DHCP is working properly.
+  master_internal_cidr_host_num  = 1
+  nfs_internal_host_num          = 2
+  worker_internal_host_num_start = 3
+  internal_cidr_prefix_length = element(
+    split("/", local.internal_cidr_prefix),
+    1
+  )
+  master_internal_ip_address = cidrhost(
+    local.internal_cidr_prefix,
+    local.master_internal_cidr_host_num
+  )
+  nfs_internal_ip_address = cidrhost(
+    local.internal_cidr_prefix,
+    local.nfs_internal_host_num
+  )
 }
 
 resource "exoscale_network" "net" {
@@ -23,73 +40,17 @@ resource "exoscale_compute" "master" {
   zone            = "${var.zone}"
   security_groups = ["${exoscale_security_group.master_sg.name}"]
 
-  # TODO: Remove when managed virtual router/DHCP is working properly.
-  user_data = <<EOF
-#cloud-config
-rancher:
-  network:
-    interfaces:
-      eth1:
-        address: ${cidrhost(local.internal_cidr_prefix, 1)}/${element(split("/", local.internal_cidr_prefix), 1)}
-EOF
+  user_data = templatefile(
+    "${path.module}/templates/master-cloud-init.tmpl",
+    {
+      admission_control_config_b64 = filebase64("${path.module}/../../../manifests/pod-node-restriction/admission-control-config.yaml"),
+      podnodeselector_config_b64   = filebase64("${path.module}/../../../manifests/pod-node-restriction/podnodeselector.yaml"),
+      audit_policy_b64             = filebase64("${path.module}/../../../manifests/audit-policy.yaml"),
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mkdir -p /etc/kubernetes/conf",
-      "sudo chown rancher:rancher /etc/kubernetes/conf"
-    ]
-
-    connection {
-      type = "ssh"
-      user = "rancher"
-      host = "${self.ip_address}"
+      # TODO: Remove when managed virtual router/DHCP is working properly.
+      address = "${local.master_internal_ip_address}/${local.internal_cidr_prefix_length}",
     }
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/../../../manifests/pod-node-restriction/admission-control-config.yaml"
-    destination = "/etc/kubernetes/conf/admission-control-config.yaml"
-
-    connection {
-      type = "ssh"
-      user = "rancher"
-      host = "${self.ip_address}"
-    }
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/../../../manifests/pod-node-restriction/podnodeselector.yaml"
-    destination = "/etc/kubernetes/conf/podnodeselector.yaml"
-
-    connection {
-      type = "ssh"
-      user = "rancher"
-      host = "${self.ip_address}"
-    }
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/../../../manifests/audit-policy.yaml"
-    destination = "/etc/kubernetes/conf/audit-policy.yaml"
-
-    connection {
-      type = "ssh"
-      user = "rancher"
-      host = "${self.ip_address}"
-    }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo chown -R root:root /etc/kubernetes/conf"
-    ]
-
-    connection {
-      type = "ssh"
-      user = "rancher"
-      host = "${self.ip_address}"
-    }
-  }
+  )
 }
 
 resource "exoscale_nic" "master_internal" {
@@ -97,7 +58,7 @@ resource "exoscale_nic" "master_internal" {
   network_id = "${exoscale_network.net.id}"
 
   # TODO: Remove when managed virtual router/DHCP is working properly.
-  ip_address = cidrhost(local.internal_cidr_prefix, 1)
+  ip_address = "${local.master_internal_ip_address}"
 }
 
 resource "exoscale_compute" "worker" {
@@ -112,21 +73,13 @@ resource "exoscale_compute" "worker" {
   zone            = "${var.zone}"
   security_groups = ["${exoscale_security_group.worker_sg.name}"]
 
-  user_data = <<EOF
-#cloud-config
-# TODO: Remove when managed virtual router/DHCP is working properly.
-rancher:
-  network:
-    interfaces:
-      eth1:
-        address: ${cidrhost(local.internal_cidr_prefix, 3 + count.index)}/${element(split("/", local.internal_cidr_prefix), 1)}
-
-# Falco required kernel headers to dynamically build and insert its kernel
-# module on pod start.
-runcmd:
-    - sudo ros service enable kernel-headers
-    - sudo ros service up kernel-headers
-EOF
+  user_data = templatefile(
+    "${path.module}/templates/worker-cloud-init.tmpl",
+    {
+      # TODO: Remove when managed virtual router/DHCP is working properly.
+      address = "${cidrhost(local.internal_cidr_prefix, local.worker_internal_host_num_start + count.index)}/${local.internal_cidr_prefix_length}"
+    }
+  )
 }
 
 resource "exoscale_nic" "worker_internal" {
@@ -136,7 +89,10 @@ resource "exoscale_nic" "worker_internal" {
   network_id = "${exoscale_network.net.id}"
 
   # TODO: Remove when managed virtual router/DHCP is working properly.
-  ip_address = cidrhost(local.internal_cidr_prefix, 3 + count.index)
+  ip_address = cidrhost(
+    local.internal_cidr_prefix,
+    local.worker_internal_host_num_start + count.index
+  )
 }
 
 resource "exoscale_compute" "nfs" {
@@ -148,31 +104,16 @@ resource "exoscale_compute" "nfs" {
   state           = "Running"
   zone            = "${var.zone}"
   security_groups = ["${exoscale_security_group.nfs_sg.name}"]
-  user_data       = <<EOF
-#cloud-config
-# TODO: Remove when managed virtual router/DHCP is working properly.
-write_files:
-- path: /etc/netplan/01-privnet.yaml
-  content: |
-    network:
-      version: 2
-      renderer: networkd
-      ethernets:
-        eth1:
-          dhcp4: no
-          addresses:
-           - ${cidrhost(local.internal_cidr_prefix, 2)}/${element(split("/", local.internal_cidr_prefix), 1)}
 
-runcmd:
-  # TODO: Remove when managed virtual router/DHCP is working properly.
-  - sudo netplan apply
+  user_data = templatefile(
+    "${path.module}/templates/nfs-cloud-init.tmpl",
+    {
+      internal_cidr_prefix = "${local.internal_cidr_prefix}"
 
-  - sudo apt-get install nfs-kernel-server -y
-  - sudo mkdir -p /nfs && sudo chown nobody:nogroup /nfs
-  - echo "/nfs ${local.internal_cidr_prefix}(rw,sync,no_subtree_check,no_root_squash)"" > /etc/exports
-  - sudo exportfs -rav
-  - sudo ufw allow 2049
-EOF
+      # TODO: Remove when managed virtual router/DHCP is working properly.
+      address = "${local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length}",
+    }
+  )
 }
 
 resource "exoscale_nic" "nfs_internal" {
@@ -180,7 +121,7 @@ resource "exoscale_nic" "nfs_internal" {
   network_id = "${exoscale_network.net.id}"
 
   # TODO: Remove when managed virtual router/DHCP is working properly.
-  ip_address = cidrhost(local.internal_cidr_prefix, 2)
+  ip_address = "${local.nfs_internal_ip_address}"
 }
 
 resource "exoscale_security_group" "master_sg" {

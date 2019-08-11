@@ -1,0 +1,12 @@
+#cloud-config
+# Falco requires kernel headers to dynamically build and insert its kernel
+# module on pod start.
+runcmd:
+  - sudo ros service enable kernel-headers
+  - sudo ros service up kernel-headers
+# TODO: Remove when managed virtual router/DHCP is working properly.
+rancher:
+  network:
+    interfaces:
+      eth1:
+        address: ${address}

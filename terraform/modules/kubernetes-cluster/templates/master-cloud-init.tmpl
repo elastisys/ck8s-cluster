@@ -1,0 +1,23 @@
+#cloud-config
+write_files:
+  - encoding: b64
+    content: ${admission_control_config_b64}
+    owner: root:root
+    path: /etc/kubernetes/conf/admission-control-config.yaml
+    permissions: '0644'
+  - encoding: b64
+    content: ${podnodeselector_config_b64}
+    owner: root:root
+    path: /etc/kubernetes/conf/podnodeselector.yaml
+    permissions: '0644'
+  - encoding: b64
+    content: ${audit_policy_b64}
+    owner: root:root
+    path: /etc/kubernetes/conf/audit-policy.yaml
+    permissions: '0644'
+# TODO: Remove when managed virtual router/DHCP is working properly.
+rancher:
+  network:
+    interfaces:
+      eth1:
+        address: ${address}
