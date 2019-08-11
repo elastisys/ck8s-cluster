@@ -1234,7 +1234,7 @@ prometheus:
     # hosts:
     #   - prometheus.domain.com
     hosts:
-    - prometheus-ss.$(ECK_DOMAIN)
+    - prometheus-ss.$(ECK_SS_DOMAIN)
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
@@ -1247,7 +1247,7 @@ prometheus:
     tls:
     - secretName: prometheus-general-tls
       hosts:
-        - prometheus-ss.$(ECK_DOMAIN)
+        - prometheus-ss.$(ECK_SS_DOMAIN)
 
   ## Configure additional options for default pod security policy for Prometheus
   ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/

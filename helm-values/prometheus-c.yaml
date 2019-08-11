@@ -1423,14 +1423,14 @@ prometheus:
     ## The remote_read spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotereadspec
     remoteRead: []
-    # - url: https://influxdb-prometheus.$(ECK_DOMAIN)/api/v1/prom/read?db=customer&u=demo&p=demo-pass
+    # - url: https://influxdb-prometheus.$(ECK_SS_DOMAIN)/api/v1/prom/read?db=customer&u=demo&p=demo-pass
 
     # - url: http://remote1/read
 
     ## The remote_write spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotewritespec
     remoteWrite: []
-    # - url: https://influxdb-prometheus.$(ECK_DOMAIN)/api/v1/prom/write?db=customer&u=demo&p=demo-pass
+    # - url: https://influxdb-prometheus.$(ECK_SS_DOMAIN)/api/v1/prom/write?db=customer&u=demo&p=demo-pass
         
     # - url: http://remote1/push
 

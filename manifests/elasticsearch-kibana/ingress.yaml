@@ -14,10 +14,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - elastic.${ECK_DOMAIN}
+    - elastic.${ECK_SS_DOMAIN}
     secretName: elastic-cert
   rules:
-  - host: elastic.${ECK_DOMAIN}
+  - host: elastic.${ECK_SS_DOMAIN}
     http:
       paths:
         - path: /
@@ -37,10 +37,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - kibana.${ECK_DOMAIN}
+    - kibana.${ECK_SS_DOMAIN}
     secretName: kibana-cert
   rules:
-  - host: kibana.${ECK_DOMAIN}
+  - host: kibana.${ECK_SS_DOMAIN}
     http:
       paths:
         - path: /
