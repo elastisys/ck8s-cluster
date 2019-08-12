@@ -74,9 +74,13 @@ Terraform created.
 Lastly, create all of the Kubernetes resources in the clusters.
 If the Oauth2 is to work a OAuth2 client need to be created in google under
 APIs & Services -> credentials.
+
+The certificates for the ingreses in the system can have either staging or productions certificates from letsencrypt. There is a limit to the number of production certificates we can get per week. So staging is recommended during development, but it will yield untrusted certificates. Note that docker will not trust Harbor with staging certs, so you can't push images to Harbor and pods can't pull images from Harbor. 
     
     export GOOGLE_CLIENT_ID=<xxx>
     export GOOGLE_CLIENT_SECRET=<xxx>
+
+    export CERT_TYPE=<prod|staging>
 
     export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
     ./scripts/deploy-ss.sh

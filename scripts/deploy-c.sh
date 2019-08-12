@@ -56,8 +56,10 @@ helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
 helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
     --set "extraArgs.oidc-issuer-url=https://dex.$ECK_SS_DOMAIN" \
     --set "extraArgs.redirect-url=https://dashboard.$ECK_C_DOMAIN/oauth2/callback" \
+    --set "extraArgs.ssl-insecure-skip-verify=${TLS_SKIP_VERIFY}" \
     --set "ingress.hosts={dashboard.$ECK_C_DOMAIN}" \
     --set "ingress.tls[0].hosts={dashboard.$ECK_C_DOMAIN}" \
+    --set "ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}" \
     -f ${SCRIPTS_PATH}/../helm-values/oauth2-proxy-values-c.yaml --version 0.12.3
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
@@ -71,6 +73,7 @@ kubectl -n kube-system create secret generic elasticsearch \
 helm upgrade fluentd kiwigrid/fluentd-elasticsearch \
     --install --values "${SCRIPTS_PATH}/../helm-values/fluentd-values.yaml" \
     --set "elasticsearch.host=elastic.${ECK_SS_DOMAIN}" \
+    --set "elasticsearch.sslVerify=${TLS_VERIFY}" \
     --namespace kube-system --version 4.5.1
 
 # CERT-MANAGER
@@ -112,7 +115,6 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   --install --namespace monitoring \
   -f ${SCRIPTS_PATH}/../helm-values/prometheus-c.yaml \
   --version 6.2.1 \
-  --set "prometheus.prometheusSpec.remoteRead[0].url=https://influxdb-prometheus.${ECK_SS_DOMAIN}/api/v1/prom/read?db\=customer&u\=demo&p\=demo-pass" \
-  --set "prometheus.prometheusSpec.remoteWrite[0].url=https://influxdb-prometheus.${ECK_SS_DOMAIN}/api/v1/prom/write?db\=customer&u\=demo&p\=demo-pass" \
   --set "prometheus.ingress.hosts={prometheus.${ECK_C_DOMAIN}}" \
-  --set "prometheus.ingress.tls[0].hosts={prometheus.${ECK_C_DOMAIN}}"
+  --set "prometheus.ingress.tls[0].hosts={prometheus.${ECK_C_DOMAIN}}" \
+  --set "prometheus.ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}"

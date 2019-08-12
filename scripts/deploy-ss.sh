@@ -49,6 +49,7 @@ helm repo update
 helm upgrade dex ${SCRIPTS_PATH}/../charts/dex --install --namespace dex \
     --set "ingress.hosts={dex.${ECK_SS_DOMAIN}}" \
     --set "ingress.tls[0].hosts={dex.${ECK_SS_DOMAIN}}" \
+    --set "ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}" \
     --set "config.issuer=https://dex.${ECK_SS_DOMAIN}" \
     --set "config.connectors[0].config.redirectURI=https://dex.${ECK_SS_DOMAIN}/callback" \
     --set "config.connectors[0].config.clientID=${GOOGLE_CLIENT_ID}" \
@@ -59,8 +60,10 @@ helm upgrade dex ${SCRIPTS_PATH}/../charts/dex --install --namespace dex \
 helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
     --set "extraArgs.redirect-url=https://dashboard.${ECK_SS_DOMAIN}/oauth2/callback" \
     --set "extraArgs.oidc-issuer-url=https://dex.${ECK_SS_DOMAIN}" \
+    --set "extraArgs.ssl-insecure-skip-verify=${TLS_SKIP_VERIFY}" \
     --set "ingress.hosts={dashboard.${ECK_SS_DOMAIN}}" \
     --set "ingress.tls[0].hosts={dashboard.${ECK_SS_DOMAIN}}" \
+    --set "ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}" \
     -f ${SCRIPTS_PATH}/../helm-values/oauth2-proxy-values-ss.yaml --version 0.12.3 --debug
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
@@ -110,6 +113,7 @@ helm upgrade harbor harbor/harbor --version 1.1.1 \
   --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key  \
   --set "expose.ingress.hosts.core=harbor.${ECK_SS_DOMAIN}" \
   --set "expose.ingress.hosts.notary=notary.harbor.${ECK_SS_DOMAIN}" \
+  --set "expose.ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}" \
   --set "externalURL=https://harbor.${ECK_SS_DOMAIN}"
 
 #INFLUXDB
@@ -123,7 +127,8 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   -f ${SCRIPTS_PATH}/../helm-values/prometheus-ss.yaml \
   --version 6.2.1 \
   --set grafana.ingress.hosts={grafana.${ECK_SS_DOMAIN}} \
-  --set grafana.ingress.tls[0].hosts={grafana.${ECK_SS_DOMAIN}}
+  --set grafana.ingress.tls[0].hosts={grafana.${ECK_SS_DOMAIN}} \
+  --set "grafana.ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}"
 
 echo Waiting for harbor to become ready
 
@@ -170,4 +175,5 @@ helm upgrade prometheus-operator-c stable/prometheus-operator \
   --install --namespace customer-monitoring \
   -f ${SCRIPTS_PATH}/../helm-values/prometheus-c-reader.yaml \
   --version 6.2.1 \
-  --set prometheus.prometheusSpec.additionalScrapeConfigs[0].static_configs[0].targets={prometheus.${ECK_C_DOMAIN}}
+  --set prometheus.prometheusSpec.additionalScrapeConfigs[0].static_configs[0].targets={prometheus.${ECK_C_DOMAIN}} \
+  --set "prometheus.prometheusSpec.additionalScrapeConfigs[0].tls_config.insecure_skip_verify=$TLS_SKIP_VERIFY"
