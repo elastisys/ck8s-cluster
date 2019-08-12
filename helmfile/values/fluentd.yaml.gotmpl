@@ -1,0 +1,83 @@
+elasticsearch:
+  scheme: https
+  port: 443
+  auth:
+    enabled: true
+    user: elastic
+    password: ""
+
+  host: elastic.{{ requiredEnv "ECK_SS_DOMAIN" }}
+
+secret:
+- name: OUTPUT_PASSWORD
+  secret_name: elasticsearch
+  secret_key: password
+
+extraConfigMaps:
+  10-kube-components.conf: |-
+    <source>
+      @id kube-components
+      @type tail
+      path /var/lib/rancher/rke/log/*.log
+      pos_file /var/log/fluentd-kube-components.pos
+      tag kubecomponents.*
+      read_from_head true
+      <parse>
+        @type multi_format
+        <pattern>
+          format json
+          time_key time
+          time_format %Y-%m-%dT%H:%M:%S.%NZ
+        </pattern>
+      </parse>
+    </source>
+    <filter kubecomponents.**>
+      @type record_transformer
+      enable_ruby true
+      <record>
+        component ${tag_suffix[6].split("_")[0]}
+        container_id ${tag_suffix[6].split("_")[1]}
+      </record>
+    </filter>
+  20-kube-audit.conf: |-
+    <source>
+      @id kube-audit
+      @type tail
+      path /var/log/kube-audit/kube-apiserver.log
+      pos_file /var/log/kube-audit/fluentd-kube-apiserver.pos
+      tag kubeaudit.*
+      read_from_head true
+      <parse>
+        @type multi_format
+        <pattern>
+          format json
+          time_key time
+          time_format %Y-%m-%dT%H:%M:%S.%NZ
+        </pattern>
+      </parse>
+    </source>
+    # Remove keys that include raw data causing errors
+    # See: https://github.com/uken/fluent-plugin-elasticsearch/issues/452
+    <filter kubeaudit.**>
+      @id kube_api_audit_normalize
+      @type record_transformer
+      remove_keys responseObject,requestObject
+    </filter>
+
+extraVolumes:
+  - name: rkelogs
+    hostPath:
+      path: /var/lib/rancher/rke/log
+
+extraVolumeMounts:
+  - name: rkelogs
+    mountPath: /var/lib/rancher/rke/log
+    readOnly: true
+
+tolerations:
+- effect: NoExecute
+  key: "node-role.kubernetes.io/etcd"
+  value: "true"
+- effect: NoSchedule
+  key: "node-role.kubernetes.io/controlplane"
+  value: "true"

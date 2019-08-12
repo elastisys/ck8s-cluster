@@ -1,0 +1,43 @@
+ingress:
+  enabled: true
+  annotations:
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+  path: /
+  tls:
+  - secretName: dex-tls
+    hosts: 
+    - dex.{{ requiredEnv "ECK_SS_DOMAIN" }} 
+  hosts:
+  - dex.{{ requiredEnv "ECK_SS_DOMAIN" }}
+
+certs:
+  web:
+    create: true
+  grpc:
+    create: true
+
+config:
+  web:
+    http: 0.0.0.0:8080
+  connectors:
+  - type: oidc
+    id: google
+    name: Google
+    config:
+      # Canonical URL of the provider, also used for configuration discovery.
+      # This value MUST match the value returned in the provider config discovery.
+      #
+      # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
+      issuer: https://accounts.google.com
+      redirectURI: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/callback
+      clientID: {{ requiredEnv "GOOGLE_CLIENT_ID" }}
+      clientSecret: {{ requiredEnv "GOOGLE_CLIENT_SECRET" }}
+  staticClients:
+    - id: kubernetes
+      name: 'Kubernetes dashboard'
+      secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+      redirectURIs:
+      - http://localhost:8000
+      - https://dashboard.{{ requiredEnv "ECK_SS_DOMAIN" }}/oauth2/callback
+      - https://dashboard.{{ requiredEnv "ECK_C_DOMAIN" }}/oauth2/callback
+  issuer: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}

@@ -1,0 +1,13 @@
+prometheus:
+  prometheusSpec:
+    remoteRead:
+    - url: https://influxdb-prometheus.{{ requiredEnv "ECK_SS_DOMAIN"}}/api/v1/prom/read?db\=customer&u\=demo&p\=demo-pass
+    remoteWrite:
+    - url: https://influxdb-prometheus.${{ requiredEnv "ECK_SS_DOMAIN" }}/api/v1/prom/write?db\=customer&u\=demo&p\=demo-pass
+  ingress:
+    hosts:
+    - prometheus.{{ requiredEnv "ECK_C_DOMAIN"}}
+    tls:
+    - secretName: prometheus-general-tls
+      hosts:
+      - prometheus.{{ requiredEnv "ECK_C_DOMAIN"}}
