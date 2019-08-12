@@ -9,6 +9,7 @@ clusters. One called "system services" and one called "customer".
 The system service cluster provides observability, log aggregation,
 private container registry with vulnerability scanning and authentication using
 the following services:
+
 * Prometheus and Grafana
 * Elasticsearch and Kibana
 * Harbor
@@ -17,6 +18,7 @@ the following services:
 The customer cluster manages the customer applications as well as providing
 intrusion detection, security policies, log forwarding and monitoring using the
 following services:
+
 * Falco
 * Open Policy Agent
 * Fluentd
