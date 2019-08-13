@@ -19,13 +19,13 @@ extraArgs:
   provider: oidc
   upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
   pass-authorization-header: true
-  redirect-url: https://dashboard.{{ requiredEnv "ECK_SS_DOMAIN" }}/oauth2/callback"
+  redirect-url: https://dashboard.{{ requiredEnv "ECK_SS_DOMAIN" }}/oauth2/callback
   oidc-issuer-url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}
-
+  ssl-insecure-skip-verify: {{ requiredEnv "TLS_SKIP_VERIFY" }}
 ingress:
   enabled: true
   annotations:
-    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
   path: /
   # Used to create an Ingress record.
   tls:

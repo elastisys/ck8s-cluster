@@ -8,6 +8,10 @@
 
 # Lockfiles does not work for multiple environments. 
 
+# How to handle if let's say harbor is installed and then acidentally removed.
+# How would you recover from such an error?
+# PVC are kept which prevents it from being installed again.
+# How to handle that?
 
 # Chart repositories used from within this state file.
 repositories:
@@ -53,17 +57,17 @@ helmDefaults:
   # path to TLS CA certificate file (default "$HELM_HOME/ca.pem")
   tlsCACert: "../certs/system-services/kube-system/certs/ca.pem"
   # path to TLS certificate file (default "$HELM_HOME/cert.pem")
-  tlsCert: "../certs/system-services/kube-system/certs/admin1.pem"
+  tlsCert: "../certs/system-services/kube-system/certs/helm.pem"
   # path to TLS key file (default "$HELM_HOME/key.pem")
-  tlsKey: "../certs/system-services/kube-system/certs/admin1-key.pem"
+  tlsKey: "../certs/system-services/kube-system/certs/helm-key.pem"
   {{ end }}
   {{ if eq .Environment.Name "customer" }}
   # path to TLS CA certificate file (default "$HELM_HOME/ca.pem")
   tlsCACert: "../certs/customer/kube-system/certs/ca.pem"
   # path to TLS certificate file (default "$HELM_HOME/cert.pem")
-  tlsCert: "../certs/customer/kube-system/certs/admin1.pem"
+  tlsCert: "../certs/customer/kube-system/certs/helm.pem"
   # path to TLS key file (default "$HELM_HOME/key.pem")
-  tlsKey: "../certs/customer/kube-system/certs/admin1-key.pem"
+  tlsKey: "../certs/customer/kube-system/certs/helm-key.pem"
   {{ end }}
 
 
@@ -83,6 +87,7 @@ releases:
   chart: stable/nfs-client-provisioner
   version: 1.2.6
   missingFileHandler: error
+  wait: true
   values:
   {{ if eq .Environment.Name "system-services" }}
   - values/nfs-client-provisioner-ss.yaml.gotmpl
@@ -116,6 +121,7 @@ releases:
   chart: jetstack/cert-manager
   version: v0.8.0
   missingFileHandler: error
+  wait: true # We need to wait
 
   # Prometheus-operator
 - name: prometheus-operator
@@ -131,7 +137,6 @@ releases:
 {{ end }}
 {{ if eq .Environment.Name "customer" }}
   - values/prometheus-operator-c.yaml.gotmpl
-  - values/prometheus-operator-c-testing.yaml.gotmpl
 {{ end }}
 
 {{ if eq .Environment.Name "system-services" }}
@@ -156,6 +161,7 @@ releases:
   chart: harbor/harbor
   version: 1.1.1
   missingFileHandler: error
+  wait: true
   values:
   - values/harbor.yaml.gotmpl
 

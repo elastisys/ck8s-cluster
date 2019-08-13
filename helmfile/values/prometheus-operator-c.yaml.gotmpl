@@ -1155,13 +1155,14 @@ prometheus:
     enabled: true
     annotations:
       ingress.kubernetes.io/rewrite-target: /
+      certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
     labels: {}
 
     ## Hostnames.
     ## Must be provided if Ingress is enabled.
     ##
-    # hosts:
-    #   - prometheus.domain.com
+    hosts:
+    - prometheus.{{ requiredEnv "ECK_C_DOMAIN"}}
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
@@ -1173,6 +1174,11 @@ prometheus:
     ##
     tls:
     - secretName: prometheus-general-tls
+      hosts:
+      - prometheus.{{ requiredEnv "ECK_C_DOMAIN"}}
+
+
+
 
   ## Configure additional options for default pod security policy for Prometheus
   ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/

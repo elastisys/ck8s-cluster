@@ -5,8 +5,8 @@ elasticsearch:
     enabled: true
     user: elastic
     password: ""
-
   host: elastic.{{ requiredEnv "ECK_SS_DOMAIN" }}
+  sslVerify: {{ requiredEnv "TLS_VERIFY" }}
 
 secret:
 - name: OUTPUT_PASSWORD

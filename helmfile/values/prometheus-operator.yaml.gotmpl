@@ -366,7 +366,7 @@ grafana:
     ##
     annotations:
       ingress.kubernetes.io/rewrite-target: /
-      certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+      certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
 

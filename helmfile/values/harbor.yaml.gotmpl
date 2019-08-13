@@ -6,7 +6,7 @@ expose:
     notarySecretName: harbor-notary-certs
   ingress:
     annotations:
-      certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+      certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
     hosts:
       core: harbor.{{ requiredEnv "ECK_SS_DOMAIN" }}
       notary: notary.harbor.{{ requiredEnv "ECK_SS_DOMAIN" }}

@@ -26,13 +26,16 @@ The following environment variables needs to be set in order to install all helm
 * `TF_VAR_exoscale_secret_key`
 * `TF_VAR_exoscale_api_key`
 * `CERT_TYPE`
+* `TLS_SKIP_VERIFY`
+* `TLS_VERIFY`
 
 ### Helmfile environments
 There is one environment for each cluster type:`system-services` and `customer`. 
 Environemnts are specififed by using the flag `-e <environment_name>`. 
 
-
 #### Check status
 
         helmfile -e customer -f helmfile.yaml status
         helmfile -e system-services -f helmfile.yaml status
+
+ToBeContinued!

@@ -1,11 +1,14 @@
 #!/bin/bash
 
 set -e
+
 : "${ECK_SS_KUBECONFIG:?Missing ECK_SS_KUBECONFIG}"
+: "${NFS_C_SERVER_IP:?Missing NFS_C_SERVER_IP}"
+
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
-# ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
 
 # NAMESPACES
@@ -26,8 +29,8 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-c.yam
 
 # HELM, TILLER
 mkdir -p ${SCRIPTS_PATH}/../certs/customer/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "admin1"
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs admin1
+${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "helm"
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs "helm"
 
 
 # DASHBOARD
@@ -45,11 +48,6 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
 
 
 # OPA
-# TODO: This appears to unfortunately take a while. Might want to use the cert
-#       generation in the chart instead of cert-manager.
-# echo Waiting for cert-manager webhook to become ready
-# kubectl -n cert-manager wait --for=condition=Ready --timeout=300s \
-#     certificate cert-manager-webhook-webhook-tls
 kubectl -n opa create cm policies -o yaml --dry-run \
     --from-file="${SCRIPTS_PATH}/../policies" | kubectl apply -f -
 kubectl -n opa label cm policies openpolicyagent.org/policy=rego --overwrite
@@ -61,3 +59,12 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/ma
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/podmonitor.crd.yaml
+
+# Helmfile
+echo
+echo Continuing to Helmfile
+echo
+
+cd ${SCRIPTS_PATH}/../helmfile
+helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner apply
+helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner apply
