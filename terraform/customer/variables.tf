@@ -12,7 +12,7 @@ variable exoscale_secret_key {
   default = ""
 }
 
-variable ssh_pub_key_file {
+variable ssh_pub_key_file_c {
   description = "Path to public SSH key file which is injected into the VMs."
 
   type = string

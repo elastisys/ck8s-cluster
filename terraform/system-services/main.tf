@@ -34,5 +34,5 @@ module "kubernetes_cluster" {
   nfs_security_group_name    = "${terraform.workspace}-ss-nfs-sg"
 
   ssh_key_name     = "${terraform.workspace}-ss-ssh-key"
-  ssh_pub_key_file = "${var.ssh_pub_key_file}"
+  ssh_pub_key_file = "${var.ssh_pub_key_file_ss}"
 }

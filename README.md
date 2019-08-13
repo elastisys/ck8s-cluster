@@ -50,7 +50,8 @@ Begin with setting up the cloud infrastructure using Terraform.
 
     export TF_VAR_exoscale_api_key=<xxx>
     export TF_VAR_exoscale_secret_key=<xxx>
-    export TF_VAR_ssh_pub_key_file=<Path to pub key>
+    export TF_VAR_ssh_pub_key_file_ss=<Path to pub key for system services cluster>
+    export TF_VAR_ssh_pub_key_file_c=<Path to pub key for customer cluster>
 
     cd ./terraform/system-services
     terraform init
