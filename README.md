@@ -34,26 +34,36 @@ When first setting up the demo environment each stage needs to be done in
 sequential order since they are dependent on each other. Once the initial
 installation is done, each stage can be updated independently.
 
+## Requirements
+
+- [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.6)
+- [exoscale provider for terraform](https://github.com/exoscale/terraform-provider-exoscale/releases) (tested with 0.11.0)
+- [RKE](https://github.com/rancher/rke/releases) (tested with 0.2.7)
+- [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
+- [helm](https://github.com/helm/helm/releases) (tested with 2.14.3)
+
 ## Cloud infrastructure
+
+See [terraform/README.md](terraform/README.md) for more details on the steps below.
 
 Begin with setting up the cloud infrastructure using Terraform.
 
     export TF_VAR_exoscale_api_key=<xxx>
     export TF_VAR_exoscale_secret_key=<xxx>
     export TF_VAR_ssh_pub_key_file=<Path to pub key>
-        
+
     cd ./terraform/system-services
-    terraform workspace select <Name>
     terraform init
+    terraform workspace select <Name>
     terraform apply
 
     cd ./terraform/customer
-    terraform workspace select <Name>
     terraform init
+    terraform workspace select <Name>
     terraform apply
 
-Obs if using a new workspace visit https://app.terraform.io -> settings -> general setting
-and change executing mode from "Remote" to "Local"
+Obs if using a new workspace visit https://app.terraform.io, click your workspace and go to settings -> general setting
+and change executing mode from "Remote" to "Local".
 
 ## Kubernetes clusters
 
@@ -72,11 +82,11 @@ Terraform created.
 ## Kubernetes resources
 
 Lastly, create all of the Kubernetes resources in the clusters.
-If the Oauth2 is to work a OAuth2 client need to be created in google under
+If the Oauth2 is to work a OAuth2 client need to be created in [google console](https://console.cloud.google.com/apis/credentials) under
 APIs & Services -> credentials.
 
-The certificates for the ingreses in the system can have either staging or productions certificates from letsencrypt. There is a limit to the number of production certificates we can get per week. So staging is recommended during development, but it will yield untrusted certificates. Note that docker will not trust Harbor with staging certs, so you can't push images to Harbor and pods can't pull images from Harbor. 
-    
+The certificates for the ingreses in the system can have either staging or productions certificates from letsencrypt. There is a limit to the number of production certificates we can get per week. So staging is recommended during development, but it will yield untrusted certificates. Note that docker will not trust Harbor with staging certs, so you can't push images to Harbor and pods can't pull images from Harbor.
+
     export GOOGLE_CLIENT_ID=<xxx>
     export GOOGLE_CLIENT_SECRET=<xxx>
 
@@ -92,10 +102,10 @@ The certificates for the ingreses in the system can have either staging or produ
 ## DNS
 
 The Domain name for the SS/C-cluster need to be registered. For "compliantkubernetes.com"
-or "compliantk8s.com" this can be done in aws route 53. Create a A record with 
-`*.<name-ss>.compliantkubernetes.com` and add the worker nodes IPs as values. 
+or "compliantk8s.com" this can be done in aws route 53. Create a A record with
+`*.<name-ss>.compliantkubernetes.com` and add the worker nodes IPs as values.
 (do the same for the C-cluster)
- 
+
 The values should be replaces with the elastic IP once thats working correctly.
 
 ## Issues and limitations
