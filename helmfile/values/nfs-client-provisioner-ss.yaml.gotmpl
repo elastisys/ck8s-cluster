@@ -4,4 +4,4 @@ serviceAccount:
   name: nfs-client-provisioner
 nfs:
   path: "/nfs"
-  server: {{ requiredEnv "NFS_SERVER_IP" }}
+  server: {{ requiredEnv "NFS_SS_SERVER_IP" }}

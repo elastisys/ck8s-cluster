@@ -45,14 +45,11 @@ helmDefaults:
   # force: true
   # enable TLS for request to Tiller
   tls: true
-  #
-  # TODO
-  # Check if this can be controlled by using environment variables instead of static paths!
-  # TODO CONT
-  # Decide if these are nessecary to use at all, can use the variables set by the scripts/helm-env.sh instead!
   
   {{ if eq .Environment.Name "system-services" }}
   
+  # Does not seem to care about the ca.crt!
+
   # path to TLS CA certificate file (default "$HELM_HOME/ca.pem")
   tlsCACert: "../certs/system-services/kube-system/certs/ca.pem"
   # path to TLS certificate file (default "$HELM_HOME/cert.pem")

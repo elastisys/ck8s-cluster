@@ -4,10 +4,27 @@ metadata:
   name: elasticsearch
   namespace: elastic-system
 spec:
-  version: 7.1.0
+  version: 7.2.0
   nodes:
-  - nodeCount: 3
+  - nodeCount: 2
     config:
       node.master: true
       node.data: true
       node.ingest: true
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch 
+          resources:
+            requests:
+              memory: 1.5Gi
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: nfs-client
