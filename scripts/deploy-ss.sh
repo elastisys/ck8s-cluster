@@ -1,22 +1,25 @@
 #!/bin/bash
 
+# Maybe some of the following could be installed using charts by helmfile.
+
 set -e
-
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-
 source "${SCRIPTS_PATH}/common.sh"
+
+# Arg for Helmfile to be interactive so that one can decide on which releases
+# to update if changes are found.
+# USE: --interactive, default is not interactive.
+INTERACTIVE=${1:-""}
+
 
 : "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
 : "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
 : "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
 : "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
+: "${NFS_SS_SERVER_IP:?Missing NFS_SS_SERVER_IP}"
 
-pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
-NFS_SERVER_IP=$(terraform output ss_nfs_internal_ip_address)
-popd > /dev/null
 
 # NAMESPACES
-
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace elastic-system --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
@@ -24,145 +27,104 @@ kubectl create namespace dex --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace nfs-provisioner --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace influxdb-prometheus --dry-run -o yaml | kubectl apply -f -
 
-# PSP
 
+# PSP
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-ss.yaml
 
-# HELM, TILLER
 
+# HELM and TILLER
 mkdir -p ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs
+${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "helm"
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs "helm"
 
-${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "admin1"
 
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs admin1
-
-# Add Helm repositories and update repository cache
-
-helm repo add harbor https://helm.goharbor.io
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-
-# DEX, OAUTH2, DASHBOARD
-
-helm upgrade dex ${SCRIPTS_PATH}/../charts/dex --install --namespace dex \
-    --set "ingress.hosts={dex.${ECK_SS_DOMAIN}}" \
-    --set "ingress.tls[0].hosts={dex.${ECK_SS_DOMAIN}}" \
-    --set "ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}" \
-    --set "config.issuer=https://dex.${ECK_SS_DOMAIN}" \
-    --set "config.connectors[0].config.redirectURI=https://dex.${ECK_SS_DOMAIN}/callback" \
-    --set "config.connectors[0].config.clientID=${GOOGLE_CLIENT_ID}" \
-    --set "config.connectors[0].config.clientSecret=${GOOGLE_CLIENT_SECRET}" \
-    --set "config.staticClients[0].redirectURIs={http://localhost:8000,https://dashboard.${ECK_SS_DOMAIN}/oauth2/callback,https://dashboard.${ECK_C_DOMAIN}/oauth2/callback}" \
-    -f ${SCRIPTS_PATH}/../helm-values/dex-values.yaml
-
-helm upgrade oauth2 stable/oauth2-proxy --install --namespace kube-system \
-    --set "extraArgs.redirect-url=https://dashboard.${ECK_SS_DOMAIN}/oauth2/callback" \
-    --set "extraArgs.oidc-issuer-url=https://dex.${ECK_SS_DOMAIN}" \
-    --set "extraArgs.ssl-insecure-skip-verify=${TLS_SKIP_VERIFY}" \
-    --set "ingress.hosts={dashboard.${ECK_SS_DOMAIN}}" \
-    --set "ingress.tls[0].hosts={dashboard.${ECK_SS_DOMAIN}}" \
-    --set "ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}" \
-    -f ${SCRIPTS_PATH}/../helm-values/oauth2-proxy-values-ss.yaml --version 0.12.3 --debug
-
+# DASHBOARD
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 
-# CERT-MANAGER
 
-# Install the cert-manager CRDs **before** installing the chart
+# CERT-MANAGER
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
-# https://docs.cert-manager.io/en/latest/getting-started/install.html#installing-with-helm
-# Label the cert-manager namespace to disable resource validation
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
 
-helm upgrade cert-manager jetstack/cert-manager \
-    --install --namespace cert-manager --version v0.8.0
-
-echo Waiting for cert-manager webhook to become ready
-kubectl wait --for=condition=Available --timeout=300s \
-    apiservice v1beta1.admission.certmanager.k8s.io
-
-# NFS client provisioner
-
-helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
-  --install --namespace kube-system --version 1.2.6 \
-  --values ${SCRIPTS_PATH}/../helm-values/nfs-client-provisioner-values.yaml \
-  --set nfs.server=${NFS_SERVER_IP}
 
 # Elasticsearch and kibana.
-
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
-sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch.yaml
-sleep 5
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
-
 cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | kubectl apply -f -
 
-# HARBOR
 
-# Create rolebindings for harbor
+# HARBOR
 kubectl -n harbor create rolebinding harbor-privileged-psp \
     --clusterrole=psp:privileged --serviceaccount=harbor:default \
     --dry-run -o yaml | kubectl apply -f -
 
-# Deploying harbor
-helm upgrade harbor harbor/harbor --version 1.1.1 \
-  --install \
-  --namespace harbor \
-  --values ${SCRIPTS_PATH}/../helm-values/harbor-values.yaml \
-  --set persistence.imageChartStorage.s3.secretkey=$TF_VAR_exoscale_secret_key \
-  --set persistence.imageChartStorage.s3.accesskey=$TF_VAR_exoscale_api_key  \
-  --set "expose.ingress.hosts.core=harbor.${ECK_SS_DOMAIN}" \
-  --set "expose.ingress.hosts.notary=notary.harbor.${ECK_SS_DOMAIN}" \
-  --set "expose.ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}" \
-  --set "externalURL=https://harbor.${ECK_SS_DOMAIN}"
 
-#INFLUXDB
-helm upgrade influxdb-prometheus stable/influxdb \
-  --install --namespace influxdb-prometheus \
-  -f ${SCRIPTS_PATH}/../helm-values/influxdb-values.yaml
+# Prometheus - install CRDS.
+kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheus.crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/prometheusrule.crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/podmonitor.crd.yaml
 
-# Deploy prometheus operator and grafana
-helm upgrade prometheus-operator stable/prometheus-operator \
-  --install --namespace monitoring \
-  -f ${SCRIPTS_PATH}/../helm-values/prometheus-ss.yaml \
-  --version 6.2.1 \
-  --set grafana.ingress.hosts={grafana.${ECK_SS_DOMAIN}} \
-  --set grafana.ingress.tls[0].hosts={grafana.${ECK_SS_DOMAIN}} \
-  --set "grafana.ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}"
 
-echo Waiting for harbor to become ready
-# We cannot use `--wait` due to this: https://github.com/helm/helm/issues/5170
+echo -e "\nContinuing with Helmfile\n"
+
+# TODO: Do somehting about that harbor wants to upgrade when doing apply twice.
+#       It should not need to update. 
+#       Looks like some certificates/secrets/checksum has changed!
+#       Unsure why that is.
+
+cd ${SCRIPTS_PATH}/../helmfile
+
+# Install cert-manager and nfs-client-provisioner first.
+helmfile -f helmfile.yaml -e system-services -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+
+# Get status of the cert-manager webhook api.
+STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
+
+# Just want to see if this ever happens.
+if [ $STATUS != "Available" ] 
+then
+    echo -e  "##\n##\nWaiting for cert-manager webhook to become ready\n##\n##"
+    kubectl wait --for=condition=Available --timeout=300s \
+        apiservice v1beta1.admission.certmanager.k8s.io
+fi
+
+# Install the rest of the charts.
+helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-client-provisioner $INTERACTIVE apply
+
+# Check harbor rollout status. 
+# Should not be needed due to 'wait' when installing/upgrading harbor!
+# Just keeping it for now but should be removed.
 kubectl -n harbor rollout status deployment harbor-harbor-clair
 
-#
-#REMEBER TO REMOVE "-k" from curl! Just here for now because of the let's encrypt certificate limitation!
-#
+# Set up initial state for harbor.
+EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 | jq '.code')
 
-# Deletes the default project "library"
-echo Removing old project from harbor
-curl -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1
+if [ $EXISTS != "404" ]
+then 
+    NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 | jq '.name')
+    if [ $NAME == "library" ]
+    then 
+        # Deletes the default project "library"
+        echo Removing project library from harbor
+        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1
 
-# Creates new private project "default"
-echo Creating new private project
-curl -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SS_DOMAIN}/api/projects --data '{
-    "project_name": "default",
-    "metadata": {
-      "public": "0",
-      "enable_content_trust": "false",
-      "prevent_vul": "false",
-      "severity": "low",
-      "auto_scan": "true"
-    }
-}'
-
-# Deploy prometheus that will scrape customer prometheus
-helm upgrade prometheus-operator-c stable/prometheus-operator \
-  --install --namespace customer-monitoring \
-  -f ${SCRIPTS_PATH}/../helm-values/prometheus-c-reader.yaml \
-  --version 6.2.1 \
-  --set prometheus.prometheusSpec.additionalScrapeConfigs[0].static_configs[0].targets={prometheus.${ECK_C_DOMAIN}} \
-  --set "prometheus.prometheusSpec.additionalScrapeConfigs[0].tls_config.insecure_skip_verify=$TLS_SKIP_VERIFY"
+        # Creates new private project "default"
+        echo Creating new private project default
+        curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SS_DOMAIN}/api/projects --data '{
+            "project_name": "default",
+            "metadata": {
+                "public": "0",
+                "enable_content_trust": "false",
+                "prevent_vul": "false",
+                "severity": "low",
+                "auto_scan": "true"
+            }
+        }'
+    fi
+fi

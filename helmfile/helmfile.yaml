@@ -116,6 +116,7 @@ releases:
   - values/prometheus-operator-c.yaml.gotmpl
 {{ end }}
 
+# System services releases
 {{ if eq .Environment.Name "system-services" }}
 # Dex
 - name: dex
@@ -164,6 +165,7 @@ releases:
   - values/prometheus-operator-c-reader.yaml.gotmpl
 {{ end }}
 
+# Customer releases
 {{ if eq .Environment.Name "customer"  }}
 # Falco
 - name: falco

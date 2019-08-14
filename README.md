@@ -41,6 +41,8 @@ installation is done, each stage can be updated independently.
 - [RKE](https://github.com/rancher/rke/releases) (tested with 0.2.7)
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
 - [helm](https://github.com/helm/helm/releases) (tested with 2.14.3)
+- [helmfile](https://github.com/roboll/helmfile) (tested with v0.80.2)
+- [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
 
 ## Cloud infrastructure
 
