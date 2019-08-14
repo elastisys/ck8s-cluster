@@ -4,9 +4,9 @@ metadata:
   name: elasticsearch
   namespace: elastic-system
 spec:
-  version: 7.2.0
+  version: 7.1.0
   nodes:
-  - nodeCount: 2
+  - nodeCount: 3
     config:
       node.master: true
       node.data: true
