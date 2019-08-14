@@ -80,6 +80,10 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
 helm upgrade cert-manager jetstack/cert-manager \
     --install --namespace cert-manager --version v0.8.0
 
+echo Waiting for cert-manager webhook to become ready
+kubectl wait --for=condition=Available --timeout=300s \
+    apiservice v1beta1.admission.certmanager.k8s.io
+
 # NFS client provisioner
 
 helm upgrade nfs-client-provisioner stable/nfs-client-provisioner \
