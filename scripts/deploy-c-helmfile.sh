@@ -8,6 +8,11 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
+# Arg for Helmfile to be interactive so that one can decide on which releases
+# to update if changes are found.
+# USE: --interactive, default is not interactive.
+INTERACTIVE=${1:-""}
+
 ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
 
@@ -61,10 +66,23 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/ma
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/podmonitor.crd.yaml
 
 # Helmfile
-echo
-echo Continuing to Helmfile
-echo
+echo -e "\nContinuing to Helmfile\n"
 
 cd ${SCRIPTS_PATH}/../helmfile
-helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner apply
-helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner apply
+
+# Install cert-manager and nfs-client-provisioner first.
+helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+
+# Get status of the cert-manager webhook api.
+STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
+
+# Just want to see if this ever happens.
+if [ $STATUS != "Available" ] 
+then
+    echo -e  "##\n##\nWaiting for cert-manager webhook to become ready\n##\n##"
+    kubectl wait --for=condition=Available --timeout=300s \
+        apiservice v1beta1.admission.certmanager.k8s.io
+fi
+
+# Install rest of the charts.
+helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner $INTERACTIVE apply
