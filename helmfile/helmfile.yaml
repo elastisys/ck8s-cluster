@@ -1,18 +1,3 @@
-# Ideally, we would like to deploy releases in an ordered fashion.
-# This is because certains services are dependant on others being up and running.
-# However, Helmfile does not support this (could be done using sub-helmfiles, see https://github.com/roboll/helmfile/issues/137).
-# One quick fix would be to use bash and manually install each release using somehting like
-# "helmfile -f helmfile.yaml -e system-services -l key:value apply"
-# Might be worth investigating what the best practices are for using Helmfile.
-# Should multiple helmfiles be used?
-
-# Lockfiles does not work for multiple environments. 
-
-# How to handle if let's say harbor is installed and then acidentally removed.
-# How would you recover from such an error?
-# PVC are kept which prevents it from being installed again.
-# How to handle that?
-
 # Chart repositories used from within this state file.
 repositories:
 - name: stable 
@@ -22,21 +7,15 @@ repositories:
 
 # System-services specific repositories
 {{ if eq .Environment.Name "system-services" }}
-
 - name: harbor
   url: https://helm.goharbor.io
-
 {{ end }}
 
 # Customer specific repositories
 {{ if eq .Environment.Name "customer" }}
-
 - name: kiwigrid
   url: https://kiwigrid.github.io
-
 {{ end }}
-
-
 
 # Defults settings to use with helm and tiller.
 helmDefaults:
@@ -49,11 +28,10 @@ helmDefaults:
   # force: true
   # enable TLS for request to Tiller
   tls: true
-  
-  {{ if eq .Environment.Name "system-services" }}
-  
-  # Does not seem to care about the ca.crt!
 
+  # TODO: Use env instead of fixed paths for certs.
+
+  {{ if eq .Environment.Name "system-services" }}
   # path to TLS CA certificate file (default "$HELM_HOME/ca.pem")
   tlsCACert: "../certs/system-services/kube-system/certs/ca.pem"
   # path to TLS certificate file (default "$HELM_HOME/cert.pem")
@@ -78,8 +56,7 @@ environments:
 
 # The desired state of Helm releases.
 releases:
-
-  # NFS
+# NFS
 - name: nfs-client-provisioner
   namespace: kube-system 
   labels:
@@ -96,7 +73,7 @@ releases:
   - values/nfs-client-provisioner-c.yaml.gotmpl
   {{ end }}
 
-  # Oauth2
+# Oauth2
 - name: oauth2
   namespace: kube-system
   labels:
@@ -113,7 +90,7 @@ releases:
   - values/oauth2-c.yaml.gotmpl
   {{ end }}
 
-  # Cert-manager
+# Cert-manager
 - name: cert-manager
   namespace: cert-manager
   labels:
@@ -121,9 +98,9 @@ releases:
   chart: jetstack/cert-manager
   version: v0.8.0
   missingFileHandler: error
-  wait: true # We need to wait
+  wait: true
 
-  # Prometheus-operator
+# Prometheus-operator
 - name: prometheus-operator
   namespace: monitoring
   labels:
@@ -140,7 +117,6 @@ releases:
 {{ end }}
 
 {{ if eq .Environment.Name "system-services" }}
-
 # Dex
 - name: dex
   namespace: dex
@@ -153,7 +129,7 @@ releases:
   - ../charts/dex/values.yaml
   - values/dex.yaml.gotmpl
 
-  # Harbor
+# Harbor
 - name: harbor
   namespace: harbor
   labels:
@@ -165,7 +141,7 @@ releases:
   values:
   - values/harbor.yaml.gotmpl
 
-  # InfluxDB
+# InfluxDB
 - name: influxdb
   namespace: influxdb-prometheus
   labels:
@@ -176,7 +152,7 @@ releases:
   values:
   - values/influxdb.yaml.gotmpl
 
-  # Prometheus-operator (customer reader - remove ASAP!)
+# Prometheus-operator (customer reader - remove at some point!)
 - name: prometheus-operator-c-reader
   namespace: customer-monitoring
   labels:
@@ -189,8 +165,7 @@ releases:
 {{ end }}
 
 {{ if eq .Environment.Name "customer"  }}
-
-  # Falco
+# Falco
 - name: falco
   namespace: falco
   labels:
@@ -199,7 +174,7 @@ releases:
   version: 0.7.6
   missingFileHandler: error
 
-  # Fluentd
+# Fluentd
 - name: fluentd
   namespace: kube-system
   labels:
@@ -210,7 +185,7 @@ releases:
   values:
   - values/fluentd.yaml.gotmpl
 
-  # opa
+# opa
 - name: opa
   namespace: opa
   labels:
@@ -220,5 +195,4 @@ releases:
   missingFileHandler: error
   values:
   - values/opa.yaml.gotmpl
-
 {{ end }}

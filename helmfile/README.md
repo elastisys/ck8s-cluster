@@ -32,10 +32,3 @@ The following environment variables needs to be set in order to install all helm
 ### Helmfile environments
 There is one environment for each cluster type:`system-services` and `customer`. 
 Environemnts are specififed by using the flag `-e <environment_name>`. 
-
-#### Check status
-
-        helmfile -e customer -f helmfile.yaml status
-        helmfile -e system-services -f helmfile.yaml status
-
-ToBeContinued!

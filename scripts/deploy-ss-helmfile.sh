@@ -68,6 +68,11 @@ echo
 echo Continuing with Helmfile
 echo
 
+# TODO: Do somehting about that harbor wants to upgrade when doing apply twice.
+#       It should not need to update. 
+#       Looks like some certificates/secrets/checksum has changed!
+#       Unsure why that is.
+
 cd ${SCRIPTS_PATH}/../helmfile
 helmfile -f helmfile.yaml -e system-services -l app=cert-manager -l app=nfs-client-provisioner apply
 helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-client-provisioner apply
