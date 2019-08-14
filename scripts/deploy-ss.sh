@@ -135,23 +135,8 @@ helm upgrade prometheus-operator stable/prometheus-operator \
   --set "grafana.ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-${CERT_TYPE}"
 
 echo Waiting for harbor to become ready
-
-
-# TODO: This doesn't handle a second run. The Clair pod gets re-created so the
-#       wait thinks it's fine because the old Clair pod is still there but the
-#       new Clair pod is not ready yet causing an internal server error
-#       response when executing the DELETE request.
-
-# Waiting for "Clair" to be ready.
 # We cannot use `--wait` due to this: https://github.com/helm/helm/issues/5170
-ready_pods=$(kubectl get deployment -n harbor harbor-harbor-clair -o jsonpath='{.status.readyReplicas}')
-# Set default 0 (output is empty if no pod is ready)
-until [ ${ready_pods:=0} -eq 1 ]
-do
-    echo "Waiting for harbor to become ready..."
-    sleep 5s
-    ready_pods=$(kubectl get deployment -n harbor harbor-harbor-clair -o jsonpath='{.status.readyReplicas}')
-done
+kubectl -n harbor rollout status deployment harbor-harbor-clair
 
 #
 #REMEBER TO REMOVE "-k" from curl! Just here for now because of the let's encrypt certificate limitation!
