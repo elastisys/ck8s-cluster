@@ -80,6 +80,15 @@ Terraform created.
     rke up --config ./eck-ss.yaml
     rke up --config ./eck-c.yaml
 
+## DNS
+
+The Domain name for the SS/C-cluster need to be registered. For "compliantkubernetes.com"
+or "compliantk8s.com" this can be done in aws route 53. Create a A record with
+`*.<name-ss>.compliantkubernetes.com` and add the worker nodes IPs as values.
+(do the same for the C-cluster)
+
+The values should be replaces with the elastic IP once thats working correctly.
+
 ## Kubernetes resources
 
 Lastly, create all of the Kubernetes resources in the clusters.
@@ -99,15 +108,6 @@ The certificates for the ingreses in the system can have either staging or produ
     export ECK_SS_KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
     export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
     ./scripts/deploy-c.sh
-
-## DNS
-
-The Domain name for the SS/C-cluster need to be registered. For "compliantkubernetes.com"
-or "compliantk8s.com" this can be done in aws route 53. Create a A record with
-`*.<name-ss>.compliantkubernetes.com` and add the worker nodes IPs as values.
-(do the same for the C-cluster)
-
-The values should be replaces with the elastic IP once thats working correctly.
 
 ## Issues and limitations
 
