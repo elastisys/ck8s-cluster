@@ -1,3 +1,19 @@
+#
+# NOTE/TODO - Reagaring Dex Helm Chart
+#
+# Currently our local helm chart for dex is used.
+# The template 'deployment.yaml' has been modified with an 
+# 'volume.optional = true' in the 'http-tls' volume mount.
+# This allows us to specifiy 'cert.web.create = false' as helm value.
+# This key cannot be set in the upstream chart because
+# the secrets that are consequently not created are expected to exsist and
+# thus the dex pod will never start.
+#
+# It would be good to document Why we don't want to create the 'web' 
+# certificates and how to proceed (if even possible) to use upstream charts.
+# The current version 1.4.0 is starting to look old since they have
+# moved to version 2.x.x. Latest -> 2.1.0.
+
 # Chart repositories used from within this state file.
 repositories:
 - name: stable 
@@ -115,6 +131,8 @@ releases:
 {{ if eq .Environment.Name "customer" }}
   - values/prometheus-operator-c.yaml.gotmpl
 {{ end }}
+
+
 
 # System services releases
 {{ if eq .Environment.Name "system-services" }}

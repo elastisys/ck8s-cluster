@@ -97,7 +97,10 @@ Lastly, create all of the Kubernetes resources in the clusters.
 If the Oauth2 is to work a OAuth2 client need to be created in [google console](https://console.cloud.google.com/apis/credentials) under
 APIs & Services -> credentials.
 
-The certificates for the ingreses in the system can have either staging or productions certificates from letsencrypt. There is a limit to the number of production certificates we can get per week. So staging is recommended during development, but it will yield untrusted certificates. Note that docker will not trust Harbor with staging certs, so you can't push images to Harbor and pods can't pull images from Harbor.
+The certificates for the ingreses in the system can have either staging or productions certificates from letsencrypt. There is a limit to the number of production certificates we can get per week. So staging is recommended during development, but it will yield untrusted certificates. Note that docker will not trust Harbor with staging certs, so you can't push images to Harbor and pods can't pull images from Harbor. 
+
+The option `--interactive` mode when deploying c and ss can be used for deciding whether or not you want to apply upgrades to helm charts. The defaullt is not to use that option. 
+
 
     export GOOGLE_CLIENT_ID=<xxx>
     export GOOGLE_CLIENT_SECRET=<xxx>
@@ -105,11 +108,11 @@ The certificates for the ingreses in the system can have either staging or produ
     export CERT_TYPE=<prod|staging>
 
     export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
-    ./scripts/deploy-ss.sh
+    ./scripts/deploy-ss.sh <--interactive>
 
     export ECK_SS_KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
     export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
-    ./scripts/deploy-c.sh
+    ./scripts/deploy-c.sh <--interactive>
 
 ## Issues and limitations
 
