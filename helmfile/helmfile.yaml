@@ -36,31 +36,17 @@ repositories:
 # Defults settings to use with helm and tiller.
 helmDefaults:
   tillerNamespace: kube-system  #dedicated default key for tiller-namespace
-  # defaults for verify, wait, force, timeout and recreatePods under releases[]
-  # verify: true
-  # wait: true
-  # timeout: 600
-  # recreatePods: true
-  # force: true
-  # enable TLS for request to Tiller
   tls: true
 
-  # TODO: Use env instead of fixed paths for certs.
-
+  # TODO: Use env or Env.values instead of fixed paths for certs.
   {{ if eq .Environment.Name "system-services" }}
-  # path to TLS CA certificate file (default "$HELM_HOME/ca.pem")
   tlsCACert: "../certs/system-services/kube-system/certs/ca.pem"
-  # path to TLS certificate file (default "$HELM_HOME/cert.pem")
   tlsCert: "../certs/system-services/kube-system/certs/helm.pem"
-  # path to TLS key file (default "$HELM_HOME/key.pem")
   tlsKey: "../certs/system-services/kube-system/certs/helm-key.pem"
   {{ end }}
   {{ if eq .Environment.Name "customer" }}
-  # path to TLS CA certificate file (default "$HELM_HOME/ca.pem")
   tlsCACert: "../certs/customer/kube-system/certs/ca.pem"
-  # path to TLS certificate file (default "$HELM_HOME/cert.pem")
   tlsCert: "../certs/customer/kube-system/certs/helm.pem"
-  # path to TLS key file (default "$HELM_HOME/key.pem")
   tlsKey: "../certs/customer/kube-system/certs/helm-key.pem"
   {{ end }}
 
@@ -131,8 +117,6 @@ releases:
 {{ if eq .Environment.Name "customer" }}
   - values/prometheus-operator-c.yaml.gotmpl
 {{ end }}
-
-
 
 # System services releases
 {{ if eq .Environment.Name "system-services" }}

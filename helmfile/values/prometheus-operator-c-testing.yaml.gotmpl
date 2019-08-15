@@ -1,8 +1,0 @@
-prometheus:
-  ingress:
-    hosts:
-    - prometheus.{{ requiredEnv "ECK_C_DOMAIN"}}
-    tls:
-    - secretName: prometheus-general-tls
-      hosts:
-      - prometheus.{{ requiredEnv "ECK_C_DOMAIN"}}
