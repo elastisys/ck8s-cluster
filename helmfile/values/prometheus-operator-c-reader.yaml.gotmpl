@@ -1172,7 +1172,7 @@ prometheus:
     tls:
     - secretName: prometheus-general-tls
       hosts:
-      - prometheus-customer.$(ECK_DOMAIN)
+      - prometheus-customer.$(ECK_SS_DOMAIN)
 
   ## Configure additional options for default pod security policy for Prometheus
   ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
