@@ -123,11 +123,9 @@ releases:
   namespace: dex
   labels:
     app: dex
-  chart: stable/dex
-  version: 1.4.0
+  chart: ../charts/dex
   missingFileHandler: error
   values:
-  - ../charts/dex/values.yaml
   - values/dex.yaml.gotmpl
 
 # Harbor

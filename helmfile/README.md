@@ -26,6 +26,7 @@ helm plugin install https://github.com/databus23/helm-diff --version 2.11.0+5
 ```
 ### Environment variables
 The following environment variables are used and needs to be set in order to install all available helm charts.
+Note: These are required for explicit use with `helmfile`. All might not be required to run the deploy scripts!
 
 * `NFS_C_SERVER_IP`
 * `NFS_SS_SERVER_IP`
@@ -47,13 +48,23 @@ Environments are specififed by using the flag `-e <environment_name>`.
 
 ### Usage
 
+
 * Install all releases specified in a helm state file e.g. `helmfile.yaml`
+   
     `helmfile -f helmfile.yaml apply`
+
 * To only install a specific release labels can be used e.g. `app=cert-manger`
+   
     `helmfile -f helmfile.yaml -l app=cert-manager apply`
+
 * Remove a specific release
+    
     `helmfile -f helmfile.yaml -l app=cert-manager destroy`
+
 * Use a specific environment
+    
     `helmfile -f helmfile.yaml -e customer apply`
+
 * Check status of releases
+   
     `helmfile -f helmfile.yaml status`
