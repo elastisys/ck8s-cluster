@@ -53,13 +53,13 @@ resource "exoscale_compute" "master" {
   )
 }
 
-resource "exoscale_nic" "master_internal" {
-  compute_id = "${exoscale_compute.master.id}"
-  network_id = "${exoscale_network.net.id}"
-
-  # TODO: Remove when managed virtual router/DHCP is working properly.
-  ip_address = "${local.master_internal_ip_address}"
-}
+#resource "exoscale_nic" "master_internal" {
+#  compute_id = "${exoscale_compute.master.id}"
+#  network_id = "${exoscale_network.net.id}"
+#
+#  # TODO: Remove when managed virtual router/DHCP is working properly.
+#  ip_address = "${local.master_internal_ip_address}"
+#}
 
 resource "exoscale_compute" "worker" {
   count = "${var.worker_count}"
@@ -82,18 +82,18 @@ resource "exoscale_compute" "worker" {
   )
 }
 
-resource "exoscale_nic" "worker_internal" {
-  count = "${var.worker_count}"
-
-  compute_id = "${element(exoscale_compute.worker.*.id, count.index)}"
-  network_id = "${exoscale_network.net.id}"
-
-  # TODO: Remove when managed virtual router/DHCP is working properly.
-  ip_address = cidrhost(
-    local.internal_cidr_prefix,
-    local.worker_internal_host_num_start + count.index
-  )
-}
+#resource "exoscale_nic" "worker_internal" {
+#  count = "${var.worker_count}"
+#
+#  compute_id = "${element(exoscale_compute.worker.*.id, count.index)}"
+#  network_id = "${exoscale_network.net.id}"
+#
+#  # TODO: Remove when managed virtual router/DHCP is working properly.
+#  ip_address = cidrhost(
+#    local.internal_cidr_prefix,
+#    local.worker_internal_host_num_start + count.index
+#  )
+#}
 
 resource "exoscale_compute" "nfs" {
   display_name    = "${var.nfs_name}"
@@ -116,13 +116,13 @@ resource "exoscale_compute" "nfs" {
   )
 }
 
-resource "exoscale_nic" "nfs_internal" {
-  compute_id = "${exoscale_compute.nfs.id}"
-  network_id = "${exoscale_network.net.id}"
-
-  # TODO: Remove when managed virtual router/DHCP is working properly.
-  ip_address = "${local.nfs_internal_ip_address}"
-}
+#resource "exoscale_nic" "nfs_internal" {
+#  compute_id = "${exoscale_compute.nfs.id}"
+#  network_id = "${exoscale_network.net.id}"
+#
+#  # TODO: Remove when managed virtual router/DHCP is working properly.
+#  ip_address = "${local.nfs_internal_ip_address}"
+#}
 
 resource "exoscale_security_group" "master_sg" {
   name        = "${var.master_security_group_name}"
@@ -249,23 +249,23 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
   }
 }
 
-resource "exoscale_ipaddress" "eip" {
-  zone                     = "${var.zone}"
-  healthcheck_mode         = "http"
-  healthcheck_port         = 10254
-  healthcheck_path         = "/healthz"
-  healthcheck_interval     = 10
-  healthcheck_timeout      = 2
-  healthcheck_strikes_ok   = 2
-  healthcheck_strikes_fail = 3
-}
-
-resource "exoscale_secondary_ipaddress" "eip_worker_association" {
-  count = "${var.worker_count}"
-
-  compute_id = "${element(exoscale_compute.worker.*.id, count.index)}"
-  ip_address = "${exoscale_ipaddress.eip.ip_address}"
-}
+#resource "exoscale_ipaddress" "eip" {
+#  zone                     = "${var.zone}"
+#  healthcheck_mode         = "http"
+#  healthcheck_port         = 10254
+#  healthcheck_path         = "/healthz"
+#  healthcheck_interval     = 10
+#  healthcheck_timeout      = 2
+#  healthcheck_strikes_ok   = 2
+#  healthcheck_strikes_fail = 3
+#}
+#
+#resource "exoscale_secondary_ipaddress" "eip_worker_association" {
+#  count = "${var.worker_count}"
+#
+#  compute_id = "${element(exoscale_compute.worker.*.id, count.index)}"
+#  ip_address = "${exoscale_ipaddress.eip.ip_address}"
+#}
 
 resource "exoscale_ssh_keypair" "ssh_key" {
   name       = "${var.ssh_key_name}"

@@ -12,7 +12,7 @@ source "${SCRIPTS_PATH}/common.sh"
 : "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
 
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
-export NFS_SS_SERVER_IP=$(terraform output ss_nfs_internal_ip_address)
+export NFS_SS_SERVER_IP=$(terraform output ss_nfs_ip_address)
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases

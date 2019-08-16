@@ -11,12 +11,12 @@ cd ${SCRIPTS_PATH}/../terraform/system-services/
 tf_out=$(terraform output -json)
 
 master_ip_address=$(echo ${tf_out} | jq -r '.ss_master_ip_address.value')
-master_internal_ip_addresses=$(echo ${tf_out} | jq -r \
-                               '.ss_master_internal_ip_address.value')
+#master_internal_ip_addresses=$(echo ${tf_out} | jq -r \
+#                               '.ss_master_internal_ip_address.value')
 
 worker_ip_address=($(echo ${tf_out} | jq -r '.ss_worker_ip_addresses.value[]'))
-worker_internal_ip_addresses=($(echo ${tf_out} | jq -r \
-                               '.ss_worker_internal_ip_addresses.value[]'))
+#worker_internal_ip_addresses=($(echo ${tf_out} | jq -r \
+#                               '.ss_worker_internal_ip_addresses.value[]'))
 
 cat <<EOF
 cluster_name: eck-system-services
@@ -25,14 +25,14 @@ ssh_agent_auth: true
 
 nodes:
   - address: ${master_ip_address}
-    internal_address: ${master_internal_ip_addresses}
+#    internal_address: ${master_internal_ip_addresses}
     user: rancher
     role: [controlplane,etcd]
 EOF
 for i in $(seq 0 $((${#worker_ip_address[@]} - 1))); do
 cat <<EOF
   - address: ${worker_ip_address[${i}]}
-    internal_address: ${worker_internal_ip_addresses[${i}]}
+#    internal_address: ${worker_internal_ip_addresses[${i}]}
     user: rancher
     role: [worker]
 EOF
