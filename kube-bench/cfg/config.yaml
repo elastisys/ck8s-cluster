@@ -1,0 +1,124 @@
+---
+## Controls Files. 
+# These are YAML files that hold all the details for running checks.
+#
+## Uncomment to use different control file paths.
+# masterControls: ./cfg/master.yaml
+# nodeControls: ./cfg/node.yaml
+# federatedControls: ./cfg/federated.yaml
+
+master:
+  components:
+    - apiserver
+    - scheduler
+    - controllermanager
+    - etcd 
+    - flanneld
+    # kubernetes is a component to cover the config file /etc/kubernetes/config that is referred to in the benchmark
+    - kubernetes
+
+  kubernetes:
+    defaultconf: /etc/kubernetes/config
+
+  apiserver:
+    bins:
+      - "kube-apiserver"
+      - "hyperkube apiserver"
+      - "hyperkube kube-apiserver"
+      - "apiserver"
+    confs:
+      - /etc/kubernetes/manifests/kube-apiserver.yaml
+      - /etc/kubernetes/manifests/kube-apiserver.manifest
+    defaultconf: /etc/kubernetes/manifests/kube-apiserver.yaml
+
+  scheduler:
+    bins:
+      - "kube-scheduler"
+      - "hyperkube scheduler"
+      - "hyperkube kube-scheduler"
+      - "scheduler"
+    confs:
+      - /etc/kubernetes/manifests/kube-scheduler.yaml
+      - /etc/kubernetes/manifests/kube-scheduler.manifest
+    defaultconf: /etc/kubernetes/manifests/kube-scheduler.yaml
+
+  controllermanager:
+    bins:
+      - "kube-controller-manager"
+      - "kube-controller"
+      - "hyperkube controller-manager"
+      - "hyperkube kube-controller-manager"
+      - "controller-manager"
+    confs:
+      - /etc/kubernetes/manifests/kube-controller-manager.yaml
+      - /etc/kubernetes/manifests/kube-controller-manager.manifest
+    defaultconf: /etc/kubernetes/manifests/kube-controller-manager.yaml
+
+  etcd:
+    optional: true
+    bins:
+      - "etcd"
+    confs:
+      - /etc/kubernetes/manifests/etcd.yaml
+      - /etc/kubernetes/manifests/etcd.manifest
+      - /etc/etcd/etcd.conf
+    defaultconf: /etc/kubernetes/manifests/etcd.yaml
+
+  flanneld:
+    optional: true
+    bins:
+      - flanneld
+    defaultconf: /etc/sysconfig/flanneld
+
+node:
+  components:
+    - kubelet
+    - proxy
+    # kubernetes is a component to cover the config file /etc/kubernetes/config that is referred to in the benchmark
+    - kubernetes
+
+  kubernetes:
+    defaultconf: /etc/kubernetes/config    
+
+  kubelet:
+    cafile:
+      - "/etc/kubernetes/pki/ca.crt"
+    bins:
+      - "hyperkube kubelet"
+      - "kubelet"
+    confs:
+      - "/var/lib/kubelet/config.yaml"
+      - "/etc/kubernetes/kubelet/kubelet-config.json"
+      - "/home/kubernetes/kubelet-config.yaml"
+    defaultconf: "/var/lib/kubelet/config.yaml"
+    defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
+    defaultkubeconfig: "/etc/kubernetes/kubelet.conf"
+    defaultcafile: "/etc/kubernetes/pki/ca.crt"
+
+  proxy:
+    bins:
+      - "kube-proxy"
+      - "hyperkube proxy"
+      - "proxy"
+    confs:
+      - /etc/kubernetes/proxy
+      - /etc/kubernetes/addons/kube-proxy-daemonset.yaml
+    defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml
+    defaultkubeconfig: "/etc/kubernetes/proxy.conf"
+
+federated:
+  components:
+    - fedapiserver
+    - fedcontrollermanager
+
+  fedapiserver:
+    bins:
+      - "hyperkube federation-apiserver"
+      - "kube-federation-apiserver"
+      - "federation-apiserver"
+
+  fedcontrollermanager:
+    bins:
+      - "hyperkube federation-controller-manager"
+      - "kube-federation-controller-manager"
+      - "federation-controller-manager"
