@@ -6,21 +6,19 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
+: "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
+: "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
+: "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
+: "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
+
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
-NFS_SS_SERVER_IP=$(terraform output ss_nfs_internal_ip_address)
+export NFS_SS_SERVER_IP=$(terraform output ss_nfs_internal_ip_address)
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
-
-
-: "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
-: "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
-: "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
-: "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
-: "${NFS_SS_SERVER_IP:?Missing NFS_SS_SERVER_IP}"
 
 
 # NAMESPACES

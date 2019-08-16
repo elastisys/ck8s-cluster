@@ -3,7 +3,6 @@
 set -e
 
 : "${ECK_SS_KUBECONFIG:?Missing ECK_SS_KUBECONFIG}"
-: "${NFS_C_SERVER_IP:?Missing NFS_C_SERVER_IP}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
