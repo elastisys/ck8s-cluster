@@ -1,16 +1,17 @@
 package kubernetes.admission
 
-# Should probably restrict the namespaces to which this policy applies to (?)
+# List of whitelisted registries.
+white_list = ["harbor.${ECK_SS_DOMAIN}"]
 
-# Change this list to include the allowed list of repos.
-white_list = ["my-repo"]
+# Set of namespaces for which this policy applies to.
+namespaces = {"opa-registry-whitelist"}
 
 # We deny if there exsists any container image with a registry
 # that does not reside within the provided white-listed registries.
 deny[msg] {
     namespace := input.request.object.metadata.namespace
-    namespace == "opa-registry-whitelist"
-
+    namespaces[namespace]
+    
     containers := get_containers(input.request.kind)
     # Compare each resource's images against the white-listed registries.
     result := [x | x := get_matching(containers[_])]

@@ -56,9 +56,20 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
 
 
 # OPA
+# Copy original 'allowed_registries'
+cp ${SCRIPTS_PATH}/../policies/allowed_registries.rego ${SCRIPTS_PATH}/../policies/allowed_registries.rego.orig
+# Add our Harbor domain as allowed registry.
+envsubst < ${SCRIPTS_PATH}/../policies/allowed_registries.rego > ${SCRIPTS_PATH}/../policies/allowed_registries.rego.tmp
+mv ${SCRIPTS_PATH}/../policies/allowed_registries.rego.tmp ${SCRIPTS_PATH}/../policies/allowed_registries.rego
+
 kubectl -n opa create cm policies -o yaml --dry-run \
-    --from-file="${SCRIPTS_PATH}/../policies" | kubectl apply -f -
+    --from-file="${SCRIPTS_PATH}/../policies/ingress-whitelist.rego" \
+    --from-file="${SCRIPTS_PATH}/../policies/main.rego" \
+    --from-file="${SCRIPTS_PATH}/../policies/netpol-demo.rego" \
+    --from-file="${SCRIPTS_PATH}/../policies/allowed_registries.rego" | kubectl apply -f -
 kubectl -n opa label cm policies openpolicyagent.org/policy=rego --overwrite
+# Restore original file.
+mv ${SCRIPTS_PATH}/../policies/allowed_registries.rego.orig ${SCRIPTS_PATH}/../policies/allowed_registries.rego
 
 
 # Prometheus CRDS
