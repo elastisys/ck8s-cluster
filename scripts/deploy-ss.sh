@@ -6,8 +6,8 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
-pushd "${SCRIPTS_PATH}/../terraform/customer/" > /dev/null
-export NFS_SS_SERVER_IP=$(terraform output c_nfs_internal_ip_address)
+pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
+NFS_SS_SERVER_IP=$(terraform output ss_nfs_internal_ip_address)
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
