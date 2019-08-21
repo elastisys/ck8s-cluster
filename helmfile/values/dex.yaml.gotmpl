@@ -40,4 +40,10 @@ config:
       - http://localhost:8000
       - https://dashboard.{{ requiredEnv "ECK_SS_DOMAIN" }}/oauth2/callback
       - https://dashboard.{{ requiredEnv "ECK_C_DOMAIN" }}/oauth2/callback
+    - id: grafana
+      secret: Z3JhZmFuYS1zZWNyZXQK  # encoded 'grafana-secret'
+      name: 'Grafana'
+      redirectURIs:
+        - https://grafana.{{ requiredEnv "ECK_SS_DOMAIN" }}/login/generic_oauth
+
   issuer: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}
