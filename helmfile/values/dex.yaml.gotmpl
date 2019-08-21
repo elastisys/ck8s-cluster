@@ -26,6 +26,14 @@ config:
       redirectURI: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/callback
       clientID: {{ requiredEnv "GOOGLE_CLIENT_ID" }}
       clientSecret: {{ requiredEnv "GOOGLE_CLIENT_SECRET" }}
+  - name: AAA
+    id: aaa
+    type: oidc
+    config:
+      clientID: {{ requiredEnv "AAA_CLIENT_ID" }}
+      clientSecret: {{ requiredEnv "AAA_CLIENT_SECRET" }}
+      issuer: https://asmp-test.a1.net/oauth2
+      redirectURI: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/callback
   staticClients:
     - id: kubernetes
       name: 'Kubernetes dashboard'
