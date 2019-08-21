@@ -517,6 +517,23 @@ grafana:
     #   replacement: $1
     #   action: replace
 
+  grafana.ini:
+    server:
+      root_url: https://grafana.{{ requiredEnv "ECK_SS_DOMAIN" }}
+
+    auth.generic_oauth:
+      name: dex
+      enabled: true
+      client_id: grafana
+      client_secret: Z3JhZmFuYS1zZWNyZXQK
+      scopes: profile email openid
+      auth_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/auth
+      token_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/token
+      api_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/api
+      allowed_domains: elastisys.com
+      allow_sign_up: true
+      tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}
+
 ## Component scraping the kube api server
 ##
 kubeApiServer:
