@@ -6,7 +6,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 source "${SCRIPTS_PATH}/common.sh"
 
-cd ${SCRIPTS_PATH}/../terraform/system-services/
+cd ${SCRIPTS_PATH}/../terraform
 
 tf_out=$(terraform output -json)
 

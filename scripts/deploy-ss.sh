@@ -12,7 +12,7 @@ source "${SCRIPTS_PATH}/common.sh"
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
 
-pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
+pushd "${SCRIPTS_PATH}/../terraform/" > /dev/null
 export NFS_SS_SERVER_IP=$(terraform output ss_nfs_ip_address)
 popd > /dev/null
 

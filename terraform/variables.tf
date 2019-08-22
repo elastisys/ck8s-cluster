@@ -12,13 +12,26 @@ variable exoscale_secret_key {
   default = ""
 }
 
+variable ssh_pub_key_file_ss {
+  description = "Path to public SSH key file which is injected into the VMs."
+
+  type = string
+}
+
 variable ssh_pub_key_file_c {
   description = "Path to public SSH key file which is injected into the VMs."
 
   type = string
 }
 
-variable worker_count {
+variable ss_worker_count {
+  description = "The number of worker nodes that should be created."
+
+  type    = number
+  default = 2
+}
+
+variable c_worker_count {
   description = "The number of worker nodes that should be created."
 
   type    = number
