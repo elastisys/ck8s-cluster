@@ -50,10 +50,13 @@ See [terraform/README.md](terraform/README.md) for more details on the steps bel
 
 Begin with setting up the cloud infrastructure using Terraform.
 
+    export AWS_ACCESS_KEY_ID=<xxx> (not needed if credentials are located in ~/.aws/credentials)
+    export AWS_SECRET_ACCESS_KEY=<xxx> (not needed if credentials are located in ~/.aws/credentials)
     export TF_VAR_exoscale_api_key=<xxx>
     export TF_VAR_exoscale_secret_key=<xxx>
     export TF_VAR_ssh_pub_key_file_ss=<Path to pub key for system services cluster>
     export TF_VAR_ssh_pub_key_file_c=<Path to pub key for customer cluster>
+    export TF_VAR_dns_prefix=<xxx>
 
     cd ./terraform/system-services
     terraform init
@@ -84,12 +87,12 @@ Terraform created.
 
 ## DNS
 
-The Domain name for the SS/C-cluster need to be registered. For "compliantkubernetes.com"
-or "compliantk8s.com" this can be done in aws route 53. Create a A record with
-`*.<name-ss>.compliantkubernetes.com` and add the worker nodes IPs as values.
-(do the same for the C-cluster)
+The dns-name will be automatically created with the name `<dns_prefix>-c/ss.compliantkubernetes.com`.
+The domain can be changed by seting the terraform variable `zone_id` to an id of another hosted zone
+in aws route53.
 
 The values should be replaces with the elastic IP once thats working correctly.
+Obs the `ECK_DOMAIN` could now be replaced to a terraform output instead.
 
 ## Kubernetes resources
 
