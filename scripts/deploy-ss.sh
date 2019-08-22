@@ -11,6 +11,9 @@ source "${SCRIPTS_PATH}/common.sh"
 : "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
 : "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
 
+# Domains that should be allowed to log in using OAuth
+export OAUTH_ALLOWED_DOMAINS=elastisys.com
+
 pushd "${SCRIPTS_PATH}/../terraform/system-services/" > /dev/null
 export NFS_SS_SERVER_IP=$(terraform output ss_nfs_ip_address)
 popd > /dev/null

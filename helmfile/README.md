@@ -39,6 +39,7 @@ Note: These are required for explicit use with `helmfile`. All might not be requ
 * `CERT_TYPE`
 * `TLS_SKIP_VERIFY`
 * `TLS_VERIFY`
+* `OAUTH_ALLOWED_DOMAINS`
 
 If any environment variable is not set helmfile will throw an error and the release will not be installed. 
 

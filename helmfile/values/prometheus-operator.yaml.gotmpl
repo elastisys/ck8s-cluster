@@ -530,7 +530,7 @@ grafana:
       auth_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/auth
       token_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/token
       api_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/api
-      allowed_domains: elastisys.com
+      allowed_domains: {{ requiredEnv "OAUTH_ALLOWED_DOMAINS" }}
       allow_sign_up: true
       tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}
 
