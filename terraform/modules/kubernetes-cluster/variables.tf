@@ -38,3 +38,8 @@ variable "dns_name" {}
 variable "aws_dns_zone_id" {
   default = "Z2A7G3OHZDNUQ1" #compliantkubernetes.com
 }
+
+variable "role_arn" {
+  default = "arn:aws:iam::248119176842:role/a1-pipeline"
+}
+
