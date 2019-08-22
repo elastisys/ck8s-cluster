@@ -88,7 +88,7 @@ Terraform created.
 ## DNS
 
 The dns-name will be automatically created with the name `<dns_prefix>-c/ss.compliantkubernetes.com`.
-The domain can be changed by seting the terraform variable `zone_id` to an id of another hosted zone
+The domain can be changed by seting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
 
 The values should be replaces with the elastic IP once thats working correctly.
