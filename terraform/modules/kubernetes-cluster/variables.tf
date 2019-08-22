@@ -35,6 +35,6 @@ variable "public_ingress_cidr_whitelist" {
 
 variable "dns_name" {}
 
-variable "zone_id" {
+variable "aws_dns_zone_id" {
   default = "Z2A7G3OHZDNUQ1" #compliantkubernetes.com
 }
