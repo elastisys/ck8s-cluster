@@ -15,5 +15,6 @@ resource "aws_route53_record" "dns" {
   name    = "*.${var.dns_name}.${data.aws_route53_zone.zone.name}"
   type    = "A"
   ttl     = "300"
+  # TODO change records to eip once working
   records = "${exoscale_compute.worker.*.ip_address}"
 }

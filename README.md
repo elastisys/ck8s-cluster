@@ -91,9 +91,6 @@ The dns-name will be automatically created with the name `<dns_prefix>-c/ss.comp
 The domain can be changed by seting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
 
-The values should be replaces with the elastic IP once thats working correctly.
-Obs the `ECK_DOMAIN` could now be replaced to a terraform output instead.
-
 ## Kubernetes resources
 
 Lastly, create all of the Kubernetes resources in the clusters.

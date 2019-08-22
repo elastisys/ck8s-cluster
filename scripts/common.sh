@@ -1,4 +1,4 @@
-
+# TODO replace ECK_SS_DOMAIN with info from terraform output
 : "${ECK_SS_DOMAIN:?Missing ECK_SS_DOMAIN}"
 : "${ECK_C_DOMAIN:?Missing ECK_C_DOMAIN}"
 
