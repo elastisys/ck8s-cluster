@@ -24,3 +24,13 @@ variable worker_count {
   type    = number
   default = 2
 }
+
+variable "public_ingress_cidr_whitelist" {
+  type    = list(string)
+  default = ["212.32.186.85/32"] # Elastisys office
+}
+
+variable "dns_prefix" {
+  description = "Prefix name for dns"
+  type = string
+}

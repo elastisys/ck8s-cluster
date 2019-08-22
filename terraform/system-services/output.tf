@@ -25,3 +25,7 @@ output "ss_nfs_ip_address" {
 #output "ss_elastic_ip" {
 #  value = "${module.kubernetes_cluster.elastic_ip_address}"
 #}
+
+output "ss_dns_name"{
+  value = "${module.kubernetes_cluster.dns_record_name}"
+}

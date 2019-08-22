@@ -25,3 +25,7 @@ output "nfs_ip_address" {
 #output "elastic_ip_address" {
 #  value = "${exoscale_ipaddress.eip.ip_address}"
 #}
+
+output "dns_record_name" {
+  value = "{aws_route53_record.dns.name}"
+}

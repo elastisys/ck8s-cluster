@@ -35,4 +35,7 @@ module "kubernetes_cluster" {
 
   ssh_key_name     = "${terraform.workspace}-c-ssh-key"
   ssh_pub_key_file = "${var.ssh_pub_key_file_c}"
+  public_ingress_cidr_whitelist = "${var.public_ingress_cidr_whitelist}"
+
+  dns_name = "${var.dns_prefix}-c"
 }

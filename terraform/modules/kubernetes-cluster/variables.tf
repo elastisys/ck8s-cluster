@@ -30,3 +30,11 @@ variable "public_ingress_cidr_whitelist" {
   type    = list(string)
   default = ["212.32.186.85/32"] # Elastisys office
 }
+
+## DNS
+
+variable "dns_name" {}
+
+variable "zone_id" {
+  default = "Z2A7G3OHZDNUQ1" #compliantkubernetes.com
+}
