@@ -27,5 +27,5 @@ output "nfs_ip_address" {
 #}
 
 output "dns_record_name" {
-  value = "{aws_route53_record.dns.name}"
+  value = "${aws_route53_record.dns.name}"
 }
