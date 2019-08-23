@@ -16,7 +16,8 @@ echo "credentials \"app.terraform.io\" {
 
 * Run `terraform init`
 * Create or select workspace: `terraform workspace select <name>` or `terraform workspace new <name>`
-    * If using a new workspace visit https://app.terraform.io, click your workspace and go to settings -> general setting and change executing mode from "Remote" to "Local".
+    * If using a new workspace make sure the token set above is exported as `export TF_TOKEN=<xxx>`
+      then run `bash set-execution-mode.sh`
 * Set up ssh key
     * Create two new pairs with `ssh-keygen` one for customer and one for system services
     * Run `ssh-add <path-to-private-key>` for both keys to add the new identities
