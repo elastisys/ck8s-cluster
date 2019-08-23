@@ -114,6 +114,11 @@ The option `--interactive` mode when deploying c and ss can be used for deciding
     export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
     ./scripts/deploy-c.sh <--interactive>
 
+## OpenID Connect with kubectl
+
+For using OpenID Connect with kubectl, see
+[kubelogin/README.md](kubelogin/README.md).
+
 ## Issues and limitations
 
 Currently there is an issue where instances, that have been added to the EIP
