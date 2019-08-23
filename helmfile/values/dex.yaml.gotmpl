@@ -2,23 +2,17 @@ ingress:
   enabled: true
   annotations:
     certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
-  path: /
   tls:
   - secretName: dex-tls
-    hosts: 
-    - dex.{{ requiredEnv "ECK_SS_DOMAIN" }} 
+    hosts:
+    - dex.{{ requiredEnv "ECK_SS_DOMAIN" }}
   hosts:
   - dex.{{ requiredEnv "ECK_SS_DOMAIN" }}
 
-certs:
-  web:
-    create: false
-  grpc:
-    create: true
+# https termination by ingress instead of through dex
+https: false
 
 config:
-  web:
-    http: 0.0.0.0:8080
   connectors:
   - type: oidc
     id: google
