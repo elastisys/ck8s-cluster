@@ -2,7 +2,7 @@ provider "aws" {
   version = "~> 2.0"
   region  = "us-east-1"
   assume_role {
-    role_arn     = "${var.role_arn}"
+    role_arn = "${var.role_arn}"
   }
 }
 

@@ -33,8 +33,8 @@ module "kubernetes_cluster" {
   worker_security_group_name = "${terraform.workspace}-ss-worker-sg"
   nfs_security_group_name    = "${terraform.workspace}-ss-nfs-sg"
 
-  ssh_key_name     = "${terraform.workspace}-ss-ssh-key"
-  ssh_pub_key_file = "${var.ssh_pub_key_file_ss}"
+  ssh_key_name                  = "${terraform.workspace}-ss-ssh-key"
+  ssh_pub_key_file              = "${var.ssh_pub_key_file_ss}"
   public_ingress_cidr_whitelist = "${var.public_ingress_cidr_whitelist}"
 
   dns_name = "${var.dns_prefix}-ss"

@@ -32,5 +32,5 @@ variable "public_ingress_cidr_whitelist" {
 
 variable "dns_prefix" {
   description = "Prefix name for dns"
-  type = string
+  type        = string
 }
