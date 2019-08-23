@@ -2,7 +2,7 @@
 runcmd:
   - sudo apt-get install nfs-kernel-server -y
   - sudo mkdir -p /nfs && sudo chown nobody:nogroup /nfs
-  - echo "/nfs ${internal_cidr_prefix}(rw,sync,no_subtree_check,no_root_squash)" > /etc/exports
+  - echo "/nfs %{for addr in worker_ips } ${addr}(rw,sync,no_subtree_check,no_root_squash) %{ endfor }" > /etc/exports
   - sudo exportfs -rav
   - sudo ufw allow 2049
   # TODO: Remove when managed virtual router/DHCP is working properly.

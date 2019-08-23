@@ -108,7 +108,8 @@ resource "exoscale_compute" "nfs" {
   user_data = templatefile(
     "${path.module}/templates/nfs-cloud-init.tmpl",
     {
-      internal_cidr_prefix = "${local.internal_cidr_prefix}"
+      worker_ips = "${exoscale_compute.worker.*.ip_address}"
+      # internal_cidr_prefix = "${local.internal_cidr_prefix}"
 
       # TODO: Remove when managed virtual router/DHCP is working properly.
       address = "${local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length}",
