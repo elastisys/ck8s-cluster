@@ -2,12 +2,12 @@
 # Sets remote execution of current workspace. Default to false. Set arg1 to true to enable
 # Local execution.
 
+set -e
+
+: "${TF_TOKEN:?Missing TF_TOKEN}"
+
 WORKSPACE=a1-demo-`terraform workspace show`
 RUN_REMOTE="false"
-if [[ -z "$TF_TOKEN" ]];then
-  echo "Error: TF_TOKEN needs to be set"
-  exit 1
-fi
 
 if [[ "$1" == "true" ]];then
   RUN_REMOTE=$1

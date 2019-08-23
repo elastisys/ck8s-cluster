@@ -58,18 +58,13 @@ Begin with setting up the cloud infrastructure using Terraform.
     export TF_VAR_ssh_pub_key_file_c=<Path to pub key for customer cluster>
     export TF_VAR_dns_prefix=<xxx>
 
-    cd ./terraform/system-services
+    cd ./terraform
     terraform init
     terraform workspace select <Name>
     terraform apply
 
-    cd ./terraform/customer
-    terraform init
-    terraform workspace select <Name>
-    terraform apply
-
-Obs if using a new workspace visit https://app.terraform.io, click your workspace and go to settings -> general setting
-and change executing mode from "Remote" to "Local".
+Obs if using a new workspace `export TF_TOKEN=xxx` (should be located in ~/.terraformrc) and
+run `bash set-execution-mode.sh`. 
 
 ## Kubernetes clusters
 
