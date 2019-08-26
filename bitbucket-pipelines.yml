@@ -14,6 +14,7 @@ pipelines:
           - echo '1' | TF_WORKSPACE=pipeline terraform init
           - terraform workspace new pipeline-$BITBUCKET_BUILD_NUMBER
           - terraform init
+          - ./set-execution-mode.sh
           - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
           - terraform apply -input=false tfplan
 
