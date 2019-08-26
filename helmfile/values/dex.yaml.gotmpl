@@ -14,6 +14,7 @@ https: false
 
 config:
   connectors:
+  {{ if and (env "GOOGLE_CLIENT_ID") (env "GOOGLE_CLIENT_SECRET") }}
   - type: oidc
     id: google
     name: Google
@@ -24,16 +25,20 @@ config:
       # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
       issuer: https://accounts.google.com
       redirectURI: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/callback
-      clientID: {{ requiredEnv "GOOGLE_CLIENT_ID" }}
-      clientSecret: {{ requiredEnv "GOOGLE_CLIENT_SECRET" }}
+      clientID: {{ env "GOOGLE_CLIENT_ID" }}
+      clientSecret: {{ env "GOOGLE_CLIENT_SECRET" }}
+  {{ end }}
+  {{ if and (env "AAA_CLIENT_ID") (env "AAA_CLIENT_SECRET") }}
   - name: AAA
     id: aaa
     type: oidc
     config:
-      clientID: {{ requiredEnv "AAA_CLIENT_ID" }}
-      clientSecret: {{ requiredEnv "AAA_CLIENT_SECRET" }}
+      clientID: {{ env "AAA_CLIENT_ID" }}
+      clientSecret: {{ env "AAA_CLIENT_SECRET" }}
       issuer: https://asmp-test.a1.net/oauth2
       redirectURI: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/callback
+      insecureSkipEmailVerified: true
+  {{ end }}
   staticClients:
     - id: kubernetes
       name: 'Kubernetes dashboard'
