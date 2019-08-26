@@ -8,7 +8,7 @@ pipelines:
         script:
           # Variables
           - source /init.sh
-            #- export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
+          - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
           # Infrastructure
           - cd terraform/
           - echo '1' | TF_WORKSPACE=pipeline terraform init
@@ -24,7 +24,6 @@ pipelines:
             script:
               # Variables
               - source /init.sh
-                #- export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
               # Infrastructure
               - cd terraform/
               - echo '1' | TF_WORKSPACE=pipeline terraform init
@@ -54,14 +53,13 @@ pipelines:
             script:
               # Variables
               - source /init.sh
-                # - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
               # Infrastructure
               - cd terraform/
               - echo '1' | TF_WORKSPACE=pipeline terraform init
               - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
               # RKE
               - sleep 40
-              - cd ../..
+              - cd ..
               - ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
               - rke up --config ./eck-c.yaml
               # Services
