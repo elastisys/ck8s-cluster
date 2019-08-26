@@ -97,7 +97,7 @@ resource "exoscale_compute" "worker" {
 
 resource "exoscale_compute" "nfs" {
   display_name    = "${var.nfs_name}"
-  template        = "Linux Ubuntu 18.04 LTS 64-bit"
+  template        = "Linux Ubuntu 19.04 64-bit"
   size            = "Large"
   disk_size       = 50
   key_pair        = "${exoscale_ssh_keypair.ssh_key.name}"
