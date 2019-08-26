@@ -1,0 +1,68 @@
+image: vanneback/exoscale-pipeline:ubuntu
+pipelines:
+  pull-requests:
+    '**':
+      - parallel:
+          - step:
+              name: Entire system service stack
+              script:
+                # Variables
+                - source /init.sh
+                # Infrastructure
+                - cd terraform/system-services
+                - echo '1' | TF_WORKSPACE=pipeline terraform init
+                - terraform workspace select pipeline
+                - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
+                - terraform apply -input=false tfplan
+                # RKE
+                - sleep 40
+                - cd ../..
+                - ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
+                - rke up --config ./eck-ss.yaml
+                # Services
+                - sleep 5
+                - export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
+                - kubectl get pods --all-namespaces
+                  #- ./scripts/deploy-ss.sh
+                - sleep 5
+                - kubectl get pods --all-namespaces
+                - kubectl get nodes
+
+              after-script:
+                - source /init.sh
+                - cd terraform/system-services
+                - echo '1' | TF_WORKSPACE=pipeline terraform init
+                - terraform workspace select pipeline
+                - terraform destroy -auto-approve
+          - step:
+              name: Entire customer stack
+              script:
+                # Variables
+                - source /init.sh
+                # Infrastructure
+                - cd terraform/customer
+                - echo '1' | TF_WORKSPACE=pipeline terraform init
+                - terraform workspace select pipeline
+                - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
+                - terraform apply -input=false tfplan
+                # RKE
+                - sleep 40
+                - cd ../..
+                - ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
+                - rke up --config ./eck-c.yaml
+                # Services
+                - sleep 5
+                - export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
+                - export ECK_SS_KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
+                - kubectl get pods --all-namespaces
+                  #- ./scripts/deploy-c.sh
+                - sleep 5
+                - kubectl get pods --all-namespaces
+                - kubectl get nodes
+
+              after-script:
+                - source /init.sh
+                - cd terraform/customer
+                - echo '1' | TF_WORKSPACE=pipeline terraform init
+                - terraform workspace select pipeline
+                - terraform destroy -auto-approve
