@@ -1,6 +1,6 @@
 #!/bin/bash
-# Sets remote execution of current workspace. Default to false. Set arg1 to true to enable
-# Local execution.
+# Sets execution mode of current workspace. Default to false(local execution). Set arg1 to true to enable
+# remote execution.
 
 set -e
 
