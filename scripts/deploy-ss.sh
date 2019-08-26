@@ -8,8 +8,6 @@ source "${SCRIPTS_PATH}/common.sh"
 
 : "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
 : "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
-: "${GOOGLE_CLIENT_ID:?Missing GOOGLE_CLIENT_ID}"
-: "${GOOGLE_CLIENT_SECRET:?Missing GOOGLE_CLIENT_SECRET}"
 
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
@@ -79,7 +77,7 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/ma
 echo -e "\nContinuing with Helmfile\n"
 
 # TODO: Do somehting about that harbor wants to upgrade when doing apply twice.
-#       It should not need to update. 
+#       It should not need to update.
 #       Looks like some certificates/secrets/checksum has changed!
 #       Unsure why that is.
 
@@ -92,7 +90,7 @@ helmfile -f helmfile.yaml -e system-services -l app=cert-manager -l app=nfs-clie
 STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
 
 # Just want to see if this ever happens.
-if [ $STATUS != "Available" ] 
+if [ $STATUS != "Available" ]
 then
     echo -e  "##\n##\nWaiting for cert-manager webhook to become ready\n##\n##"
     kubectl wait --for=condition=Available --timeout=300s \
@@ -102,7 +100,7 @@ fi
 # Install the rest of the charts.
 helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-client-provisioner $INTERACTIVE apply
 
-# Check harbor rollout status. 
+# Check harbor rollout status.
 # Should not be needed due to 'wait' when installing/upgrading harbor!
 # Just keeping it for now but should be removed.
 kubectl -n harbor rollout status deployment harbor-harbor-clair
@@ -111,10 +109,10 @@ kubectl -n harbor rollout status deployment harbor-harbor-clair
 EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 | jq '.code')
 
 if [ $EXISTS != "404" ]
-then 
+then
     NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 | jq '.name')
     if [ $NAME == "library" ]
-    then 
+    then
         # Deletes the default project "library"
         echo Removing project library from harbor
         curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1
