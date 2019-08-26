@@ -63,8 +63,8 @@ Begin with setting up the cloud infrastructure using Terraform.
     terraform workspace select <Name>
     terraform apply
 
-Obs if using a new workspace `export TF_TOKEN=xxx` (should be located in ~/.terraformrc) and
-run `bash set-execution-mode.sh`. 
+Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx` 
+(should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`. 
 
 ## Kubernetes clusters
 
