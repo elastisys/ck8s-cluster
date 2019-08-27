@@ -2,7 +2,7 @@
 The pipeline is now using a ubuntu based docker image now located at dockerhub on
 `vanneback/exoscale-pipeline`. 
 
-The pipeline first executes an init script Â´init-sh`. This scripts sets all the variables
+The pipeline first executes an init script `init-sh`. This scripts sets all the variables
 needed. The script should not need to be altered and all the variables can be changed from
 bitbucket https://bitbucket.org/elastisys/a1-demo/admin/addon/admin/pipelines/repository-variables.
 
@@ -23,7 +23,6 @@ If any other dependencies are inserted in the project they will need to be added
 and the image will need to be rebuilt.
 
 ## TODO
-* The installation of services is now not included since it doesnt work correctly. Once this is fixed
 simply remove the comment on the `deploy-ss/c.sh` line.
 * Rebuild image to another location which is not a user specific public registry.
 * Add checks that the cluster is actually functioning correctly, not just installed.
