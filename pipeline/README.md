@@ -23,6 +23,6 @@ If any other dependencies are inserted in the project they will need to be added
 and the image will need to be rebuilt.
 
 ## TODO
-simply remove the comment on the `deploy-ss/c.sh` line.
 * Rebuild image to another location which is not a user specific public registry.
 * Add checks that the cluster is actually functioning correctly, not just installed.
+* Perhaps move this dir to own repo with CI for pushing image.
