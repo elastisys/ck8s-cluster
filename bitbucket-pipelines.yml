@@ -1,7 +1,9 @@
 image: vanneback/exoscale-pipeline:ubuntu
 pipelines:
-  pull-requests:
-    '**':
+  #pull-requests:
+  #  '**':
+  branches:
+    master:
       - step:
           name: Infrastructure
           script:

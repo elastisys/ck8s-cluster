@@ -2,7 +2,7 @@
 The pipeline is now using a ubuntu based docker image now located at dockerhub on
 `vanneback/exoscale-pipeline`. 
 
-The pipeline first executes an init script `init-sh`. This scripts sets all the variables
+The pipeline first executes an init script `init.sh`. This scripts sets all the variables
 needed. The script should not need to be altered and all the variables can be changed from
 bitbucket https://bitbucket.org/elastisys/a1-demo/admin/addon/admin/pipelines/repository-variables.
 
