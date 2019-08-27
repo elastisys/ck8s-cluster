@@ -25,7 +25,8 @@ pipelines:
           - echo '1' | TF_WORKSPACE=pipeline terraform init
           - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
           - terraform destroy -auto-approve
-          - terraform destroy -auto-approve
+          - terraform workspace select pipeline
+          - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
 
     - parallel:
         - step:
@@ -59,7 +60,8 @@ pipelines:
               - echo '1' | TF_WORKSPACE=pipeline terraform init
               - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
               - terraform destroy -auto-approve
-              - terraform destroy -auto-approve
+              - terraform workspace select pipeline
+              - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
         - step:
             name: customer stack
             script:
@@ -92,7 +94,8 @@ pipelines:
               - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
               - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
               - terraform destroy -auto-approve
-              - terraform destroy -auto-approve
+              - terraform workspace select pipeline
+              - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
     - step:
         name: Clean up
         trigger: manual
@@ -103,4 +106,5 @@ pipelines:
           - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
           - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
           - terraform destroy -auto-approve
-          - terraform destroy -auto-approve
+          - terraform workspace select pipeline
+          - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER

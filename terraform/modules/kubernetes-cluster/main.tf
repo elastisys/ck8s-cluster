@@ -153,18 +153,18 @@ resource "exoscale_security_group_rules" "master_sg_rules" {
     protocol = "TCP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${var.master_security_group_name}",
-      "${var.worker_security_group_name}",
-      "${var.nfs_security_group_name}",
+      "${exoscale_security_group.master_sg.name}",
+      "${exoscale_security_group.worker_sg.name}",
+      "${exoscale_security_group.nfs_sg.name}",
     ]
   }
   ingress {
     protocol = "UDP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${var.master_security_group_name}",
-      "${var.worker_security_group_name}",
-      "${var.nfs_security_group_name}",
+      "${exoscale_security_group.master_sg.name}",
+      "${exoscale_security_group.worker_sg.name}",
+      "${exoscale_security_group.nfs_sg.name}",
     ]
   }
 }
@@ -197,18 +197,18 @@ resource "exoscale_security_group_rules" "worker_sg_rules" {
     protocol = "TCP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${var.master_security_group_name}",
-      "${var.worker_security_group_name}",
-      "${var.nfs_security_group_name}",
+      "${exoscale_security_group.master_sg.name}",
+      "${exoscale_security_group.worker_sg.name}",
+      "${exoscale_security_group.nfs_sg.name}",
     ]
   }
   ingress {
     protocol = "UDP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${var.master_security_group_name}",
-      "${var.worker_security_group_name}",
-      "${var.nfs_security_group_name}",
+      "${exoscale_security_group.master_sg.name}",
+      "${exoscale_security_group.worker_sg.name}",
+      "${exoscale_security_group.nfs_sg.name}",
     ]
   }
 }
@@ -234,18 +234,18 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
     protocol = "TCP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${var.master_security_group_name}",
-      "${var.worker_security_group_name}",
-      "${var.nfs_security_group_name}",
+      "${exoscale_security_group.master_sg.name}",
+      "${exoscale_security_group.worker_sg.name}",
+      "${exoscale_security_group.nfs_sg.name}",
     ]
   }
   ingress {
     protocol = "UDP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${var.master_security_group_name}",
-      "${var.worker_security_group_name}",
-      "${var.nfs_security_group_name}",
+      "${exoscale_security_group.master_sg.name}",
+      "${exoscale_security_group.worker_sg.name}",
+      "${exoscale_security_group.nfs_sg.name}",
     ]
   }
 }
