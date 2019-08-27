@@ -29,6 +29,7 @@ kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace dex --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace nfs-provisioner --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace influxdb-prometheus --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
 
 
 # PSP
@@ -73,6 +74,15 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/ma
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/servicemonitor.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/podmonitor.crd.yaml
 
+
+# Prometheus customer reader
+# Generate additional scrape configs
+envsubst < "$SCRIPTS_PATH"/../manifests/prometheus/prometheus-federate-additional.yaml | \
+    kubectl create secret generic additional-federate-scrape-configs -n monitoring --dry-run \
+    -o yaml --from-file=prometheus-federate-additional.yaml=/dev/stdin | \
+    kubectl apply -f -
+# Create prometheus customer reader
+envsubst < "$SCRIPTS_PATH"/../manifests/prometheus/prometheus-c-reader.yaml | kubectl apply -f -
 
 echo -e "\nContinuing with Helmfile\n"
 

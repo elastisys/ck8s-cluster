@@ -1,0 +1,48 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  labels:
+    app: prometheus-customer-reader
+  name: prometheus-customer-reader
+  namespace: monitoring
+spec:
+  additionalScrapeConfigs:
+    key: prometheus-federate-additional.yaml
+    name: additional-federate-scrape-configs
+
+  # alerting:
+  #   alertmanagers: []
+  baseImage: quay.io/prometheus/prometheus
+  enableAdminAPI: false
+  # externalUrl: http://prometheus-operator-c-read-prometheus.customer-monitoring:9090
+  # listenLocal: false
+  logFormat: logfmt
+  logLevel: info
+  # paused: false
+  remoteRead:
+  - read_recent: true
+    url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=customer2&u=demo&p=demo-pass
+  remoteWrite:
+  - url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=customer2&u=demo&p=demo-pass
+  replicas: 1
+  retention: 10d
+  # routePrefix: /
+  # ruleNamespaceSelector: {}
+  # ruleSelector:
+  #   matchLabels:
+  #     app: prometheus-operator
+  #     # app: prometheus-customer-reader
+  #     # release: prometheus-customer-reader
+  #     release: prometheus-operator
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  # serviceAccountName: prometheus-operator-c-read-prometheus
+  serviceAccountName: prometheus-operator-prometheus
+  # serviceMonitorNamespaceSelector: {}
+  # serviceMonitorSelector:
+  #   matchLabels:
+  #     release: prometheus-customer-reader
+      # release: prometheus-operator
+  version: v2.10.0

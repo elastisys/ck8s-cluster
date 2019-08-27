@@ -137,17 +137,6 @@ releases:
   missingFileHandler: error
   values:
   - values/influxdb.yaml.gotmpl
-
-# Prometheus-operator (customer reader - remove at some point!)
-- name: prometheus-operator-c-reader
-  namespace: customer-monitoring
-  labels:
-    app: prometheus-operator-c-reader
-  chart: stable/prometheus-operator
-  version: 6.2.1
-  missingFileHandler: error
-  values:
-  - values/prometheus-operator-c-reader.yaml.gotmpl
 {{ end }}
 
 # Customer releases
