@@ -23,6 +23,7 @@ module "ss_cluster" {
   master_name                 = "${terraform.workspace}-ss-master"
   worker_name                 = "${terraform.workspace}-ss-worker"
   worker_count                = "${var.ss_worker_count}"
+  worker_size                 = "${var.ss_worker_size}"
 
   network_name                = "${terraform.workspace}-ss-network"
   nfs_name                    = "${terraform.workspace}-ss-nfs"
@@ -46,6 +47,7 @@ module "c_cluster" {
   master_name                 = "${terraform.workspace}-c-master"
   worker_name                 = "${terraform.workspace}-c-worker"
   worker_count                = "${var.c_worker_count}"
+  worker_size                 = "${var.c_worker_size}"
 
   network_name                = "${terraform.workspace}-c-network"
   nfs_name                    = "${terraform.workspace}-c-nfs"

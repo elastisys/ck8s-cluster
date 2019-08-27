@@ -14,6 +14,8 @@ variable "worker_name" {}
 
 variable "worker_count" {}
 
+variable "worker_size" {}
+
 variable "nfs_name" {}
 
 variable "master_security_group_name" {}

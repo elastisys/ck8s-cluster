@@ -66,7 +66,7 @@ resource "exoscale_compute" "worker" {
 
   display_name    = "${var.worker_name}-${count.index}"
   template        = "Linux RancherOS 1.5.1 64-bit"
-  size            = "Large"
+  size            = "${var.worker_size}"
   disk_size       = 50
   key_pair        = "${exoscale_ssh_keypair.ssh_key.name}"
   state           = "Running"
