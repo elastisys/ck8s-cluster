@@ -1,26 +1,26 @@
 - job_name: 'federate'
-      scrape_interval: 15s
+  scrape_interval: 15s
 
-      honor_labels: true
-      metrics_path: '/federate'
+  honor_labels: true
+  metrics_path: '/federate'
 
-      scheme: https
+  scheme: https
 
-      params:
-        'match[]':
-          - '{job="kubelet"}'
-          - '{job="kube-state-metrics"}'
-          - '{job="node-exporter"}'
-          - '{job="coredns"}'
-          - '{job="apiserver"}'
-          - '{__name__=~"job:.*"}'
-          - '{__name__=~"namespace(_|:).*"}'
+  params:
+    'match[]':
+      - '{job="kubelet"}'
+      - '{job="kube-state-metrics"}'
+      - '{job="node-exporter"}'
+      - '{job="coredns"}'
+      - '{job="apiserver"}'
+      - '{__name__=~"job:.*"}'
+      - '{__name__=~"namespace(_|:).*"}'
 
-      tls_config:
-        insecure_skip_verify: ${TLS_SKIP_VERIFY} #TODO: remove this later when we have stable certs/when in production
+  tls_config:
+    insecure_skip_verify: ${TLS_SKIP_VERIFY} #TODO: remove this later when we have stable certs/when in production
 
-      static_configs:
-        - labels:
-            cluster: customer
-          targets:
-          - prometheus.${ECK_C_DOMAIN}
+  static_configs:
+    - labels:
+        cluster: customer
+      targets:
+      - prometheus.${ECK_C_DOMAIN}

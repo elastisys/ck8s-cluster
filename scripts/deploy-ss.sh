@@ -76,13 +76,15 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/ma
 
 
 # Prometheus customer reader
-# Generate additional scrape configs
+# Generate customer scrape configs
 envsubst < "$SCRIPTS_PATH"/../manifests/prometheus/prometheus-federate-additional.yaml | \
-    kubectl create secret generic additional-federate-scrape-configs -n monitoring --dry-run \
+    kubectl create secret generic prometheus-c-scrape-configs -n monitoring --dry-run \
     -o yaml --from-file=prometheus-federate-additional.yaml=/dev/stdin | \
     kubectl apply -f -
 # Create prometheus customer reader
 envsubst < "$SCRIPTS_PATH"/../manifests/prometheus/prometheus-c-reader.yaml | kubectl apply -f -
+# Expose prometheus customer reader
+kubectl apply -f "$SCRIPTS_PATH"/../manifests/prometheus/prometheus-c-service.yaml
 
 echo -e "\nContinuing with Helmfile\n"
 

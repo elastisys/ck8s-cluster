@@ -473,14 +473,14 @@ grafana:
   #   type: influxdb
   #   url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086
   #   version: 1
-  - name: prometheus-c
+  - name: prometheus-c-reader
     access: proxy
     basicAuth: false
     editable: false
     isDefault: true
     orgId: 1
     type: prometheus
-    url: http://prometheus-operator-c-read-prometheus.customer-monitoring.svc.cluster.local:9090
+    url: http://prometheus-c-reader:9090
     version: 1
   - name: prometheus-ss
     access: proxy
