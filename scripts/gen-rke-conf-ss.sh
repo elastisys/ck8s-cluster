@@ -4,7 +4,7 @@ set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
-: "${ECK_SS_DOMAIN:?Missing ECK_SS_DOMAIN}"
+source "${SCRIPTS_PATH}/common.sh"
 
 cd ${SCRIPTS_PATH}/../terraform
 
