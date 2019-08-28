@@ -51,7 +51,11 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 # CERT-MANAGER
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer.yaml
+envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-core-cert.yaml | kubectl apply -f -
+envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-notary-cert.yaml | kubectl apply -f -
 
 
 # Elasticsearch and kibana.

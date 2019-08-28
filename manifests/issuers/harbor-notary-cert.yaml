@@ -1,0 +1,12 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: harbor-notary-cert
+  namespace: harbor
+spec:
+  secretName: harbor-notary-cert
+  commonName: "notary.harbor.${ECK_SS_DOMAIN}"
+  isCA: false
+  issuerRef:
+    name: selfsigning-issuer
+    kind: ClusterIssuer

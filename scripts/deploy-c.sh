@@ -52,7 +52,8 @@ kubectl -n kube-system create secret generic elasticsearch \
 # CERT-MANAGER
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 
 
 # OPA
