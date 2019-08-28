@@ -53,6 +53,7 @@ pipelines:
                 - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
                 - source /init.sh
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
+                - kubectl get pods --all-namespaces
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
@@ -86,6 +87,7 @@ pipelines:
                 - source /init.sh
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
                 - cd terraform/
+                - kubectl get pods --all-namespaces
                 - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
                 - terraform destroy -auto-approve
