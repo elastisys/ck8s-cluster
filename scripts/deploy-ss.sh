@@ -127,11 +127,12 @@ EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/
 if [ $EXISTS != "404" ]
 then
     NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 | jq '.name')
-    if [ $NAME == "library" ]
+    if [ $NAME == "\"library\"" ]
     then
         # Deletes the default project "library"
         echo Removing project library from harbor
-        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1
+        # Curl will retrun status 500 even though it successfully removed the project.
+        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 > /dev/null
 
         # Creates new private project "default"
         echo Creating new private project default
