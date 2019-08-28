@@ -17,7 +17,7 @@
       - '{__name__=~"namespace(_|:).*"}'
 
   tls_config:
-    insecure_skip_verify: ${TLS_SKIP_VERIFY} #TODO: remove this later when we have stable certs/when in production
+    insecure_skip_verify: ${TLS_SKIP_VERIFY}
 
   static_configs:
     - labels:
