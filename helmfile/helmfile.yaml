@@ -21,7 +21,7 @@ repositories:
 helmDefaults:
   tillerNamespace: kube-system  #dedicated default key for tiller-namespace
   tls: true
-  timeout: 600
+  timeout: 300
 
   # TODO: Use env or Env.values instead of fixed paths for certs.
   {{ if eq .Environment.Name "system-services" }}

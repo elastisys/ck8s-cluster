@@ -55,6 +55,7 @@ pipelines:
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
                 - export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
                 - kubectl get pods --all-namespaces
+                - kubectl describe pods --all-namespaces
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
@@ -89,6 +90,7 @@ pipelines:
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
                 - export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
                 - kubectl get pods --all-namespaces
+                - kubectl describe pods --all-namespaces
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
