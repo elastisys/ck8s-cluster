@@ -4,9 +4,7 @@ metadata:
   name: restricted-psp
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
-    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
     seccomp.security.alpha.kubernetes.io/defaultProfileName:  'runtime/default'
-    apparmor.security.beta.kubernetes.io/defaultProfileName:  'runtime/default'
 spec:
   privileged: false
   # Required to prevent escalations to root.
@@ -32,6 +30,7 @@ spec:
     rule: 'MustRunAsNonRoot'
   seLinux:
     # This policy assumes the nodes are using AppArmor rather than SELinux.
+    # TODO: RancherOS does not support seLinux, but if that changes then this should be altered to use seLinux
     rule: 'RunAsAny'
   supplementalGroups:
     rule: 'MustRunAs'
