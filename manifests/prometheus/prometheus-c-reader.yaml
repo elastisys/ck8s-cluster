@@ -10,10 +10,7 @@ spec:
     key: prometheus-federate-additional.yaml
     name: prometheus-c-scrape-configs
 
-  # alerting:
-  #   alertmanagers: []
   enableAdminAPI: false
-  # listenLocal: false
   logFormat: logfmt
   logLevel: info
   remoteRead:
@@ -23,7 +20,6 @@ spec:
   - url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=customer2&u=demo&p=demo-pass
   replicas: 1
   retention: 10d
-  # routePrefix: /
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true
