@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Maybe some of the following could be installed using charts by helmfile.
-
 set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
@@ -92,20 +90,10 @@ kubectl apply -f "$SCRIPTS_PATH"/../manifests/prometheus-c-reader/prometheus-c-s
 
 echo -e "\nContinuing with Helmfile\n"
 
-# TODO: Do somehting about that harbor wants to upgrade when doing apply twice.
-#       It should not need to update.
-#       Looks like some certificates/secrets/checksum has changed!
-#       Unsure why that is.
-
 cd ${SCRIPTS_PATH}/../helmfile
 
 # Install cert-manager and nfs-client-provisioner first.
 helmfile -f helmfile.yaml -e system-services -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
-
-# # Install nfs-client-provisioner.
-# helmfile -f helmfile.yaml -e system-services -l app=nfs-client-provisioner $INTERACTIVE apply
-# # Install cert-manager.
-# helmfile -f helmfile.yaml -e system-services -l app=cert-manager $INTERACTIVE apply
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
@@ -120,18 +108,9 @@ fi
 
 # Install dex.
 helmfile -f helmfile.yaml -e system-services -l app=dex $INTERACTIVE apply
-# Install oauth2
-helmfile -f helmfile.yaml -e system-services -l app=oauth2 $INTERACTIVE apply
-# # Install prometheus-operator
-# helmfile -f helmfile.yaml -e system-services -l app=prometheus-operator $INTERACTIVE apply
-# # Install influxdb
-# helmfile -f helmfile.yaml -e system-services -l app=influxdb $INTERACTIVE apply
-# # Install harbor
-# helmfile -f helmfile.yaml -e system-services -l app=harbor $INTERACTIVE apply
-
 
 # Install the rest of the charts.
-helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=oauth2 $INTERACTIVE apply
+helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex $INTERACTIVE apply
 
 # Check harbor rollout status.
 # Should not be needed due to 'wait' when installing/upgrading harbor!

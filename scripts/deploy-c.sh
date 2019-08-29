@@ -22,10 +22,6 @@ kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 
 
-# Node restriction
-# sh ${SCRIPTS_PATH}/node-restriction.sh
-
-
 # PSP
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
@@ -81,11 +77,6 @@ cd ${SCRIPTS_PATH}/../helmfile
 # Install cert-manager and nfs-client-provisioner first.
 helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 
-# # Install nfs-client-provisioner
-# helmfile -f helmfile.yaml -e customer -l app=nfs-client-provisioner $INTERACTIVE apply
-# # Install cert-manager
-# helmfile -f helmfile.yaml -e customer -l app=cert-manager $INTERACTIVE apply
-
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
 
@@ -97,21 +88,13 @@ then
         apiservice v1beta1.admission.certmanager.k8s.io
 fi
 
-# # Install prometheus-operator
-# helmfile -f helmfile.yaml -e customer -l app=prometheus-operator $INTERACTIVE apply
-# # Install falco
-# helmfile -f helmfile.yaml -e customer -l app=falco $INTERACTIVE apply
-# # Install opa
-# helmfile -f helmfile.yaml -e customer -l app=opa $INTERACTIVE apply
-# # Install oauth2
-# helmfile -f helmfile.yaml -e customer -l app=oauth2 $INTERACTIVE apply
-
-# Install rest of the charts.
+# Install rest of the charts excluding fluentd.
 helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd $INTERACTIVE apply
 
 
 # FLUENTD
 
+# Get elastisearch password from system-services cluster
 ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
 while [ -z "$ES_PW" ]
