@@ -1,4 +1,4 @@
-image: vanneback/exoscale-pipeline:ubuntu
+image: olarsson2/exoscale-pipeline:ubuntu
 pipelines:
   default:
     - step:
