@@ -16,9 +16,6 @@ popd > /dev/null
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
-ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
-
-
 # NAMESPACES
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
@@ -44,10 +41,6 @@ source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer
 # DASHBOARD
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 
-
-# FLUENTD
-kubectl -n kube-system create secret generic elasticsearch \
-    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
 
 # CERT-MANAGER
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
@@ -86,12 +79,12 @@ echo -e "\nContinuing to Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
 # Install cert-manager and nfs-client-provisioner first.
-#helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 
-# Install nfs-client-provisioner
-helmfile -f helmfile.yaml -e customer -l app=nfs-client-provisioner $INTERACTIVE apply
-# Install cert-manager
-helmfile -f helmfile.yaml -e customer -l app=cert-manager $INTERACTIVE apply
+# # Install nfs-client-provisioner
+# helmfile -f helmfile.yaml -e customer -l app=nfs-client-provisioner $INTERACTIVE apply
+# # Install cert-manager
+# helmfile -f helmfile.yaml -e customer -l app=cert-manager $INTERACTIVE apply
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
@@ -104,16 +97,33 @@ then
         apiservice v1beta1.admission.certmanager.k8s.io
 fi
 
-# Install fluentd
-helmfile -f helmfile.yaml -e customer -l app=fluentd $INTERACTIVE apply
-# Install prometheus-operator
-helmfile -f helmfile.yaml -e customer -l app=prometheus-operator $INTERACTIVE apply
-# Install falco
-helmfile -f helmfile.yaml -e customer -l app=falco $INTERACTIVE apply
-# Install opa
-helmfile -f helmfile.yaml -e customer -l app=opa $INTERACTIVE apply
-# Install oauth2
-helmfile -f helmfile.yaml -e customer -l app=oauth2 $INTERACTIVE apply
+# # Install prometheus-operator
+# helmfile -f helmfile.yaml -e customer -l app=prometheus-operator $INTERACTIVE apply
+# # Install falco
+# helmfile -f helmfile.yaml -e customer -l app=falco $INTERACTIVE apply
+# # Install opa
+# helmfile -f helmfile.yaml -e customer -l app=opa $INTERACTIVE apply
+# # Install oauth2
+# helmfile -f helmfile.yaml -e customer -l app=oauth2 $INTERACTIVE apply
 
 # Install rest of the charts.
-#helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner $INTERACTIVE apply
+helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd $INTERACTIVE apply
+
+
+# FLUENTD
+
+ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+
+while [ -z "$ES_PW" ]
+do
+    echo "Waiting for elasticsearch password"
+    sleep 5
+    ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+done
+echo "Got elsticsearch password"
+
+kubectl -n kube-system create secret generic elasticsearch \
+    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
+
+# Install fluentd
+helmfile -f helmfile.yaml -e customer -l app=fluentd $INTERACTIVE apply
