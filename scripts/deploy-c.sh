@@ -86,7 +86,12 @@ echo -e "\nContinuing to Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
 # Install cert-manager and nfs-client-provisioner first.
-helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+#helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+
+# Install nfs-client-provisioner
+helmfile -f helmfile.yaml -e customer -l app=nfs-client-provisioner $INTERACTIVE apply
+# Install cert-manager
+helmfile -f helmfile.yaml -e customer -l app=cert-manager $INTERACTIVE apply
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
@@ -99,5 +104,16 @@ then
         apiservice v1beta1.admission.certmanager.k8s.io
 fi
 
+# Install fluentd
+helmfile -f helmfile.yaml -e customer -l app=fluentd $INTERACTIVE apply
+# Install prometheus-operator
+helmfile -f helmfile.yaml -e customer -l app=prometheus-operator $INTERACTIVE apply
+# Install falco
+helmfile -f helmfile.yaml -e customer -l app=falco $INTERACTIVE apply
+# Install opa
+helmfile -f helmfile.yaml -e customer -l app=opa $INTERACTIVE apply
+# Install oauth2
+helmfile -f helmfile.yaml -e customer -l app=oauth2 $INTERACTIVE apply
+
 # Install rest of the charts.
-helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner $INTERACTIVE apply
+#helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner $INTERACTIVE apply
