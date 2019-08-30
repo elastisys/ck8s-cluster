@@ -7,6 +7,16 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
+# Check CERT_TYPE and set appropriate env-variables for verifying tls or not
+if [[ "$CERT_TYPE" == "prod" ]];
+then export TLS_VERIFY="true"
+    export TLS_SKIP_VERIFY="false"
+elif [[ "$CERT_TYPE" == "staging" ]];
+then export TLS_VERIFY="false"
+    export TLS_SKIP_VERIFY="true"
+else echo "CERT_TYPE should be set to prod or staging"; exit 1;
+fi
+
 pushd "${SCRIPTS_PATH}/../terraform/" > /dev/null
 export NFS_C_SERVER_IP=$(terraform output c_nfs_ip_address)
 popd > /dev/null

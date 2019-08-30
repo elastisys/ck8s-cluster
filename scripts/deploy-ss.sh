@@ -10,6 +10,16 @@ source "${SCRIPTS_PATH}/common.sh"
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
 
+# Check CERT_TYPE and set appropriate env-variables for verifying tls or not
+if [[ "$CERT_TYPE" == "prod" ]];
+then export TLS_VERIFY="true"
+    export TLS_SKIP_VERIFY="false"
+elif [[ "$CERT_TYPE" == "staging" ]];
+then export TLS_VERIFY="false"
+    export TLS_SKIP_VERIFY="true"
+else echo "CERT_TYPE should be set to prod or staging"; exit 1;
+fi
+
 pushd "${SCRIPTS_PATH}/../terraform/" > /dev/null
 export NFS_SS_SERVER_IP=$(terraform output ss_nfs_ip_address)
 popd > /dev/null
