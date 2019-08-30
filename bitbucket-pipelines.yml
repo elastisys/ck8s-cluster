@@ -37,9 +37,8 @@ pipelines:
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
                 # RKE
-                # Sleep needed for docker to start on nodes.
-                - sleep 40
                 - cd ..
+                - ./scripts/check-docker.sh
                 - ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
                 - rke up --config ./eck-ss.yaml
               artifacts:
@@ -66,9 +65,8 @@ pipelines:
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
                 # RKE
-                # Sleep needed for docker to start on nodes.
-                - sleep 40
                 - cd ..
+                - ./scripts/check-docker.sh
                 - ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
                 - rke up --config ./eck-c.yaml
               artifacts:
