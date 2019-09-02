@@ -1,8 +1,0 @@
-#cloud-config
-runcmd:
- - mkdir -p /dev/diskimage
- - dd if=/dev/zero of=/dev/diskimage/diskimage bs=5M count=1024
- - mkfs.ext4 /dev/diskimage/diskimage
- - mkdir -p /mnt/mountpoint
-mounts:
-- ["/dev/diskimage/diskimage", "/mnt/mountpoint", "ext4", ""]

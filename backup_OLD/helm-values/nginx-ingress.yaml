@@ -1,7 +1,0 @@
-controller:
-  hostNetwork: true
-  kind: DaemonSet
-  # extraArgs:
-  #   - report-node-internal-ip-address
-podSecurityPolicy:
-  enabled: true
