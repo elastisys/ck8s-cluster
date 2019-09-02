@@ -86,6 +86,17 @@ The dns-name will be automatically created with the name `<dns_prefix>-c/ss.comp
 The domain can be changed by setting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
 
+## Setting up Google as identity provider for dex.
+
+1. Go to GCP and create a project. 
+Select `APIs &Services` in the menu.
+
+2. Select `Oauth consent screen` and name the application with the same name as the project of your google cloud project add the top level domain e.g. `compliantkubernetes.com` to Authorized domains. 
+
+3. Go to `Credentials` and press `Create credentials` and select `OAuth client ID`. 
+Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.compliantkubernetes.com`.
+Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.compliantkubernetes.com/callback`
+
 ## Kubernetes resources
 
 Lastly, create all of the Kubernetes resources in the clusters.
