@@ -14,7 +14,7 @@ RUN tar -xvzf terraform-provider-exoscale* terraform-provider-exoscale_v0.11.0 &
     mv terraform-provider-exoscale_v0.11.0 ~/.terraform.d/plugins/
 
 #RKE
-RUN wget https://github.com/rancher/rke/releases/download/v0.2.7/rke_linux-amd64 && \
+RUN wget https://github.com/rancher/rke/releases/download/v0.2.8/rke_linux-amd64 && \
     chmod 755 rke_linux-amd64 && \
     mv rke_linux-amd64 /usr/local/bin/rke
 

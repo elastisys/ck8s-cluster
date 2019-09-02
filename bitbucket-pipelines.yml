@@ -1,4 +1,4 @@
-image: olarsson2/exoscale-pipeline:ubuntu
+image: elastisys/exoscale-pipeline
 pipelines:
   pull-requests:
     '**':
