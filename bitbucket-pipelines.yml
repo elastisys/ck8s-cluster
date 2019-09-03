@@ -16,6 +16,9 @@ pipelines:
             - ./set-execution-mode.sh
             - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
             - terraform apply -input=false tfplan
+            - set -e
+            - ./../pipeline/test/infrastructure/ssh.sh system-services
+            - ./../pipeline/test/infrastructure/ssh.sh customer
           after-script:
             - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
             - source /init.sh
