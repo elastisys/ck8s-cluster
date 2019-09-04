@@ -43,6 +43,9 @@ pipelines:
                 - ./scripts/check-docker.sh
                 - ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
                 - rke up --config ./eck-ss.yaml
+                - export KUBECONFIG=./kube_config_eck-ss.yaml
+                - cd pipeline/test/k8s
+                - ./check-nodes.sh system-services
               artifacts:
                 - kube_config_eck-ss.yaml
               after-script:
@@ -71,9 +74,11 @@ pipelines:
                 - ./scripts/check-docker.sh
                 - ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
                 - rke up --config ./eck-c.yaml
+                - export KUBECONFIG=./kube_config_eck-c.yaml
+                - cd pipeline/test/k8s
+                - ./check-nodes.sh customer
               artifacts:
                 - kube_config_eck-c.yaml
-
               after-script:
                 - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
                 - source /init.sh
