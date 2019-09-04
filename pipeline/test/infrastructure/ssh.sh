@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Check that cluster type argument is set and valid.
 if [ "$1" != "system-services" -a "$1" != "customer" ]
 then 
@@ -54,30 +56,23 @@ function check_hosts () {
     for host in "${host_addresses[@]}"
     do 
         echo "Checking host: $host"
-        ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1
+        success="true"
+        ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1 || success="false"
 
-        if [[ "$?" -ne 0 ]]
+        if [[ "$success" != "true" ]]
         then 
             wait_time=0
-            success=false
-            echo "here"
-            while ( ! $success ) && [[ $wait_time < 60 ]]
+
+            while [[ "$success" != "true" ]] && [[ "$wait_time" < 60 ]]
             do
                 echo "Retrying host: $host"
-                ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1 
-
-                if [[ "$?" -eq 0 ]]
-                then
-                    success=true
-                else 
-                    success=false
-                fi
-
+                success="true"
+                ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1 || success="false"
                 wait_time=$((wait_time + 5))
                 sleep 5
             done 
 
-            if ( ! $success )
+            if [[ "$success" == "false" ]]
             then 
                 echo "Host: $host is not reachable by ssh!"
                 exit 1
