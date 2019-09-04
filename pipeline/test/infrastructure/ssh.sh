@@ -50,15 +50,15 @@ function check_hosts () {
     if [ "$nr_hosts" -ne "${#host_addresses[@]}" ]
     then 
         echo -e "Invalid number of hosts are running\nDesired: $nr_hosts\nRunning: ${#host_addresses[@]}"
+        exit 1
     fi
 
     # Check that all hosts are reachable via ssh. Retrying for 1 minute.
     for host in "${host_addresses[@]}"
     do 
         echo "Checking host: $host"
-        success="true"
-        ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1 || success="false"
-
+        success="false"
+        
         if [[ "$success" != "true" ]]
         then 
             wait_time=0
