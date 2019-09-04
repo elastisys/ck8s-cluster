@@ -55,17 +55,17 @@ function check_hosts () {
     do 
         echo "Checking host: $host"
         ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1
-       
+
         if [[ "$?" -ne 0 ]]
         then 
             wait_time=0
             success=false
-
-            while [[ ! success ]] && [[ $wait_time < 60 ]]
+            echo "here"
+            while ( ! $success ) && [[ $wait_time < 60 ]]
             do
                 echo "Retrying host: $host"
                 ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1 
-                
+
                 if [[ "$?" -eq 0 ]]
                 then
                     success=true
@@ -73,10 +73,11 @@ function check_hosts () {
                     success=false
                 fi
 
-                wait_time=$((wait_time + 2))
+                wait_time=$((wait_time + 5))
+                sleep 5
             done 
 
-            if [[ ! success ]]
+            if ( ! $success )
             then 
                 echo "Host: $host is not reachable by ssh!"
                 exit 1
