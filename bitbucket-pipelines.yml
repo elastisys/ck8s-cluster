@@ -43,7 +43,7 @@ pipelines:
                 - ./scripts/check-docker.sh
                 - ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
                 - rke up --config ./eck-ss.yaml
-                - export KUBECONFIG=./kube_config_eck-ss.yaml
+                - export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
                 - cd pipeline/test/k8s
                 - ./check-nodes.sh system-services
               artifacts:
@@ -74,7 +74,7 @@ pipelines:
                 - ./scripts/check-docker.sh
                 - ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
                 - rke up --config ./eck-c.yaml
-                - export KUBECONFIG=./kube_config_eck-c.yaml
+                - export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
                 - cd pipeline/test/k8s
                 - ./check-nodes.sh customer
               artifacts:

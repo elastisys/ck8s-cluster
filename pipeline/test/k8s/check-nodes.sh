@@ -22,12 +22,17 @@ fi
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
-
 # Get desired numbers from terraform.
 cd ${SCRIPTS_PATH}/../../../terraform
 tf_out=$(terraform output -json)
-cd ${SCRIPTS_PATH}/
 
+# For whatever reason it was not always able to get the output..
+if [[ "$?" -ne 0 ]]
+then 
+    exit 1
+fi
+
+cd ${SCRIPTS_PATH}/
 
 desired_workers=($(echo ${tf_out} | jq -r ".${prefix}_worker_count.value" ))
 desired_controlplanes=1
@@ -40,31 +45,47 @@ labels=$(kubectl get nodes -o json | jq ".items[].metadata.labels")
 echo "Checking workers"
 workers=$(echo "$labels" | jq 'values | select(."node-role.kubernetes.io/worker" == "true") | [."node-role.kubernetes.io/worker"]')
 
-if [[ "${#workers[@]}" -ne  "$desired_workers" ]]
+# We need to check this because list=[""] is evaluated to be empty while ${#list[@]}=1...
+if [[ -z ${workers} ]]
 then 
-    echo -e "\tInvalid number of worker nodes are running\n\tDesired: $desired_workers\n\tRunning: ${#workers[@]}"
+    echo -e "\tInvalid number of workers are running\n\tDesired: $desired_workers\n\tRunning: 0"
 else
-    echo -e "\t${#workers[@]}/$desired_workers workers are running."
+    if [[ "${#workers[@]}" -ne  "$desired_workers" ]]
+    then 
+        echo -e "\tInvalid number of worker nodes are running\n\tDesired: $desired_workers\n\tRunning: ${#workers[@]}"
+    else
+        echo -e "\t${#workers[@]}/$desired_workers workers are running."
+    fi
 fi
 
 # Check number of controlplanes.
 echo "Checking controlplanes"
 controlplanes=$(echo "$labels" | jq 'values | select(."node-role.kubernetes.io/controlplane" == "true") | [."node-role.kubernetes.io/controlplane"]')
 
-if [[ "${#controlplanes[@]}" -ne "$desired_controlplanes" ]]
-then 
-    echo -e "\tInvalid number of controlplanes are running\n\tDesired: $desired_controlplanes\n\tRunning: ${#controlplanes[@]}"
+if [[ -z ${controlplanes} ]]
+then
+    echo -e "\tInvalid number of controlplanes are running\n\tDesired: $desired_controlplanes\n\tRunning: 0"
 else
-    echo -e "\t${#controlplanes[@]}/$desired_controlplanes controlplanes are running."
+    if [[ ${#controlplanes[@]} -ne "$desired_controlplanes" ]]
+    then 
+        echo -e "\tInvalid number of controlplanes are running\n\tDesired: $desired_controlplanes\n\tRunning: ${#controlplanes[@]}"
+    else
+        echo -e "\t${#controlplanes[@]}/$desired_controlplanes controlplanes are running."
+    fi
 fi
 
 # Check number of etcds.
 echo "Checking etcds"
 etcds=$(echo "$labels" | jq 'values | select(."node-role.kubernetes.io/etcd" == "true") | [."node-role.kubernetes.io/etcd"]')
 
-if [[ "${#etcds[@]}" -ne "$desired_etcds" ]]
+if  [[ -z "${etcds}" ]]
 then
-    echo -e "\tInvalid number of etcds are running\n\tDesired: $desired_etcds\n\tRunning: ${#etcds[@]}"
+    echo -e "\tInvalid number of etcds are running\n\tDesired: $desired_etcds\n\tRunning: 0"
 else 
-    echo -e "\t${#etcds[@]}/$desired_etcds etcds are running."
+    if [ ${#etcds[@]} -ne "$desired_etcds" ]
+    then 
+        echo -e "\tInvalid number of etcds are running\n\tDesired: $desired_etcds\n\tRunning: ${#etcds[@]}"
+    else 
+        echo -e "\t${#etcds[@]}/$desired_etcds etcds are running."
+    fi
 fi
