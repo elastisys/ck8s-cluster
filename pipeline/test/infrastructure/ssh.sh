@@ -37,7 +37,8 @@ function check_hosts () {
         nr_hosts=1
         host_addresses=($(echo ${tf_out} | jq -r ".${prefix}_${type}_ip_address.value" ))
         user="ubuntu"
-    else
+    elif [ "$type" == "master" ]
+    then
         nr_hosts=1
         host_addresses=($(echo ${tf_out} | jq -r ".${prefix}_${type}_ip_address.value" ))
         user="rancher"
@@ -48,7 +49,6 @@ function check_hosts () {
     then 
         echo -e "Invalid number of hosts are running\nDesired: $nr_hosts\nRunning: ${#host_addresses[@]}"
     fi
-
 
     # Check that all hosts are reachable via ssh. Retrying for 1 minute.
     for host in "${host_addresses[@]}"
