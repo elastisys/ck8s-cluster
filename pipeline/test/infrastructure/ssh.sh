@@ -13,13 +13,17 @@ echo "Running test on the $1 cluster"
 
 if [ $1 == "system-services" ]
 then 
-    prefix="ss"
+    prefix="system_services"
 elif [ $1 == "customer" ]
 then
-    prefix="c"
+    prefix="customer"
 fi
 
-tf_out=$(terraform output -json)
+SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+
+cd ${SCRIPTS_PATH}/../../../
+
+infra=$(cat hosts.json)
 
 # TODO - Update this function when we can have variable amount of masters.
 function check_hosts () {
@@ -29,20 +33,20 @@ function check_hosts () {
     if [ "$type" == "worker" ]
     then
         # Number of desired hosts of type.
-        nr_hosts=$(echo ${tf_out} | jq -r ".${prefix}_${type}_count.value" )
+        nr_hosts=$(echo ${infra} | jq -r ".${prefix}_${type}_count.value" )
 
         # IP addresses of the worker nodes.
-        host_addresses=($(echo ${tf_out} | jq -r ".${prefix}_${type}_ip_addresses.value[]" ))
+        host_addresses=($(echo ${infra} | jq -r ".${prefix}_${type}_ip_addresses.value[]" ))
         user="rancher"
     elif [ "$type" == "nfs" ]
     then 
         nr_hosts=1
-        host_addresses=($(echo ${tf_out} | jq -r ".${prefix}_${type}_ip_address.value" ))
+        host_addresses=($(echo ${infra} | jq -r ".${prefix}_${type}_ip_address.value" ))
         user="ubuntu"
     elif [ "$type" == "master" ]
     then
         nr_hosts=1
-        host_addresses=($(echo ${tf_out} | jq -r ".${prefix}_${type}_ip_address.value" ))
+        host_addresses=($(echo ${infra} | jq -r ".${prefix}_${type}_ip_address.value" ))
         user="rancher"
     fi
 

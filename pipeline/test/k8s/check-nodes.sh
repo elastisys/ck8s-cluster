@@ -16,23 +16,22 @@ echo "Running tests on the $1 cluster"
 
 if [ $1 == "system-services" ]
 then 
-    prefix="ss"
+    prefix="system_services"
 elif [ $1 == "customer" ]
 then
-    prefix="c"
+    prefix="customer"
 fi
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
-# Get terraform output
-cd ${SCRIPTS_PATH}/../../../terraform
-tf_out=$(terraform output -json)
-cd ${SCRIPTS_PATH}/
+cd ${SCRIPTS_PATH}/../../../
 
 # Get the desired number of each node type.
-desired_workers=($(echo ${tf_out} | jq -r ".${prefix}_worker_count.value" ))
+desired_workers=($(cat hosts.json | jq -r ".${prefix}_worker_count.value" ))
 desired_controlplanes=1
 desired_etcds=1
+
+cd ${SCRIPTS_PATH}/
 
 # Get the lables of each node
 labels=$(kubectl get nodes -o json | jq ".items[].metadata.labels")

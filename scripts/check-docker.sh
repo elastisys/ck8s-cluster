@@ -3,13 +3,26 @@
 set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
-# Get terraform output
-cd ${SCRIPTS_PATH}/../terraform
-tf_out=$(terraform output -json)
+if [ "$1" != "system-services" -a "$1" != "customer" ]
+then 
+    echo "Usage: ss.sh <system-services | customer>"
+    exit 1
+fi
+
+if [ $1 == "system-services" ]
+then 
+    prefix="system_services"
+elif [ $1 == "customer" ]
+then
+    prefix="customer"
+fi
+
+# Get infra info
+cd ${SCRIPTS_PATH}/../
 
 # TODO - Update when we can have variable amount of masters.
-master_ip_address=$(echo ${tf_out} | jq -r '.c_master_ip_address.value')
-worker_ip_addresses=($(echo ${tf_out} | jq -r '.c_worker_ip_addresses.value[]'))
+master_ip_address=$(cat hosts.json | jq -r ".${prefix}_master_ip_address.value")
+worker_ip_addresses=($(cat hosts.json | jq -r ".${prefix}_worker_ip_addresses.value[]"))
 
 hosts=$worker_ip_addresses
 hosts+=($master_ip_address)

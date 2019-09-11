@@ -16,15 +16,15 @@ pipelines:
             - ./set-execution-mode.sh
             - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
             - terraform apply -input=false tfplan
-#            - ./../pipeline/test/infrastructure/ssh.sh system-services
-#            - ./../pipeline/test/infrastructure/ssh.sh customer
             # Generate hosts.json
             - ../scripts/gen-hosts.sh
+            - ./../pipeline/test/infrastructure/ssh.sh system-services
+            - ./../pipeline/test/infrastructure/ssh.sh customer
           artifacts:
             - hosts.json
           after-script:
             - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
-            - source /init.sh
+            - source pipeline/init.sh
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             - cd terraform/
             - echo '1' | TF_WORKSPACE=pipeline terraform init
@@ -37,21 +37,20 @@ pipelines:
           - step:
               name: system service rke
               script:
-                - ./scripts/check-docker.sh
+                - source pipeline/init.sh
+                - source scripts/variables.sh
+                - ./scripts/check-docker.sh system-services
                 - ./scripts/gen-rke-conf-system.sh > ./eck-system.yaml
                 - rke up --config ./eck-system.yaml
-              #  - export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
-              #  - cd pipeline/test/k8s
-              #  - ./check-nodes.sh system-services
+                - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
+                - cd pipeline/test/k8s
+                - ./check-nodes.sh system-services
               artifacts:
                 - kube_config_eck-system.yaml
               after-script:
                 - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
                 - source pipeline/init.sh
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
-                - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
-                - kubectl get pods --all-namespaces
-                - kubectl describe pods --all-namespaces
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
@@ -61,22 +60,20 @@ pipelines:
           - step:
               name: customer rke
               script:
+                - source pipeline/init.sh
                 - source scripts/variables.sh
-                - ./scripts/check-docker.sh
+                - ./scripts/check-docker.sh customer
                 - ./scripts/gen-rke-conf-customer.sh > ./eck-customer.yaml
                 - rke up --config ./eck-customer.yaml
-                # - export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
-                # - cd pipeline/test/k8s
-                # - ./check-nodes.sh customer
+                - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
+                - cd pipeline/test/k8s
+                - ./check-nodes.sh customer
               artifacts:
                 - kube_config_eck-customer.yaml
               after-script:
                 - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
                 - source pipeline/init.sh
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
-                - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
-                - kubectl get pods --all-namespaces
-                - kubectl describe pods --all-namespaces
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
@@ -88,6 +85,7 @@ pipelines:
           - step:
               name: system service deploy
               script:
+                - source pipeline/init.sh
                 - source scripts/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
                 - echo $KUBECONFIG
@@ -112,6 +110,7 @@ pipelines:
           - step:
               name: customer deploy
               script:
+                - source pipeline/init.sh
                 - source scripts/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
                 - echo $KUBECONFIG
@@ -135,61 +134,61 @@ pipelines:
                 - terraform workspace select pipeline
                 - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
 
-      # - parallel:
-      #     - step:
-      #         name: system service test
-      #         script:
-      #           # Variables
-      #           - source /init.sh
-      #           - cd terraform/
-      #           - echo '1' | TF_WORKSPACE=pipeline terraform init
-      #           - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
-      #           - cd ..
-      #           - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
-      #           - source ./scripts/common.sh
-      #           # Tests
-      #           - ./pipeline/test/services/test-ss.sh
+      - parallel:
+          - step:
+              name: system service test
+              script:
+                # Variables
+                - source pipeline/init.sh
+                - cd terraform/
+                - echo '1' | TF_WORKSPACE=pipeline terraform init
+                - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
+                - cd ..
+                - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
+                - source ./scripts/common.sh
+                # Tests
+                - ./pipeline/test/services/test-ss.sh
 
-      #         after-script:
-      #           - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
-      #           - source /init.sh
-      #           - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
-      #           - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
-      #           - kubectl get pods --all-namespaces
-      #           - kubectl describe pods --all-namespaces
-      #           - cd terraform/
-      #           - echo '1' | TF_WORKSPACE=pipeline terraform init
-      #           - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
-      #           - terraform destroy -auto-approve
-      #           - terraform workspace select pipeline
-      #           - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
-      #     - step:
-      #         name: customer test
-      #         script:
-      #           # Variables
-      #           - source /init.sh
-      #           - cd terraform/
-      #           - echo '1' | TF_WORKSPACE=pipeline terraform init
-      #           - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
-      #           - cd ..
-      #           - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
-      #           - source ./scripts/common.sh
-      #           # Services
-      #           - ./pipeline/test/services/test-c.sh
+              after-script:
+                - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
+                - source /init.sh
+                - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
+                - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
+                - kubectl get pods --all-namespaces
+                - kubectl describe pods --all-namespaces
+                - cd terraform/
+                - echo '1' | TF_WORKSPACE=pipeline terraform init
+                - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
+                - terraform destroy -auto-approve
+                - terraform workspace select pipeline
+                - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
+          - step:
+              name: customer test
+              script:
+                # Variables
+                - source /init.sh
+                - cd terraform/
+                - echo '1' | TF_WORKSPACE=pipeline terraform init
+                - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
+                - cd ..
+                - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
+                - source ./scripts/common.sh
+                # Services
+                - ./pipeline/test/services/test-c.sh
 
-      #         after-script:
-      #           - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
-      #           - source /init.sh
-      #           - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
-      #           - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
-      #           - kubectl get pods --all-namespaces
-      #           - kubectl describe pods --all-namespaces
-      #           - cd terraform/
-      #           - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
-      #           - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
-      #           - terraform destroy -auto-approve
-      #           - terraform workspace select pipeline
-      #           - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
+              after-script:
+                - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
+                - source /init.sh
+                - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
+                - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
+                - kubectl get pods --all-namespaces
+                - kubectl describe pods --all-namespaces
+                - cd terraform/
+                - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
+                - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
+                - terraform destroy -auto-approve
+                - terraform workspace select pipeline
+                - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
 
       - step:
           name: Clean up
