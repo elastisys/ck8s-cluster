@@ -1,7 +1,23 @@
-SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
-pushd "${SCRIPTS_PATH}/../" > /dev/null
+# Common environment variables needed for deploy-*.sh
 
-export ECK_CUSTOMER_DOMAIN=$(cat hosts.json | jq -r '.customer_dns_name.value' | sed 's/[^.]*[.]//')
-export ECK_SYSTEM_DOMAIN=$(cat hosts.json | jq -r '.system_services_dns_name.value' | sed 's/[^.]*[.]//')
+# Domains
+: "${ECK_SYSTEM_DOMAIN:?Missing ECK_SYSTEM_DOMAIN}"
+: "${ECK_CUSTOMER_DOMAIN:?Missing ECK_CUSTOMER_DOMAIN}"
 
-popd > /dev/null
+# Cert type
+: "${CERT_TYPE:?Missing CERT_TYPE}"
+
+# Kubeconfig
+: "${KUBECONFIG:?Missing KUBECONFIG}"
+
+# Export whether to skip tls verify or not.
+if [[ "$CERT_TYPE" == "prod" ]];
+then export TLS_VERIFY="true"
+    export TLS_SKIP_VERIFY="false"
+elif [[ "$CERT_TYPE" == "staging" ]];
+then export TLS_VERIFY="false"
+    export TLS_SKIP_VERIFY="true"
+else 
+    echo "CERT_TYPE should be set to either 'prod' or 'staging'"
+    exit 1
+fi

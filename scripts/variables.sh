@@ -1,3 +1,5 @@
+#!/bin/bash
+
 SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 pushd "${SCRIPTS_PATH}/../" > /dev/null
 

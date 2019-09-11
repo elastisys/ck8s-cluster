@@ -3,7 +3,7 @@
 set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-source "${SCRIPTS_PATH}/common-new.sh"
+source "${SCRIPTS_PATH}/common.sh"
 
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
 : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"

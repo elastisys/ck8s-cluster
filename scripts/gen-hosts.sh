@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Generates hosts.json from terraform output.
+
 set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"

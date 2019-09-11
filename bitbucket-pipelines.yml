@@ -140,6 +140,7 @@ pipelines:
               script:
                 # Variables
                 - source pipeline/init.sh
+                - source scripts/variables.sh
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
@@ -151,7 +152,7 @@ pipelines:
 
               after-script:
                 - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
-                - source /init.sh
+                - source pipeline/init.sh
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
                 - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
                 - kubectl get pods --all-namespaces
@@ -166,7 +167,8 @@ pipelines:
               name: customer test
               script:
                 # Variables
-                - source /init.sh
+                - source pipeline/init.sh
+                - source scripts/variables.sh
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
@@ -178,7 +180,7 @@ pipelines:
 
               after-script:
                 - 'if [ "$BITBUCKET_EXIT_CODE" == "0" ]; then exit 0 ; fi'
-                - source /init.sh
+                - source pipeline/init.sh
                 - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
                 - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
                 - kubectl get pods --all-namespaces
