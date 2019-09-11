@@ -2,23 +2,16 @@
 
 set -e
 
-: "${ECK_SS_KUBECONFIG:?Missing ECK_SS_KUBECONFIG}"
+: "${ECK_SYSTEM_KUBECONFIG:?Missing ECK_SYSTEM_KUBECONFIG}"
+: "${ECK_CUSTOMER_DOMAIN:?Missing ECK_CUSTOMER_DOMAIN}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-source "${SCRIPTS_PATH}/common.sh"
 
-# Check CERT_TYPE and set appropriate env-variables for verifying tls or not
-if [[ "$CERT_TYPE" == "prod" ]];
-then export TLS_VERIFY="true"
-    export TLS_SKIP_VERIFY="false"
-elif [[ "$CERT_TYPE" == "staging" ]];
-then export TLS_VERIFY="false"
-    export TLS_SKIP_VERIFY="true"
-else echo "CERT_TYPE should be set to prod or staging"; exit 1;
-fi
+source "${SCRIPTS_PATH}/common-new.sh"
 
-pushd "${SCRIPTS_PATH}/../terraform/" > /dev/null
-export NFS_C_SERVER_IP=$(terraform output c_nfs_ip_address)
+
+pushd "${SCRIPTS_PATH}/../" > /dev/null
+export NFS_C_SERVER_IP=$(cat hosts.json | jq -r '.customer_nfs_ip_address.value')
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
@@ -105,13 +98,13 @@ helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provi
 # FLUENTD
 
 # Get elastisearch password from system-services cluster
-ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+ES_PW=$(kubectl --kubeconfig="${ECK_SYSTEM_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
 while [ -z "$ES_PW" ]
 do
     echo "Waiting for elasticsearch password"
     sleep 5
-    ES_PW=$(kubectl --kubeconfig="${ECK_SS_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+    ES_PW=$(kubectl --kubeconfig="${ECK_SYSTEM_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 done
 echo "Got elsticsearch password"
 

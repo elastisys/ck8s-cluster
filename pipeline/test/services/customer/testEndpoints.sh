@@ -3,5 +3,5 @@ source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
 echo -e "\nTesting endpoints"
 
-testEndpoint Prometheus https://prometheus.${ECK_C_DOMAIN}/
+testEndpoint Prometheus https://prometheus.${ECK_CUSTOMER_DOMAIN}/
 

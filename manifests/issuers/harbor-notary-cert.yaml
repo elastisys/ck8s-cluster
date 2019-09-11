@@ -5,7 +5,7 @@ metadata:
   namespace: harbor
 spec:
   secretName: harbor-notary-cert
-  commonName: "notary.harbor.${ECK_SS_DOMAIN}"
+  commonName: "notary.harbor.${ECK_SYSTEM_DOMAIN}"
   isCA: false
   issuerRef:
     name: selfsigning-issuer

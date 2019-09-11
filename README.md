@@ -71,8 +71,8 @@ Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx
 Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
-    export ECK_SS_DOMAIN=<name-ss>.compliantkubernetes.com
-    export ECK_C_DOMAIN=<name-c>.compliantkubernetes.com
+    export ECK_SYSTEM_DOMAIN=<name-ss>.compliantkubernetes.com
+    export ECK_CUSTOMER_DOMAIN=<name-c>.compliantkubernetes.com
 
     ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
     ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml

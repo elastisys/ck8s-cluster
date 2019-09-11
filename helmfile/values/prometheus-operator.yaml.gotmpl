@@ -378,7 +378,7 @@ grafana:
     ## Must be provided if Ingress is enable.
     ##
     hosts:
-    - grafana.{{ requiredEnv "ECK_SS_DOMAIN" }}
+    - grafana.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
 
 
     ## Path for grafana ingress
@@ -390,7 +390,7 @@ grafana:
     tls:
     - secretName: grafana-general-tls
       hosts:
-      - grafana.{{ requiredEnv "ECK_SS_DOMAIN" }}   
+      - grafana.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}   
 
   rbac:
     pspUseAppArmor: false
@@ -519,7 +519,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: https://grafana.{{ requiredEnv "ECK_SS_DOMAIN" }}
+      root_url: https://grafana.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
 
     auth.generic_oauth:
       name: dex
@@ -527,9 +527,9 @@ grafana:
       client_id: grafana
       client_secret: Z3JhZmFuYS1zZWNyZXQK
       scopes: profile email openid
-      auth_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/auth
-      token_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/token
-      api_url: https://dex.{{ requiredEnv "ECK_SS_DOMAIN" }}/api
+      auth_url: https://dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}/auth
+      token_url: https://dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}/token
+      api_url: https://dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}/api
       allowed_domains: {{ requiredEnv "OAUTH_ALLOWED_DOMAINS" }}
       allow_sign_up: true
       tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}
@@ -1238,7 +1238,7 @@ prometheus:
     # hosts:
     #   - prometheus.domain.com
     hosts:
-    - prometheus-ss.$(ECK_SS_DOMAIN)
+    - prometheus-ss.$(ECK_SYSTEM_DOMAIN)
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
@@ -1251,7 +1251,7 @@ prometheus:
     tls:
     - secretName: prometheus-general-tls
       hosts:
-        - prometheus-ss.$(ECK_SS_DOMAIN)
+        - prometheus-ss.$(ECK_SYSTEM_DOMAIN)
 
   ## Configure additional options for default pod security policy for Prometheus
   ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/

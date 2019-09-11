@@ -1,27 +1,21 @@
 #!/bin/bash
 
 set -e
-SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-source "${SCRIPTS_PATH}/common.sh"
 
-: "${TF_VAR_exoscale_api_key:?Missing TF_VAR_exoscale_api_key}"
-: "${TF_VAR_exoscale_secret_key:?Missing TF_VAR_exoscale_secret_key}"
+SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+source "${SCRIPTS_PATH}/common-new.sh"
+
+: "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
+: "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
+: "${S3_REGION:?Missing S3_REGION}"
+: "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
+: "${S3_BUCKET_NAME:?Missing S3_BUCKET_NAME}"
 
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
 
-# Check CERT_TYPE and set appropriate env-variables for verifying tls or not
-if [[ "$CERT_TYPE" == "prod" ]];
-then export TLS_VERIFY="true"
-    export TLS_SKIP_VERIFY="false"
-elif [[ "$CERT_TYPE" == "staging" ]];
-then export TLS_VERIFY="false"
-    export TLS_SKIP_VERIFY="true"
-else echo "CERT_TYPE should be set to prod or staging"; exit 1;
-fi
-
-pushd "${SCRIPTS_PATH}/../terraform/" > /dev/null
-export NFS_SS_SERVER_IP=$(terraform output ss_nfs_ip_address)
+pushd "${SCRIPTS_PATH}/../" > /dev/null
+export NFS_SS_SERVER_IP=$(cat hosts.json | jq -r '.system_services_nfs_ip_address.value')
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
@@ -128,21 +122,21 @@ helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-clien
 kubectl -n harbor rollout status deployment harbor-harbor-clair
 
 # Set up initial state for harbor.
-EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 | jq '.code')
+EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects/1 | jq '.code')
 
 if [ $EXISTS != "404" ]
 then
-    NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 | jq '.name')
+    NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects/1 | jq '.name')
     if [ $NAME == "\"library\"" ]
     then
         # Deletes the default project "library"
         echo Removing project library from harbor
         # Curl will retrun status 500 even though it successfully removed the project.
-        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SS_DOMAIN}/api/projects/1 > /dev/null
+        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects/1 > /dev/null
 
         # Creates new private project "default"
         echo Creating new private project default
-        curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SS_DOMAIN}/api/projects --data '{
+        curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects --data '{
             "project_name": "default",
             "metadata": {
                 "public": "0",

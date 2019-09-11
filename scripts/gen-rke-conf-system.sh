@@ -2,21 +2,14 @@
 
 set -e
 
+: "${ECK_SYSTEM_DOMAIN:?Missing ECK_SYSTEM_DOMAIN}"
+
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+cd ${SCRIPTS_PATH}/../
+hosts=$(cat hosts.json)
 
-source "${SCRIPTS_PATH}/common.sh"
-
-cd ${SCRIPTS_PATH}/../terraform
-
-tf_out=$(terraform output -json)
-
-master_ip_address=$(echo ${tf_out} | jq -r '.ss_master_ip_address.value')
-#master_internal_ip_addresses=$(echo ${tf_out} | jq -r \
-#                               '.ss_master_internal_ip_address.value')
-
-worker_ip_address=($(echo ${tf_out} | jq -r '.ss_worker_ip_addresses.value[]'))
-#worker_internal_ip_addresses=($(echo ${tf_out} | jq -r \
-#                               '.ss_worker_internal_ip_addresses.value[]'))
+master_ip_address=$(echo ${hosts} | jq -r '.system_services_master_ip_address.value')
+worker_ip_address=($(echo ${hosts} | jq -r '.system_services_worker_ip_addresses.value[]'))
 
 cat <<EOF
 cluster_name: eck-system-services
@@ -25,14 +18,12 @@ ssh_agent_auth: true
 
 nodes:
   - address: ${master_ip_address}
-#    internal_address: ${master_internal_ip_addresses}
     user: rancher
     role: [controlplane,etcd]
 EOF
 for i in $(seq 0 $((${#worker_ip_address[@]} - 1))); do
 cat <<EOF
   - address: ${worker_ip_address[${i}]}
-#    internal_address: ${worker_internal_ip_addresses[${i}]}
     user: rancher
     role: [worker]
 EOF
@@ -45,7 +36,7 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_args:
-      oidc-issuer-url: https://dex.${ECK_SS_DOMAIN}
+      oidc-issuer-url: https://dex.${ECK_SYSTEM_DOMAIN}
       oidc-client-id: kubernetes
       oidc-username-claim: email
       oidc-groups-claim: groups
