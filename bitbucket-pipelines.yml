@@ -30,7 +30,7 @@ pipelines:
               name: system service rke
               script:
                 - source pipeline/init.sh
-                - source scripts/variables.sh
+                - source pipeline/variables.sh
                 - ./scripts/check-docker.sh system-services
                 - ./scripts/gen-rke-conf-system.sh > ./eck-system.yaml
                 - rke up --config ./eck-system.yaml
@@ -45,7 +45,7 @@ pipelines:
               name: customer rke
               script:
                 - source pipeline/init.sh
-                - source scripts/variables.sh
+                - source pipeline/variables.sh
                 - ./scripts/check-docker.sh customer
                 - ./scripts/gen-rke-conf-customer.sh > ./eck-customer.yaml
                 - rke up --config ./eck-customer.yaml
@@ -62,7 +62,7 @@ pipelines:
               name: system service deploy
               script:
                 - source pipeline/init.sh
-                - source scripts/variables.sh
+                - source pipeline/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
                 - echo $KUBECONFIG
                 - kubectl get pods --all-namespaces
@@ -76,7 +76,7 @@ pipelines:
               name: customer deploy
               script:
                 - source pipeline/init.sh
-                - source scripts/variables.sh
+                - source pipeline/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
                 - echo $KUBECONFIG
                 - export ECK_SYSTEM_KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
@@ -94,7 +94,7 @@ pipelines:
               script:
                 # Variables
                 - source pipeline/init.sh
-                - source scripts/variables.sh
+                - source pipeline/variables.sh
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
@@ -111,7 +111,7 @@ pipelines:
               script:
                 # Variables
                 - source pipeline/init.sh
-                - source scripts/variables.sh
+                - source pipeline/variables.sh
                 - cd terraform/
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER

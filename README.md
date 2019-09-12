@@ -54,35 +54,40 @@ Begin with setting up the cloud infrastructure using Terraform.
     export AWS_SECRET_ACCESS_KEY=<xxx> (not needed if credentials are located in ~/.aws/credentials)
     export TF_VAR_exoscale_api_key=<xxx>
     export TF_VAR_exoscale_secret_key=<xxx>
-    export TF_VAR_ssh_pub_key_file_ss=<Path to pub key for system services cluster>
-    export TF_VAR_ssh_pub_key_file_c=<Path to pub key for customer cluster>
+    export TF_VAR_ssh_pub_key_file_system_services=<Path to pub key for system services cluster>
+    export TF_VAR_ssh_pub_key_file_customer=<Path to pub key for customer cluster>
     export TF_VAR_dns_prefix=<xxx>
 
     cd ./terraform
     terraform init
     terraform workspace select <Name>
     terraform apply
+    
 
 Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx` 
 (should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`. 
+
+
 
 ## Kubernetes clusters
 
 Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
-    export ECK_SYSTEM_DOMAIN=<name-ss>.compliantkubernetes.com
-    export ECK_CUSTOMER_DOMAIN=<name-c>.compliantkubernetes.com
+    ./scripts/gen-hosts.sh
 
-    ./scripts/gen-rke-conf-ss.sh > ./eck-ss.yaml
-    ./scripts/gen-rke-conf-c.sh > ./eck-c.yaml
+    export ECK_SYSTEM_DOMAIN=<name-system-services>.compliantkubernetes.com
+    export ECK_CUSTOMER_DOMAIN=<name-customer>.compliantkubernetes.com
 
-    rke up --config ./eck-ss.yaml
-    rke up --config ./eck-c.yaml
+    ./scripts/gen-rke-conf-system.sh > ./eck-system.yaml
+    ./scripts/gen-rke-conf-customer.sh > ./eck-customer.yaml
+
+    rke up --config ./eck-system.yaml
+    rke up --config ./eck-customer.yaml
 
 ## DNS
 
-The dns-name will be automatically created with the name `<dns_prefix>-c/ss.compliantkubernetes.com`.
+The dns-name will be automatically created with the name `<dns_prefix>-customer/system-services.compliantkubernetes.com`.
 The domain can be changed by setting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
 
@@ -121,12 +126,19 @@ You can activate them by setting environment variables with client ID and secret
 
     export CERT_TYPE=<prod|staging>
 
-    export KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
-    ./scripts/deploy-ss.sh <--interactive>
+    # For harbor image chart storage
+    export S3_ACCESS_KEY=<exoscale_api_key>
+    export S3_SECRET_KEY=<exoscale_secret_key>
+    export S3_REGION=de-fra-1
+    export S3_REGION_ENDPOINT=https://sos-de-fra-1.exo.io
+    export S3_BUCKET_NAME=harbor-bucket
 
-    export ECK_SS_KUBECONFIG=$(pwd)/kube_config_eck-ss.yaml
-    export KUBECONFIG=$(pwd)/kube_config_eck-c.yaml
-    ./scripts/deploy-c.sh <--interactive>
+    export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
+    ./scripts/deploy-system.sh <--interactive>
+
+    export ECK_SYSTEM_KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
+    export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
+    ./scripts/deploy-customer.sh <--interactive>
 
 ## OpenID Connect with kubectl
 
