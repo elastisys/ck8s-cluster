@@ -152,8 +152,10 @@ releases:
   labels:
     app: falco
   chart: stable/falco
-  version: 0.7.6
+  version: 1.0.7
   missingFileHandler: error
+  values:
+  - values/falco.yaml.gotmpl
 
 # Fluentd
 - name: fluentd
