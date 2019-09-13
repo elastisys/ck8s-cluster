@@ -40,6 +40,4 @@ RUN wget https://github.com/roboll/helmfile/releases/download/v0.81.0/helmfile_l
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile
 
-COPY init.sh .
-
 ENTRYPOINT ["/bin/bash"]

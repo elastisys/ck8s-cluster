@@ -3,8 +3,8 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 SUCCESSES=0
 FAILURES=0
 
-source ${SCRIPTS_PATH}/system-services/testPodsReady.sh
-source ${SCRIPTS_PATH}/system-services/testEndpoints.sh
+source ${SCRIPTS_PATH}/workload-cluster/testPodsReady.sh
+source ${SCRIPTS_PATH}/workload-cluster/testEndpoints.sh
 
 echo -e "\nSuccesses: $SUCCESSES"
 echo "Failures: $FAILURES"

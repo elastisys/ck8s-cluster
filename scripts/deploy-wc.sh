@@ -9,15 +9,22 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 source "${SCRIPTS_PATH}/common.sh"
 
+if [[ "$#" -lt 1 ]]
+then 
+  echo "Usage: deploy-wc.sh path-to-infra-file <--interactive>"
+  exit 1
+fi
+
+infra="$1"
 
 pushd "${SCRIPTS_PATH}/../" > /dev/null
-export NFS_WC_SERVER_IP=$(cat infra.json | jq -r '.workload_cluster.nfs_ip_address')
+export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_ip_address')
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
-INTERACTIVE=${1:-""}
+INTERACTIVE=${2:-""}
 
 # NAMESPACES
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -

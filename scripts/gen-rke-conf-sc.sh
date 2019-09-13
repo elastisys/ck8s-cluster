@@ -4,12 +4,16 @@ set -e
 
 : "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
 
-SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-cd ${SCRIPTS_PATH}/../
-hosts=$(cat infra.json)
+if [[ "$#" -ne 1 ]]
+then 
+  echo "Usage: gen-rke-conf-sc.sh <path-to-infra-file>"
+  exit 1
+fi
 
-master_ip_address=$(echo ${hosts} | jq -r '.service_cluster.master_ip_address')
-worker_ip_address=($(echo ${hosts} | jq -r '.service_cluster.worker_ip_addresses[]'))
+infra="$1"
+
+master_ip_address=$(cat $infra | jq -r '.service_cluster.master_ip_address')
+worker_ip_address=($(cat $infra | jq -r '.service_cluster.worker_ip_addresses[]'))
 
 cat <<EOF
 cluster_name: eck-system-services

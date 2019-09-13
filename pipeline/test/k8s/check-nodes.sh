@@ -6,26 +6,22 @@ set -e
 # It determines whether or not the desired number of masters/etcd and workers in the cluster is met.
 
 # Check that cluster type argument is set and valid.
-if [ "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
+if [ "$#" -ne 2 -o "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
 then 
-    echo "Usage: ss.sh <service_cluster | workload_cluster>"
+    echo "Usage: check-nodes.sh <service_cluster | workload_cluster> path-to-infra-file"
     exit 1
 fi
 
 echo "Running test on the $1 cluster"
 
 prefix="$1"
-
-SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-
-cd ${SCRIPTS_PATH}/../../../
+infra="$2"
 
 # Get the desired number of each node type.
-desired_workers=($(cat infra.json | jq -r ".${prefix}.worker_count" ))
+desired_workers=($(cat $infra | jq -r ".${prefix}.worker_count" ))
 desired_controlplanes=1
 desired_etcds=1
 
-cd ${SCRIPTS_PATH}/
 
 # Get the lables of each node
 labels=$(kubectl get nodes -o json | jq ".items[].metadata.labels")

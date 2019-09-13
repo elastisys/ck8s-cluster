@@ -5,23 +5,32 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
+
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
 : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
 : "${S3_REGION:?Missing S3_REGION}"
 : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
 : "${S3_BUCKET_NAME:?Missing S3_BUCKET_NAME}"
 
+if [[ "$#" -lt 1 ]]
+then 
+  echo "Usage: deploy-sc.sh path-to-infra-file <--interactive>"
+  exit 1
+fi
+
+infra="$1"
+
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
 
 pushd "${SCRIPTS_PATH}/../" > /dev/null
-export NFS_SC_SERVER_IP=$(cat infra.json | jq -r '.service_cluster.nfs_ip_address')
+export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_ip_address')
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
-INTERACTIVE=${1:-""}
+INTERACTIVE=${2:-""}
 
 
 # NAMESPACES

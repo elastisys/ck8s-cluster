@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Generates infra.json from terraform output.
+# Generates json infra from terraform output.
 
 set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-cd "${SCRIPTS_PATH}/../terraform/"
+pushd "${SCRIPTS_PATH}/../terraform/" > /dev/null
 tf_out=$(terraform output -json)
-cd "${SCRIPTS_PATH}/../"
+popd > /dev/null
 
 # Makes into cleaner infra format than terraform output
 
@@ -32,4 +32,4 @@ workload=$(echo $tf_out | jq '{
     "worker_count": .wc_worker_count.value}
     | {"workload_cluster": values}')
 
-echo $workload $service | jq -s add > infra.json
+echo $workload $service | jq -s add

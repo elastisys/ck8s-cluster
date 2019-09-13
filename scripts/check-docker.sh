@@ -1,25 +1,25 @@
 #!/bin/bash
 
 set -e
-SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 # Check that cluster type argument is set and valid.
-if [ "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
+if [ "$#" -ne 2 -o "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
 then 
-    echo "Usage: ss.sh <service_cluster | workload_cluster>"
+    echo "Usage: check-docker.sh <service_cluster | workload_cluster> path-to-infra-file"
     exit 1
 fi
 
 echo "Running test on the $1 cluster"
 
 prefix="$1"
+infra="$2"
 
 # Get infra info
 cd ${SCRIPTS_PATH}/../
 
 # TODO - Update when we can have variable amount of masters.
-master_ip_address=$(cat infra.json | jq -r ".${prefix}.master_ip_address")
-worker_ip_addresses=($(cat infra.json | jq -r ".${prefix}.worker_ip_addresses[]"))
+master_ip_address=$(cat $infra | jq -r ".${prefix}.master_ip_address")
+worker_ip_addresses=($(cat $infra | jq -r ".${prefix}.worker_ip_addresses[]"))
 
 hosts=$worker_ip_addresses
 hosts+=($master_ip_address)

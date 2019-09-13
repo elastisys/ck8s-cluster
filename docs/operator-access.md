@@ -9,7 +9,7 @@ This document describes how and what services operators can access.
 ## Kubernetes API
 
 You can access the Kubernetes API by using the kubeconfig files produced by RKE during installation.
-There is one for the customer cluster and one for the system services cluster.
+There is one for the workload cluster and one for the service cluster.
 
 **TODO:** Determine how these files should be stored and distributed among operators.
 
@@ -37,24 +37,24 @@ You are now ready use helm with this cluster.
 
 ## Available Services
 
-All services are available on a domain relative to the customer environment.
-If the customer cluster has the domain https://company-1.compliantk8s.com you will for example be able to access the system cluster dashboard at https://dashboard.company-1-system.compliantk8s.com.
-In this document, the placeholder `ECK_DOMAIN` will be used to represent the customer domain and `ECK_SC_DOMAIN` the system domain.
-If you want to replace `ECK_DOMAIN` with your actual domain in this document, do the following:
+All services are available on a domain relative to the workload environment.
+If the workload cluster has the domain https://company-1.compliantk8s.com you will for example be able to access the system cluster dashboard at https://dashboard.company-1-system.compliantk8s.com.
+In this document, the placeholder `ECK_WC_DOMAIN` will be used to represent the workload domain and `ECK_SC_DOMAIN` the service domain.
+If you want to replace `ECK_WC_DOMAIN` with your actual domain in this document, do the following:
 
 ```shell
-sed 's/ECK_DOMAIN/customer-1.compliantk8s.com/g' docs/operator-access.md
+sed 's/ECK_WC_DOMAIN/customer-1.compliantk8s.com/g' docs/operator-access.md
 ```
 
 Log in to the services using your A1 AAA or Google credentials.
 
 ### Service endpoints
 
-- **Kubernetes customer Dashboard** URL: https://dashboard.ECK_DOMAIN
+- **Kubernetes customer Dashboard** URL: https://dashboard.ECK_WC_DOMAIN
 - **Kubernetes system Dashboard** URL: https://dashboard.ECK_SC_DOMAIN
-- **Kibana** URL: https://kibana.ECK_DOMAIN
-- **Harbor** URL: https://harbor.ECK_DOMAIN
-- **Grafana customer** URL: https://grafana.ECK_DOMAIN
+- **Kibana** URL: https://kibana.ECK_WC_DOMAIN
+- **Harbor** URL: https://harbor.ECK_WC_DOMAIN
+- **Grafana customer** URL: https://grafana.ECK_WC_DOMAIN
 - **Grafana system** URL: https://grafana.ECK_SC_DOMAIN
 - **Prometheus** URL: TODO
 - **Alertmanager** URL: TODO

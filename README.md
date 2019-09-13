@@ -74,20 +74,20 @@ Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx
 Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
-    ./scripts/gen-infra.sh
+    ./scripts/gen-infra.sh > infra.json
 
-    export ECK_SC_DOMAIN=<name-sc>.compliantkubernetes.com
-    export ECK_WC_DOMAIN=<name-wc>.compliantkubernetes.com
+    export ECK_SC_DOMAIN=$(cat infra.json | jq -r '.service_cluster.dns_name' | sed 's/[^.]*[.]//')
+    export ECK_WC_DOMAIN=$(cat infra.json | jq -r '.workload_cluster.dns_name' | sed 's/[^.]*[.]//')
 
-    ./scripts/gen-rke-conf-system.sh > eck-sc.yaml
-    ./scripts/gen-rke-conf-customer.sh > eck-wc.yaml
+    ./scripts/gen-rke-conf-system.sh infra.json  > eck-sc.yaml
+    ./scripts/gen-rke-conf-customer.sh infra.json > eck-wc.yaml
 
     rke up --config eck-sc.yaml
     rke up --config eck-wc.yaml
 
 ## DNS
 
-The dns-name will be automatically created with the name `<dns_prefix>-customer/system-services.compliantkubernetes.com`.
+The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.compliantkubernetes.com`.
 The domain can be changed by setting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
 
@@ -112,7 +112,7 @@ The certificates for the ingresses in the system can have either staging or prod
 There is a limit to the number of production certificates we can get per week. So staging is recommended during development, but it will yield untrusted certificates.
 Note that docker will not trust Harbor with staging certs, so you can't push images to Harbor and pods can't pull images from Harbor.
 
-The option `--interactive` mode when deploying c and ss can be used for deciding whether or not you want to apply upgrades to helm charts.
+The option `--interactive` mode can be used when running `deploy-wc/sc.sh` to decide whether or not you want to apply upgrades to helm charts.
 The default is not to use that option.
 
 There are two optional identity providers for dex: Google and A1 AAA.
@@ -134,11 +134,11 @@ You can activate them by setting environment variables with client ID and secret
     export S3_BUCKET_NAME=harbor-bucket
 
     export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-    ./scripts/deploy-sc.sh <--interactive>
+    ./scripts/deploy-sc.sh infra.json <--interactive>
 
     export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
     export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
-    ./scripts/deploy-wc.sh <--interactive>
+    ./scripts/deploy-wc.sh infra.json <--interactive>
 
 ## OpenID Connect with kubectl
 
