@@ -54,8 +54,8 @@ Begin with setting up the cloud infrastructure using Terraform.
     export AWS_SECRET_ACCESS_KEY=<xxx> (not needed if credentials are located in ~/.aws/credentials)
     export TF_VAR_exoscale_api_key=<xxx>
     export TF_VAR_exoscale_secret_key=<xxx>
-    export TF_VAR_ssh_pub_key_file_system_services=<Path to pub key for system services cluster>
-    export TF_VAR_ssh_pub_key_file_customer=<Path to pub key for customer cluster>
+    export TF_VAR_ssh_pub_key_file_sc=<Path to pub key for service cluster>
+    export TF_VAR_ssh_pub_key_file_wc=<Path to pub key for workload cluster>
     export TF_VAR_dns_prefix=<xxx>
 
     cd ./terraform
