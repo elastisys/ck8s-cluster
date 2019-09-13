@@ -157,3 +157,14 @@ then
         }'
     fi
 fi
+
+
+# Adding dashboards to kibana
+echo "Waiting until kibana is ready"
+if ! kubectl rollout status -n elastic-system deployment kibana-kb --timeout=5m
+then
+    exit 1
+fi
+ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+curl -kL -X POST "kibana.${ECK_SC_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
+    --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ES_PW}
