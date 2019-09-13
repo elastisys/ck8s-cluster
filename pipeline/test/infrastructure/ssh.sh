@@ -3,27 +3,21 @@
 set -e
 
 # Check that cluster type argument is set and valid.
-if [ "$1" != "system-services" -a "$1" != "customer" ]
+if [ "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
 then 
-    echo "Usage: ss.sh <system-services | customer>"
+    echo "Usage: ss.sh <service_cluster | workload_cluster>"
     exit 1
 fi
 
 echo "Running test on the $1 cluster"
 
-if [ $1 == "system-services" ]
-then 
-    prefix="system_services"
-elif [ $1 == "customer" ]
-then
-    prefix="customer"
-fi
+prefix="$1"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 cd ${SCRIPTS_PATH}/../../../
 
-infra=$(cat hosts.json)
+infra=$(cat infra.json)
 
 # TODO - Update this function when we can have variable amount of masters.
 function check_hosts () {
@@ -33,20 +27,20 @@ function check_hosts () {
     if [ "$type" == "worker" ]
     then
         # Number of desired hosts of type.
-        nr_hosts=$(echo ${infra} | jq -r ".${prefix}_${type}_count.value" )
+        nr_hosts=$(echo ${infra} | jq -r ".${prefix}.${type}_count" )
 
         # IP addresses of the worker nodes.
-        host_addresses=($(echo ${infra} | jq -r ".${prefix}_${type}_ip_addresses.value[]" ))
+        host_addresses=($(echo ${infra} | jq -r ".${prefix}.${type}_ip_addresses[]" ))
         user="rancher"
     elif [ "$type" == "nfs" ]
     then 
         nr_hosts=1
-        host_addresses=($(echo ${infra} | jq -r ".${prefix}_${type}_ip_address.value" ))
+        host_addresses=($(echo ${infra} | jq -r ".${prefix}.${type}_ip_address" ))
         user="ubuntu"
     elif [ "$type" == "master" ]
     then
         nr_hosts=1
-        host_addresses=($(echo ${infra} | jq -r ".${prefix}_${type}_ip_address.value" ))
+        host_addresses=($(echo ${infra} | jq -r ".${prefix}.${type}_ip_address" ))
         user="rancher"
     fi
 

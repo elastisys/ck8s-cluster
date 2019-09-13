@@ -5,11 +5,11 @@ echo -e "\nTesting endpoints"
 
 PW=$(kubectl get secrets -n elastic-system elasticsearch-es-elastic-user -o jsonpath="{.data.elastic}" | base64 -d)
 
-testEndpoint Elasticsearch https://elastic.${ECK_SYSTEM_DOMAIN}/ elastic:${PW}
+testEndpoint Elasticsearch https://elastic.${ECK_SC_DOMAIN}/ elastic:${PW}
 
-testEndpoint Kibana https://kibana.${ECK_SYSTEM_DOMAIN}/ elastic:${PW}
+testEndpoint Kibana https://kibana.${ECK_SC_DOMAIN}/ elastic:${PW}
 
-testEndpoint Harbor https://harbor.${ECK_SYSTEM_DOMAIN}/ admin:Harbor12345
+testEndpoint Harbor https://harbor.${ECK_SC_DOMAIN}/ admin:Harbor12345
 
-testEndpoint Grafana https://grafana.${ECK_SYSTEM_DOMAIN}/ admin:prom-operator
+testEndpoint Grafana https://grafana.${ECK_SC_DOMAIN}/ admin:prom-operator
 

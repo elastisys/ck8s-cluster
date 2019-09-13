@@ -5,7 +5,7 @@ metadata:
   namespace: harbor
 spec:
   secretName: harbor-core-cert
-  commonName: "harbor.${ECK_SYSTEM_DOMAIN}"
+  commonName: "harbor.${ECK_SC_DOMAIN}"
   isCA: false
   issuerRef:
     name: selfsigning-issuer

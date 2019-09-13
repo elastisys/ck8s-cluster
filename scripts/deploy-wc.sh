@@ -2,8 +2,8 @@
 
 set -e
 
-: "${ECK_SYSTEM_KUBECONFIG:?Missing ECK_SYSTEM_KUBECONFIG}"
-: "${ECK_CUSTOMER_DOMAIN:?Missing ECK_CUSTOMER_DOMAIN}"
+: "${ECK_SC_KUBECONFIG:?Missing ECK_SC_KUBECONFIG}"
+: "${ECK_WC_DOMAIN:?Missing ECK_WC_DOMAIN}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
@@ -11,7 +11,7 @@ source "${SCRIPTS_PATH}/common.sh"
 
 
 pushd "${SCRIPTS_PATH}/../" > /dev/null
-export NFS_C_SERVER_IP=$(cat hosts.json | jq -r '.customer_nfs_ip_address.value')
+export NFS_WC_SERVER_IP=$(cat infra.json | jq -r '.workload_cluster.nfs_ip_address')
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
@@ -98,13 +98,13 @@ helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provi
 # FLUENTD
 
 # Get elastisearch password from system-services cluster
-ES_PW=$(kubectl --kubeconfig="${ECK_SYSTEM_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+ES_PW=$(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
 while [ -z "$ES_PW" ]
 do
     echo "Waiting for elasticsearch password"
     sleep 5
-    ES_PW=$(kubectl --kubeconfig="${ECK_SYSTEM_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+    ES_PW=$(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 done
 echo "Got elsticsearch password"
 

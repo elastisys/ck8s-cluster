@@ -15,7 +15,7 @@ source "${SCRIPTS_PATH}/common.sh"
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
 
 pushd "${SCRIPTS_PATH}/../" > /dev/null
-export NFS_SS_SERVER_IP=$(cat hosts.json | jq -r '.system_services_nfs_ip_address.value')
+export NFS_SC_SERVER_IP=$(cat infra.json | jq -r '.service_cluster.nfs_ip_address')
 popd > /dev/null
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
@@ -122,21 +122,21 @@ helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-clien
 kubectl -n harbor rollout status deployment harbor-harbor-clair
 
 # Set up initial state for harbor.
-EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects/1 | jq '.code')
+EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.code')
 
 if [ $EXISTS != "404" ]
 then
-    NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects/1 | jq '.name')
+    NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
     if [ $NAME == "\"library\"" ]
     then
         # Deletes the default project "library"
         echo Removing project library from harbor
         # Curl will retrun status 500 even though it successfully removed the project.
-        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects/1 > /dev/null
+        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
 
         # Creates new private project "default"
         echo Creating new private project default
-        curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SYSTEM_DOMAIN}/api/projects --data '{
+        curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
             "project_name": "default",
             "metadata": {
                 "public": "0",

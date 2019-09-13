@@ -2,14 +2,14 @@
 
 set -e
 
-: "${ECK_SYSTEM_DOMAIN:?Missing ECK_SYSTEM_DOMAIN}"
+: "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 cd ${SCRIPTS_PATH}/../
-hosts=$(cat hosts.json)
+hosts=$(cat infra.json)
 
-master_ip_address=$(echo ${hosts} | jq -r '.customer_master_ip_address.value')
-worker_ip_address=($(echo ${hosts} | jq -r '.customer_worker_ip_addresses.value[]'))
+master_ip_address=$(echo ${hosts} | jq -r '.workload_cluster.master_ip_address')
+worker_ip_address=($(echo ${hosts} | jq -r '.workload_cluster.worker_ip_addresses[]'))
 
 cat <<EOF
 cluster_name: eck-customer
@@ -40,7 +40,7 @@ services:
       - "/etc/kubernetes/conf:/etc/kubernetes/conf"
       - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
-      oidc-issuer-url: https://dex.${ECK_SYSTEM_DOMAIN}
+      oidc-issuer-url: https://dex.${ECK_SC_DOMAIN}
       oidc-client-id: kubernetes
       oidc-username-claim: email
       oidc-groups-claim: groups
@@ -65,7 +65,7 @@ ingress:
     enable-ssl-passthrough: ""
 
 private_registries:
-    - url: harbor.${ECK_SYSTEM_DOMAIN}
+    - url: harbor.${ECK_SC_DOMAIN}
       user: admin
       password: Harbor12345
 EOF

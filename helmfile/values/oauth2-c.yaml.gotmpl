@@ -19,8 +19,8 @@ extraArgs:
   provider: oidc
   upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
   pass-authorization-header: true
-  redirect-url: https://dashboard.{{ requiredEnv "ECK_CUSTOMER_DOMAIN" }}/oauth2/callback"
-  oidc-issuer-url: https://dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
+  redirect-url: https://dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}/oauth2/callback"
+  oidc-issuer-url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}
   ssl-insecure-skip-verify: {{ requiredEnv "TLS_SKIP_VERIFY" }}
 
 ingress:
@@ -32,6 +32,6 @@ ingress:
   tls:
     - secretName: dashboard-certs
       hosts:
-      - dashboard.{{ requiredEnv "ECK_CUSTOMER_DOMAIN" }}
+      - dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}
   hosts:
-  - dashboard.{{ requiredEnv "ECK_CUSTOMER_DOMAIN" }}
+  - dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}

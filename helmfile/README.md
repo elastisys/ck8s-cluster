@@ -28,10 +28,10 @@ helm plugin install https://github.com/databus23/helm-diff --version 2.11.0+5
 The following environment variables are used and needs to be set in order to install all available helm charts.
 Note: These are required for explicit use with `helmfile`. All might not be required to run the deploy scripts!
 
-* `NFS_C_SERVER_IP`
-* `NFS_SS_SERVER_IP`
-* `ECK_CUSTOMER_DOMAIN`
-* `ECK_SYSTEM_DOMAIN`
+* `NFS_WC_SERVER_IP`
+* `NFS_SC_SERVER_IP`
+* `ECK_WC_DOMAIN`
+* `ECK_SC_DOMAIN`
 * `GOOGLE_CLIENT_ID`
 * `GOOGLE_CLIENT_SECRET`
 * `TF_VAR_exoscale_secret_key`

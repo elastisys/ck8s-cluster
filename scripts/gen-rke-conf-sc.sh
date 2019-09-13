@@ -2,14 +2,14 @@
 
 set -e
 
-: "${ECK_SYSTEM_DOMAIN:?Missing ECK_SYSTEM_DOMAIN}"
+: "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 cd ${SCRIPTS_PATH}/../
-hosts=$(cat hosts.json)
+hosts=$(cat infra.json)
 
-master_ip_address=$(echo ${hosts} | jq -r '.system_services_master_ip_address.value')
-worker_ip_address=($(echo ${hosts} | jq -r '.system_services_worker_ip_addresses.value[]'))
+master_ip_address=$(echo ${hosts} | jq -r '.service_cluster.master_ip_address')
+worker_ip_address=($(echo ${hosts} | jq -r '.service_cluster.worker_ip_addresses[]'))
 
 cat <<EOF
 cluster_name: eck-system-services
@@ -36,7 +36,7 @@ services:
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_args:
-      oidc-issuer-url: https://dex.${ECK_SYSTEM_DOMAIN}
+      oidc-issuer-url: https://dex.${ECK_SC_DOMAIN}
       oidc-client-id: kubernetes
       oidc-username-claim: email
       oidc-groups-claim: groups

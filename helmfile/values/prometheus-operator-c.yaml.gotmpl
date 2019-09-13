@@ -1162,7 +1162,7 @@ prometheus:
     ## Must be provided if Ingress is enabled.
     ##
     hosts:
-    - prometheus.{{ requiredEnv "ECK_CUSTOMER_DOMAIN"}}
+    - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
@@ -1175,7 +1175,7 @@ prometheus:
     tls:
     - secretName: prometheus-general-tls
       hosts:
-      - prometheus.{{ requiredEnv "ECK_CUSTOMER_DOMAIN"}}
+      - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
 
 
 

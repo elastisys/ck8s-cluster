@@ -17,48 +17,48 @@ provider "exoscale" {
   timeout = 120 # default: waits 60 seconds in total for a resource
 }
 
-module "system_services_cluster" {
+module "service_cluster" {
   source                      = "./modules/kubernetes-cluster"
 
-  master_name                 = "${terraform.workspace}-system-services-master"
-  worker_name                 = "${terraform.workspace}-system-services-worker"
-  worker_count                = "${var.system_services_worker_count}"
-  worker_size                 = "${var.system_services_worker_size}"
+  master_name                 = "${terraform.workspace}-sc-master"
+  worker_name                 = "${terraform.workspace}-sc-worker"
+  worker_count                = "${var.sc_worker_count}"
+  worker_size                 = "${var.sc_worker_size}"
 
-  network_name                = "${terraform.workspace}-system-services-network"
-  nfs_name                    = "${terraform.workspace}-system-services-nfs"
-  dns_name                    = "${var.dns_prefix}-system-services"
+  network_name                = "${terraform.workspace}-sc-network"
+  nfs_name                    = "${terraform.workspace}-sc-nfs"
+  dns_name                    = "${var.dns_prefix}-sc"
 
-  master_security_group_name  = "${terraform.workspace}-system-services-master-sg"
-  worker_security_group_name  = "${terraform.workspace}-system-services-worker-sg"
-  nfs_security_group_name     = "${terraform.workspace}-system-services-nfs-sg"
+  master_security_group_name  = "${terraform.workspace}-sc-master-sg"
+  worker_security_group_name  = "${terraform.workspace}-sc-worker-sg"
+  nfs_security_group_name     = "${terraform.workspace}-sc-nfs-sg"
 
-  ssh_key_name                = "${terraform.workspace}-system-services-ssh-key"
-  ssh_pub_key_file            = "${var.ssh_pub_key_file_system_services}"
+  ssh_key_name                = "${terraform.workspace}-sc-ssh-key"
+  ssh_pub_key_file            = "${var.ssh_pub_key_file_sc}"
   
   public_ingress_cidr_whitelist = "${var.public_ingress_cidr_whitelist}"
 
 }
 
 
-module "customer_cluster" {
+module "workload_cluster" {
   source                      = "./modules/kubernetes-cluster"
 
-  master_name                 = "${terraform.workspace}-customer-master"
-  worker_name                 = "${terraform.workspace}-customer-worker"
-  worker_count                = "${var.customer_worker_count}"
-  worker_size                 = "${var.customer_worker_size}"
+  master_name                 = "${terraform.workspace}-wc-master"
+  worker_name                 = "${terraform.workspace}-wc-worker"
+  worker_count                = "${var.wc_worker_count}"
+  worker_size                 = "${var.wc_worker_size}"
 
-  network_name                = "${terraform.workspace}-customer-network"
-  nfs_name                    = "${terraform.workspace}-customer-nfs"
-  dns_name                    = "${var.dns_prefix}-customer"
+  network_name                = "${terraform.workspace}-wc-network"
+  nfs_name                    = "${terraform.workspace}-wc-nfs"
+  dns_name                    = "${var.dns_prefix}-wc"
 
-  master_security_group_name  = "${terraform.workspace}-customer-master-sg"
-  worker_security_group_name  = "${terraform.workspace}-customer-worker-sg"
-  nfs_security_group_name     = "${terraform.workspace}-customer-nfs-sg"
+  master_security_group_name  = "${terraform.workspace}-wc-master-sg"
+  worker_security_group_name  = "${terraform.workspace}-wc-worker-sg"
+  nfs_security_group_name     = "${terraform.workspace}-wc-nfs-sg"
 
-  ssh_key_name                = "${terraform.workspace}-customer-ssh-key"
-  ssh_pub_key_file            = "${var.ssh_pub_key_file_customer}"
+  ssh_key_name                = "${terraform.workspace}-wc-ssh-key"
+  ssh_pub_key_file            = "${var.ssh_pub_key_file_wc}"
   
   public_ingress_cidr_whitelist = "${var.public_ingress_cidr_whitelist}"
 }

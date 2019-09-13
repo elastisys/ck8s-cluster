@@ -5,9 +5,9 @@ ingress:
   tls:
   - secretName: dex-tls
     hosts:
-    - dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
+    - dex.{{ requiredEnv "ECK_SC_DOMAIN" }}
   hosts:
-  - dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
+  - dex.{{ requiredEnv "ECK_SC_DOMAIN" }}
 
 # https termination by ingress instead of through dex
 https: false
@@ -24,7 +24,7 @@ config:
       #
       # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
       issuer: https://accounts.google.com
-      redirectURI: https://dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}/callback
+      redirectURI: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/callback
       clientID: {{ env "GOOGLE_CLIENT_ID" }}
       clientSecret: {{ env "GOOGLE_CLIENT_SECRET" }}
   {{ end }}
@@ -36,7 +36,7 @@ config:
       clientID: {{ env "AAA_CLIENT_ID" }}
       clientSecret: {{ env "AAA_CLIENT_SECRET" }}
       issuer: https://asmp-test.a1.net/oauth2
-      redirectURI: https://dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}/callback
+      redirectURI: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/callback
       insecureSkipEmailVerified: true
   {{ end }}
   staticClients:
@@ -45,12 +45,12 @@ config:
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
       redirectURIs:
       - http://localhost:8000
-      - https://dashboard.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}/oauth2/callback
-      - https://dashboard.{{ requiredEnv "ECK_CUSTOMER_DOMAIN" }}/oauth2/callback
+      - https://dashboard.{{ requiredEnv "ECK_SC_DOMAIN" }}/oauth2/callback
+      - https://dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}/oauth2/callback
     - id: grafana
       secret: Z3JhZmFuYS1zZWNyZXQK  # encoded 'grafana-secret'
       name: 'Grafana'
       redirectURIs:
-        - https://grafana.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}/login/generic_oauth
+        - https://grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}/login/generic_oauth
 
-  issuer: https://dex.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
+  issuer: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}

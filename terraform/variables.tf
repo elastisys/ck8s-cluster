@@ -12,40 +12,40 @@ variable exoscale_secret_key {
   default = ""
 }
 
-variable ssh_pub_key_file_system_services {
+variable ssh_pub_key_file_sc {
   description = "Path to public SSH key file which is injected into the VMs."
 
   type = string
 }
 
-variable ssh_pub_key_file_customer {
+variable ssh_pub_key_file_wc {
   description = "Path to public SSH key file which is injected into the VMs."
 
   type = string
 }
 
-variable system_services_worker_count {
+variable sc_worker_count {
   description = "The number of worker nodes that should be created."
 
   type    = number
   default = 1
 }
 
-variable system_services_worker_size {
+variable sc_worker_size {
   description = "The size of the system-services worker VMs."
 
   type = string
   default = "Extra-large"
 }
 
-variable customer_worker_count {
+variable wc_worker_count {
   description = "The number of worker nodes that should be created."
 
   type    = number
   default = 1
 }
 
-variable customer_worker_size {
+variable wc_worker_size {
   description = "The size of the customer worker VMs."
 
   type = string

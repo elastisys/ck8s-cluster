@@ -39,7 +39,7 @@ You are now ready use helm with this cluster.
 
 All services are available on a domain relative to the customer environment.
 If the customer cluster has the domain https://company-1.compliantk8s.com you will for example be able to access the system cluster dashboard at https://dashboard.company-1-system.compliantk8s.com.
-In this document, the placeholder `ECK_DOMAIN` will be used to represent the customer domain and `ECK_SYSTEM_DOMAIN` the system domain.
+In this document, the placeholder `ECK_DOMAIN` will be used to represent the customer domain and `ECK_SC_DOMAIN` the system domain.
 If you want to replace `ECK_DOMAIN` with your actual domain in this document, do the following:
 
 ```shell
@@ -51,11 +51,11 @@ Log in to the services using your A1 AAA or Google credentials.
 ### Service endpoints
 
 - **Kubernetes customer Dashboard** URL: https://dashboard.ECK_DOMAIN
-- **Kubernetes system Dashboard** URL: https://dashboard.ECK_SYSTEM_DOMAIN
+- **Kubernetes system Dashboard** URL: https://dashboard.ECK_SC_DOMAIN
 - **Kibana** URL: https://kibana.ECK_DOMAIN
 - **Harbor** URL: https://harbor.ECK_DOMAIN
 - **Grafana customer** URL: https://grafana.ECK_DOMAIN
-- **Grafana system** URL: https://grafana.ECK_SYSTEM_DOMAIN
+- **Grafana system** URL: https://grafana.ECK_SC_DOMAIN
 - **Prometheus** URL: TODO
 - **Alertmanager** URL: TODO
 

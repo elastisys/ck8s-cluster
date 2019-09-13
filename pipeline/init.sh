@@ -1,8 +1,8 @@
 #!/bin/bash
 export SSH_PATH=~/.ssh/id_rsa
 export TF_IN_AUTOMATION="true"
-export TF_VAR_ssh_pub_key_file_system_services=${SSH_PATH}.pub
-export TF_VAR_ssh_pub_key_file_customer=${SSH_PATH}.pub
+export TF_VAR_ssh_pub_key_file_sc=${SSH_PATH}.pub
+export TF_VAR_ssh_pub_key_file_wc=${SSH_PATH}.pub
 export TF_VAR_exoscale_api_key=$EXOSCALE_API_KEY
 export TF_VAR_exoscale_secret_key=$EXOSCALE_SECRET_KEY
 #export GOOGLE_CLIENT_ID=asd

@@ -23,4 +23,4 @@
     - labels:
         cluster: customer
       targets:
-      - prometheus.${ECK_CUSTOMER_DOMAIN}
+      - prometheus.${ECK_WC_DOMAIN}

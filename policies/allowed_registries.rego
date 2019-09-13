@@ -1,7 +1,7 @@
 package kubernetes.admission
 
 # List of whitelisted registries.
-white_list = ["harbor.${ECK_SYSTEM_DOMAIN}"]
+white_list = ["harbor.${ECK_SC_DOMAIN}"]
 
 # Set of namespaces for which this policy applies to.
 namespaces = {"opa-registry-whitelist"}

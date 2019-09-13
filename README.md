@@ -74,16 +74,16 @@ Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx
 Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
-    ./scripts/gen-hosts.sh
+    ./scripts/gen-infra.sh
 
-    export ECK_SYSTEM_DOMAIN=<name-system-services>.compliantkubernetes.com
-    export ECK_CUSTOMER_DOMAIN=<name-customer>.compliantkubernetes.com
+    export ECK_SC_DOMAIN=<name-sc>.compliantkubernetes.com
+    export ECK_WC_DOMAIN=<name-wc>.compliantkubernetes.com
 
-    ./scripts/gen-rke-conf-system.sh > ./eck-system.yaml
-    ./scripts/gen-rke-conf-customer.sh > ./eck-customer.yaml
+    ./scripts/gen-rke-conf-system.sh > eck-sc.yaml
+    ./scripts/gen-rke-conf-customer.sh > eck-wc.yaml
 
-    rke up --config ./eck-system.yaml
-    rke up --config ./eck-customer.yaml
+    rke up --config eck-sc.yaml
+    rke up --config eck-wc.yaml
 
 ## DNS
 
@@ -133,12 +133,12 @@ You can activate them by setting environment variables with client ID and secret
     export S3_REGION_ENDPOINT=https://sos-de-fra-1.exo.io
     export S3_BUCKET_NAME=harbor-bucket
 
-    export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
-    ./scripts/deploy-system.sh <--interactive>
+    export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+    ./scripts/deploy-sc.sh <--interactive>
 
-    export ECK_SYSTEM_KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
-    export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
-    ./scripts/deploy-customer.sh <--interactive>
+    export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+    export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
+    ./scripts/deploy-wc.sh <--interactive>
 
 ## OpenID Connect with kubectl
 

@@ -16,57 +16,55 @@ pipelines:
             - ./set-execution-mode.sh
             - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
             - terraform apply -input=false tfplan
-            # Generate hosts.json
-            - ../scripts/gen-hosts.sh
-            - ./../pipeline/test/infrastructure/ssh.sh system-services
-            - ./../pipeline/test/infrastructure/ssh.sh customer
+            # Generate infra.json
+            - ../scripts/gen-infra.sh
+            - ./../pipeline/test/infrastructure/ssh.sh service_cluster
+            - ./../pipeline/test/infrastructure/ssh.sh workload_cluster
           artifacts:
-            - hosts.json
+            - infra.json
           after-script:
             - ./pipeline/after-script.sh
 
       - parallel:
           - step:
-              name: system service rke
+              name: service cluster rke
               script:
                 - source pipeline/init.sh
                 - source pipeline/variables.sh
-                - ./scripts/check-docker.sh system-services
-                - ./scripts/gen-rke-conf-system.sh > ./eck-system.yaml
-                - rke up --config ./eck-system.yaml
-                - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
+                - ./scripts/check-docker.sh service_cluster
+                - ./scripts/gen-rke-conf-sc.sh > ./eck-sc.yaml
+                - rke up --config ./eck-sc.yaml
+                - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - cd pipeline/test/k8s
-                - ./check-nodes.sh system-services
+                - ./check-nodes.sh service_cluster
               artifacts:
-                - kube_config_eck-system.yaml
+                - kube_config_eck-sc.yaml
               after-script:
                 - ./pipeline/after-script.sh
           - step:
-              name: customer rke
+              name: workload cluster rke
               script:
                 - source pipeline/init.sh
                 - source pipeline/variables.sh
-                - ./scripts/check-docker.sh customer
-                - ./scripts/gen-rke-conf-customer.sh > ./eck-customer.yaml
-                - rke up --config ./eck-customer.yaml
-                - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
+                - ./scripts/check-docker.sh workload_cluster
+                - ./scripts/gen-rke-conf-wc.sh > ./eck-wc.yaml
+                - rke up --config ./eck-wc.yaml
+                - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - cd pipeline/test/k8s
-                - ./check-nodes.sh customer
+                - ./check-nodes.sh workload_cluster
               artifacts:
-                - kube_config_eck-customer.yaml
+                - kube_config_eck-wc.yaml
               after-script:
                 - ./pipeline/after-script.sh
       
       - parallel:
           - step:
-              name: system service deploy
+              name: service cluster deploy
               script:
                 - source pipeline/init.sh
                 - source pipeline/variables.sh
-                - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
-                - echo $KUBECONFIG
-                - kubectl get pods --all-namespaces
-                - ./scripts/deploy-system.sh
+                - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+                - ./scripts/deploy-sc.sh
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
 
@@ -77,11 +75,9 @@ pipelines:
               script:
                 - source pipeline/init.sh
                 - source pipeline/variables.sh
-                - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
-                - echo $KUBECONFIG
-                - export ECK_SYSTEM_KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
-                - kubectl get pods --all-namespaces
-                - ./scripts/deploy-customer.sh
+                - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
+                - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+                - ./scripts/deploy-wc.sh
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
 
@@ -99,7 +95,7 @@ pipelines:
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
                 - cd ..
-                - export KUBECONFIG=$(pwd)/kube_config_eck-system.yaml
+                - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - source ./scripts/common.sh
                 # Tests
                 - ./pipeline/test/services/test-ss.sh
@@ -116,7 +112,7 @@ pipelines:
                 - echo '1' | TF_WORKSPACE=pipeline terraform init
                 - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
                 - cd ..
-                - export KUBECONFIG=$(pwd)/kube_config_eck-customer.yaml
+                - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - source ./scripts/common.sh
                 # Services
                 - ./pipeline/test/services/test-c.sh

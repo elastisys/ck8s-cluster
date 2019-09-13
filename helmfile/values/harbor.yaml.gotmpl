@@ -8,8 +8,8 @@ expose:
     annotations:
       certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
     hosts:
-      core: harbor.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
-      notary: notary.harbor.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
+      core: harbor.{{ requiredEnv "ECK_SC_DOMAIN" }}
+      notary: notary.harbor.{{ requiredEnv "ECK_SC_DOMAIN" }}
 
 persistence:
   enabled: true
@@ -34,7 +34,7 @@ persistence:
       secretkey: {{ requiredEnv "S3_SECRET_KEY" }}
       accesskey: {{ requiredEnv "S3_ACCESS_KEY" }}
 
-externalURL: https://harbor.{{ requiredEnv "ECK_SYSTEM_DOMAIN" }}
+externalURL: https://harbor.{{ requiredEnv "ECK_SC_DOMAIN" }}
 
 core:
   secret: abcdefghijklmnop #TODO: Should be randomized
