@@ -6,7 +6,6 @@ pipelines:
           name: Infrastructure
           script:
             # Variables
-            - build_dir="/opt/atlassian/pipelines/agent/build"
             - source pipeline/init.sh
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             # Infrastructure
@@ -20,8 +19,8 @@ pipelines:
             # Generate infra.json
             - cd ..
             - ./scripts/gen-infra.sh > infra.json
-            - ./pipeline/test/infrastructure/ssh.sh service_cluster "$build_dir/infra.json"
-            - ./pipeline/test/infrastructure/ssh.sh workload_cluster "$build_dir/infra.json"
+            - ./pipeline/test/infrastructure/ssh.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+            - ./pipeline/test/infrastructure/ssh.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
           artifacts:
             - infra.json
           after-script:
@@ -34,12 +33,12 @@ pipelines:
                 - build_dir="/opt/atlassian/pipelines/agent/build"
                 - source pipeline/init.sh
                 - source pipeline/variables.sh
-                - ./scripts/check-docker.sh service_cluster "$build_dir/infra.json"
-                - ./scripts/gen-rke-conf-sc.sh "$build_dir/infra.json" > ./eck-sc.yaml
+                - ./scripts/check-docker.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+                - ./scripts/gen-rke-conf-sc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-sc.yaml
                 - rke up --config ./eck-sc.yaml
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - cd pipeline/test/k8s
-                - ./check-nodes.sh service_cluster "$build_dir/infra.json"
+                - ./check-nodes.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
               artifacts:
                 - kube_config_eck-sc.yaml
               after-script:
@@ -50,12 +49,12 @@ pipelines:
                 - build_dir="/opt/atlassian/pipelines/agent/build"
                 - source pipeline/init.sh
                 - source pipeline/variables.sh
-                - ./scripts/check-docker.sh workload_cluster "$build_dir/infra.json"
-                - ./scripts/gen-rke-conf-wc.sh "$build_dir/infra.json" > ./eck-wc.yaml
+                - ./scripts/check-docker.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+                - ./scripts/gen-rke-conf-wc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-wc.yaml
                 - rke up --config ./eck-wc.yaml
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - cd pipeline/test/k8s
-                - ./check-nodes.sh workload_cluster "$build_dir/infra.json"
+                - ./check-nodes.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
               artifacts:
                 - kube_config_eck-wc.yaml
               after-script:
@@ -69,7 +68,7 @@ pipelines:
                 - source pipeline/init.sh
                 - source pipeline/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - ./scripts/deploy-sc.sh "$build_dir/infra.json"
+                - ./scripts/deploy-sc.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
               after-script:
@@ -82,7 +81,7 @@ pipelines:
                 - source pipeline/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - ./scripts/deploy-wc.sh "$build_dir/infra.json"
+                - ./scripts/deploy-wc.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
               after-script:
