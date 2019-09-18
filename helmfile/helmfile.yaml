@@ -84,7 +84,7 @@ releases:
   labels:
     app: cert-manager
   chart: jetstack/cert-manager
-  version: v0.8.0
+  version: v0.10.0
   missingFileHandler: error
   wait: true
 

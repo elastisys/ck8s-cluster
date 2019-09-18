@@ -88,14 +88,14 @@ cd ${SCRIPTS_PATH}/../helmfile
 helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 
 # Get status of the cert-manager webhook api.
-STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
+STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
 
 # Just want to see if this ever happens.
 if [ $STATUS != "Available" ] 
 then
     echo -e  "##\n##\nWaiting for cert-manager webhook to become ready\n##\n##"
     kubectl wait --for=condition=Available --timeout=300s \
-        apiservice v1beta1.admission.certmanager.k8s.io
+        apiservice v1beta1.webhook.certmanager.k8s.io
 fi
 
 # Install rest of the charts excluding fluentd.
