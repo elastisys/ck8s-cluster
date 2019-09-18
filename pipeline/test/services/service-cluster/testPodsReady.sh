@@ -51,7 +51,7 @@ done
 
 STATEFULSETS=(
     "monitoring prometheus-prometheus-operator-prometheus"
-    "monitoring prometheus-prometheus-c-reader"
+    "monitoring prometheus-prometheus-wc-reader"
     "monitoring alertmanager-prometheus-operator-alertmanager"
     "elastic-system elastic-operator"
     "harbor harbor-harbor-database"

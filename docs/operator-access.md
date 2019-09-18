@@ -22,8 +22,8 @@ The certificates used are created during installation and are by default stored 
 Set up environment variables for accessing the secured tiller like this (note that `kubectl` should already be configured for the cluster you want to access before you do this):
 ```shell
 # Namespace, cert dir and client as arguments.
-# Switch system-services to customer to access the customer cluster.
-source scripts/helm-env.sh kube-system certs/system-services/certs admin1
+# Switch service_cluster to workload_cluster to access the customers cluster.
+source scripts/helm-env.sh kube-system certs/service_cluster/certs admin1
 # Make sure you can access tiller
 helm version
 # Should give output similar to this:
@@ -50,12 +50,11 @@ Log in to the services using your A1 AAA or Google credentials.
 
 ### Service endpoints
 
-- **Kubernetes customer Dashboard** URL: https://dashboard.ECK_WC_DOMAIN
-- **Kubernetes system Dashboard** URL: https://dashboard.ECK_SC_DOMAIN
+- **Kubernetes workload cluster Dashboard** URL: https://dashboard.ECK_WC_DOMAIN
+- **Kubernetes service cluster Dashboard** URL: https://dashboard.ECK_SC_DOMAIN
 - **Kibana** URL: https://kibana.ECK_WC_DOMAIN
 - **Harbor** URL: https://harbor.ECK_WC_DOMAIN
-- **Grafana customer** URL: https://grafana.ECK_WC_DOMAIN
-- **Grafana system** URL: https://grafana.ECK_SC_DOMAIN
+- **Grafana** URL: https://grafana.ECK_SC_DOMAIN
 - **Prometheus** URL: TODO
 - **Alertmanager** URL: TODO
 

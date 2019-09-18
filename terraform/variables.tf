@@ -32,7 +32,7 @@ variable sc_worker_count {
 }
 
 variable sc_worker_size {
-  description = "The size of the system-services worker VMs."
+  description = "The size of the worker VMs."
 
   type = string
   default = "Extra-large"
@@ -46,7 +46,7 @@ variable wc_worker_count {
 }
 
 variable wc_worker_size {
-  description = "The size of the customer worker VMs."
+  description = "The size of the worker VMs."
 
   type = string
   default = "Large"

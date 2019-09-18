@@ -71,7 +71,7 @@ alertmanager:
 
   ## Deploy alertmanager
   ##
-  enabled: false
+  enabled: true
 
   ## Service account for Alertmanager to use.
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -125,8 +125,7 @@ alertmanager:
   ##      https://prometheus.io/docs/alerting/notification_examples/
   ##
   templateFiles: {}
-  #
-
+  
 
   ingress:
     enabled: false
@@ -349,22 +348,25 @@ alertmanager:
 ## Using default values from https://github.com/helm/charts/blob/master/stable/grafana/values.yaml
 ##
 grafana:
-  enabled: false
+  enabled: true
 
   ## Deploy default dashboards.
   ##
   defaultDashboardsEnabled: true
 
+  # admin username is "admin"
   adminPassword: prom-operator
 
   ingress:
     ## If true, Grafana Ingress will be created
     ##
-    enabled: false
+    enabled: true
 
     ## Annotations for Grafana Ingress
     ##
-    annotations: {}
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
 
@@ -375,9 +377,9 @@ grafana:
     ## Hostnames.
     ## Must be provided if Ingress is enable.
     ##
-    # hosts:
-    #   - grafana.domain.com
-    hosts: []
+    hosts:
+    - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}
+
 
     ## Path for grafana ingress
     path: /
@@ -385,10 +387,10 @@ grafana:
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     ##
-    tls: []
-    # - secretName: grafana-general-tls
-    #   hosts:
-    #   - grafana.example.com
+    tls:
+    - secretName: grafana-general-tls
+      hosts:
+      - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}   
 
   rbac:
     pspUseAppArmor: false
@@ -404,13 +406,35 @@ grafana:
       label: grafana_dashboard
     datasources:
       enabled: true
-      defaultDatasourceEnabled: true
+      defaultDatasourceEnabled: false
       ## Create datasource for each Pod of Prometheus StatefulSet;
       ## this uses headless service `prometheus-operated` which is
       ## created by Prometheus Operator
       ## ref: https://git.io/fjaBS
       createPrometheusReplicasDatasources: false
       label: grafana_datasource
+
+  dashboardProviders: 
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+  ## Configure grafana dashboard to import
+  ## NOTE: To use dashboards you must also enable/configure dashboardProviders
+  ## ref: https://grafana.com/dashboards
+  ##
+  ## dashboards per provider, use provider name as key.
+  ##
+  dashboards:
+    default: {}
 
   extraConfigmapMounts: []
   # - name: certs-configmap
@@ -420,19 +444,53 @@ grafana:
 
   ## Configure additional grafana datasources
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
-  additionalDataSources: []
-  # - name: prometheus-sample
+  additionalDataSources:
+  # - name: influxDB-c
   #   access: proxy
-  #   basicAuth: true
-  #   basicAuthPassword: pass
-  #   basicAuthUser: daco
+  #   database: workload_cluster
+  #   basicAuth: false
   #   editable: false
+  #   user: demo 
+  #   secureJsonData:
+  #     password: demo-pass
   #   jsonData:
-  #       tlsSkipVerify: true
+  #     httpMode: GET
   #   orgId: 1
-  #   type: prometheus
-  #   url: https://prometheus.svc:9090
+  #   type: influxdb
+  #   url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086
   #   version: 1
+  # - name: influxDB-ss
+  #   access: proxy
+  #   database: service_cluster
+  #   basicAuth: false
+  #   editable: false
+  #   user: demo 
+  #   secureJsonData:
+  #     password: demo-pass
+  #   jsonData:
+  #     httpMode: GET
+  #   orgId: 1
+  #   type: influxdb
+  #   url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086
+  #   version: 1
+  - name: prometheus-wc-reader
+    access: proxy
+    basicAuth: false
+    editable: false
+    isDefault: true
+    orgId: 1
+    type: prometheus
+    url: http://prometheus-wc-reader:9090
+    version: 1
+  - name: prometheus-ss
+    access: proxy
+    basicAuth: false
+    editable: false
+    isDefault: false
+    orgId: 1
+    type: prometheus
+    url: http://prometheus-operator-prometheus:9090
+    version: 1
 
   ## If true, create a serviceMonitor for grafana
   ##
@@ -458,6 +516,23 @@ grafana:
     #   target_label: nodename
     #   replacement: $1
     #   action: replace
+
+  grafana.ini:
+    server:
+      root_url: https://grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}
+
+    auth.generic_oauth:
+      name: dex
+      enabled: true
+      client_id: grafana
+      client_secret: Z3JhZmFuYS1zZWNyZXQK
+      scopes: profile email openid
+      auth_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/auth
+      token_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/token
+      api_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/api
+      allowed_domains: {{ requiredEnv "OAUTH_ALLOWED_DOMAINS" }}
+      allow_sign_up: true
+      tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}
 
 ## Component scraping the kube api server
 ##
@@ -1076,7 +1151,7 @@ prometheusOperator:
     repository: quay.io/coreos/configmap-reload
     tag: v0.0.1
 
-  ## Prometheus-config-reloader image to use for config and rule reloading
+  ## prometheus-config-reloader image to use for config and rule reloading
   ##
   prometheusConfigReloaderImage:
     repository: quay.io/coreos/prometheus-config-reloader
@@ -1152,17 +1227,18 @@ prometheus:
     maxUnavailable: ""
 
   ingress:
-    enabled: true
+    enabled: false
     annotations:
       ingress.kubernetes.io/rewrite-target: /
-      certmanager.k8s.io/cluster-issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
     labels: {}
 
     ## Hostnames.
     ## Must be provided if Ingress is enabled.
     ##
+    # hosts:
+    #   - prometheus.domain.com
     hosts:
-    - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
+    - prometheus-ss.$(ECK_SC_DOMAIN)
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
@@ -1175,10 +1251,7 @@ prometheus:
     tls:
     - secretName: prometheus-general-tls
       hosts:
-      - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
-
-
-
+        - prometheus-ss.$(ECK_SC_DOMAIN)
 
   ## Configure additional options for default pod security policy for Prometheus
   ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
@@ -1414,16 +1487,14 @@ prometheus:
 
     ## The remote_read spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotereadspec
-    remoteRead: []
-    # - url: https://influxdb-prometheus.$(ECK_DOMAIN)/api/v1/prom/read?db=customer&u=demo&p=demo-pass
-
+    remoteRead: 
+    - url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p=demo-pass
     # - url: http://remote1/read
 
     ## The remote_write spec configuration for Prometheus.
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#remotewritespec
-    remoteWrite: []
-    # - url: https://influxdb-prometheus.$(ECK_DOMAIN)/api/v1/prom/write?db=customer&u=demo&p=demo-pass
-        
+    remoteWrite: 
+    - url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p=demo-pass
     # - url: http://remote1/push
 
     ## Resource limits & requests
@@ -1457,6 +1528,32 @@ prometheus:
     ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     ##
     additionalScrapeConfigs: []
+    # - job_name: 'federate'
+    #   scrape_interval: 15s
+
+    #   honor_labels: true
+    #   metrics_path: '/federate'
+
+    #   scheme: https
+
+    #   params:
+    #     'match[]':
+    #       - '{job="kubelet"}'
+    #       - '{__name__=~"job:.*"}'
+
+    #   tls_config:
+    #     insecure_skip_verify: true
+
+    #   static_configs:
+    #     - targets:
+    #       - 'prometheus-workload_cluster.compliantk8s.com'
+    #       labels:
+    #         cluster: workload_cluster
+
+
+
+
+
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
     #     - role: node

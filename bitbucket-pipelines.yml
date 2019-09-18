@@ -28,7 +28,7 @@ pipelines:
 
       - parallel:
           - step:
-              name: service cluster rke
+              name: Service cluster rke
               script:
                 - build_dir="/opt/atlassian/pipelines/agent/build"
                 - source pipeline/init.sh
@@ -44,7 +44,7 @@ pipelines:
               after-script:
                 - ./pipeline/after-script.sh
           - step:
-              name: workload cluster rke
+              name: Workload cluster rke
               script:
                 - build_dir="/opt/atlassian/pipelines/agent/build"
                 - source pipeline/init.sh
@@ -62,7 +62,7 @@ pipelines:
   
       - parallel:
           - step:
-              name: service cluster deploy
+              name: Service cluster deploy
               script:
                 - build_dir="/opt/atlassian/pipelines/agent/build"
                 - source pipeline/init.sh
@@ -74,7 +74,7 @@ pipelines:
               after-script:
                 - ./pipeline/after-script.sh
           - step:
-              name: customer deploy
+              name: Workload cluster deploy
               script:
                 - build_dir="/opt/atlassian/pipelines/agent/build"
                 - source pipeline/init.sh
@@ -89,7 +89,7 @@ pipelines:
 
       - parallel:
           - step:
-              name: system service test
+              name: Service cluster test
               script:
                 # Variables
                 - source pipeline/init.sh
@@ -105,7 +105,7 @@ pipelines:
               after-script:
                 - ./pipeline/after-script.sh
           - step:
-              name: customer test
+              name: Workload cluster test
               script:
                 # Variables
                 - source pipeline/init.sh

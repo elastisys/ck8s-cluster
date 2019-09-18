@@ -35,13 +35,13 @@ kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 # PSP
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-c.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-wc.yaml
 
 
 # HELM, TILLER
-mkdir -p ${SCRIPTS_PATH}/../certs/customer/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/customer "helm"
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/customer/kube-system/certs "helm"
+mkdir -p ${SCRIPTS_PATH}/../certs/workload_cluster/kube-system/certs
+${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/workload_cluster "helm"
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/workload_cluster/kube-system/certs "helm"
 
 
 # DASHBOARD
@@ -85,7 +85,7 @@ echo -e "\nContinuing to Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
 # Install cert-manager and nfs-client-provisioner first.
-helmfile -f helmfile.yaml -e customer -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
@@ -99,12 +99,12 @@ then
 fi
 
 # Install rest of the charts excluding fluentd.
-helmfile -f helmfile.yaml -e customer -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd $INTERACTIVE apply
+helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd $INTERACTIVE apply
 
 
 # FLUENTD
 
-# Get elastisearch password from system-services cluster
+# Get elastisearch password from service_cluster cluster
 ES_PW=$(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
 while [ -z "$ES_PW" ]
@@ -119,4 +119,4 @@ kubectl -n kube-system create secret generic elasticsearch \
     --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
 
 # Install fluentd
-helmfile -f helmfile.yaml -e customer -l app=fluentd $INTERACTIVE apply
+helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply

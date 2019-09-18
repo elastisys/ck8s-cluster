@@ -4,9 +4,9 @@ Elastisys Compliant Kubernetes A1 demo
 # Overview
 
 The Elastisys Compliant Kubernetes (ECK) A1 demo platform runs two Kubernetes
-clusters. One called "system services" and one called "customer".
+clusters. One called "service" and one called "workload".
 
-The system service cluster provides observability, log aggregation,
+The _service cluster_ provides observability, log aggregation,
 private container registry with vulnerability scanning and authentication using
 the following services:
 
@@ -15,7 +15,7 @@ the following services:
 * Harbor
 * Dex
 
-The customer cluster manages the customer applications as well as providing
+The _workload cluster_ manages the customer applications as well as providing
 intrusion detection, security policies, log forwarding and monitoring using the
 following services:
 
@@ -79,8 +79,8 @@ Terraform created.
     export ECK_SC_DOMAIN=$(cat infra.json | jq -r '.service_cluster.dns_name' | sed 's/[^.]*[.]//')
     export ECK_WC_DOMAIN=$(cat infra.json | jq -r '.workload_cluster.dns_name' | sed 's/[^.]*[.]//')
 
-    ./scripts/gen-rke-conf-system.sh infra.json  > eck-sc.yaml
-    ./scripts/gen-rke-conf-customer.sh infra.json > eck-wc.yaml
+    ./scripts/gen-rke-conf-sc.sh infra.json  > eck-sc.yaml
+    ./scripts/gen-rke-conf-wc.sh infra.json > eck-wc.yaml
 
     rke up --config eck-sc.yaml
     rke up --config eck-wc.yaml

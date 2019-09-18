@@ -16,7 +16,7 @@ master_ip_address=$(cat $infra | jq -r '.service_cluster.master_ip_address')
 worker_ip_address=($(cat $infra | jq -r '.service_cluster.worker_ip_addresses[]'))
 
 cat <<EOF
-cluster_name: eck-system-services
+cluster_name: eck-service_cluster
 
 ssh_agent_auth: true
 

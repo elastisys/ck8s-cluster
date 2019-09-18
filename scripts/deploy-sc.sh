@@ -46,13 +46,13 @@ kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
 # PSP
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-ss.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-sc.yaml
 
 
 # HELM and TILLER
-mkdir -p ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/system-services "helm"
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/system-services/kube-system/certs "helm"
+mkdir -p ${SCRIPTS_PATH}/../certs/service_cluster/kube-system/certs
+${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../certs/service_cluster "helm"
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../certs/service_cluster/kube-system/certs "helm"
 
 
 # DASHBOARD
@@ -90,23 +90,23 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/ma
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/podmonitor.crd.yaml
 
 
-# Prometheus customer reader
-# Generate customer scrape configs
-envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-c-reader/prometheus-federate-additional.yaml | \
-    kubectl create secret generic prometheus-c-scrape-configs -n monitoring --dry-run \
+# Prometheus workload_cluster reader
+# Generate workload_cluster scrape configs
+envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-federate-additional.yaml | \
+    kubectl create secret generic prometheus-wc-scrape-configs -n monitoring --dry-run \
     -o yaml --from-file=prometheus-federate-additional.yaml=/dev/stdin | \
     kubectl apply -f -
-# Create prometheus customer reader
-envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-c-reader/prometheus-c-reader.yaml | kubectl apply -f -
-# Expose prometheus customer reader
-kubectl apply -f "$SCRIPTS_PATH"/../manifests/prometheus-c-reader/prometheus-c-service.yaml
+# Create prometheus workload_cluster reader
+envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-reader.yaml | kubectl apply -f -
+# Expose prometheus workload_cluster reader
+kubectl apply -f "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-service.yaml
 
 echo -e "\nContinuing with Helmfile\n"
 
 cd ${SCRIPTS_PATH}/../helmfile
 
 # Install cert-manager and nfs-client-provisioner first.
-helmfile -f helmfile.yaml -e system-services -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.admission.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
@@ -120,10 +120,10 @@ then
 fi
 
 # Install dex.
-helmfile -f helmfile.yaml -e system-services -l app=dex $INTERACTIVE apply
+helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
 
 # Install the rest of the charts.
-helmfile -f helmfile.yaml -e system-services -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex $INTERACTIVE apply
+helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex $INTERACTIVE apply
 
 # Check harbor rollout status.
 # Should not be needed due to 'wait' when installing/upgrading harbor!

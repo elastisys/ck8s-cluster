@@ -5,14 +5,14 @@ repositories:
 - name: jetstack
   url: https://charts.jetstack.io
 
-# System-services specific repositories
-{{ if eq .Environment.Name "system-services" }}
+# service_cluster specific repositories
+{{ if eq .Environment.Name "service_cluster" }}
 - name: harbor
   url: https://helm.goharbor.io
 {{ end }}
 
-# Customer specific repositories
-{{ if eq .Environment.Name "customer" }}
+# Workload cluster specific repositories
+{{ if eq .Environment.Name "workload_cluster" }}
 - name: kiwigrid
   url: https://kiwigrid.github.io
 {{ end }}
@@ -25,22 +25,22 @@ helmDefaults:
   wait: false
 
   # TODO: Use env or Env.values instead of fixed paths for certs.
-  {{ if eq .Environment.Name "system-services" }}
-  tlsCACert: "../certs/system-services/kube-system/certs/ca.pem"
-  tlsCert: "../certs/system-services/kube-system/certs/helm.pem"
-  tlsKey: "../certs/system-services/kube-system/certs/helm-key.pem"
+  {{ if eq .Environment.Name "service_cluster" }}
+  tlsCACert: "../certs/service_cluster/kube-system/certs/ca.pem"
+  tlsCert: "../certs/service_cluster/kube-system/certs/helm.pem"
+  tlsKey: "../certs/service_cluster/kube-system/certs/helm-key.pem"
   {{ end }}
-  {{ if eq .Environment.Name "customer" }}
-  tlsCACert: "../certs/customer/kube-system/certs/ca.pem"
-  tlsCert: "../certs/customer/kube-system/certs/helm.pem"
-  tlsKey: "../certs/customer/kube-system/certs/helm-key.pem"
+  {{ if eq .Environment.Name "workload_cluster" }}
+  tlsCACert: "../certs/workload_cluster/kube-system/certs/ca.pem"
+  tlsCert: "../certs/workload_cluster/kube-system/certs/helm.pem"
+  tlsKey: "../certs/workload_cluster/kube-system/certs/helm-key.pem"
   {{ end }}
 
 
 # Environments
 environments:
-  customer:
-  system-services:
+  workload_cluster:
+  service_cluster:
 
 # The desired state of Helm releases.
 releases:
@@ -54,11 +54,11 @@ releases:
   missingFileHandler: error
   wait: true
   values:
-  {{ if eq .Environment.Name "system-services" }}
-  - values/nfs-client-provisioner-ss.yaml.gotmpl
+  {{ if eq .Environment.Name "service_cluster" }}
+  - values/nfs-client-provisioner-sc.yaml.gotmpl
   {{ end }}
-  {{ if eq .Environment.Name "customer" }}
-  - values/nfs-client-provisioner-c.yaml.gotmpl
+  {{ if eq .Environment.Name "workload_cluster" }}
+  - values/nfs-client-provisioner-wc.yaml.gotmpl
   {{ end }}
 
 # Oauth2
@@ -70,12 +70,12 @@ releases:
   version: 0.12.3
   missingFileHandler: error
   values:
-  {{ if eq .Environment.Name "system-services" }}
-    - values/oauth2-ss.yaml.gotmpl
+  {{ if eq .Environment.Name "service_cluster" }}
+    - values/oauth2-sc.yaml.gotmpl
   {{ end }}
 
-  {{ if eq .Environment.Name "customer" }}
-  - values/oauth2-c.yaml.gotmpl
+  {{ if eq .Environment.Name "workload_cluster" }}
+  - values/oauth2-wc.yaml.gotmpl
   {{ end }}
 
 # Cert-manager
@@ -97,15 +97,15 @@ releases:
   version: 6.2.1
   missingFileHandler: error
   values:
-{{ if eq .Environment.Name "system-services" }}
-  - values/prometheus-operator.yaml.gotmpl
+{{ if eq .Environment.Name "service_cluster" }}
+  - values/prometheus-operator-sc.yaml.gotmpl
 {{ end }}
-{{ if eq .Environment.Name "customer" }}
-  - values/prometheus-operator-c.yaml.gotmpl
+{{ if eq .Environment.Name "workload_cluster" }}
+  - values/prometheus-operator-wc.yaml.gotmpl
 {{ end }}
 
-# System services releases
-{{ if eq .Environment.Name "system-services" }}
+# Service cluster releases
+{{ if eq .Environment.Name "service_cluster" }}
 # Dex
 - name: dex
   namespace: dex
@@ -144,8 +144,8 @@ releases:
 # End of system services releases
 {{ end }}
 
-# Customer releases
-{{ if eq .Environment.Name "customer"  }}
+# Workload cluster releases
+{{ if eq .Environment.Name "workload_cluster"  }}
 # Falco
 - name: falco
   namespace: falco

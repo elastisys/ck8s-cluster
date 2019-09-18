@@ -4,7 +4,7 @@ https://github.com/roboll/helmfile
 
 Some notes
 
-* Currently only one helm state file is used containing the states for the helm releases for both the customer and system-services clusters. `Environments` are used to differentiate between the two. It should be investigated what the best practices are, like use sub-helmfiles etc.
+* Currently only one helm state file is used containing the states for the helm releases for both the workload_cluster and service_cluster clusters. `Environments` are used to differentiate between the two. It should be investigated what the best practices are, like use sub-helmfiles etc.
 
 * In `helmfile.yaml` the certificates used to communicate with tiller is set to `../certs/<cluster-type>/kube-system/certs/helm.*`. Could be specifed using env variables in the future, or ignored if the nessecary helm env variables already have been set.  
 
@@ -44,7 +44,7 @@ Note: These are required for explicit use with `helmfile`. All might not be requ
 If any environment variable is not set helmfile will throw an error and the release will not be installed. 
 
 ### Helmfile environments
-There is one environment for each cluster type:`system-services` and `customer`. 
+There is one environment for each cluster type:`service_cluster` and `workload_cluster`. 
 Environments are specififed by using the flag `-e <environment_name>`.
 
 ### Usage
@@ -64,7 +64,7 @@ Environments are specififed by using the flag `-e <environment_name>`.
 
 * Use a specific environment
     
-    `helmfile -f helmfile.yaml -e customer apply`
+    `helmfile -f helmfile.yaml -e workload_cluster apply`
 
 * Check status of releases
    

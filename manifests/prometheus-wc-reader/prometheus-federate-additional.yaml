@@ -21,6 +21,6 @@
 
   static_configs:
     - labels:
-        cluster: customer
+        cluster: workload_cluster
       targets:
       - prometheus.${ECK_WC_DOMAIN}

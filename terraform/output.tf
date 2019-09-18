@@ -1,4 +1,4 @@
-# System services cluster outputs
+# Service cluster outputs
 
 output "sc_worker_count" {
   value = "${var.sc_worker_count}"
@@ -37,7 +37,7 @@ output "sc_dns_name"{
 }
 
 
-#Customer cluster outputs
+# Workload cluster cluster outputs
 
 output "wc_worker_count" {
   value = "${var.wc_worker_count}"
