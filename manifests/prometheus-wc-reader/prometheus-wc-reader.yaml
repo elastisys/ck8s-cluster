@@ -15,9 +15,9 @@ spec:
   logLevel: info
   remoteRead:
   - read_recent: true
-    url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster2&u=demo&p=demo-pass
+    url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u=demo&p=demo-pass
   remoteWrite:
-  - url: http://influxdb-prometheus.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=workload_cluster2&u=demo&p=demo-pass
+  - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=workload_cluster&u=demo&p=demo-pass
   replicas: 1
   retention: 10d
   securityContext:
