@@ -39,13 +39,17 @@ services:
     pod_security_policy: true
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
+    extra_binds:
+    # Adds file from node into docker container running api-server
+      - "/etc/kubernetes/conf:/etc/kubernetes/conf"
+      - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
       oidc-issuer-url: https://dex.${ECK_SC_DOMAIN}
       oidc-client-id: kubernetes
       oidc-username-claim: email
       oidc-groups-claim: groups
-      # Enable audit log to stdout
-      audit-log-path: "-"
+      audit-policy-file: "/etc/kubernetes/conf/audit-policy.yaml"
+      audit-log-path: "/var/log/kube-audit/kube-apiserver.log"
       # Increase number of delete workers
       delete-collection-workers: 3
       # Set the level of log output to debug-level
