@@ -9,6 +9,7 @@ elasticsearch:
   sslVerify: {{ requiredEnv "TLS_VERIFY" }}
   logLevel: "debug"
 
+# Default args include "-q" which sets loglevel to warning. 
 fluentdArgs: "--no-supervisor"
 configMaps:
   useDefaults:
