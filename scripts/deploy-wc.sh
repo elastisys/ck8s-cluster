@@ -99,7 +99,26 @@ then
 fi
 
 # Install rest of the charts excluding fluentd.
-helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd $INTERACTIVE apply
+helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd,app!=prometheus-operator $INTERACTIVE apply
+
+# Install prometheus-operator.
+tries=3 #prometheus operator sometimes does not succede, we will try to deploy this many times
+success=false
+for i in $(seq 1 $tries)
+do
+    if helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE apply
+    then
+        success=true
+        break
+    else
+        echo failed to deploy prometheus operator on try $i
+        helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE destroy
+    fi
+done
+if [ $success != "true" ] # Then prometheus operator failed too many times
+then
+    exit 1
+fi
 
 
 # FLUENTD

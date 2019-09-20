@@ -123,7 +123,26 @@ fi
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
 
 # Install the rest of the charts.
-helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex $INTERACTIVE apply
+helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator $INTERACTIVE apply
+
+# Install prometheus-operator.
+tries=3 #prometheus operator sometimes does not succede, we will try to deploy this many times
+success=false
+for i in $(seq 1 $tries)
+do
+    if helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE apply
+    then
+        success=true
+        break
+    else
+        echo failed to deploy prometheus operator on try $i
+        helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE destroy
+    fi
+done
+if [ $success != "true" ] # Then prometheus operator failed too many times
+then
+    exit 1
+fi
 
 # Check harbor rollout status.
 # Should not be needed due to 'wait' when installing/upgrading harbor!
