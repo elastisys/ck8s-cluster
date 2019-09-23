@@ -75,6 +75,8 @@ The commands listed above will set up the cloud infrastructure using a "default"
     export TF_VAR_wc_master_count=<x | default 1>
     export TF_VAR_wc_master_size=<x | default "Large">
 
+    export TF_VAR_sc_nfs_size=<x | default "Medium">
+    export TF_VAR_wc_nfs_size=<x | default "Medium">
 
 ## Kubernetes clusters
 

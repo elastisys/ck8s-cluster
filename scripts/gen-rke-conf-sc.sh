@@ -6,7 +6,7 @@ set -e
 
 if [[ "$#" -ne 1 ]]
 then 
-  echo "Usage: gen-rke-conf-sc.sh <path-to-infra-file>"
+  echo "Usage: gen-rke-conf-wc.sh <path-to-infra-file>"
   exit 1
 fi
 
@@ -16,7 +16,7 @@ master_ip_addresses=($(cat $infra | jq -r '.service_cluster.master_ip_addresses[
 worker_ip_addresses=($(cat $infra | jq -r '.service_cluster.worker_ip_addresses[]'))
 
 cat <<EOF
-cluster_name: eck-workload_cluster
+cluster_name: eck-service_cluster
 
 ssh_agent_auth: true
 

@@ -6,6 +6,8 @@ variable "zone" {
   default = "ch-gva-2"
 }
 
+variable "nfs_size" {}
+
 variable "network_name" {}
 
 variable "master_name" {}

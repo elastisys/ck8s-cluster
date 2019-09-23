@@ -28,8 +28,10 @@ module "service_cluster" {
   worker_count                = "${var.sc_worker_count}"
   worker_size                 = "${var.sc_worker_size}"
 
-  network_name                = "${terraform.workspace}-sc-network"
   nfs_name                    = "${terraform.workspace}-sc-nfs"
+  nfs_size                    = "${var.sc_nfs_size}"
+
+  network_name                = "${terraform.workspace}-sc-network"
   dns_name                    = "${var.dns_prefix}-sc"
 
   master_security_group_name  = "${terraform.workspace}-sc-master-sg"
@@ -55,8 +57,10 @@ module "workload_cluster" {
   worker_count                = "${var.wc_worker_count}"
   worker_size                 = "${var.wc_worker_size}"
 
-  network_name                = "${terraform.workspace}-wc-network"
   nfs_name                    = "${terraform.workspace}-wc-nfs"
+  nfs_size                    = "${var.wc_nfs_size}"
+
+  network_name                = "${terraform.workspace}-wc-network"
   dns_name                    = "${var.dns_prefix}-wc"
 
   master_security_group_name  = "${terraform.workspace}-wc-master-sg"
