@@ -18,18 +18,20 @@ popd > /dev/null
 
 service=$(echo $tf_out | jq '{
     "worker_ip_addresses": .sc_worker_ip_addresses.value,
-    "master_ip_address": .sc_master_ip_address.value,
+    "master_ip_addresses": .sc_master_ip_addresses.value,
     "nfs_ip_address": .sc_nfs_ip_address.value,
     "dns_name": .sc_dns_name.value,
-    "worker_count": .sc_worker_count.value}
+    "worker_count": .sc_worker_count.value,
+    "master_count": .sc_master_count.value}
     | {"service_cluster": values}')
 
 workload=$(echo $tf_out | jq '{
     "worker_ip_addresses": .wc_worker_ip_addresses.value,
-    "master_ip_address": .wc_master_ip_address.value,
+    "master_ip_addresses": .wc_master_ip_addresses.value,
     "nfs_ip_address": .wc_nfs_ip_address.value,
     "dns_name": .wc_dns_name.value,
-    "worker_count": .wc_worker_count.value}
+    "worker_count": .wc_worker_count.value,
+    "master_count": .wc_master_count.value}
     | {"workload_cluster": values}')
 
 echo $workload $service | jq -s add

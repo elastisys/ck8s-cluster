@@ -67,6 +67,13 @@ Begin with setting up the cloud infrastructure using Terraform.
 Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx` 
 (should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`. 
 
+The commands listed above will set up the cloud infrastructure using a "default" configuration. Changing the number of machines and thier size can be done by exporting the following values before running `terraform apply`.
+
+    export TF_VAR_sc_master_count=<x | default 1>
+    export TF_VAR_sc_master_size=<x | default "Large">
+    
+    export TF_VAR_wc_master_count=<x | default 1>
+    export TF_VAR_wc_master_size=<x | default "Large">
 
 
 ## Kubernetes clusters

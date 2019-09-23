@@ -21,6 +21,9 @@ module "service_cluster" {
   source                      = "./modules/kubernetes-cluster"
 
   master_name                 = "${terraform.workspace}-sc-master"
+  master_count                = "${var.sc_master_count}"
+  master_size                 = "${var.sc_master_size}"
+
   worker_name                 = "${terraform.workspace}-sc-worker"
   worker_count                = "${var.sc_worker_count}"
   worker_size                 = "${var.sc_worker_size}"
@@ -45,6 +48,9 @@ module "workload_cluster" {
   source                      = "./modules/kubernetes-cluster"
 
   master_name                 = "${terraform.workspace}-wc-master"
+  master_count                = "${var.wc_master_count}"
+  master_size                 = "${var.wc_master_size}"
+
   worker_name                 = "${terraform.workspace}-wc-worker"
   worker_count                = "${var.wc_worker_count}"
   worker_size                 = "${var.wc_worker_size}"

@@ -15,9 +15,4 @@ write_files:
     owner: root:root
     path: /etc/kubernetes/conf/audit-policy.yaml
     permissions: '0644'
-# TODO: Remove when managed virtual router/DHCP is working properly.
-rancher:
-  network:
-    interfaces:
-      eth1:
-        address: ${address}
+    

@@ -12,26 +12,35 @@ fi
 
 infra="$1"
 
-master_ip_address=$(cat $infra | jq -r '.service_cluster.master_ip_address')
-worker_ip_address=($(cat $infra | jq -r '.service_cluster.worker_ip_addresses[]'))
+master_ip_addresses=($(cat $infra | jq -r '.service_cluster.master_ip_addresses[]'))
+worker_ip_addresses=($(cat $infra | jq -r '.service_cluster.worker_ip_addresses[]'))
 
 cat <<EOF
-cluster_name: eck-service_cluster
+cluster_name: eck-workload_cluster
 
 ssh_agent_auth: true
 
 nodes:
-  - address: ${master_ip_address}
+EOF
+
+for i in $(seq 0 $((${#master_ip_addresses[@]} - 1)))
+do
+cat <<EOF
+  - address: ${master_ip_addresses[${i}]}
     user: rancher
     role: [controlplane,etcd]
 EOF
-for i in $(seq 0 $((${#worker_ip_address[@]} - 1))); do
+done
+
+for i in $(seq 0 $((${#worker_ip_addresses[@]} - 1)))
+do
 cat <<EOF
-  - address: ${worker_ip_address[${i}]}
+  - address: ${worker_ip_addresses[${i}]}
     user: rancher
     role: [worker]
 EOF
 done
+
 cat <<EOF
 
 services:

@@ -5,7 +5,7 @@ set -e
 # Check that cluster type argument is set and valid.
 if [ "$#" -ne 2 -o "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
 then 
-    echo "Usage: ss.sh <service_cluster | workload_cluster> path-to-infra-file"
+    echo "Usage: ssh.sh <service_cluster | workload_cluster> path-to-infra-file"
     exit 1
 fi
 
@@ -20,10 +20,7 @@ function check_hosts () {
 
     if [ "$type" == "worker" ]
     then
-        # Number of desired hosts of type.
         nr_hosts=$(cat $infra | jq -r ".${prefix}.${type}_count" )
-
-        # IP addresses of the worker nodes.
         host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[]" ))
         user="rancher"
     elif [ "$type" == "nfs" ]
@@ -33,8 +30,8 @@ function check_hosts () {
         user="ubuntu"
     elif [ "$type" == "master" ]
     then
-        nr_hosts=1
-        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_address" ))
+        nr_hosts=$(cat $infra | jq -r ".${prefix}.${type}_count" )
+        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[]" ))
         user="rancher"
     fi
 

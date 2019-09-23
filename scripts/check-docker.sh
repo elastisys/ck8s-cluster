@@ -14,16 +14,14 @@ echo "Running test on the $1 cluster"
 prefix="$1"
 infra="$2"
 
-# Get infra info
-cd ${SCRIPTS_PATH}/../
-
-# TODO - Update when we can have variable amount of masters.
-master_ip_address=$(cat $infra | jq -r ".${prefix}.master_ip_address")
+master_ip_addresses=($(cat $infra | jq -r ".${prefix}.master_ip_addresses[]"))
 worker_ip_addresses=($(cat $infra | jq -r ".${prefix}.worker_ip_addresses[]"))
 
-hosts=$worker_ip_addresses
-hosts+=($master_ip_address)
+# Join the two lists.
+hosts=(${worker_ip_addresses[@]})
+hosts+=(${master_ip_addresses[@]})
 
+# Check that each host in hosts is reachable via ssh.
 for host in "${hosts[@]}"
 do
   echo "Checking if docker is running on host: $host"

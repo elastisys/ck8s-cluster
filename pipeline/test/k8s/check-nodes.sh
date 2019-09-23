@@ -19,8 +19,8 @@ infra="$2"
 
 # Get the desired number of each node type.
 desired_workers=($(cat $infra | jq -r ".${prefix}.worker_count" ))
-desired_controlplanes=1
-desired_etcds=1
+desired_controlplanes=($(cat $infra | jq -r ".${prefix}.master_count" ))
+desired_etcds=($(cat $infra | jq -r ".${prefix}.master_count" ))
 
 
 # Get the lables of each node

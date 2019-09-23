@@ -10,6 +10,10 @@ variable "network_name" {}
 
 variable "master_name" {}
 
+variable "master_count" {}
+
+variable "master_size" {}
+
 variable "worker_name" {}
 
 variable "worker_count" {}

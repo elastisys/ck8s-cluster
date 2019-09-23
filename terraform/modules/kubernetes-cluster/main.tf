@@ -31,9 +31,11 @@ resource "exoscale_network" "net" {
 }
 
 resource "exoscale_compute" "master" {
-  display_name    = "${var.master_name}"
+  count = "${var.master_count}"
+
+  display_name    = "${var.master_name}-${count.index}"
   template        = "Linux RancherOS 1.5.1 64-bit"
-  size            = "Large"
+  size            = "${var.master_size}"
   disk_size       = 50
   key_pair        = "${exoscale_ssh_keypair.ssh_key.name}"
   state           = "Running"
@@ -48,7 +50,7 @@ resource "exoscale_compute" "master" {
       audit_policy_b64             = filebase64("${path.module}/manifest/audit-policy.yaml"),
 
       # TODO: Remove when managed virtual router/DHCP is working properly.
-      address = "${local.master_internal_ip_address}/${local.internal_cidr_prefix_length}",
+      # address = "${local.master_internal_ip_address}/${local.internal_cidr_prefix_length}",
     }
   )
 }
@@ -77,7 +79,7 @@ resource "exoscale_compute" "worker" {
     "${path.module}/templates/worker-cloud-init.tmpl",
     {
       # TODO: Remove when managed virtual router/DHCP is working properly.
-      address = "${cidrhost(local.internal_cidr_prefix, local.worker_internal_host_num_start + count.index)}/${local.internal_cidr_prefix_length}"
+      # address = "${cidrhost(local.internal_cidr_prefix, local.worker_internal_host_num_start + count.index)}/${local.internal_cidr_prefix_length}"
     }
   )
 }
@@ -112,7 +114,7 @@ resource "exoscale_compute" "nfs" {
       # internal_cidr_prefix = "${local.internal_cidr_prefix}"
 
       # TODO: Remove when managed virtual router/DHCP is working properly.
-      address = "${local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length}",
+      # address = "${local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length}",
     }
   )
 }
