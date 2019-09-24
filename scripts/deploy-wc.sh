@@ -3,7 +3,7 @@
 set -e
 
 : "${ECK_SC_KUBECONFIG:?Missing ECK_SC_KUBECONFIG}"
-: "${ECK_WC_DOMAIN:?Missing ECK_WC_DOMAIN}"
+: "${ENABLE_OPA:?Missing ENABLE_OPA}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
@@ -29,7 +29,11 @@ INTERACTIVE=${2:-""}
 # NAMESPACES
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
+
+if [[ $ENABLE_OPA == "true" ]]
+then
+    kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
+fi
 
 
 # PSP
@@ -58,21 +62,23 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 
 
 # OPA
-# Copy original 'allowed_registries'
-cp ${SCRIPTS_PATH}/../policies/allowed_registries.rego ${SCRIPTS_PATH}/../policies/allowed_registries.rego.orig
-# Add our Harbor domain as allowed registry.
-envsubst < ${SCRIPTS_PATH}/../policies/allowed_registries.rego > ${SCRIPTS_PATH}/../policies/allowed_registries.rego.tmp
-mv ${SCRIPTS_PATH}/../policies/allowed_registries.rego.tmp ${SCRIPTS_PATH}/../policies/allowed_registries.rego
+if [[ $ENABLE_OPA == "true" ]]
+then
+    # Copy original 'allowed_registries'
+    cp ${SCRIPTS_PATH}/../policies/allowed_registries.rego ${SCRIPTS_PATH}/../policies/allowed_registries.rego.orig
+    # Add our Harbor domain as allowed registry.
+    envsubst < ${SCRIPTS_PATH}/../policies/allowed_registries.rego > ${SCRIPTS_PATH}/../policies/allowed_registries.rego.tmp
+    mv ${SCRIPTS_PATH}/../policies/allowed_registries.rego.tmp ${SCRIPTS_PATH}/../policies/allowed_registries.rego
 
-kubectl -n opa create cm policies -o yaml --dry-run \
-    --from-file="${SCRIPTS_PATH}/../policies/ingress-whitelist.rego" \
-    --from-file="${SCRIPTS_PATH}/../policies/main.rego" \
-    --from-file="${SCRIPTS_PATH}/../policies/netpol-demo.rego" \
-    --from-file="${SCRIPTS_PATH}/../policies/allowed_registries.rego" | kubectl apply -f -
-kubectl -n opa label cm policies openpolicyagent.org/policy=rego --overwrite
-# Restore original file.
-mv ${SCRIPTS_PATH}/../policies/allowed_registries.rego.orig ${SCRIPTS_PATH}/../policies/allowed_registries.rego
-
+    kubectl -n opa create cm policies -o yaml --dry-run \
+        --from-file="${SCRIPTS_PATH}/../policies/ingress-whitelist.rego" \
+        --from-file="${SCRIPTS_PATH}/../policies/main.rego" \
+        --from-file="${SCRIPTS_PATH}/../policies/netpol-demo.rego" \
+        --from-file="${SCRIPTS_PATH}/../policies/allowed_registries.rego" | kubectl apply -f -
+    kubectl -n opa label cm policies openpolicyagent.org/policy=rego --overwrite
+    # Restore original file.
+    mv ${SCRIPTS_PATH}/../policies/allowed_registries.rego.orig ${SCRIPTS_PATH}/../policies/allowed_registries.rego
+fi
 
 # Prometheus CRDS
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml
@@ -100,12 +106,18 @@ then
         apiservice v1beta1.webhook.certmanager.k8s.io
 fi
 
-# Install rest of the charts excluding fluentd.
-helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd,app!=prometheus-operator $INTERACTIVE apply
+if [[ $ENABLE_OPA == "true" ]]
+then
+    # Install rest of the charts excluding fluentd and prometheus.
+    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd,app!=prometheus-operator $INTERACTIVE apply
+else
+    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd,app!=prometheus-operator,app!=opa $INTERACTIVE apply
+fi
 
-# Install prometheus-operator.
-tries=3 #prometheus operator sometimes does not succede, we will try to deploy this many times
+# Install prometheus-operator. Retry three times.
+tries=3 
 success=false
+
 for i in $(seq 1 $tries)
 do
     if helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE apply
@@ -117,7 +129,9 @@ do
         helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE destroy
     fi
 done
-if [ $success != "true" ] # Then prometheus operator failed too many times
+
+# Then prometheus operator failed too many times
+if [ $success != "true" ] 
 then
     exit 1
 fi

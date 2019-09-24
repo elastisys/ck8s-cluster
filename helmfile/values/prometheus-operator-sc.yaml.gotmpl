@@ -1,3 +1,11 @@
+global:
+  rbac:
+    pspEnabled: {{ env "ENABLE_PSP" | default "true" }}
+
+kube-state-metrics:
+  podSecurityPolicy:
+    enabled: {{ env "ENABLE_PSP" | default "true" }}
+
 grafana:
   # admin username is "admin"
   adminPassword: prom-operator
@@ -17,6 +25,7 @@ grafana:
       - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}   
   rbac:
     pspUseAppArmor: false
+    pspEnabled: {{ env "ENABLE_PSP" | default "true" }}
 
   serviceAccount:
     create: true

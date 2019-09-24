@@ -129,9 +129,10 @@ helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
 # Install the rest of the charts.
 helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator $INTERACTIVE apply
 
-# Install prometheus-operator.
-tries=3 #prometheus operator sometimes does not succede, we will try to deploy this many times
+# Install prometheus-operator. Retry three times.
+tries=3 
 success=false
+
 for i in $(seq 1 $tries)
 do
     if helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE apply
@@ -143,7 +144,9 @@ do
         helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE destroy
     fi
 done
-if [ $success != "true" ] # Then prometheus operator failed too many times
+
+# Then prometheus operator failed too many times
+if [ $success != "true" ] 
 then
     exit 1
 fi
@@ -159,6 +162,7 @@ EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/
 if [ $EXISTS != "404" ]
 then
     NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
+    
     if [ $NAME == "\"library\"" ]
     then
         # Deletes the default project "library"
@@ -184,10 +188,12 @@ fi
 
 # Adding dashboards to kibana
 echo "Waiting until kibana is ready"
+
 if ! kubectl rollout status -n elastic-system deployment kibana-kb --timeout=5m
 then
     exit 1
 fi
+
 ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 curl -kL -X POST "kibana.${ECK_SC_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
     --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ES_PW}

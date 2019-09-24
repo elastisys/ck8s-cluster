@@ -3,6 +3,7 @@
 set -e
 
 : "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
+: "${ENABLE_PSP:?Missing ENABLE_PSP}"
 
 if [[ "$#" -ne 1 ]]
 then 
