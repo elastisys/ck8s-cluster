@@ -26,13 +26,18 @@ following services:
 
 # Setup
 
-The management of the ECK A1 demo platform is separated into different stages,
+The management of the ECK platform is separated into different stages,
 Exoscale cloud infrastructure (terraform), Kubernetes cluster (rke) and
 Kubernetes resources (helm, kubectl).
 
 When first setting up the demo environment each stage needs to be done in
 sequential order since they are dependent on each other. Once the initial
 installation is done, each stage can be updated independently.
+
+## Cloud providers
+
+Currently we support two cloud providers: Exoscale and Safespring.
+The main difference between them is in setting up the cloud infrastructure. We have one terraform folder for each provider. The rest of the setup is controlled by the environment variable `CLOUD_PROVIDER` which should be set to `exoscale` or `safespring`.
 
 ## Requirements
 
@@ -50,6 +55,8 @@ See [terraform/README.md](terraform/README.md) for more details on the steps bel
 
 Begin with setting up the cloud infrastructure using Terraform.
 
+For exoscale:
+
     export AWS_ACCESS_KEY_ID=<xxx> (not needed if credentials are located in ~/.aws/credentials)
     export AWS_SECRET_ACCESS_KEY=<xxx> (not needed if credentials are located in ~/.aws/credentials)
     export TF_VAR_exoscale_api_key=<xxx>
@@ -58,11 +65,45 @@ Begin with setting up the cloud infrastructure using Terraform.
     export TF_VAR_ssh_pub_key_file_wc=<Path to pub key for workload cluster>
     export TF_VAR_dns_prefix=<xxx>
 
-    cd ./terraform
+    export CLOUD_PROVIDER=exoscale
+
+    cd ./terraform/exoscale
     terraform init
     terraform workspace select <Name>
     terraform apply
     
+For safespring:
+
+    export AWS_ACCESS_KEY_ID=<xxx> (not needed if credentials are located in ~/.aws/credentials)
+    export AWS_SECRET_ACCESS_KEY=<xxx> (not needed if credentials are located in ~/.aws/credentials)
+    export TF_VAR_ssh_pub_key_file_sc=<Path to pub key for service cluster>
+    export TF_VAR_ssh_pub_key_file_wc=<Path to pub key for workload cluster>
+    export TF_VAR_dns_prefix=<xxx>
+
+    export OS_IDENTITY_API_VERSION=3
+    export OS_AUTH_URL=https://keystone.api.cloud.ipnett.se/v3
+    export OS_PROJECT_DOMAIN_NAME=elastisys.se
+    export OS_USER_DOMAIN_NAME=elastisys.se
+    export OS_PROJECT_NAME=infra.elastisys.se
+    export OS_USERNAME=<username>
+    export OS_PASSWORD=<password>
+    export OS_REGION_NAME=se-east-1
+    export OS_PROJECT_ID=9f91e56185fb4f929c36430ac4bcbe6e
+
+    export CLOUD_PROVIDER=safespring
+
+    cd ./terraform/safespring
+    terraform init
+    terraform workspace select <Name>
+    terraform apply
+
+    #Then set up a python environment with ansible:
+    pipenv install
+    pipenv shell
+
+    #Prepare all nodes by installing docker on them:
+    ./scripts/generate-inventory.sh > ansible/hosts.ini
+    ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
 
 Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx` 
 (should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`. 

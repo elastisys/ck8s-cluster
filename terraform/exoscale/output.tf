@@ -19,7 +19,7 @@ output "sc_nfs_ip_address" {
   value = "${module.service_cluster.nfs_ip_address}"
 }
 
-output "sc_dns_name"{
+output "sc_dns_name" {
   value = "${module.service_cluster.dns_record_name}"
 }
 
@@ -45,7 +45,7 @@ output "wc_nfs_ip_address" {
   value = "${module.workload_cluster.nfs_ip_address}"
 }
 
-output "wc_dns_name"{
+output "wc_dns_name" {
   value = "${module.workload_cluster.dns_record_name}"
 }
 

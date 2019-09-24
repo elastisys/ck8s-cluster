@@ -3,10 +3,20 @@
 set -e
 
 : "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
+
+if [ $CLOUD_PROVIDER == "safespring" ]
+then
+: "${OS_USERNAME:?Missing OS_USERNAME}"
+: "${OS_PASSWORD:?Missing OS_PASSWORD}"
+: "${OS_AUTH_URL:?Missing OS_AUTH_URL}"
+: "${OS_PROJECT_ID:?Missing OS_PROJECT_ID}"
+: "${OS_USER_DOMAIN_NAME:?Missing OS_USER_DOMAIN_NAME}"
+fi
 
 if [[ "$#" -ne 1 ]]
 then 
-  echo "Usage: gen-rke-conf-wc.sh <path-to-infra-file>"
+  >&2 echo "Usage: gen-rke-conf-wc.sh <path-to-infra-file>"
   exit 1
 fi
 
@@ -18,6 +28,12 @@ ENABLE_PSP=${ENABLE_PSP:-true}
 master_ip_addresses=($(cat $infra | jq -r '.workload_cluster.master_ip_addresses[]'))
 worker_ip_addresses=($(cat $infra | jq -r '.workload_cluster.worker_ip_addresses[]'))
 
+if [ $CLOUD_PROVIDER == "safespring" ]
+then
+  master_private_ip_addresses=($(cat $infra | jq -r '.workload_cluster.master_private_ip_addresses[]'))
+  worker_private_ip_addresses=($(cat $infra | jq -r '.workload_cluster.worker_private_ip_addresses[]'))
+fi
+
 cat <<EOF
 cluster_name: eck-workload_cluster
 
@@ -26,22 +42,44 @@ ssh_agent_auth: true
 nodes:
 EOF
 
-for i in $(seq 0 $((${#master_ip_addresses[@]} - 1))) 
+for i in $(seq 0 $((${#master_ip_addresses[@]} - 1)))
 do
 cat <<EOF
   - address: ${master_ip_addresses[${i}]}
-    user: rancher
     role: [controlplane,etcd]
 EOF
+if [ $CLOUD_PROVIDER == "exoscale" ]
+then
+cat <<EOF
+    user: rancher
+EOF
+elif [ $CLOUD_PROVIDER == "safespring" ]
+then
+cat <<EOF
+    user: ubuntu
+    internal_address: ${master_private_ip_addresses[${i}]}
+EOF
+fi
 done
 
-for i in $(seq 0 $((${#worker_ip_addresses[@]} - 1))) 
+for i in $(seq 0 $((${#worker_ip_addresses[@]} - 1)))
 do
 cat <<EOF
   - address: ${worker_ip_addresses[${i}]}
-    user: rancher
     role: [worker]
 EOF
+if [ $CLOUD_PROVIDER == "exoscale" ]
+then
+cat <<EOF
+    user: rancher
+EOF
+elif [ $CLOUD_PROVIDER == "safespring" ]
+then
+cat <<EOF
+    user: ubuntu
+    internal_address: ${worker_private_ip_addresses[${i}]}
+EOF
+fi
 done
 
 cat <<EOF
@@ -113,3 +151,18 @@ private_registries:
       user: admin
       password: Harbor12345
 EOF
+
+if [ $CLOUD_PROVIDER == "safespring" ]
+then
+cat <<EOF
+cloud_provider:
+  name: openstack
+  openstackCloudProvider:
+    global:
+      username: ${OS_USERNAME}
+      password: ${OS_PASSWORD}
+      auth-url: ${OS_AUTH_URL}
+      tenant-id: ${OS_PROJECT_ID}
+      domain-name: ${OS_USER_DOMAIN_NAME}
+EOF
+fi

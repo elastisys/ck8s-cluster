@@ -8,7 +8,7 @@ set -e
 # Check that cluster type argument is set and valid.
 if [ "$#" -ne 2 -o "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
 then 
-    echo "Usage: check-nodes.sh <service_cluster | workload_cluster> path-to-infra-file"
+    >&2 echo "Usage: check-nodes.sh <service_cluster | workload_cluster> path-to-infra-file"
     exit 1
 fi
 

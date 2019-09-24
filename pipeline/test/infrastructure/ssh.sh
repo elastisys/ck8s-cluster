@@ -5,7 +5,7 @@ set -e
 # Check that cluster type argument is set and valid.
 if [ "$#" -ne 2 -o "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
 then 
-    echo "Usage: ssh.sh <service_cluster | workload_cluster> path-to-infra-file"
+    >&2 echo "Usage: ssh.sh <service_cluster | workload_cluster> path-to-infra-file"
     exit 1
 fi
 
@@ -18,21 +18,20 @@ function check_hosts () {
     type=$1
     echo "Running checks hosts of type $type"
 
-    if [ "$type" == "worker" ]
+    if [ "$type" == "worker" ] || [ "$type" == "master" ]
     then
         nr_hosts=$(cat $infra | jq -r ".${prefix}.${type}_count" )
         host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[]" ))
-        user="rancher"
+        if [ "$CLOUD_PROVIDER" == "exoscale" ]
+        then user="rancher"
+        elif [ "$CLOUD_PROVIDER" == "safespring" ]
+        then user="ubuntu"
+        fi
     elif [ "$type" == "nfs" ]
     then 
         nr_hosts=1
         host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_address" ))
         user="ubuntu"
-    elif [ "$type" == "master" ]
-    then
-        nr_hosts=$(cat $infra | jq -r ".${prefix}.${type}_count" )
-        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[]" ))
-        user="rancher"
     fi
 
     # Check that the list of host ip addresses is equal to the number of desired workers.

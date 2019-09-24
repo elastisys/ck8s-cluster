@@ -5,6 +5,9 @@ export TF_VAR_ssh_pub_key_file_sc=${SSH_PATH}.pub
 export TF_VAR_ssh_pub_key_file_wc=${SSH_PATH}.pub
 export TF_VAR_exoscale_api_key=$EXOSCALE_API_KEY
 export TF_VAR_exoscale_secret_key=$EXOSCALE_SECRET_KEY
+
+export CLOUD_PROVIDER=exoscale
+
 #export GOOGLE_CLIENT_ID=asd
 #export GOOGLE_CLIENT_SECRET=asd
 export CERT_TYPE=staging

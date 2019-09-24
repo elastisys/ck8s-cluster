@@ -5,8 +5,15 @@
 set -e
 
 : "${TF_TOKEN:?Missing TF_TOKEN}"
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 
+if [ $CLOUD_PROVIDER == "exoscale" ]
+then
 WORKSPACE=a1-demo-`terraform workspace show`
+elif [ $CLOUD_PROVIDER == "safespring" ]
+then
+WORKSPACE=safespring-demo-`terraform workspace show`
+fi
 RUN_REMOTE="false"
 
 if [[ "$1" == "true" ]];then

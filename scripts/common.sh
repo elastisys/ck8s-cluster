@@ -10,6 +10,9 @@
 # Kubeconfig
 : "${KUBECONFIG:?Missing KUBECONFIG}"
 
+# Cloud provider
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
+
 # Export whether to skip tls verify or not.
 if [[ "$CERT_TYPE" == "prod" ]];
 then export TLS_VERIFY="true"

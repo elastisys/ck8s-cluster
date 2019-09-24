@@ -1,0 +1,69 @@
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Install docker
+      apt:
+        name: docker.io
+        update_cache: yes
+
+    - name: Add the user ubuntu to the docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+- hosts: nfs
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Create NFS share directory
+      file: path=/nfs state=directory owner=root group=root mode=0777
+
+    - name: Create filesystem
+      filesystem: dev={{ nfs_device_path }} fstype=ext4
+
+    - name: Configure NFS share mount point
+      mount: name=/nfs src={{ nfs_device_path }} fstype=ext4 state=mounted
+
+    - name: Configure NFS exports
+      copy: content="/nfs    {{ internal_cidr_prefix }}(rw,sync,no_root_squash,no_subtree_check)\n" dest=/etc/exports
+
+    - name: Install NFS server
+      apt:
+        name: nfs-kernel-server
+        update_cache: yes
+
+- hosts: "wc_master*,sc_master*"
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Create Kubernetes conf directory
+      file: path=/etc/kubernetes/conf state=directory owner=root group=root mode=0755
+
+    - name: Add audit policy
+      copy:
+        src: ./audit-policy.yaml
+        dest: /etc/kubernetes/conf/audit-policy.yaml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Add admission control config
+      copy:
+        src: ./admission-control-config.yaml
+        dest: /etc/kubernetes/conf/admission-control-config.yaml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Add PodNodeSelector
+      copy:
+        src: ./podnodeselector.yaml
+        dest: /etc/kubernetes/conf/podnodeselector.yaml
+        owner: root
+        group: root
+        mode: '0644'

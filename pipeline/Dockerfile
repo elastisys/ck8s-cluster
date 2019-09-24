@@ -1,7 +1,7 @@
 FROM ubuntu:18.10
 
 RUN  apt-get update \
-  && apt-get install -y wget unzip ssh gettext-base jq curl
+  && apt-get install -y wget unzip ssh gettext-base jq curl python3.7
 
 #Terraform
 RUN wget https://releases.hashicorp.com/terraform/0.12.6/terraform_0.12.6_linux_amd64.zip
@@ -25,7 +25,7 @@ RUN wget https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/l
     mv ./kubectl /usr/local/bin/kubectl
 
 #Helm
-Run wget https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz && \
+RUN wget https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz && \
     tar -zxvf helm-v2.14.3-linux-amd64.tar.gz && \
     mv linux-amd64/helm /usr/local/bin/helm
 
@@ -39,5 +39,10 @@ RUN wget https://github.com/databus23/helm-diff/releases/download/v2.11.0%2B5/he
 RUN wget https://github.com/roboll/helmfile/releases/download/v0.81.0/helmfile_linux_amd64 && \
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile
+
+#Pipenv
+RUN apt install python3-pip -y
+RUN python3 -m pip install pip
+RUN python3.6 -m pip install pipenv
 
 ENTRYPOINT ["/bin/bash"]

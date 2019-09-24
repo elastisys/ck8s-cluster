@@ -14,15 +14,19 @@ source "${SCRIPTS_PATH}/common.sh"
 
 if [[ "$#" -lt 1 ]]
 then 
-  echo "Usage: deploy-wc.sh path-to-infra-file <--interactive>"
+  >&2 echo "Usage: deploy-wc.sh path-to-infra-file <--interactive>"
   exit 1
 fi
 
 infra="$1"
 
-pushd "${SCRIPTS_PATH}/../" > /dev/null
+if [ $CLOUD_PROVIDER == "exoscale" ]
+then
 export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_ip_address')
-popd > /dev/null
+elif [ $CLOUD_PROVIDER == "safespring" ]
+then
+export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_private_ip_address')
+fi
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.

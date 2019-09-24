@@ -12,3 +12,4 @@ certs
 **/*.state
 **/*.rkestate
 env.sh
+hosts.ini

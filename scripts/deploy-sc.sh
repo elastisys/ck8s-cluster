@@ -8,7 +8,7 @@ source "${SCRIPTS_PATH}/common.sh"
 
 if [[ "$#" -lt 1 ]]
 then 
-  echo "Usage: deploy-sc.sh path-to-infra-file <--interactive>"
+  >&2 echo "Usage: deploy-sc.sh path-to-infra-file <--interactive>"
   exit 1
 fi
 
@@ -30,9 +30,13 @@ fi
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
 
-pushd "${SCRIPTS_PATH}/../" > /dev/null
+if [ $CLOUD_PROVIDER == "exoscale" ]
+then
 export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_ip_address')
-popd > /dev/null
+elif [ $CLOUD_PROVIDER == "safespring" ]
+then
+export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_private_ip_address')
+fi
 
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
