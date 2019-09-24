@@ -3,6 +3,7 @@
 set -e
 
 : "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
+: "${ENABLE_PSP:?Missing ENABLE_PSP}"
 
 if [[ "$#" -ne 1 ]]
 then 
@@ -45,7 +46,20 @@ cat <<EOF
 
 services:
   kube-api:
+EOF
+
+if [[ $ENABLE_PSP == "true" ]]
+then
+cat <<EOF
     pod_security_policy: true
+EOF
+else
+cat <<EOF
+    pod_security_policy: false
+EOF
+fi
+
+cat <<EOF
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_binds:
@@ -63,9 +77,24 @@ services:
       delete-collection-workers: 3
       # Set the level of log output to debug-level
       v: 4
-      # Enables PodTolerationRestriction and PodNodeSelector admission plugin in apiserver
-      enable-admission-plugins: "PodTolerationRestriction,PodNodeSelector,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy,PodSecurityPolicy"
       admission-control-config-file: "/etc/kubernetes/conf/admission-control-config.yaml"
+EOF
+
+if [[ $ENABLE_PSP == "true" ]]
+then
+cat <<EOF 
+      # Enables PodTolerationRestriction, PodNodeSelector, and PSP admission plugin in apiserver
+      enable-admission-plugins: "PodTolerationRestriction,PodNodeSelector,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
+EOF
+else
+cat <<EOF
+      # Enables PodTolerationRestriction and PodNodeSelector admission plugin in apiserver
+      enable-admission-plugins: "PodTolerationRestriction,PodNodeSelector,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
+EOF
+fi
+
+
+cat <<EOF
 
   etcd:
     snapshot: true

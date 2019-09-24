@@ -45,7 +45,20 @@ cat <<EOF
 
 services:
   kube-api:
+EOF
+
+if [[ $ENABLE_PSP == "true" ]]
+then
+cat <<EOF
     pod_security_policy: true
+EOF
+else
+cat <<EOF
+    pod_security_policy: false
+EOF
+fi
+
+cat <<EOF
     # Add additional arguments to the kubernetes API server
     # This WILL OVERRIDE any existing defaults
     extra_binds:
@@ -63,7 +76,20 @@ services:
       delete-collection-workers: 3
       # Set the level of log output to debug-level
       v: 4
+EOF
+
+if [[ $ENABLE_PSP == "true" ]]
+then
+cat <<EOF
       enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
+EOF
+else
+cat <<EOF
+      enable-admission-plugins: "NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
+EOF
+fi
+
+cat <<EOF
 
   etcd:
     snapshot: true
