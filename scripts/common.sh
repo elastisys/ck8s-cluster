@@ -1,8 +1,5 @@
 # Common environment variables needed for deploy-*.sh
 
-# Cluster lockdown
-: "${ENABLE_PSP:?Missing ENABLE_PSP}"
-
 # Domains
 : "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
 : "${ECK_WC_DOMAIN:?Missing ECK_WC_DOMAIN}"

@@ -5,7 +5,6 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
-
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
 : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
 : "${S3_REGION:?Missing S3_REGION}"
@@ -19,6 +18,9 @@ then
 fi
 
 infra="$1"
+
+# If unset -> true
+ENABLE_PSP=${ENABLE_PSP:-true}
 
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"

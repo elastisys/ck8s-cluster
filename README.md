@@ -94,6 +94,8 @@ Terraform created.
     rke up --config eck-sc.yaml
     rke up --config eck-wc.yaml
 
+To create a cluster without PodSecurityPoslicy and OPA set `ENABLE_PSP` and `ENABLE_OPA` to `false`.
+
 ## DNS
 
 The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.compliantkubernetes.com`.

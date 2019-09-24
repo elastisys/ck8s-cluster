@@ -13,6 +13,9 @@ fi
 
 infra="$1"
 
+# If unset -> true
+ENABLE_PSP=${ENABLE_PSP:-true}
+
 master_ip_addresses=($(cat $infra | jq -r '.workload_cluster.master_ip_addresses[]'))
 worker_ip_addresses=($(cat $infra | jq -r '.workload_cluster.worker_ip_addresses[]'))
 

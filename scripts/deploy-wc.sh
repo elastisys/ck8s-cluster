@@ -3,7 +3,10 @@
 set -e
 
 : "${ECK_SC_KUBECONFIG:?Missing ECK_SC_KUBECONFIG}"
-: "${ENABLE_OPA:?Missing ENABLE_OPA}"
+
+# If unset -> true.
+ENABLE_OPA=${ENABLE_OPA:-true}
+ENABLE_PSP=${ENABLE_PSP:-true}
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
