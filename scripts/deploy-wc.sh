@@ -33,10 +33,12 @@ kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
 
 
 # PSP
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-wc.yaml
-
+if [[ $ENABLE_PSP == "true" ]]
+then
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-wc.yaml
+fi
 
 # HELM, TILLER
 mkdir -p ${SCRIPTS_PATH}/../certs/workload_cluster/kube-system/certs

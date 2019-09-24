@@ -44,10 +44,12 @@ kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
 
 
 # PSP
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-sc.yaml
-
+if [[ $ENABLE_PSP == "true" ]]
+then 
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-sc.yaml
+fi
 
 # HELM and TILLER
 mkdir -p ${SCRIPTS_PATH}/../certs/service_cluster/kube-system/certs
@@ -77,10 +79,12 @@ cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | 
 
 
 # HARBOR
-kubectl -n harbor create rolebinding harbor-privileged-psp \
-    --clusterrole=psp:privileged --serviceaccount=harbor:default \
-    --dry-run -o yaml | kubectl apply -f -
-
+if [[ $ENABLE_PSP == "true" ]]
+then
+    kubectl -n harbor create rolebinding harbor-privileged-psp \
+        --clusterrole=psp:privileged --serviceaccount=harbor:default \
+        --dry-run -o yaml | kubectl apply -f -
+fi
 
 # Prometheus - install CRDS.
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/master/example/prometheus-operator-crd/alertmanager.crd.yaml
