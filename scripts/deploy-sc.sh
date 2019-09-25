@@ -5,11 +5,6 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
-: "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
-: "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
-: "${S3_REGION:?Missing S3_REGION}"
-: "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
-: "${S3_BUCKET_NAME:?Missing S3_BUCKET_NAME}"
 
 if [[ "$#" -lt 1 ]]
 then 
@@ -21,6 +16,16 @@ infra="$1"
 
 # If unset -> true
 ENABLE_PSP=${ENABLE_PSP:-true}
+ENABLE_HARBOR=${ENABLE_HARBOR:-true}
+
+if [[ $ENABLE_HARBOR == "true" ]]
+then 
+    : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
+    : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
+    : "${S3_REGION:?Missing S3_REGION}"
+    : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
+    : "${S3_BUCKET_NAME:?Missing S3_BUCKET_NAME}"
+fi
 
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
@@ -38,19 +43,41 @@ INTERACTIVE=${2:-""}
 # NAMESPACES
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace elastic-system --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace dex --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace nfs-provisioner --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace influxdb-prometheus --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
 
+if [[ $ENABLE_HARBOR == "true" ]]
+then 
+    kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
+fi
 
 # PSP
 if [[ $ENABLE_PSP == "true" ]]
 then 
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/psp-access-sc.yaml
+    
+    # Deploy common roles and rolebindings.
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/kube-system-role-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/rke-job-deployer-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nginx-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/tiller-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nfs-client-provisioner-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/cert-manager-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/dashboard-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-ns-psp.yaml
+
+    # Deploy cluster spcific roles and rolebindings.
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/dex-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/elastic-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/influxdb-psp.yaml
+    
+    if [[ $ENABLE_HARBOR == "true" ]]
+    then 
+        kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/
+    fi
+
 fi
 
 # HELM and TILLER
@@ -69,9 +96,12 @@ kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer.yaml
-envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-core-cert.yaml | kubectl apply -f -
-envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-notary-cert.yaml | kubectl apply -f -
 
+if [[ $ENABLE_HARBOR == "true" ]]
+then 
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-core-cert.yaml | kubectl apply -f -
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-notary-cert.yaml | kubectl apply -f -
+fi
 
 # Elasticsearch and kibana.
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
@@ -81,7 +111,7 @@ cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | 
 
 
 # HARBOR
-if [[ $ENABLE_PSP == "true" ]]
+if [[ $ENABLE_PSP == "true" && $ENABLE_HARBOR == "true" ]]
 then
     kubectl -n harbor create rolebinding harbor-privileged-psp \
         --clusterrole=psp:privileged --serviceaccount=harbor:default \
@@ -107,11 +137,11 @@ envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-reade
 # Expose prometheus workload_cluster reader
 kubectl apply -f "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-service.yaml
 
-echo -e "\nContinuing with Helmfile\n"
 
+echo -e "\nContinuing with Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
-# Install cert-manager and nfs-client-provisioner first.
+# Install cert-manager and nfs-client-provisioner.
 helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 
 # Get status of the cert-manager webhook api.
@@ -128,8 +158,14 @@ fi
 # Install dex.
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
 
-# Install the rest of the charts.
-helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator $INTERACTIVE apply
+if [[ $ENABLE_HARBOR == "true" ]]
+then 
+    # Install the rest of the charts, excluding prometheus-operator.
+    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator $INTERACTIVE apply
+else
+    # Install the rest of the charts, excluding prometheus-operator.
+    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=harbor $INTERACTIVE apply
+fi
 
 # Install prometheus-operator. Retry three times.
 tries=3 
@@ -153,40 +189,42 @@ then
     exit 1
 fi
 
-# Check harbor rollout status.
-# Should not be needed due to 'wait' when installing/upgrading harbor!
-# Just keeping it for now but should be removed.
-kubectl -n harbor rollout status deployment harbor-harbor-clair
-
-# Set up initial state for harbor.
-EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.code')
-
-if [ $EXISTS != "404" ]
+if [[ $ENABLE_HARBOR == "true" ]]
 then
-    NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
-    
-    if [ $NAME == "\"library\"" ]
-    then
-        # Deletes the default project "library"
-        echo Removing project library from harbor
-        # Curl will retrun status 500 even though it successfully removed the project.
-        curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
+    # Check harbor rollout status.
+    # Should not be needed due to 'wait' when installing/upgrading harbor!
+    # Just keeping it for now but should be removed.
+    kubectl -n harbor rollout status deployment harbor-harbor-clair
 
-        # Creates new private project "default"
-        echo Creating new private project default
-        curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
-            "project_name": "default",
-            "metadata": {
-                "public": "0",
-                "enable_content_trust": "false",
-                "prevent_vul": "false",
-                "severity": "low",
-                "auto_scan": "true"
-            }
-        }'
+    # Set up initial state for harbor.
+    EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.code')
+
+    if [ $EXISTS != "404" ]
+    then
+        NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
+        
+        if [ $NAME == "\"library\"" ]
+        then
+            # Deletes the default project "library"
+            echo Removing project library from harbor
+            # Curl will retrun status 500 even though it successfully removed the project.
+            curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
+
+            # Creates new private project "default"
+            echo Creating new private project default
+            curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
+                "project_name": "default",
+                "metadata": {
+                    "public": "0",
+                    "enable_content_trust": "false",
+                    "prevent_vul": "false",
+                    "severity": "low",
+                    "auto_scan": "true"
+                }
+            }'
+        fi
     fi
 fi
-
 
 # Adding dashboards to kibana
 echo "Waiting until kibana is ready"
