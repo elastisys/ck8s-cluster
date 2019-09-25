@@ -44,7 +44,7 @@ variable "public_ingress_cidr_whitelist" {
 variable "dns_name" {}
 
 variable "aws_dns_zone_id" {
-  default = "Z2A7G3OHZDNUQ1" #compliantkubernetes.com
+  default = "Z2STJRQSJO5PZ0" # elastisys.com
 }
 
 variable "role_arn" {
