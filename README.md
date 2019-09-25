@@ -98,7 +98,7 @@ To create a cluster without PodSecurityPoslicy, OPA, and Harbor set the environm
 
 ## DNS
 
-The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.compliantkubernetes.com`.
+The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.elastisys.se`.
 The domain can be changed by setting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
 
@@ -107,11 +107,11 @@ in aws route53.
 1. Go to GCP and create a project. 
 Select `APIs &Services` in the menu.
 
-2. Select `Oauth consent screen` and name the application with the same name as the project of your google cloud project add the top level domain e.g. `compliantkubernetes.com` to Authorized domains. 
+2. Select `Oauth consent screen` and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains. 
 
 3. Go to `Credentials` and press `Create credentials` and select `OAuth client ID`. 
-Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.compliantkubernetes.com`.
-Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.compliantkubernetes.com/callback`
+Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.elastisys.se`.
+Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`
 
 ## Kubernetes resources
 
