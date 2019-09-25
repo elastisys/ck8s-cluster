@@ -94,7 +94,7 @@ Terraform created.
     rke up --config eck-sc.yaml
     rke up --config eck-wc.yaml
 
-To create a cluster without PodSecurityPoslicy and OPA set `ENABLE_PSP` and `ENABLE_OPA` to `false`.
+To create a cluster without PodSecurityPoslicy, OPA, and Harbor set the environments variables `ENABLE_PSP`, `ENABLE_OPA`, `ENABLE_HARBOR` to `false`.
 
 ## DNS
 
