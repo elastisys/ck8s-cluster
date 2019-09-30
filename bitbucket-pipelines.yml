@@ -72,7 +72,7 @@ pipelines:
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
               after-script:
-                - ./pipeline/after-script.sh
+                - ./pipeline/after-script.sh pipeline/init-exoscale.sh
           - step:
               name: Workload cluster deploy
               script:
