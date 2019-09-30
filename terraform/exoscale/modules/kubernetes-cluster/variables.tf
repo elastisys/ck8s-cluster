@@ -36,7 +36,7 @@ variable "ssh_pub_key_file" {}
 
 variable "public_ingress_cidr_whitelist" {
   type    = list(string)
-  default = ["212.32.186.85/32", "193.187.219.4/32"] # Elastisys office, A1 office
+  default = ["194.132.164.168/32", "193.187.219.4/32"] # Elastisys office, A1 office
 }
 
 ## DNS
