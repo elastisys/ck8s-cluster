@@ -1,0 +1,7 @@
+storageClass:
+  defaultClass: true
+serviceAccount:
+  name: nfs-client-provisioner
+nfs:
+  path: "/nfs"
+  server: {{ requiredEnv "NFS_VAULT_SERVER_IP" }}

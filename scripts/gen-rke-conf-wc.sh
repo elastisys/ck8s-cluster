@@ -25,6 +25,9 @@ infra="$1"
 # If unset -> true
 ENABLE_PSP=${ENABLE_PSP:-true}
 
+# Use default harbor password if not set.
+HARBOR_PWD=${HARBOR_PWD:-"Harbor12345"}
+
 master_ip_addresses=($(cat $infra | jq -r '.workload_cluster.master_ip_addresses[]'))
 worker_ip_addresses=($(cat $infra | jq -r '.workload_cluster.worker_ip_addresses[]'))
 
@@ -149,7 +152,7 @@ ingress:
 private_registries:
     - url: harbor.${ECK_SC_DOMAIN}
       user: admin
-      password: Harbor12345
+      password: ${HARBOR_PWD}
 EOF
 
 if [ $CLOUD_PROVIDER == "safespring" ]

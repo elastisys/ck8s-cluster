@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: vault
+  namespace: vault
+  annotations:
+    #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  tls:
+  - hosts:
+    - "vault.${ECK_VAULT_DOMAIN}"
+    secretName: vault
+  rules:
+  - host: "vault.${ECK_VAULT_DOMAIN}"
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: vault
+            servicePort: 8200

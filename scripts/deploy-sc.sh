@@ -18,6 +18,9 @@ infra="$1"
 ENABLE_PSP=${ENABLE_PSP:-true}
 ENABLE_HARBOR=${ENABLE_HARBOR:-true}
 
+# Use default pass for influxdb if unset.
+INFLUXDB_PWD=${INFLUXDB_PWD:-"demo-pass"}
+
 if [[ $ENABLE_HARBOR == "true" ]]
 then 
     : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"

@@ -8,7 +8,7 @@ kube-state-metrics:
 
 grafana:
   # admin username is "admin"
-  adminPassword: prom-operator
+  adminPassword: {{ env "GRAFANA_PWD" | default "prom-operator" }}
 
   ingress:
     enabled: true
@@ -95,6 +95,6 @@ prometheusOperator:
 prometheus:
   prometheusSpec:
     remoteRead: 
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p=demo-pass
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
     remoteWrite: 
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p=demo-pass  
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}  

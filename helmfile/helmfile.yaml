@@ -129,6 +129,7 @@ releases:
   wait: true
   values:
   - values/harbor.yaml.gotmpl
+  - harborAdminPassword: {{ env "HARBOR_PWD" | default "Harbor12345" }}
 
 # InfluxDB
 - name: influxdb
