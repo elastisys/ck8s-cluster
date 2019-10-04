@@ -215,11 +215,11 @@ then
             # Deletes the default project "library"
             echo Removing project library from harbor
             # Curl will retrun status 500 even though it successfully removed the project.
-            curl -s -k -X DELETE -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
+            curl -s -k -X DELETE -u admin:${HARBOR_PWD} https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
 
             # Creates new private project "default"
             echo Creating new private project default
-            curl -s -k -X POST -u admin:Harbor12345 --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
+            curl -s -k -X POST -u admin:${HARBOR_PWD} --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
                 "project_name": "default",
                 "metadata": {
                     "public": "0",

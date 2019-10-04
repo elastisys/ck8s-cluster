@@ -10,7 +10,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 if [[ "$#" -lt 1 ]]
 then 
-  >&2 echo "Usage: deploy-vault.sh path-to-infra-file"
+  >&2 echo "Usage: deploy-svc.sh path-to-infra-file"
   exit 1
 fi
 

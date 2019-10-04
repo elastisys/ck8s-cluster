@@ -36,6 +36,8 @@ persistence:
 
 externalURL: https://harbor.{{ requiredEnv "ECK_SC_DOMAIN" }}
 
+harborAdminPassword: {{ env "HARBOR_PWD" | default "Harbor12345" }}
+
 core:
   secret: abcdefghijklmnop #TODO: Should be randomized
   secretName: harbor-core-cert

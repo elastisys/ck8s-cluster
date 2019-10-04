@@ -32,12 +32,8 @@ echo "Keys and token: $keys_token"
 # Change this later. Store keys and master token temporarily.
 echo $keys_token > keys-token
 
-root_token=$(echo $keys_token | jq '.root_token')
+root_token=$(echo $keys_token | jq -r '.root_token')
 
-# Get rid of starting end ending double quotes.
-temp="${root_token%\"}"
-temp="${temp#\"}"
-
-export VAULT_TOKEN="$temp"
+export VAULT_TOKEN="$root_token"
 
 ${SCRIPTS_PATH}/config-vault.sh

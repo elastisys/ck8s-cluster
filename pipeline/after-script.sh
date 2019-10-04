@@ -14,6 +14,15 @@ fi
 # Run init script
 source $1
 
+# Export vault variables
+source pipeline/vault-variables.sh
+
+# Export vault token
+export VAULT_TOKEN=$(cat vault-token.txt)
+
+# Revoke vault token, remove password secrets for services
+./pipeline/vault-cleanup.sh grafana harbor influxdb
+
 export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
 if [ "$CLOUD_PROVIDER" == "exoscale" ]
 then 

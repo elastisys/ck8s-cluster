@@ -24,6 +24,7 @@ following services:
 * Fluentd
 * Prometheus
 
+
 # Setup
 
 The management of the ECK platform is separated into different stages,
@@ -34,10 +35,12 @@ When first setting up the demo environment each stage needs to be done in
 sequential order since they are dependent on each other. Once the initial
 installation is done, each stage can be updated independently.
 
+
 ## Cloud providers
 
 Currently we support two cloud providers: Exoscale and Safespring.
 The main difference between them is in setting up the cloud infrastructure. We have one terraform folder for each provider. The rest of the setup is controlled by the environment variable `CLOUD_PROVIDER` which should be set to `exoscale` or `safespring`.
+
 
 ## Requirements
 
@@ -48,6 +51,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [helm](https://github.com/helm/helm/releases) (tested with 2.14.3)
 - [helmfile](https://github.com/roboll/helmfile) (tested with v0.81.3)
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
+
 
 ## Cloud infrastructure
 
@@ -119,6 +123,50 @@ The commands listed above will set up the cloud infrastructure using a "default"
     export TF_VAR_sc_nfs_size=<x | default "Medium">
     export TF_VAR_wc_nfs_size=<x | default "Medium">
 
+
+## Service passwords - optional
+Once the cloud infrastructure is running it is time to generate and store passwords in vault for some of the services.
+
+Begin by getting a hold of a vault token. (Most likley via the elastisys secrets repo)
+Set the environment variables
+
+    export CUSTOMER_ID=<the customer identifier>
+    export VAULT_ADDR=<the url to vault | https://vault.eck.elastisys.se>
+    export VAULT_TOKEN=<...>
+    export PWD_LENGTH=<desired length for the passwords>
+
+The secrets for a given customer will be stored at the path `eck/v1/${CUSTOMER_ID}/1/*`.
+The `1` can be used to reference secrets in different eck clusters if a customer happens to have more than just one.
+If a customer has more than one eck cluster than the `1` can be changed accordingly to reference the correct cluster.
+Due to the secrets engine (kv version 2), the path when storing secrets through the API needs to have `data` in the path. 
+The passwords for the services will be located at `eck/v1/${CUSTOMER_ID}/1/{service_name}` with the key `password`.
+
+Set the following environment variable
+
+    export BASE_PATH=<"eck/data/v1/${CUSTOMER_ID}/1">
+
+To generate and store the passwords for the services - `grafana`, `harbor`, and `influxdb` - execute the following command
+    
+    ./scripts/store-pwds.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$PWD_LENGTH" "$BASE_PATH" "grafana" "influxdb" "harbor"
+
+If you do not want to generate passwords for a certain service then simply remove it from command above.
+
+Now the passwords have been generated and stored in vault!
+
+**Note**: As of yet it is not possible to change the default vaule of the **elastic** user that the elastisearch operator creates. See https://github.com/elastic/cloud-on-k8s/issues/967
+
+To use the generated password for the services run the following commands to fetch the passwords and export them as environment variables
+
+    # Get grafana password
+    export GRAFANA_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/grafana" | jq -r '.data.data.password')
+
+    # Get harbor password
+    export HARBOR_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/harbor" | jq -r '.data.data.password')
+
+    # Get influxdb password
+    export INFLUXDB_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/influxdb" | jq -r '.data.data.password')
+
+
 ## Kubernetes clusters
 
 Next, install the Kubernetes clusters on the cloud infrastructure that
@@ -137,11 +185,13 @@ Terraform created.
 
 To create a cluster without PodSecurityPoslicy, OPA, and Harbor set the environments variables `ENABLE_PSP`, `ENABLE_OPA`, `ENABLE_HARBOR` to `false`.
 
+
 ## DNS
 
 The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.elastisys.se`.
 The domain can be changed by setting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
+
 
 ## Setting up Google as identity provider for dex.
 
@@ -153,6 +203,7 @@ Select `APIs &Services` in the menu.
 3. Go to `Credentials` and press `Create credentials` and select `OAuth client ID`. 
 Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.elastisys.se`.
 Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`
+
 
 ## Kubernetes resources
 
@@ -196,6 +247,34 @@ You can activate them by setting environment variables with client ID and secret
 
 For using OpenID Connect with kubectl, see
 [kubelogin/README.md](kubelogin/README.md).
+
+
+## Vault
+
+Vault can be used to "store" cluster specific resources such as the kube configurations and rke states.
+Since vault is a key vault store files will need to be stringified through the use of for example `base64`.
+
+For example, to store the rke state for the system cluster you can execute the following
+
+    # Path to where your secret will be stored.
+    export SECRET_PATH="eck/data/v1/first_customer/1/workload_cluster/rkestate"
+
+    RKESTATE=$(cat eck-sc.rkestate | base64 --wrap=0)
+
+    tee payload.json <<EOF
+    {
+        "data": {
+            "statefile": "$RKESTATE"
+        }
+    }
+    EOF
+
+    cat payload.json | ./scripts/vault-post.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$SECRET_PATH" | jq
+
+To retrieve the stored file 
+
+    ./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$SECRET_PATH" | jq '.data.data.statefile' | base64 --decode
+
 
 ## Issues and limitations
 

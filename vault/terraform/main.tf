@@ -28,7 +28,7 @@ module "vault_cluster" {
   nfs_size                    = "${var.vault_nfs_size}"
 
   network_name                = "${terraform.workspace}-vault-network"
-  dns_name                    = "${var.dns_prefix}-vault"
+  dns_name                    = "${var.dns_prefix}"
 
   master_security_group_name  = "${terraform.workspace}-vault-master-sg"
   nfs_security_group_name     = "${terraform.workspace}-vault-nfs-sg"
