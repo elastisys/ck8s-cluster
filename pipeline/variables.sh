@@ -12,4 +12,5 @@ export S3_ACCESS_KEY=$EXOSCALE_API_KEY
 export S3_SECRET_KEY=$EXOSCALE_SECRET_KEY
 export S3_REGION=de-fra-1
 export S3_REGION_ENDPOINT=https://sos-de-fra-1.exo.io
-export S3_BUCKET_NAME=harbor-bucket
+export S3_HARBOR_BUCKET_NAME=harbor-bucket
+export S3_VELERO_BUCKET_NAME=velero-bucket

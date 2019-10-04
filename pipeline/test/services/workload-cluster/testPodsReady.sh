@@ -15,6 +15,7 @@ DEPLOYMENTS=(
     "opa opa"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
+    "velero velero"
 )
 
 echo -e "\nTesting deployments"
@@ -30,6 +31,7 @@ DAEMONSETS=(
     "kube-system canal"
     "ingress-nginx nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
+    "velero restic"
 )
 
 echo -e "\nTesting daemonsets"

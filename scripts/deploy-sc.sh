@@ -27,7 +27,7 @@ then
     : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
     : "${S3_REGION:?Missing S3_REGION}"
     : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
-    : "${S3_BUCKET_NAME:?Missing S3_BUCKET_NAME}"
+    : "${S3_HARBOR_BUCKET_NAME:?Missing S3_HARBOR_BUCKET_NAME}"
 fi
 
 # Domains that should be allowed to log in using OAuth

@@ -178,4 +178,16 @@ releases:
   missingFileHandler: error
   values:
   - values/opa.yaml.gotmpl
+
+# Velero
+- name: velero
+  namespace: velero
+  labels:
+    app: velero
+  chart: stable/velero
+  version: 2.1.7
+  missingFileHandler: error
+  values:
+  - values/velero.yaml.gotmpl
+
 {{ end }}
