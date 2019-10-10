@@ -14,19 +14,29 @@ fi
 
 infra="$1"
 
+# General aws S3 cli variables.
+: "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
+: "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
+: "${S3_REGION:?Missing S3_REGION}"
+: "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
+
+# Inlfux backup variables.
+: "${INFLUX_ADDR:?Missing INFLUX_ADDR}"
+: "${S3_INFLUX_BUCKET_URL:?Missing S3_INFLUX_BUCKET_URL}"
+: "${INFLUX_BACKUP_SCHEDULE:?Missing INFLUX_BACKUP_SCHEDULE}"
+
+
 # If unset -> true
 ENABLE_PSP=${ENABLE_PSP:-true}
 ENABLE_HARBOR=${ENABLE_HARBOR:-true}
 
-# Use default pass for influxdb if unset.
+# Use default pass if unset.
 INFLUXDB_PWD=${INFLUXDB_PWD:-"demo-pass"}
+HARBOR_PWD=${HARBOR_PWD:-"Harbor12345"}
+GRAFANA_PWD=${GRAFANA_PWD:-"prom-operator"}
 
 if [[ $ENABLE_HARBOR == "true" ]]
-then 
-    : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
-    : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
-    : "${S3_REGION:?Missing S3_REGION}"
-    : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
+then
     : "${S3_HARBOR_BUCKET_NAME:?Missing S3_HARBOR_BUCKET_NAME}"
 fi
 
@@ -244,3 +254,6 @@ fi
 ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 curl -kL -X POST "kibana.${ECK_SC_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
     --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ES_PW}
+
+# Install InfluxDB backup cron-job
+envsubst < ${SCRIPTS_PATH}/../manifests/backup/backup-influx-cronjob.yaml | kubectl -n influxdb-prometheus apply -f -

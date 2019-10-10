@@ -1,0 +1,12 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: vault-cert
+  namespace: vault
+spec:
+  secretName: vault
+  commonName: "vault.${ECK_VAULT_DOMAIN}"
+  isCA: false
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
