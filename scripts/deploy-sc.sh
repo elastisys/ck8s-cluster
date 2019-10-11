@@ -46,6 +46,7 @@ GRAFANA_PWD=${GRAFANA_PWD:-"prom-operator"}
 if [[ $ENABLE_HARBOR == "true" ]]
 then
     : "${S3_HARBOR_BUCKET_NAME:?Missing S3_HARBOR_BUCKET_NAME}"
+    : "${S3_ES_BACKUP_BUCKET_NAME:?Missing S3_ES_BACKUP_BUCKET_NAME}"
 fi
 
 # Domains that should be allowed to log in using OAuth
@@ -130,7 +131,11 @@ fi
 
 # Elasticsearch and kibana.
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch.yaml
+kubectl create secret generic s3-credentials -n elastic-system \
+    --from-literal=s3.client.default.access_key=${S3_ACCESS_KEY} \
+    --from-literal=s3.client.default.secret_key=${S3_SECRET_KEY} \
+    --dry-run -o yaml | kubectl apply -f -
+cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch.yaml | envsubst | kubectl apply -f -
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | kubectl apply -f -
 
@@ -251,6 +256,21 @@ then
     fi
 fi
 
+# Adding backup job and repository to elasticsearch
+while [[ $(kubectl get elasticsearches.elasticsearch.k8s.elastic.co -n elastic-system elasticsearch -o 'jsonpath={.status.health}') != "green" ]]
+do
+    echo "Waiting until elasticsearch is ready"
+    sleep 2
+done
+
+ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_snapshot/s3_backup_repository?pretty" \
+    -H 'Content-Type: application/json' \
+    -d' {"type": "s3", "settings":{ "bucket": "'"${S3_ES_BACKUP_BUCKET_NAME}"'", "client": "default"}}' \
+    -k -u elastic:${ES_PW}
+
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
+
 # Adding dashboards to kibana
 echo "Waiting until kibana is ready"
 
@@ -259,7 +279,6 @@ then
     exit 1
 fi
 
-ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 curl -kL -X POST "kibana.${ECK_SC_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
     --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ES_PW}
 

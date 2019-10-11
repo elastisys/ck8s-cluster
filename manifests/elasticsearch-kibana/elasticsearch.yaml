@@ -11,8 +11,18 @@ spec:
       node.master: true
       node.data: true
       node.ingest: true
+      plugin.mandatory: repository-s3
+      s3.client.default.endpoint: ${S3_REGION_ENDPOINT}
+      s3.client.default.protocol: https
     podTemplate:
       spec:
+        initContainers:
+        - name: install-s3-plugin
+          command:
+          - sh
+          - -c
+          - |
+            bin/elasticsearch-plugin install --batch repository-s3
         containers:
         - name: elasticsearch 
           resources:
@@ -28,3 +38,5 @@ spec:
           requests:
             storage: 10Gi
         storageClassName: nfs-client
+  secureSettings:
+    secretName: s3-credentials
