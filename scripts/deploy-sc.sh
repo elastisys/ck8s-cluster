@@ -30,6 +30,14 @@ infra="$1"
 ENABLE_PSP=${ENABLE_PSP:-true}
 ENABLE_HARBOR=${ENABLE_HARBOR:-true}
 
+# If unset -> false
+ECK_RESTORE_CLUSTER=${ECK_RESTORE_CLUSTER:-false}
+
+if [[ $ECK_RESTORE_CLUSTER != "false" ]]
+then 
+    : "${INFLUX_BACKUP_NAME:?Missing INFLUX_BACKUP_NAME}"
+fi
+
 # Use default pass if unset.
 INFLUXDB_PWD=${INFLUXDB_PWD:-"demo-pass"}
 HARBOR_PWD=${HARBOR_PWD:-"Harbor12345"}
@@ -255,5 +263,13 @@ ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=js
 curl -kL -X POST "kibana.${ECK_SC_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
     --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ES_PW}
 
-# Install InfluxDB backup cron-job
+# Restore InfluxDB from backup
+if [[ $ECK_RESTORE_CLUSTER != "false" ]]
+then
+    echo "Restoring InfluxDB"
+    envsubst < ${SCRIPTS_PATH}/../manifests/restore/restore-influx.yaml | kubectl -n influxdb-prometheus apply -f -
+fi
+
+## Maybe this can become problematic if cluster is being restored?
+# Install InfluxDB backup cron-job.
 envsubst < ${SCRIPTS_PATH}/../manifests/backup/backup-influx-cronjob.yaml | kubectl -n influxdb-prometheus apply -f -

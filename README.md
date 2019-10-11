@@ -125,6 +125,7 @@ The commands listed above will set up the cloud infrastructure using a "default"
 
 
 ## Service passwords - optional
+
 Once the cloud infrastructure is running it is time to generate and store passwords in vault for some of the services.
 
 Begin by getting a hold of a vault token. (Most likley via the elastisys secrets repo)
@@ -135,11 +136,14 @@ Set the environment variables
     export VAULT_TOKEN=<...>
     export PWD_LENGTH=<desired length for the passwords>
 
-The secrets for a given customer will be stored at the path `eck/v1/${CUSTOMER_ID}/1/*`.
+The secrets for a given customer should be stored at the path `eck/v1/${CUSTOMER_ID}/1/*`. 
+To use the a more correct terminology the _path_ really is `v1/${CUSTOMER_ID}/1/*`, while `eck/` is the location of the secrets engine used - [KV v2](https://www.vaultproject.io/api/secret/kv/kv-v2.html). 
+
 The `1` can be used to reference secrets in different eck clusters if a customer happens to have more than just one.
 If a customer has more than one eck cluster than the `1` can be changed accordingly to reference the correct cluster.
-Due to the secrets engine (kv version 2), the path when storing secrets through the API needs to have `data` in the path. 
+The API endpoint for KV v2 is `eck/data/<path>`. Therefore to write secrets to `eck/v1/${CUSTOMER_ID}/1/*`, the API endpoint becomes `eck/data/v1/${CUSTOMER_ID}/1/*`. 
 The passwords for the services will be located at `eck/v1/${CUSTOMER_ID}/1/{service_name}` with the key `password`.
+The environment variable `BASE_PATH` is used to reference the API endpoint excluding the name of the service to store password for.
 
 Set the following environment variable
 
@@ -153,7 +157,6 @@ If you do not want to generate passwords for a certain service then simply remov
 
 Now the passwords have been generated and stored in vault!
 
-**Note**: As of yet it is not possible to change the default vaule of the **elastic** user that the elastisearch operator creates. See https://github.com/elastic/cloud-on-k8s/issues/967
 
 To use the generated password for the services run the following commands to fetch the passwords and export them as environment variables
 
@@ -165,6 +168,8 @@ To use the generated password for the services run the following commands to fet
 
     # Get influxdb password
     export INFLUXDB_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/influxdb" | jq -r '.data.data.password')
+
+**Note**: As of yet it is not possible to change the default vaule of the **elastic** user that the elastisearch operator creates. See https://github.com/elastic/cloud-on-k8s/issues/967
 
 
 ## Kubernetes clusters
@@ -257,12 +262,12 @@ For using OpenID Connect with kubectl, see
 
 ## Vault
 
-Vault can be used to "store" cluster specific resources such as the kube configurations and rke states.
-Since vault is a key vault store files will need to be stringified through the use of for example `base64`.
+Vault can be used to "store" cluster specific resources such as kube configurations and rke states.
+Since vault is a key-value store, files will need to be stringified through the use of for example `base64`.
 
 For example, to store the rke state for the system cluster you can execute the following
 
-    # Path to where your secret will be stored.
+    # API endpoint to where your secret will be stored.
     export SECRET_PATH="eck/data/v1/first_customer/1/workload_cluster/rkestate"
 
     RKESTATE=$(cat eck-sc.rkestate | base64 --wrap=0)
@@ -276,6 +281,8 @@ For example, to store the rke state for the system cluster you can execute the f
     EOF
 
     cat payload.json | ./scripts/vault-post.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$SECRET_PATH" | jq
+
+    rm payload.json
 
 To retrieve the stored file 
 

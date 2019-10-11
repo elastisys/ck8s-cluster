@@ -37,7 +37,7 @@ spec:
     - '-c'
     - |
       printenv
-      aws s3 --endpoint-url $S3_REGION_ENDPOINT sync /backups $INFLUX_S3_BUCKET_URL --acl "private"
+      aws s3 --endpoint-url $S3_REGION_ENDPOINT sync /backups $S3_INFLUX_BUCKET_URL --acl "private"
     env:
     # Aws s3 cli variables.
     - name: AWS_DEFAULT_REGION

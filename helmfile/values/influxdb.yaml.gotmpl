@@ -20,9 +20,11 @@ config:
   http:
     auth_enabled: true
 
+{{ if or (not (env "ECK_RESTORE_CLUSTER")) (not (eq (env "ECK_RESTORE_CLUSTER") "true")) }}
 initScripts:
   enabled: true
   scripts:
     init.iql: |+
       CREATE DATABASE "service_cluster";
       CREATE DATABASE "workload_cluster"
+{{ end }}
