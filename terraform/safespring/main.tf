@@ -53,12 +53,12 @@ module "service_cluster" {
   prefix = "${terraform.workspace}-service-cluster"
 
   master_count = var.sc_master_count
-  worker_count = var.sc_master_count
+  worker_count = var.sc_worker_count
 
   image_id = "${data.openstack_images_image_v2.ubuntu.id}"
   key_pair = "${openstack_compute_keypair_v2.sshkey_sc.id}"
 
-  dns_name = "${var.dns_prefix}-safespring-sc"
+  dns_name = "${var.dns_prefix}-sc"
 
   master_flavor_id = "${data.openstack_compute_flavor_v2.b_medium.id}"
   worker_flavor_id = "${data.openstack_compute_flavor_v2.b_large.id}"
@@ -71,12 +71,12 @@ module "workload_cluster" {
   prefix = "${terraform.workspace}-workload-cluster"
 
   master_count = var.wc_master_count
-  worker_count = var.wc_master_count
+  worker_count = var.wc_worker_count
 
   image_id = "${data.openstack_images_image_v2.ubuntu.id}"
   key_pair = "${openstack_compute_keypair_v2.sshkey_wc.id}"
 
-  dns_name = "${var.dns_prefix}-safespring-wc"
+  dns_name = "${var.dns_prefix}-wc"
 
   master_flavor_id = "${data.openstack_compute_flavor_v2.b_medium.id}"
   worker_flavor_id = "${data.openstack_compute_flavor_v2.b_large.id}"
