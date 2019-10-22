@@ -5,7 +5,7 @@ set -e
 : "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
 : "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 
-if [ $CLOUD_PROVIDER == "safespring" ]
+if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
 then
 : "${OS_USERNAME:?Missing OS_USERNAME}"
 : "${OS_PASSWORD:?Missing OS_PASSWORD}"
@@ -28,7 +28,7 @@ ENABLE_PSP=${ENABLE_PSP:-true}
 master_ip_addresses=($(cat $infra | jq -r '.service_cluster.master_ip_addresses[]'))
 worker_ip_addresses=($(cat $infra | jq -r '.service_cluster.worker_ip_addresses[]'))
 
-if [ $CLOUD_PROVIDER == "safespring" ]
+if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
 then
   master_private_ip_addresses=($(cat $infra | jq -r '.service_cluster.master_private_ip_addresses[]'))
   worker_private_ip_addresses=($(cat $infra | jq -r '.service_cluster.worker_private_ip_addresses[]'))
@@ -53,7 +53,7 @@ then
 cat <<EOF
     user: rancher
 EOF
-elif [ $CLOUD_PROVIDER == "safespring" ]
+elif [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
 then
 cat <<EOF
     user: ubuntu
@@ -73,7 +73,7 @@ then
 cat <<EOF
     user: rancher
 EOF
-elif [ $CLOUD_PROVIDER == "safespring" ]
+elif [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
 then
 cat <<EOF
     user: ubuntu
@@ -143,7 +143,7 @@ ingress:
     enable-ssl-passthrough: ""
 EOF
 
-if [ $CLOUD_PROVIDER == "safespring" ]
+if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
 then
 cat <<EOF
 cloud_provider:

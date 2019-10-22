@@ -38,6 +38,13 @@ then
     : "${INFLUX_BACKUP_NAME:?Missing INFLUX_BACKUP_NAME}"
 fi
 
+if [ $CLOUD_PROVIDER == "citycloud" ]
+then
+    export STORAGE_CLASS=cinder-storage
+else 
+    export STORAGE_CLASS=nfs-client
+fi
+
 # Use default pass if unset.
 INFLUXDB_PWD=${INFLUXDB_PWD:-"demo-pass"}
 HARBOR_PWD=${HARBOR_PWD:-"Harbor12345"}
@@ -168,11 +175,29 @@ envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-reade
 kubectl apply -f "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-service.yaml
 
 
+if [ $CLOUD_PROVIDER == "citycloud" ]
+then
+    storage=$(kubectl get storageclasses.storage.k8s.io cinder-storage)
+    if [ $storage != "cinder-storage" ]
+    then
+        # Install cinder StorageClass.
+        kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
+    fi
+fi
+
+
 echo -e "\nContinuing with Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
-# Install cert-manager and nfs-client-provisioner.
-helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+
+if [ $CLOUD_PROVIDER == "citycloud" ]
+then
+    # Install cert-manager.
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply
+else
+    # Install cert-manager and nfs-client-provisioner.
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+fi
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')

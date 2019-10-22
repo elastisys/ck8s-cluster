@@ -117,13 +117,31 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/servicemonitor.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
 
-# Helmfile
-echo -e "\nContinuing to Helmfile\n"
 
+if [ $CLOUD_PROVIDER == "citycloud" ]
+then
+    storage=$(kubectl get storageclasses.storage.k8s.io cinder-storage)
+    if [ $storage != "cinder-storage" ]
+    then
+        # Install cinder StorageClass.
+        kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
+    fi
+fi
+
+
+echo -e "\nContinuing with Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
-# Install cert-manager and nfs-client-provisioner first.
-helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+
+if [ $CLOUD_PROVIDER == "citycloud" ]
+then
+    # Install cert-manager.
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply
+else
+    # Install cert-manager and nfs-client-provisioner.
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+fi
+
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')

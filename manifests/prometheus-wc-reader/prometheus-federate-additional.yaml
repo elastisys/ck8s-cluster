@@ -1,5 +1,5 @@
 - job_name: 'federate'
-  scrape_interval: 15s
+  scrape_interval: 30s
 
   honor_labels: true
   metrics_path: '/federate'

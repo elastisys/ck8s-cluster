@@ -10,6 +10,14 @@ spec:
     key: prometheus-federate-additional.yaml
     name: prometheus-wc-scrape-configs
 
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 0.3
+    limits:
+      memory: 2Gi
+      cpu: 1
+
   enableAdminAPI: false
   logFormat: logfmt
   logLevel: info

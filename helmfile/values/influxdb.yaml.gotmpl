@@ -3,7 +3,6 @@ image:
 
 persistence:
   useExisting: false
-  storageClass: "nfs-client"
 
 setDefaultUser:
   user:
@@ -19,6 +18,14 @@ env:
 config:
   http:
     auth_enabled: true
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 0.3
+  limits:
+    memory: 4Gi
+    cpu: 1.5
 
 {{ if or (not (env "ECK_RESTORE_CLUSTER")) (not (eq (env "ECK_RESTORE_CLUSTER") "true")) }}
 initScripts:

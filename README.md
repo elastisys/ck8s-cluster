@@ -106,7 +106,31 @@ For safespring:
     pipenv shell
 
     #Prepare all nodes by installing docker on them:
-    ./scripts/generate-inventory.sh > ansible/hosts.ini
+    ./scripts/generate-inventory.sh infra.json > ansible/hosts.ini
+    ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
+
+For citycloud we are not responsible for creating the infrastructure, they will provides us with VMs, loadbalancer, etc. Though we do have access to the infrastructure (so far the infrastructure for Getinge). And after getting the VMs we must first manually create the `infra.json` file and then run an ansible script to install docker and add some files.
+
+    export OS_USERNAME=<username>
+    export OS_PASSWORD=<password>
+    export OS_AUTH_URL=https://fra1.citycloud.com:5000
+    export OS_USER_DOMAIN_NAME=CCP_Domain_37642
+    export OS_PROJECT_DOMAIN_NAME=CCP_Domain_37642
+    export OS_REGION_NAME=Fra1
+    export OS_PROJECT_NAME="Spider"
+    export OS_TENANT_NAME="Spider"
+    export OS_AUTH_VERSION=3
+    export OS_IDENTITY_API_VERSION=3
+    export OS_PROJECT_ID=ba47a6b513b645dd94fa31ea5e2becbd
+
+    export CLOUD_PROVIDER=citycloud
+    
+    #Then set up a python environment with ansible:
+    pipenv install
+    pipenv shell
+
+    #Prepare all nodes by installing docker on them:
+    ./scripts/generate-inventory.sh infra.json > ansible/hosts.ini
     ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
 
 Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx` 

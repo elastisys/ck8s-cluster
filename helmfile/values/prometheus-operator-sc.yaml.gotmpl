@@ -94,6 +94,13 @@ prometheusOperator:
 
 prometheus:
   prometheusSpec:
+    resources: 
+      requests:
+        memory: 512Mi
+        cpu: 0.3
+      limits:
+        memory: 2Gi
+        cpu: 1
     remoteRead: 
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
     remoteWrite: 

@@ -28,6 +28,23 @@ spec:
           resources:
             requests:
               memory: 1.5Gi
+              cpu: 0.3
+            limits:
+              memory: 2Gi
+              cpu: 1
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 80
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: common.k8s.elastic.co/type
+                    operator: In
+                    values:
+                    - elasticsearch
+                topologyKey: "kubernetes.io/hostname"
+
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
@@ -37,6 +54,6 @@ spec:
         resources:
           requests:
             storage: 10Gi
-        storageClassName: nfs-client
+        storageClassName: ${STORAGE_CLASS}
   secureSettings:
     secretName: s3-credentials

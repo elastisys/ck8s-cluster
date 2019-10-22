@@ -2,6 +2,8 @@
 
 set -e
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
+
 if [[ "$#" -ne 1 ]]
 then 
   >&2 echo "Usage: generate-inventory.sh <path-to-infra-file>"
@@ -46,14 +48,20 @@ wc_worker${i} ansible_host=${wc_worker_ip_addresses[${i}]}
 EOF
 done
 
-cat <<EOF
+if [ $CLOUD_PROVIDER != "citycloud" ]
+then
+  cat <<EOF
 [nfs]
 sc_nfs ansible_host=${sc_nfs_ip_address}
 wc_nfs ansible_host=${wc_nfs_ip_address}
-[all:vars]
-ansible_user=ubuntu
-ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 [nfs:vars]
 internal_cidr_prefix=172.16.0.0/24
 nfs_device_path=${nfs_device_path}
+EOF
+fi
+
+cat <<EOF
+[all:vars]
+ansible_user=ubuntu
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 EOF
