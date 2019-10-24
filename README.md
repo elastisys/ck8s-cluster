@@ -321,10 +321,10 @@ Example using the CLI:
     SECRET_PATH="eck/v1/first_customer/1/service_cluster/rkestate"
 
     # To store secret
-    cat eck-sc.yaml | base64 | vault kv put $SECRET_PATH rkestate=-
+    cat eck-sc.rkestate | base64 | vault kv put $SECRET_PATH rkestate=-
 
     # To update secret - add and/or update keys/values.
-    echo "Hello" | base64 | vault kv patch $SECRET_PATH other_key=-
+    echo "Hello" | vault kv patch $SECRET_PATH other_key=-
 
     # To retrieve secret
     vault kv get -format=json $SECRET_PATH | jq -r '.data.data.rkestate' | base64 --decode

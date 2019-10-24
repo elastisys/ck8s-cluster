@@ -123,8 +123,8 @@ releases:
   namespace: harbor
   labels:
     app: harbor
-  chart: "../charts/harbor-helm-master"
-  version: 1.1.1
+  chart: harbor/harbor
+  version: 1.2.1
   missingFileHandler: error
   wait: true
   values:
