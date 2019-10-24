@@ -6,6 +6,25 @@ kube-state-metrics:
   podSecurityPolicy:
     enabled: {{ env "ENABLE_PSP" | default "true" }}
 
+alertmanager:
+  config:
+    # See https://prometheus.io/docs/alerting/configuration/
+    global:
+      slack_api_url: https://hooks.slack.com/services/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
+    route:
+      # default receiver
+      receiver: techteam
+      routes:
+      - match:
+          # The watchdog alert is always active, send it to null.
+          alertname: Watchdog
+        receiver: 'null'
+    receivers:
+    - name: 'null'
+    - name: techteam
+      slack_configs:
+      - channel: techteam
+
 grafana:
   # admin username is "admin"
   adminPassword: {{ env "GRAFANA_PWD" | default "prom-operator" }}
@@ -22,7 +41,7 @@ grafana:
     tls:
     - secretName: grafana-general-tls
       hosts:
-      - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}   
+      - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}
   rbac:
     pspUseAppArmor: false
     pspEnabled: {{ env "ENABLE_PSP" | default "true" }}
@@ -37,7 +56,7 @@ grafana:
       enabled: true
       defaultDatasourceEnabled: false
 
-  dashboardProviders: 
+  dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
       providers:
@@ -94,14 +113,14 @@ prometheusOperator:
 
 prometheus:
   prometheusSpec:
-    resources: 
+    resources:
       requests:
         memory: 512Mi
         cpu: 0.3
       limits:
         memory: 2Gi
         cpu: 1
-    remoteRead: 
+    remoteRead:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
-    remoteWrite: 
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}  
+    remoteWrite:
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
