@@ -286,13 +286,17 @@ For using OpenID Connect with kubectl, see
 
 ## Vault
 
-Vault can be used to "store" cluster specific resources such as kube configurations and rke states.
-Since vault is a key-value store, files will need to be stringified through the use of for example `base64`.
+Vault can be used to store cluster specific resources such as kube configurations and rke states.
+Vault is currently exposed at `https://vault.eck.elastisys.se`
+Since vault is a key-value store, files will need to be stringified through the use of for example `base64`. Keep in mind the size of the value that you are trying to store. Certain backends have a per-key-value limit, e.g. 512KB is the limit when using [consul](https://www.consul.io/docs/faq.html#q-what-is-the-per-key-value-size-limitation-for-consul-39-s-key-value-store-).
 
-For example, to store the rke state for the system cluster you can execute the following
+You can interact with vault through either the [HTTP API](https://www.vaultproject.io/api/overview.html) or the [Vault CLI](https://www.vaultproject.io/docs/commands/).
+
+
+Example using the HTTP API and the provided scripts:
 
     # API endpoint to where your secret will be stored.
-    export SECRET_PATH="eck/data/v1/first_customer/1/workload_cluster/rkestate"
+    SECRET_PATH="eck/data/v1/first_customer/1/service_cluster/rkestate"
 
     RKESTATE=$(cat eck-sc.rkestate | base64 --wrap=0)
 
@@ -308,9 +312,34 @@ For example, to store the rke state for the system cluster you can execute the f
 
     rm payload.json
 
-To retrieve the stored file 
+    # To retrieve the secret 
 
-    ./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$SECRET_PATH" | jq '.data.data.statefile' | base64 --decode
+    ./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$SECRET_PATH" | jq -r '.data.data.statefile' | base64 --decode
+
+Example using the CLI:
+
+    SECRET_PATH="eck/v1/first_customer/1/service_cluster/rkestate"
+
+    # To store secret
+    cat eck-sc.yaml | base64 | vault kv put $SECRET_PATH rkestate=-
+
+    # To update secret - add and/or update keys/values.
+    echo "Hello" | base64 | vault kv patch $SECRET_PATH other_key=-
+
+    # To retrieve secret
+    vault kv get -format=json $SECRET_PATH | jq -r '.data.data.rkestate' | base64 --decode
+    # or
+    vault kv get -field=rkestate $SECRET_PATH | base64 --decode
+
+    # Retrieve specific version of secret
+    vault kv get -format=json -version=2 $SECRET_PATH | jq '.data.data'
+
+    # Delete latest version of secret
+    vault kv delete $SECRET_PATH
+
+    # Delete secret completely
+    vault kv metadata delete $SECRET_PATH 
+
 
 
 ## Issues and limitations
