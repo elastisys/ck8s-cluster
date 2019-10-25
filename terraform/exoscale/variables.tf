@@ -27,7 +27,7 @@ variable sc_master_count {
 variable sc_master_size {
   description = "The size of the master VMs"
   type        = string
-  default     = "Large"
+  default     = "Small"
 }
 
 variable sc_worker_count {
@@ -45,7 +45,7 @@ variable sc_worker_size {
 variable sc_nfs_size {
   description = "The size of the nfs machine"
   type        = string
-  default     = "Medium"
+  default     = "Small"
 }
 
 
@@ -64,7 +64,7 @@ variable wc_master_count {
 variable wc_master_size {
   description = "The size of the master VMs."
   type        = string
-  default     = "Large"
+  default     = "Small"
 }
 
 variable wc_worker_count {
@@ -82,7 +82,7 @@ variable wc_worker_size {
 variable wc_nfs_size {
   description = "The size of the nfs machine"
   type        = string
-  default     = "Medium"
+  default     = "Small"
 }
 
 # Common variables.
