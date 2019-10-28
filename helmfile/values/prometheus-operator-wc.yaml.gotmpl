@@ -8,6 +8,14 @@ alertmanager:
 grafana:
   enabled: false
 
+# TODO: These do not work out of the box with RKE
+# If we switch to kubeadm they should be fine, otherwise we should look into
+# how to configure them properly for RKE.
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+
 prometheusOperator:
   createCustomResource: false
 

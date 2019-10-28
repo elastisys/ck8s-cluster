@@ -6,10 +6,20 @@ metadata:
   name: prometheus-wc-reader
   namespace: monitoring
 spec:
+  alerting:
+    # Use the default alertmanager that comes with prometheus-operator
+    alertmanagers:
+    - name: prometheus-operator-alertmanager
+      namespace: monitoring
+      pathPrefix: /
+      port: web
   additionalScrapeConfigs:
     key: prometheus-federate-additional.yaml
     name: prometheus-wc-scrape-configs
-
+  ruleSelector:
+    matchLabels:
+      app: prometheus-operator
+      release: prometheus-operator
   resources:
     requests:
       memory: 512Mi
@@ -36,3 +46,5 @@ spec:
   serviceMonitorSelector:
     matchLabels:
       target: none  # so that operator wont generate new config
+  externalLabels:
+    cluster: workload_cluster

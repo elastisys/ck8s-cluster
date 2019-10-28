@@ -13,6 +13,8 @@
       - '{job="node-exporter"}'
       - '{job="coredns"}'
       - '{job="apiserver"}'
+      - '{job="prometheus-operator-prometheus"}'
+      - '{job="prometheus-operator-operator"}'
       - '{__name__=~"job:.*"}'
       - '{__name__=~"namespace(_|:).*"}'
 
