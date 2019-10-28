@@ -19,11 +19,24 @@ alertmanager:
           # The watchdog alert is always active, send it to null.
           alertname: Watchdog
         receiver: 'null'
+      - match:
+          # This alert is a bit over sensitive at the moment
+          # See this: https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/108
+          alertname: CPUThrottlingHigh
+        receiver: 'null'
     receivers:
     - name: 'null'
     - name: techteam
       slack_configs:
       - channel: techteam
+
+# TODO: These do not work out of the box with RKE
+# If we switch to kubeadm they should be fine, otherwise we should look into
+# how to configure them properly for RKE.
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
 
 grafana:
   # admin username is "admin"
