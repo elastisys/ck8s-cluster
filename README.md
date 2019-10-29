@@ -218,8 +218,10 @@ To create a cluster without PodSecurityPoslicy, OPA, and Harbor set the environm
 
 ## DNS
 
-The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.elastisys.se`.
-The domain can be changed by setting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
+The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.a1ck.io` for exoscale and `<dns_prefix>-wc/sc.elastisys.se` for safespring.
+In exoscale we use exoscale's own dns features, while for safespring we use AWS.
+
+For safespring the domain can be changed by setting the terraform variable `aws_dns_zone_id` to an id of another hosted zone
 in aws route53.
 
 

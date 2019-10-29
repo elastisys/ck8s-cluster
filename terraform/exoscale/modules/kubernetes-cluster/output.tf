@@ -11,7 +11,7 @@ output "nfs_ip_address" {
 }
 
 output "dns_record_name" {
-  value = "${aws_route53_record.dns.name}"
+  value = "${exoscale_domain_record.worker.0.name}.${exoscale_domain_record.worker.0.domain}"
 }
 
 #  value = "${exoscale_nic.master_internal.ip_address}"

@@ -274,3 +274,12 @@ resource "exoscale_ssh_keypair" "ssh_key" {
   name       = "${var.ssh_key_name}"
   public_key = trimspace(file(pathexpand("${var.ssh_pub_key_file}")))
 }
+
+resource "exoscale_domain_record" "worker" {
+  count = "${var.worker_count}"
+
+  domain = "a1ck.io"
+  content = "${element(exoscale_compute.worker.*.ip_address, count.index)}"
+  name = "*.${var.dns_name}"
+  record_type = "A"
+}
