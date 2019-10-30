@@ -42,7 +42,7 @@ alertmanager:
       slack_configs:
       # Note: the channel here does not apply if the webhook URL is for a specific channel
       - channel: techteam
-        # Webhook URL for techteam, see https://api.slack.com/apps/ANJ11SFK3/general?
+        # Webhook URL for slack, see https://api.slack.com/apps/ANJ11SFK3/general?
         api_url: {{ requiredEnv "SLACK_API_URL" }}
         send_resolved: true
         # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/

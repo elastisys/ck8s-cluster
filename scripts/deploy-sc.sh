@@ -27,7 +27,8 @@ infra="$1"
 
 # Alerting variables
 ALERT_TO=${ALERT_TO:-slack}
-SLACK_API_URL=${SLACK_API_URL:-https://hooks.slack.com/services/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}
+# Default URL is for sending to the #ck8s-ops channel
+SLACK_API_URL=${SLACK_API_URL:-https://hooks.slack.com/services/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}
 
 # If unset -> true
 ENABLE_PSP=${ENABLE_PSP:-true}
