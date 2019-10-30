@@ -38,11 +38,12 @@ alertmanager:
     receivers:
     - name: 'null'
     - name: techteam
+      {{ if eq (env "ALERT_TO") "slack" }}
       slack_configs:
       # Note: the channel here does not apply if the webhook URL is for a specific channel
       - channel: techteam
         # Webhook URL for techteam, see https://api.slack.com/apps/ANJ11SFK3/general?
-        api_url: https://hooks.slack.com/services/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
+        api_url: {{ requiredEnv "SLACK_API_URL" }}
         send_resolved: true
         # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
         # We need to escape the templating brackets for alertmanager here with
@@ -65,6 +66,7 @@ alertmanager:
           *{{ .Name }}:* {{ .Value }}
           {{ end }}
           {{ end }}`}}
+      {{ end }}
 
 # TODO: These do not work out of the box with RKE
 # If we switch to kubeadm they should be fine, otherwise we should look into

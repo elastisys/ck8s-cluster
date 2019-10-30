@@ -7,7 +7,7 @@ source "${SCRIPTS_PATH}/common.sh"
 
 
 if [[ "$#" -lt 1 ]]
-then 
+then
   >&2 echo "Usage: deploy-sc.sh path-to-infra-file <--interactive>"
   exit 1
 fi
@@ -25,6 +25,9 @@ infra="$1"
 : "${S3_INFLUX_BUCKET_URL:?Missing S3_INFLUX_BUCKET_URL}"
 : "${INFLUX_BACKUP_SCHEDULE:?Missing INFLUX_BACKUP_SCHEDULE}"
 
+# Alerting variables
+ALERT_TO=${ALERT_TO:-slack}
+SLACK_API_URL=${SLACK_API_URL:-https://hooks.slack.com/services/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}
 
 # If unset -> true
 ENABLE_PSP=${ENABLE_PSP:-true}
@@ -34,14 +37,14 @@ ENABLE_HARBOR=${ENABLE_HARBOR:-true}
 ECK_RESTORE_CLUSTER=${ECK_RESTORE_CLUSTER:-false}
 
 if [[ $ECK_RESTORE_CLUSTER != "false" ]]
-then 
+then
     : "${INFLUX_BACKUP_NAME:?Missing INFLUX_BACKUP_NAME}"
 fi
 
 if [ $CLOUD_PROVIDER == "citycloud" ]
 then
     export STORAGE_CLASS=cinder-storage
-else 
+else
     export STORAGE_CLASS=nfs-client
 fi
 
@@ -82,15 +85,15 @@ kubectl create namespace influxdb-prometheus --dry-run -o yaml | kubectl apply -
 kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
 
 if [[ $ENABLE_HARBOR == "true" ]]
-then 
+then
     kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
 fi
 
 # PSP
 if [[ $ENABLE_PSP == "true" ]]
-then 
+then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
-    
+
     # Deploy common roles and rolebindings.
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/kube-system-role-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/rke-job-deployer-psp.yaml
@@ -105,9 +108,9 @@ then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/dex-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/elastic-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/influxdb-psp.yaml
-    
+
     if [[ $ENABLE_HARBOR == "true" ]]
-    then 
+    then
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/
     fi
 
@@ -131,7 +134,7 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer.yaml
 
 if [[ $ENABLE_HARBOR == "true" ]]
-then 
+then
     envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-core-cert.yaml | kubectl apply -f -
     envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-notary-cert.yaml | kubectl apply -f -
 fi
@@ -214,7 +217,7 @@ fi
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
 
 if [[ $ENABLE_HARBOR == "true" ]]
-then 
+then
     # Install the rest of the charts, excluding prometheus-operator.
     helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator $INTERACTIVE apply
 else
@@ -223,7 +226,7 @@ else
 fi
 
 # Install prometheus-operator. Retry three times.
-tries=3 
+tries=3
 success=false
 
 for i in $(seq 1 $tries)
@@ -239,7 +242,7 @@ do
 done
 
 # Then prometheus operator failed too many times
-if [ $success != "true" ] 
+if [ $success != "true" ]
 then
     exit 1
 fi
@@ -257,7 +260,7 @@ then
     if [ $EXISTS != "404" ]
     then
         NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
-        
+
         if [ $NAME == "\"library\"" ]
         then
             # Deletes the default project "library"
