@@ -10,12 +10,25 @@ alertmanager:
   config:
     # See https://prometheus.io/docs/alerting/configuration/
     route:
+      group_by: [cluster, alertname]
       # default receiver
       receiver: techteam
       routes:
       - match:
           # The watchdog alert is always active, send it to null.
           alertname: Watchdog
+        receiver: 'null'
+      - match:
+          # TODO: it would be nice to do this some other way.
+          # The workload_cluster does not have an alertmanager, send to null.
+          alertname: AlertmanagerDown
+          cluster: workload_cluster
+        receiver: 'null'
+      - match:
+          # TODO: it would be nice to do this some other way.
+          # The workload_cluster does not have an alertmanager, send to null.
+          alertname: PrometheusNotConnectedToAlertmanagers
+          cluster: workload_cluster
         receiver: 'null'
       - match:
           # This alert is a bit over sensitive at the moment
@@ -41,7 +54,11 @@ alertmanager:
           {{`
           *Common summary:* {{ .CommonAnnotations.summary }}
           *Common description:* {{ .CommonAnnotations.description }}
+          {{ range .CommonLabels.SortedPairs }}
+          *{{ .Name }}:* {{ .Value }}
+          {{ end }}
 
+          *Individual alerts below*
           {{ range .Alerts }}
           *Status:* {{ .Status }}
           {{ range .Annotations.SortedPairs }}
@@ -156,3 +173,5 @@ prometheus:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
     remoteWrite:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
+    externalLabels:
+      cluster: service_cluster
