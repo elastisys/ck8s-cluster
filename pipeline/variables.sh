@@ -19,3 +19,6 @@ export S3_ES_BACKUP_BUCKET_NAME=es-backup
 export INFLUX_ADDR=influx.influxdb-prometheus.svc:8088
 export S3_INFLUX_BUCKET_URL=s3://influxdb-backups
 export INFLUX_BACKUP_SCHEDULE="0 0 * * *"
+
+# Disable alerts
+export ALERT_TO=none
