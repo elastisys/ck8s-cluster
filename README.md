@@ -75,7 +75,7 @@ For exoscale:
     terraform init
     terraform workspace select <Name>
     terraform apply
-    
+
 For safespring:
 
     export AWS_ACCESS_KEY_ID=<xxx> (not needed if credentials are located in ~/.aws/credentials)
@@ -101,14 +101,6 @@ For safespring:
     terraform workspace select <Name>
     terraform apply
 
-    #Then set up a python environment with ansible:
-    pipenv install
-    pipenv shell
-
-    #Prepare all nodes by installing docker on them:
-    ./scripts/generate-inventory.sh infra.json > ansible/hosts.ini
-    ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
-
 For citycloud we are not responsible for creating the infrastructure, they will provides us with VMs, loadbalancer, etc. Though we do have access to the infrastructure (so far the infrastructure for Getinge). And after getting the VMs we must first manually create the `infra.json` file and then run an ansible script to install docker and add some files.
 
     export OS_USERNAME=<username>
@@ -124,29 +116,40 @@ For citycloud we are not responsible for creating the infrastructure, they will 
     export OS_PROJECT_ID=ba47a6b513b645dd94fa31ea5e2becbd
 
     export CLOUD_PROVIDER=citycloud
-    
-    #Then set up a python environment with ansible:
-    pipenv install
-    pipenv shell
 
-    #Prepare all nodes by installing docker on them:
-    ./scripts/generate-inventory.sh infra.json > ansible/hosts.ini
-    ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
-
-Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx` 
-(should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`. 
+Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx`
+(should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`.
 
 The commands listed above will set up the cloud infrastructure using a "default" configuration. Changing the number of machines and thier size can be done by exporting the following values before running `terraform apply`.
 
     export TF_VAR_sc_master_count=<x | default 1>
     export TF_VAR_sc_master_size=<x | default "Large">
-    
+
     export TF_VAR_wc_master_count=<x | default 1>
     export TF_VAR_wc_master_size=<x | default "Large">
 
     export TF_VAR_sc_nfs_size=<x | default "Medium">
     export TF_VAR_wc_nfs_size=<x | default "Medium">
 
+When terraform is done, you need to create a JSON file with the details of the infrastructure:
+
+    ./scripts/gen-infra.sh > infra.json
+
+If the base image used to create the virtual machines does not include docker, you will also need to install it first on all machines.
+(This is currently the case for Safespring and Citycloud.)
+This can be done with ansible like this:
+
+    # Set up a python environment with ansible:
+    pipenv install
+    pipenv shell
+
+    # (Optional) If your ssh keys are not picked up by the authentication agent
+    # you need to add them for ansible to be able to use them:
+    ssh-add ${TF_VAR_ssh_pub_key_file_sc%.pub} ${TF_VAR_ssh_pub_key_file_wc%.pub}
+
+    # Install docker on all nodes:
+    ./scripts/generate-inventory.sh infra.json > ansible/hosts.ini
+    ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
 
 ## Service passwords - optional
 
@@ -160,12 +163,12 @@ Set the environment variables
     export VAULT_TOKEN=<...>
     export PWD_LENGTH=<desired length for the passwords>
 
-The secrets for a given customer should be stored at the path `eck/v1/${CUSTOMER_ID}/1/*`. 
-To use the a more correct terminology the _path_ really is `v1/${CUSTOMER_ID}/1/*`, while `eck/` is the location of the secrets engine used - [KV v2](https://www.vaultproject.io/api/secret/kv/kv-v2.html). 
+The secrets for a given customer should be stored at the path `eck/v1/${CUSTOMER_ID}/1/*`.
+To use the a more correct terminology the _path_ really is `v1/${CUSTOMER_ID}/1/*`, while `eck/` is the location of the secrets engine used - [KV v2](https://www.vaultproject.io/api/secret/kv/kv-v2.html).
 
 The `1` can be used to reference secrets in different eck clusters if a customer happens to have more than just one.
 If a customer has more than one eck cluster than the `1` can be changed accordingly to reference the correct cluster.
-The API endpoint for KV v2 is `eck/data/<path>`. Therefore to write secrets to `eck/v1/${CUSTOMER_ID}/1/*`, the API endpoint becomes `eck/data/v1/${CUSTOMER_ID}/1/*`. 
+The API endpoint for KV v2 is `eck/data/<path>`. Therefore to write secrets to `eck/v1/${CUSTOMER_ID}/1/*`, the API endpoint becomes `eck/data/v1/${CUSTOMER_ID}/1/*`.
 The passwords for the services will be located at `eck/v1/${CUSTOMER_ID}/1/{service_name}` with the key `password`.
 The environment variable `BASE_PATH` is used to reference the API endpoint excluding the name of the service to store password for.
 
@@ -174,7 +177,7 @@ Set the following environment variable
     export BASE_PATH=<"eck/data/v1/${CUSTOMER_ID}/1">
 
 To generate and store the passwords for the services - `grafana`, `harbor`, and `influxdb` - execute the following command
-    
+
     ./scripts/store-pwds.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$PWD_LENGTH" "$BASE_PATH" "grafana" "influxdb" "harbor"
 
 If you do not want to generate passwords for a certain service then simply remove it from command above.
@@ -201,8 +204,6 @@ To use the generated password for the services run the following commands to fet
 Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
-    ./scripts/gen-infra.sh > infra.json
-
     export ECK_SC_DOMAIN=$(cat infra.json | jq -r '.service_cluster.dns_name' | sed 's/[^.]*[.]//')
     export ECK_WC_DOMAIN=$(cat infra.json | jq -r '.workload_cluster.dns_name' | sed 's/[^.]*[.]//')
 
@@ -224,12 +225,12 @@ in aws route53.
 
 ## Setting up Google as identity provider for dex.
 
-1. Go to GCP and create a project. 
+1. Go to GCP and create a project.
 Select `APIs &Services` in the menu.
 
-2. Select `Oauth consent screen` and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains. 
+2. Select `Oauth consent screen` and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains.
 
-3. Go to `Credentials` and press `Create credentials` and select `OAuth client ID`. 
+3. Go to `Credentials` and press `Create credentials` and select `OAuth client ID`.
 Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.elastisys.se`.
 Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`
 
@@ -312,7 +313,7 @@ Example using the HTTP API and the provided scripts:
 
     rm payload.json
 
-    # To retrieve the secret 
+    # To retrieve the secret
 
     ./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$SECRET_PATH" | jq -r '.data.data.statefile' | base64 --decode
 
@@ -338,7 +339,7 @@ Example using the CLI:
     vault kv delete $SECRET_PATH
 
     # Delete secret completely
-    vault kv metadata delete $SECRET_PATH 
+    vault kv metadata delete $SECRET_PATH
 
 
 
