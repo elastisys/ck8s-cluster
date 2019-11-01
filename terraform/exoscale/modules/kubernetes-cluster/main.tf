@@ -272,5 +272,5 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
 
 resource "exoscale_ssh_keypair" "ssh_key" {
   name       = "${var.ssh_key_name}"
-  public_key = file(pathexpand("${var.ssh_pub_key_file}"))
+  public_key = trimspace(file(pathexpand("${var.ssh_pub_key_file}")))
 }
