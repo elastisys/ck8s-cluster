@@ -103,7 +103,7 @@ then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nfs-client-provisioner-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/cert-manager-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/dashboard-psp.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-ns-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-restricted-psp.yaml
 
     # Deploy cluster spcific roles and rolebindings.
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/dex-psp.yaml

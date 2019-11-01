@@ -19,7 +19,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 source "${SCRIPTS_PATH}/common.sh"
 
 if [[ "$#" -lt 1 ]]
-then 
+then
   >&2 echo "Usage: deploy-wc.sh path-to-infra-file <--interactive>"
   exit 1
 fi
@@ -53,7 +53,7 @@ fi
 if [[ $ENABLE_PSP == "true" ]]
 then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
-    
+
     # Deploy common roles and rolebindings.
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/kube-system-role-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/rke-job-deployer-psp.yaml
@@ -62,12 +62,12 @@ then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nfs-client-provisioner-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/cert-manager-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/dashboard-psp.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-ns-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-restricted-psp.yaml
 
     # Deploy cluster spcific roles and rolebindings
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/falco-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/fluentd-psp.yaml
-    
+
     if [[ $ENABLE_OPA == "true" ]]
     then
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/
@@ -147,7 +147,7 @@ fi
 STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
 
 # Just want to see if this ever happens.
-if [ $STATUS != "Available" ] 
+if [ $STATUS != "Available" ]
 then
     echo -e  "##\n##\nWaiting for cert-manager webhook to become ready\n##\n##"
     kubectl wait --for=condition=Available --timeout=300s \
@@ -164,7 +164,7 @@ else
 fi
 
 # Install prometheus-operator. Retry three times.
-tries=3 
+tries=3
 success=false
 
 for i in $(seq 1 $tries)
@@ -180,7 +180,7 @@ do
 done
 
 # Then prometheus operator failed too many times
-if [ $success != "true" ] 
+if [ $success != "true" ]
 then
     exit 1
 fi
