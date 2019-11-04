@@ -183,7 +183,7 @@ module "nfs" {
 
 resource "openstack_blockstorage_volume_v2" "nfs_volume" {
   name = "${var.prefix}-nfs-volume"
-  size = 50
+  size = 200
 }
 
 resource "openstack_compute_volume_attach_v2" "nfs_va" {

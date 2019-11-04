@@ -3,6 +3,7 @@ image:
 
 persistence:
   useExisting: false
+  size: 30Gi
 
 setDefaultUser:
   user:
@@ -21,11 +22,11 @@ config:
 
 resources:
   requests:
-    memory: 512Mi
-    cpu: 0.3
+    memory: 3Gi
+    cpu: 0.5
   limits:
     memory: 4Gi
-    cpu: 1.5
+    cpu: 2
 
 {{ if or (not (env "ECK_RESTORE_CLUSTER")) (not (eq (env "ECK_RESTORE_CLUSTER") "true")) }}
 initScripts:

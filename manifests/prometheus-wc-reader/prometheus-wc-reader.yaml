@@ -16,13 +16,9 @@ spec:
   additionalScrapeConfigs:
     key: prometheus-federate-additional.yaml
     name: prometheus-wc-scrape-configs
-  ruleSelector:
-    matchLabels:
-      app: prometheus-operator
-      release: prometheus-operator
   resources:
     requests:
-      memory: 512Mi
+      memory: 1Gi
       cpu: 0.3
     limits:
       memory: 2Gi

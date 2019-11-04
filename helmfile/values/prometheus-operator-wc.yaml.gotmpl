@@ -23,6 +23,13 @@ kube-state-metrics:
   podSecurityPolicy:
     enabled: {{ requiredEnv "ENABLE_PSP" }}
 
+kubeApiServer:
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|)'
+
 prometheus:
   ingress:
     enabled: true
@@ -38,3 +45,12 @@ prometheus:
     - secretName: prometheus-general-tls
       hosts:
       - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
+
+  prometheusSpec:
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 0.3
+      limits:
+        memory: 2Gi
+        cpu: 1

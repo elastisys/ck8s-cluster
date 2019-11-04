@@ -88,6 +88,7 @@ pipelines:
                 - ./scripts/deploy-sc.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
+                - kubectl describe nodes
               after-script:
                 - ./pipeline/after-script.sh pipeline/init-exoscale.sh
           - step:

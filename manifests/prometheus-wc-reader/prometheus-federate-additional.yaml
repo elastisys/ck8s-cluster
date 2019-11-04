@@ -1,4 +1,9 @@
-- job_name: 'federate'
+#The idea with splitting the federation in two is to (hopefully) reduce the resources needed for prometheus.
+#If I have understood it correctly prometheus will use more resources (primarily memory) if you have larger scrapes.
+#So if we scrape everything from another prometheus it will be a large job where prometheus might run out of memory.
+#But splitting them might reduce the memory needed.
+#The kubelet is roughly half of the metrics, so these two scrapes will be roughly the same size.
+- job_name: 'federate-kubelet'
   scrape_interval: 30s
 
   honor_labels: true
@@ -9,6 +14,26 @@
   params:
     'match[]':
       - '{job="kubelet"}'
+
+  tls_config:
+    insecure_skip_verify: ${TLS_SKIP_VERIFY}
+
+  static_configs:
+    - labels:
+        cluster: workload_cluster
+      targets:
+      - prometheus.${ECK_WC_DOMAIN}
+
+- job_name: 'federate-others'
+  scrape_interval: 30s
+
+  honor_labels: true
+  metrics_path: '/federate'
+
+  scheme: https
+
+  params:
+    'match[]':
       - '{job="kube-state-metrics"}'
       - '{job="node-exporter"}'
       - '{job="coredns"}'
