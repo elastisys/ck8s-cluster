@@ -26,14 +26,14 @@ helmDefaults:
 
   # TODO: Use env or Env.values instead of fixed paths for certs.
   {{ if eq .Environment.Name "service_cluster" }}
-  tlsCACert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "PREFIX" }}/certs/service_cluster/kube-system/certs/ca.pem"
-  tlsCert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "PREFIX" }}/certs/service_cluster/kube-system/certs/helm.pem"
-  tlsKey: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "PREFIX" }}/certs/service_cluster/kube-system/certs/helm-key.pem"
+  tlsCACert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "ENVIRONMENT_NAME" }}/certs/service_cluster/kube-system/certs/ca.pem"
+  tlsCert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "ENVIRONMENT_NAME" }}/certs/service_cluster/kube-system/certs/helm.pem"
+  tlsKey: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "ENVIRONMENT_NAME" }}/certs/service_cluster/kube-system/certs/helm-key.pem"
   {{ end }}
   {{ if eq .Environment.Name "workload_cluster" }}
-  tlsCACert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "PREFIX" }}/certs/workload_cluster/kube-system/certs/ca.pem"
-  tlsCert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "PREFIX" }}/certs/workload_cluster/kube-system/certs/helm.pem"
-  tlsKey: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "PREFIX" }}/certs/workload_cluster/kube-system/certs/helm-key.pem"
+  tlsCACert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "ENVIRONMENT_NAME" }}/certs/workload_cluster/kube-system/certs/ca.pem"
+  tlsCert: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "ENVIRONMENT_NAME" }}/certs/workload_cluster/kube-system/certs/helm.pem"
+  tlsKey: "../clusters/{{ env "CLOUD_PROVIDER" }}/{{ env "ENVIRONMENT_NAME" }}/certs/workload_cluster/kube-system/certs/helm-key.pem"
   {{ end }}
 
 

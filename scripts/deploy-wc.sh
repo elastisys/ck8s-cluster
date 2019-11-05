@@ -75,9 +75,9 @@ then
 fi
 
 # HELM, TILLER
-mkdir -p ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${PREFIX}/certs/workload_cluster/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${PREFIX}/certs/workload_cluster "helm"
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${PREFIX}/certs/workload_cluster/kube-system/certs "helm"
+mkdir -p ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster/kube-system/certs
+${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster "helm"
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster/kube-system/certs "helm"
 
 
 # DASHBOARD
