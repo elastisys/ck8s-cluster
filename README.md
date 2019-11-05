@@ -96,12 +96,19 @@ source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_
 
 In order to setup a new Compliant Kubernetes cluster you will need to do the following.
 
-Decide on a prefix for this environment, the cloud provider to use and add common environment variables:
+Create 4 S3 buckets, one for each of Harbor, Velero, Elasticsearch and Influxdb.
+
+Decide on a name for this environment, the cloud provider to use and add common environment variables:
 
 ```
 # Add these to env.sh
 export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|exoscale|citycloud}
+
+export S3_HARBOR_BUCKET_NAME=<harbor-bucket>
+export S3_VELERO_BUCKET_NAME=<velero-bucket>
+export S3_ES_BACKUP_BUCKET_NAME=<es-backup>
+export S3_INFLUX_BUCKET_URL=s3://<influxdb-bucket>
 
 # Cloud provider specific env. Add these to env.sh
 # Exoscale
