@@ -268,6 +268,7 @@ You can activate them by setting environment variables with client ID and secret
     export S3_REGION_ENDPOINT=https://sos-de-fra-1.exo.io
     export S3_HARBOR_BUCKET_NAME=harbor-bucket
     export S3_VELERO_BUCKET_NAME=velero-bucket
+    export S3_ES_BACKUP_BUCKET_NAME=harbor-backup
 
     # Influx cronjob backup variables.
     export INFLUX_ADDR=influx.influxdb-prometheus.svc:8088

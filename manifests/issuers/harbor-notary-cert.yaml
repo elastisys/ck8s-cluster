@@ -8,5 +8,5 @@ spec:
   commonName: "notary.harbor.${ECK_SC_DOMAIN}"
   isCA: false
   issuerRef:
-    name: selfsigning-issuer
-    kind: ClusterIssuer
+    name: selfsigning-issuer-harbor
+    kind: Issuer

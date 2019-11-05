@@ -42,6 +42,7 @@ INTERACTIVE=${2:-""}
 # NAMESPACES
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
 
 if [[ $ENABLE_OPA == "true" ]]
 then
@@ -87,9 +88,10 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 # CERT-MANAGER
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 
+export CERT_NAMESPACE=monitoring
+envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml | kubectl apply -f -
+envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml | kubectl apply -f -
 
 # OPA
 if [[ $ENABLE_OPA == "true" ]]

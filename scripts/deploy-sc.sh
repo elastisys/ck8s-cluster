@@ -130,9 +130,18 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 # CERT-MANAGER
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer.yaml
+
+declare -A name_array
+name_array=(["harbor"]="harbor" ["dex"]="dex" ["elastic-system"]="elastic-system" ["kube-system"]="kube-system" ["monitoring"]="monitoring")
+
+for i in "${!name_array[@]}"
+do
+    export CERT_NAMESPACE=${name_array[$i]}
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml | kubectl apply -f -
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml | kubectl apply -f -
+done
+
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer-harbor.yaml
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then

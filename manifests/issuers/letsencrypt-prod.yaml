@@ -1,10 +1,11 @@
 apiVersion: certmanager.k8s.io/v1alpha1
-kind: ClusterIssuer
+kind: Issuer
 metadata:
-  name: letsencrypt-prod
+  name: letsencrypt-${CERT_NAMESPACE}-prod
+  namespace: ${CERT_NAMESPACE}
 spec:
   acme:
-    email: lennart.jern@elastisys.com
+    email: techteam@elastisys.com 
     privateKeySecretRef:
       name: letsencrypt-prod
     server: https://acme-v02.api.letsencrypt.org/directory
