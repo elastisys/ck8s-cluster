@@ -52,6 +52,191 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [helmfile](https://github.com/roboll/helmfile) (tested with v0.81.3)
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
 
+## Get environment from Vault
+
+Get environment data from vault:
+
+```
+export PREFIX=test
+export CLOUD_PROVIDER={safespring|exoscale|citycloud}
+
+# Create folder structure
+FOLDERS="ssh-keys rke infra env certs/service_cluster/kube-system/certs certs/workload_cluster/kube-system/certs"
+for folder in ${FOLDERS}
+do
+    mkdir -p clusters/$CLOUD_PROVIDER/${PREFIX}/${folder}
+done
+
+FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml rke/kube_config_eck-wc.yaml env/env.sh certs/service_cluster/kube-system/certs/ca-key.pem certs/service_cluster/kube-system/certs/ca.pem certs/service_cluster/kube-system/certs/helm-key.pem certs/service_cluster/kube-system/certs/helm.pem certs/service_cluster/kube-system/certs/tiller-key.pem certs/service_cluster/kube-system/certs/tiller.pem certs/workload_cluster/kube-system/certs/ca-key.pem certs/workload_cluster/kube-system/certs/ca.pem certs/workload_cluster/kube-system/certs/helm-key.pem certs/workload_cluster/kube-system/certs/helm.pem certs/workload_cluster/kube-system/certs/tiller-key.pem certs/workload_cluster/kube-system/certs/tiller.pem"
+for file in ${FILES}
+do
+    vault kv get -field=base64-content eck/v1/${CLOUD_PROVIDER}/${PREFIX}/${file} | base64 --decode > clusters/${CLOUD_PROVIDER}/${PREFIX}/${file}
+done
+```
+
+Access Kubernetes API:
+
+```
+# Service cluster
+export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${PREFIX}/rke/kube_config_eck-sc.yaml
+# Workload cluster
+export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${PREFIX}/rke/kube_config_eck-wc.yaml
+```
+
+Use helm:
+
+```
+# Service cluster
+source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${PREFIX}/certs/service_cluster/kube-system/certs "helm"
+# Workload cluster
+source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${PREFIX}/certs/workload_cluster/kube-system/certs "helm"
+```
+
+## Quick setup of a new environment
+
+In order to setup a new Compliant Kubernetes cluster you will need to do the following.
+
+Decide on a prefix for this environment, the cloud provider to use and add common environment variables:
+
+```
+# Add these to env.sh
+export PREFIX=test
+export CLOUD_PROVIDER={safespring|exoscale|citycloud}
+
+# Cloud provider specific env. Add these to env.sh
+# Exoscale
+export TF_VAR_exoscale_api_key=<xxx>
+export TF_VAR_exoscale_secret_key=<xxx>
+export S3_ACCESS_KEY=<exoscale_api_key>
+export S3_SECRET_KEY=<exoscale_secret_key>
+# Safespring and Citycloud
+export OS_USERNAME=<username>
+export OS_PASSWORD=<password>
+# You should also have AWS credentials in ~/.aws/credentials, or add these:
+export AWS_ACCESS_KEY_ID=<xxx>
+export AWS_SECRET_ACCESS_KEY=<xxx>
+
+# Source all environment files
+source env.sh
+source common-env.sh
+source ${CLOUD_PROVIDER}-common-env.sh
+```
+
+Generate ssh-keys and folder structure:
+
+```
+# Create folder structure
+FOLDERS="ssh-keys rke infra env certs"
+for folder in ${FOLDERS}
+do
+    mkdir -p clusters/$CLOUD_PROVIDER/${PREFIX}/${folder}
+done
+
+# Generate ssh-keys
+ssh-keygen -q -N "" -f clusters/$CLOUD_PROVIDER/${PREFIX}/ssh-keys/id_rsa_sc
+ssh-keygen -q -N "" -f clusters/$CLOUD_PROVIDER/${PREFIX}/ssh-keys/id_rsa_wc
+```
+
+Create the infrastructure using terraform:
+
+```
+cd ./terraform/${CLOUD_PROVIDER}
+terraform init
+terraform workspace select ${PREFIX}
+terraform apply
+cd ../..
+```
+
+*Note:* if using a new workspace set execution mode to local by `export TF_TOKEN=xxx`
+(should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`.
+
+When terraform is done, you need to create a JSON file with the details of the infrastructure:
+
+```
+./scripts/gen-infra.sh > clusters/$CLOUD_PROVIDER/${PREFIX}/infra/infra.json
+```
+
+If the base image used to create the virtual machines does not include docker, you will also need to install it first on all machines.
+(This is currently the case for Safespring and Citycloud.)
+This can be done with ansible like this:
+
+```
+# Set up a python environment with ansible:
+pipenv install
+pipenv shell
+
+# Add ssh-keys to agent:
+ssh-add clusters/$CLOUD_PROVIDER/${PREFIX}/ssh-keys/id_rsa_sc clusters/$CLOUD_PROVIDER/${PREFIX}/ssh-keys/id_rsa_wc
+
+# Install docker on all nodes:
+./scripts/generate-inventory.sh clusters/$CLOUD_PROVIDER/${PREFIX}/infra/infra.json > ansible/hosts.ini
+ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
+```
+
+Next, install the Kubernetes clusters on the cloud infrastructure that
+Terraform created.
+
+```
+export ECK_SC_DOMAIN=${PREFIX}-sc.elastisys.se
+export ECK_WC_DOMAIN=${PREFIX}-wc.elastisys.se
+
+./scripts/gen-rke-conf-sc.sh clusters/$CLOUD_PROVIDER/${PREFIX}/infra/infra.json  > clusters/$CLOUD_PROVIDER/${PREFIX}/rke/eck-sc.yaml
+./scripts/gen-rke-conf-wc.sh clusters/$CLOUD_PROVIDER/${PREFIX}/infra/infra.json > clusters/$CLOUD_PROVIDER/${PREFIX}/rke/eck-wc.yaml
+
+rke up --config clusters/$CLOUD_PROVIDER/${PREFIX}/rke/eck-sc.yaml
+rke up --config clusters/$CLOUD_PROVIDER/${PREFIX}/rke/eck-wc.yaml
+```
+
+Install services:
+
+```
+export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${PREFIX}/rke/kube_config_eck-sc.yaml
+./scripts/deploy-sc.sh clusters/$CLOUD_PROVIDER/${PREFIX}/infra/infra.json
+
+export ECK_SC_KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${PREFIX}/rke/kube_config_eck-sc.yaml
+export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${PREFIX}/rke/kube_config_eck-wc.yaml
+./scripts/deploy-wc.sh clusters/$CLOUD_PROVIDER/${PREFIX}/infra/infra.json
+```
+
+You can use Vault to store all data about the environment securely.
+This includes ssh-keys, passwords, IP addresses, etc.
+
+Configure the vault address: `export VAULT_ADDR=https://vault.eck.elastisys.se`
+and log in to Vault: `vault login`.
+
+You can now store all the important credentials and state used so far in vault:
+```
+cp env.sh clusters/${CLOUD_PROVIDER}/${PREFIX}/env/env.sh
+cd clusters/${CLOUD_PROVIDER}/${PREFIX}
+FILES="ssh-keys/* rke/* certs/service_cluster/kube-system/certs/* certs/workload_cluster/kube-system/certs/* env/*"
+for file in ${FILES}
+do
+    cat ${file} | base64 | vault kv put eck/v1/${CLOUD_PROVIDER}/${PREFIX}/${file} base64-content=-
+done
+cd ../../..
+```
+
+## Delete environment from Vault
+
+Delete secrets:
+
+```
+export PREFIX=test
+export CLOUD_PROVIDER={safespring|citycloud|exoscale}
+FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml rke/kube_config_eck-wc.yaml env/env.sh certs/service_cluster/kube-system/certs/ca-key.pem certs/service_cluster/kube-system/certs/ca.pem certs/service_cluster/kube-system/certs/helm-key.pem certs/service_cluster/kube-system/certs/helm.pem certs/service_cluster/kube-system/certs/tiller-key.pem certs/service_cluster/kube-system/certs/tiller.pem certs/workload_cluster/kube-system/certs/ca-key.pem certs/workload_cluster/kube-system/certs/ca.pem certs/workload_cluster/kube-system/certs/helm-key.pem certs/workload_cluster/kube-system/certs/helm.pem certs/workload_cluster/kube-system/certs/tiller-key.pem certs/workload_cluster/kube-system/certs/tiller.pem"
+
+# Delete just data for the current version
+for file in ${FILES}
+do
+    vault kv delete eck/v1/${CLOUD_PROVIDER}/${PREFIX}/${file}
+done
+
+# Delete everything: metadata and all versions
+for file in ${FILES}
+do
+    vault kv metadata delete eck/v1/${CLOUD_PROVIDER}/${PREFIX}/${file}
+done
+```
 
 ## Cloud infrastructure
 
