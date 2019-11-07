@@ -1,0 +1,70 @@
+global:
+  rbac:
+    pspEnabled: {{ env "ENABLE_PSP" | default "true" }}
+
+prometheusOperator:
+  enabled: false
+  createCustomResource: false
+
+alertmanager:
+  enabled: false
+
+nodeExporter:
+  enabled: false
+
+grafana:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    enableAdminAPI: false
+    replicas: 1
+    securityContext:
+      fsGroup: 2000
+      runAsNonRoot: true
+      runAsUser: 1000
+    externalLabels: 
+      cluster: service_cluster
+    additionalScrapeConfigs:
+    - job_name: 'federate'
+      scrape_interval: 30s
+
+      honor_labels: true
+      metrics_path: '/federate'
+
+      scheme: https
+
+      params:
+        'match[]':
+          - '{job="customer-*"}'
+
+      tls_config:
+        insecure_skip_verify: true
+
+      static_configs:
+        - labels:
+            cluster: workload_cluster
+          targets:
+          - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
+
+    serviceMonitorSelector:
+      matchLabels:
+        target: none
+    resources:
+      requests:
+        memory: 512Mi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
+        cpu: "300m" # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+      limits:
+        memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
+        cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+    externalLabels:
+      cluster: service_cluster

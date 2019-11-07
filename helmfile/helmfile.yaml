@@ -118,6 +118,17 @@ releases:
   values:
   - values/dex.yaml.gotmpl
 
+# Prometheus-operator
+- name: prometheus-operator-customer
+  namespace: monitoring
+  labels:
+    app: prometheus-operator-customer
+  chart: stable/prometheus-operator
+  version: 6.2.1
+  missingFileHandler: error
+  values:
+  - values/prometheus-operator-sc-customer.yaml.gotmpl
+
 # Harbor
 - name: harbor
   namespace: harbor

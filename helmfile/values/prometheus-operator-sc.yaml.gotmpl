@@ -173,11 +173,10 @@ prometheus:
   prometheusSpec:
     resources:
       requests:
-        memory: 1Gi
-        cpu: 0.3
-      limits:
-        memory: 2Gi
-        cpu: 1
+        memory: 1Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
+        cpu: "300m" # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+        memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
+        cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
     remoteRead:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD" }}
     remoteWrite:

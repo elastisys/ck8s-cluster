@@ -1,0 +1,28 @@
+# The images will export data with jmx exporter to port 8080 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testjar-deployment
+  namespace: monitoring
+  labels:
+    app: customer-jar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customer-jar
+  template:
+    metadata:
+      labels:
+        app: customer-jar
+    spec:
+      containers:
+        resources:
+          limits:
+            memory: "225Mi"
+            cpu: "100m"
+      - name: customer-javajar
+        image: erikgunne/rep:testjar
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
