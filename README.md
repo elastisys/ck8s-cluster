@@ -227,6 +227,18 @@ done
 cd ../../..
 ```
 
+## Customer access
+
+The `deploy-wc.sh` script creates RBAC resources, namespaces and a kubeconfig-file (`customer_kubeconfig.yaml`) to be used by the customer.
+You can configure what namespaces should be created and which users that should get access using the following environment variables:
+
+```
+CUSTOMER_NAMESPACES="demo1 demo2 demo3" # default: demo
+CUSTOMER_ADMIN_USERS="admin1@example.com admin2@example.com" # default: admin@example.com
+```
+
+The customer kubeconfig will be configured to use the first namespace by default.
+
 ## Delete environment from Vault
 
 Delete secrets:
@@ -540,41 +552,6 @@ Example using the CLI:
     # Delete secret completely
     vault kv metadata delete $SECRET_PATH
 
-
-## Customer demo access
-
-Set up customer access in a demo environment:
-
-```
-kubectl create ns demo
-kubectl -n demo create rolebinding demo-admin --clusterrole=admin --user=admin@example.com
-```
-
-Generate kubeconfig for customer:
-
-```
-ENVIRONMENT_NAME=test
-ECK_SC_DOMAIN=${ENVIRONMENT_NAME}-sc.elastisys.se
-ECK_WC_DOMAIN=${ENVIRONMENT_NAME}-wc.elastisys.se
-OIDC_ISSUER_URL=https://dex.${ECK_SC_DOMAIN}
-OIDC_CLIENT_ID=kubernetes
-OIDC_CLIENT_SECRET=ZXhhbXBsZS1hcHAtc2VjcmV0
-
-KUBECONFIG=customer_kubeconfig.yaml
-kubectl config set-cluster compliantk8s --server=https://${ECK_WC_DOMAIN}:6443
-kubectl config set-credentials developer --exec-command=kubelogin \
-  --exec-api-version=client.authentication.k8s.io/v1beta1 \
-  --exec-arg=get-token \
-  --exec-arg=--oidc-issuer-url=${OIDC_ISSUER_URL} \
-  --exec-arg=--oidc-client-id=${OIDC_CLIENT_ID} \
-  --exec-arg=--oidc-client-secret=${OIDC_CLIENT_SECRET} \
-  --exec-arg=--oidc-extra-scope=email
-kubectl config set-context developer@compliantk8s --user developer --cluster=compliantk8s --namespace=demo
-kubectl config use-context developer@compliantk8s
-```
-
-Finally copy the `cluster` definition from `kube_config_eck-wc.yaml`.
-Including `certificate-authority-data` and `server`.
 
 ## Issues and limitations
 

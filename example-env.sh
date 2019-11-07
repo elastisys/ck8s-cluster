@@ -71,3 +71,7 @@ export GOOGLE_CLIENT_SECRET=somelongsecret
 export GRAFANA_PWD=somelongsecret
 export HARBOR_PWD=somelongsecret
 export INFLUXDB_PWD=somelongsecret
+
+# Customer access
+export CUSTOMER_NAMESPACES="demo1 demo2 demo3" # default "demo"
+export CUSTOMER_ADMIN_USERS="admin1@example.com admin2@example.com" # default "admin@example.com"
