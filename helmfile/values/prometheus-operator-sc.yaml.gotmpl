@@ -150,7 +150,7 @@ grafana:
       name: dex
       enabled: true
       client_id: grafana
-      client_secret: Z3JhZmFuYS1zZWNyZXQK
+      client_secret: {{ requiredEnv "GRAFANA_CLIENT_SECRET" }}
       scopes: profile email openid
       auth_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/auth
       token_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/token

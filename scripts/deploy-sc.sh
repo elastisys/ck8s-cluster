@@ -53,6 +53,10 @@ fi
 INFLUXDB_PWD=${INFLUXDB_PWD:-"demo-pass"}
 HARBOR_PWD=${HARBOR_PWD:-"Harbor12345"}
 GRAFANA_PWD=${GRAFANA_PWD:-"prom-operator"}
+DASHBOARD_CLIENT_SECRET=${DASHBOARD_CLIENT_SECRET:-"$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"}
+GRAFANA_CLIENT_SECRET=${GRAFANA_CLIENT_SECRET:-"$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"}
+# This one is special since it is used also by deploy-wc.sh
+: "${KUBELOGIN_CLIENT_SECRET:?Missing KUBELOGIN_CLIENT_SECRET}"
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then

@@ -13,6 +13,7 @@ ingress:
 https: false
 
 config:
+  issuer: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}
   connectors:
   {{ if and (env "GOOGLE_CLIENT_ID") (env "GOOGLE_CLIENT_SECRET") }}
   - type: oidc
@@ -40,15 +41,19 @@ config:
       insecureSkipEmailVerified: true
   {{ end }}
   staticClients:
-    - id: kubernetes
+    - id: dashboard
       name: 'Kubernetes dashboard'
-      secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+      secret: {{ requiredEnv "DASHBOARD_CLIENT_SECRET" }}
       redirectURIs:
-      - http://localhost:8000
       - https://dashboard.{{ requiredEnv "ECK_SC_DOMAIN" }}/oauth2/callback
       - https://dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}/oauth2/callback
+    - id: kubelogin
+      name: 'Kubernetes CLI'
+      secret: {{ requiredEnv "KUBELOGIN_CLIENT_SECRET" }}
+      redirectURIs:
+      - http://localhost:8000
     - id: grafana
-      secret: Z3JhZmFuYS1zZWNyZXQK  # encoded 'grafana-secret'
+      secret: {{ requiredEnv "GRAFANA_CLIENT_SECRET" }}
       name: 'Grafana'
       redirectURIs:
         - https://grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}/login/generic_oauth
@@ -62,5 +67,3 @@ config:
       username: "admin"
       userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
 {{ end }}
-
-  issuer: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}

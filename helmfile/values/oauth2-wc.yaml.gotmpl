@@ -1,9 +1,9 @@
 # Oauth client configuration specifics
 config:
   # OAuth client ID
-  clientID: "kubernetes"
+  clientID: "dashboard"
   # OAuth client secret
-  clientSecret: "ZXhhbXBsZS1hcHAtc2VjcmV0"
+  clientSecret: "{{ requiredEnv "DASHBOARD_CLIENT_SECRET" }}"
   # Create a new secret with the following command
   # openssl rand -base64 32 | head -c 32 | base64
   # Use an existing secret for OAuth2 credentials (see secret.yaml for required fields)
@@ -19,7 +19,7 @@ extraArgs:
   provider: oidc
   upstream: http://kubernetes-dashboard.kube-system.svc.cluster.local
   pass-authorization-header: true
-  redirect-url: https://dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}/oauth2/callback"
+  redirect-url: https://dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}/oauth2/callback
   oidc-issuer-url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}
   ssl-insecure-skip-verify: {{ requiredEnv "TLS_SKIP_VERIFY" }}
 
