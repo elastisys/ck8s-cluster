@@ -1,10 +1,10 @@
 global:
   rbac:
-    pspEnabled: {{ env "ENABLE_PSP" | default "true" }}
+    pspEnabled: {{ requiredEnv "ENABLE_PSP" }}
 
 kube-state-metrics:
   podSecurityPolicy:
-    enabled: {{ env "ENABLE_PSP" | default "true" }}
+    enabled: {{ requiredEnv "ENABLE_PSP" }}
 
 alertmanager:
   config:
@@ -95,7 +95,7 @@ grafana:
       - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}
   rbac:
     pspUseAppArmor: false
-    pspEnabled: {{ env "ENABLE_PSP" | default "true" }}
+    pspEnabled: {{ requiredEnv "ENABLE_PSP" }}
 
   serviceAccount:
     create: true
