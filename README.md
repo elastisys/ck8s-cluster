@@ -98,7 +98,9 @@ In order to setup a new Compliant Kubernetes cluster you will need to do the fol
 
 Create 4 S3 buckets, one for each of Harbor, Velero, Elasticsearch and Influxdb.
 
-Decide on a name for this environment, the cloud provider to use and add common environment variables:
+Decide on a name for this environment, the cloud provider to use and add environment variables to the `env.sh` file.
+More details on available variables and an example is available in `example-env.sh`.
+The minimum you will need is documented here:
 
 ```
 # Add these to env.sh
@@ -122,7 +124,11 @@ export OS_PASSWORD=<password>
 # You should also have AWS credentials in ~/.aws/credentials, or add these:
 export AWS_ACCESS_KEY_ID=<xxx>
 export AWS_SECRET_ACCESS_KEY=<xxx>
+```
 
+Save `env.sh` when you are done and `source` all environment files to set the environment variables:
+
+```
 # Source all environment files
 source env.sh
 source common-env.sh
@@ -310,7 +316,7 @@ For citycloud we are not responsible for creating the infrastructure, they will 
 Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx`
 (should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`.
 
-The commands listed above will set up the cloud infrastructure using a "default" configuration. Changing the number of machines and thier size can be done by exporting the following values before running `terraform apply`.
+The commands listed above will set up the cloud infrastructure using a "default" configuration. Changing the number of machines and their size can be done by exporting the following values before running `terraform apply`.
 
     export TF_VAR_sc_master_count=<x | default 1>
     export TF_VAR_sc_master_size=<x | default "Large">
