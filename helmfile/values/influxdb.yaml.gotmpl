@@ -7,13 +7,13 @@ persistence:
 setDefaultUser:
   user:
     username: demo
-    password: {{ env "INFLUXDB_PWD" | default "demo-pass" }}
+    password: {{ requiredEnv "INFLUXDB_PWD" }}
 
 env:
 - name: INFLUXDB_ADMIN_USER
   value: demo
 - name: INFLUXDB_ADMIN_PASSWORD
-  value: {{ env "INFLUXDB_PWD" | default "demo-pass" }}
+  value: {{ requiredEnv "INFLUXDB_PWD" }}
 
 config:
   http:

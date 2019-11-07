@@ -78,7 +78,7 @@ kubeScheduler:
 
 grafana:
   # admin username is "admin"
-  adminPassword: {{ env "GRAFANA_PWD" | default "prom-operator" }}
+  adminPassword: {{ requiredEnv "GRAFANA_PWD" }}
 
   ingress:
     enabled: true
@@ -172,8 +172,8 @@ prometheus:
         memory: 2Gi
         cpu: 1
     remoteRead:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD" }}
     remoteWrite:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ env "INFLUXDB_PWD" | default "demo-pass" }}
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD" }}
     externalLabels:
       cluster: service_cluster
