@@ -185,9 +185,6 @@ Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
 ```
-export ECK_SC_DOMAIN=${ENVIRONMENT_NAME}-sc.elastisys.se
-export ECK_WC_DOMAIN=${ENVIRONMENT_NAME}-wc.elastisys.se
-
 ./scripts/gen-rke-conf-sc.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json  > clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-sc.yaml
 ./scripts/gen-rke-conf-wc.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json > clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-wc.yaml
 

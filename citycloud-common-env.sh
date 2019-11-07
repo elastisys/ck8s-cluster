@@ -9,3 +9,6 @@ export OS_IDENTITY_API_VERSION=3
 export OS_PROJECT_ID=ba47a6b513b645dd94fa31ea5e2becbd
 export S3_REGION=fra1
 export S3_REGION_ENDPOINT=https://swift-fra1.citycloud.com:8080/
+
+export ECK_SC_DOMAIN=${ENVIRONMENT_NAME}-sc.elastisys.se
+export ECK_WC_DOMAIN=${ENVIRONMENT_NAME}-wc.elastisys.se

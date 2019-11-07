@@ -17,7 +17,7 @@ variable "nfs_flavor_id" {}
 variable "dns_name" {}
 
 variable "aws_dns_zone_id" {
-  default = "Z2STJRQSJO5PZ0" # elastisys.com
+  default = "Z2STJRQSJO5PZ0" # elastisys.se
 }
 
 variable "role_arn" {
