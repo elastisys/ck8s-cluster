@@ -13,3 +13,4 @@ certs
 **/*.rkestate
 env.sh
 hosts.ini
+clusters
