@@ -241,7 +241,7 @@ kubectl config view --raw \
     -o jsonpath="{.clusters[0].cluster.certificate-authority-data}" \
     | base64 --decode > ${CUSTOMER_CERTIFICATE_AUTHORITY}
 
-CUSTOMER_KUBECONFIG=customer_kubeconfig.yaml
+CUSTOMER_KUBECONFIG=${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/customer/kubeconfig.yaml
 kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-cluster compliantk8s \
     --server=${CUSTOMER_SERVER} \
     --certificate-authority=${CUSTOMER_CERTIFICATE_AUTHORITY} --embed-certs=true

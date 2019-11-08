@@ -61,13 +61,26 @@ export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|exoscale|citycloud}
 
 # Create folder structure
-FOLDERS="ssh-keys rke infra env certs/service_cluster/kube-system/certs certs/workload_cluster/kube-system/certs"
+FOLDERS="ssh-keys rke infra env customer certs/service_cluster/kube-system/certs certs/workload_cluster/kube-system/certs"
 for folder in ${FOLDERS}
 do
     mkdir -p clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/${folder}
 done
 
-FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml rke/kube_config_eck-wc.yaml env/env.sh certs/service_cluster/kube-system/certs/ca-key.pem certs/service_cluster/kube-system/certs/ca.pem certs/service_cluster/kube-system/certs/helm-key.pem certs/service_cluster/kube-system/certs/helm.pem certs/service_cluster/kube-system/certs/tiller-key.pem certs/service_cluster/kube-system/certs/tiller.pem certs/workload_cluster/kube-system/certs/ca-key.pem certs/workload_cluster/kube-system/certs/ca.pem certs/workload_cluster/kube-system/certs/helm-key.pem certs/workload_cluster/kube-system/certs/helm.pem certs/workload_cluster/kube-system/certs/tiller-key.pem certs/workload_cluster/kube-system/certs/tiller.pem"
+FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
+rke/kube_config_eck-wc.yaml env/env.sh customer/kubeconfig.yaml
+certs/service_cluster/kube-system/certs/ca-key.pem
+certs/service_cluster/kube-system/certs/ca.pem
+certs/service_cluster/kube-system/certs/helm-key.pem
+certs/service_cluster/kube-system/certs/helm.pem
+certs/service_cluster/kube-system/certs/tiller-key.pem
+certs/service_cluster/kube-system/certs/tiller.pem
+certs/workload_cluster/kube-system/certs/ca-key.pem
+certs/workload_cluster/kube-system/certs/ca.pem
+certs/workload_cluster/kube-system/certs/helm-key.pem
+certs/workload_cluster/kube-system/certs/helm.pem
+certs/workload_cluster/kube-system/certs/tiller-key.pem
+certs/workload_cluster/kube-system/certs/tiller.pem"
 for file in ${FILES}
 do
     vault kv get -field=base64-content eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file} | base64 --decode > clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file}
@@ -139,7 +152,7 @@ Generate ssh-keys and folder structure:
 
 ```
 # Create folder structure
-FOLDERS="ssh-keys rke infra env certs"
+FOLDERS="ssh-keys rke infra env certs customer"
 for folder in ${FOLDERS}
 do
     mkdir -p clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/${folder}
@@ -219,7 +232,7 @@ You can now store all the important credentials and state used so far in vault:
 ```
 cp env.sh clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/env/env.sh
 cd clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}
-FILES="ssh-keys/* rke/* certs/service_cluster/kube-system/certs/* certs/workload_cluster/kube-system/certs/* env/*"
+FILES="ssh-keys/* rke/* customer/* certs/service_cluster/kube-system/certs/* certs/workload_cluster/kube-system/certs/* env/*"
 for file in ${FILES}
 do
     cat ${file} | base64 | vault kv put eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file} base64-content=-
@@ -229,7 +242,7 @@ cd ../../..
 
 ## Customer access
 
-The `deploy-wc.sh` script creates RBAC resources, namespaces and a kubeconfig-file (`customer_kubeconfig.yaml`) to be used by the customer.
+The `deploy-wc.sh` script creates RBAC resources, namespaces and a kubeconfig-file (`clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/customer/kubeconfig.yaml`) to be used by the customer.
 You can configure what namespaces should be created and which users that should get access using the following environment variables:
 
 ```
@@ -246,7 +259,20 @@ Delete secrets:
 ```
 export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|citycloud|exoscale}
-FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml rke/kube_config_eck-wc.yaml env/env.sh certs/service_cluster/kube-system/certs/ca-key.pem certs/service_cluster/kube-system/certs/ca.pem certs/service_cluster/kube-system/certs/helm-key.pem certs/service_cluster/kube-system/certs/helm.pem certs/service_cluster/kube-system/certs/tiller-key.pem certs/service_cluster/kube-system/certs/tiller.pem certs/workload_cluster/kube-system/certs/ca-key.pem certs/workload_cluster/kube-system/certs/ca.pem certs/workload_cluster/kube-system/certs/helm-key.pem certs/workload_cluster/kube-system/certs/helm.pem certs/workload_cluster/kube-system/certs/tiller-key.pem certs/workload_cluster/kube-system/certs/tiller.pem"
+FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
+rke/kube_config_eck-wc.yaml env/env.sh
+certs/service_cluster/kube-system/certs/ca-key.pem
+certs/service_cluster/kube-system/certs/ca.pem
+certs/service_cluster/kube-system/certs/helm-key.pem
+certs/service_cluster/kube-system/certs/helm.pem
+certs/service_cluster/kube-system/certs/tiller-key.pem
+certs/service_cluster/kube-system/certs/tiller.pem
+certs/workload_cluster/kube-system/certs/ca-key.pem
+certs/workload_cluster/kube-system/certs/ca.pem
+certs/workload_cluster/kube-system/certs/helm-key.pem
+certs/workload_cluster/kube-system/certs/helm.pem
+certs/workload_cluster/kube-system/certs/tiller-key.pem
+certs/workload_cluster/kube-system/certs/tiller.pem"
 
 # Delete just data for the current version
 for file in ${FILES}
