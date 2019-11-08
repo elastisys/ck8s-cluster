@@ -29,6 +29,19 @@ persistence:
     redis:
       size: 1Gi
   imageChartStorage:
+    {{ if eq (requiredEnv "CLOUD_PROVIDER") "citycloud" }}
+    type: swift
+    swift:
+      authurl: {{ requiredEnv "OS_AUTH_URL" }}/v3
+      username: {{ requiredEnv "OS_USERNAME" }}
+      password: {{ requiredEnv "OS_PASSWORD" }}
+      container: {{ requiredEnv "S3_HARBOR_BUCKET_NAME" }}
+      region: {{ requiredEnv "OS_REGION_NAME" }}
+      authversion: {{ requiredEnv "OS_AUTH_VERSION" }}
+      tenant: {{ requiredEnv "OS_TENANT_NAME" }}
+      domain: {{ requiredEnv "OS_PROJECT_DOMAIN_NAME" }}
+    disableredirect: true
+    {{ else }}
     type: s3
     s3:
       region: {{ requiredEnv "S3_REGION" }}
@@ -36,6 +49,7 @@ persistence:
       bucket: {{ requiredEnv "S3_HARBOR_BUCKET_NAME" }}
       secretkey: {{ requiredEnv "S3_SECRET_KEY" }}
       accesskey: {{ requiredEnv "S3_ACCESS_KEY" }}
+    {{ end }}
 
 externalURL: https://harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}
 
