@@ -22,3 +22,12 @@ export INFLUX_BACKUP_SCHEDULE="0 0 * * *"
 
 # Disable alerts
 export ALERT_TO=none
+# In case we want alerts at some point
+export SLACK_API_URL=https://hooks.slack.com/services/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
+
+export ENABLE_PSP=true
+export ENABLE_OPA=true
+export ENABLE_HARBOR=true
+export OAUTH_ALLOWED_DOMAINS="example.com"
+export CUSTOMER_NAMESPACES="demo"
+export CUSTOMER_ADMIN_USERS="admin@example.com"
