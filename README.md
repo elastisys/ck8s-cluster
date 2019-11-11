@@ -125,6 +125,11 @@ export S3_VELERO_BUCKET_NAME=<velero-bucket>
 export S3_ES_BACKUP_BUCKET_NAME=<es-backup>
 export S3_INFLUX_BUCKET_URL=s3://<influxdb-bucket>
 
+# Generate a client secret for Oauth and add to env.sh
+# You can use this command to generate the secret:
+# cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20
+export KUBELOGIN_CLIENT_SECRET=<the-secret-here>
+
 # Cloud provider specific env. Add these to env.sh
 # Exoscale
 export TF_VAR_exoscale_api_key=<xxx>
