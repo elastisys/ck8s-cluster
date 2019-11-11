@@ -65,7 +65,7 @@ then
 fi
 
 # Domains that should be allowed to log in using OAuth
-export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-elastisys.com}"
+export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-example.com}"
 
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
