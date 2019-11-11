@@ -68,7 +68,7 @@ export GOOGLE_CLIENT_ID=1234512345abcdeabcde.apps.googleusercontent.com
 export GOOGLE_CLIENT_SECRET=somelongsecret
 
 # Only emails with these domains are allowed to login through dex.
-# Applies to Grafana oauth login.
+# Applies to Google as identity provider and Grafana oauth login.
 export OAUTH_ALLOWED_DOMAINS="example.com elastisys.com" # default "example.com"
 
 # Passwords for services

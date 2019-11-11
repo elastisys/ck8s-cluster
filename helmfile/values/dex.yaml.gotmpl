@@ -28,6 +28,8 @@ config:
       redirectURI: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/callback
       clientID: {{ env "GOOGLE_CLIENT_ID" }}
       clientSecret: {{ env "GOOGLE_CLIENT_SECRET" }}
+      hostedDomains:
+{{ requiredEnv "OAUTH_ALLOWED_DOMAINS" | splitList " " | toYaml | indent 8 }}
   {{ end }}
   {{ if and (env "AAA_CLIENT_ID") (env "AAA_CLIENT_SECRET") }}
   - name: AAA
