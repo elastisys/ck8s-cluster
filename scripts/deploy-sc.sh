@@ -25,14 +25,10 @@ infra="$1"
 : "${S3_INFLUX_BUCKET_URL:?Missing S3_INFLUX_BUCKET_URL}"
 : "${INFLUX_BACKUP_SCHEDULE:?Missing INFLUX_BACKUP_SCHEDULE}"
 
-# Alerting variables
-ALERT_TO=${ALERT_TO:-slack}
-# Default URL is for sending to the #ck8s-ops channel
-SLACK_API_URL=${SLACK_API_URL:-https://hooks.slack.com/services/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}
-
-# If unset -> true
-ENABLE_PSP=${ENABLE_PSP:-true}
-ENABLE_HARBOR=${ENABLE_HARBOR:-true}
+: "${ENABLE_PSP:?Missing ENABLE_PSP}"
+: "${ENABLE_HARBOR:?Missing ENABLE_HARBOR}"
+: "${SLACK_API_URL:?Missing SLACK_API_URL}"
+: "${OAUTH_ALLOWED_DOMAINS:?Missing OAUTH_ALLOWED_DOMAINS}"
 
 # If unset -> false
 ECK_RESTORE_CLUSTER=${ECK_RESTORE_CLUSTER:-false}
@@ -63,9 +59,6 @@ then
     : "${S3_HARBOR_BUCKET_NAME:?Missing S3_HARBOR_BUCKET_NAME}"
     : "${S3_ES_BACKUP_BUCKET_NAME:?Missing S3_ES_BACKUP_BUCKET_NAME}"
 fi
-
-# Domains that should be allowed to log in using OAuth
-export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-example.com}"
 
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then

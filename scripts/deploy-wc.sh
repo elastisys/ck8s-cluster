@@ -10,10 +10,10 @@ set -e
 : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
 : "${S3_VELERO_BUCKET_NAME:?Missing S3_VELERO_BUCKET_NAME}"
 : "${KUBELOGIN_CLIENT_SECRET:?Missing KUBELOGIN_CLIENT_SECRET}"
-
-# If unset -> true.
-ENABLE_OPA=${ENABLE_OPA:-true}
-ENABLE_PSP=${ENABLE_PSP:-true}
+: "${ENABLE_OPA:?Missing ENABLE_OPA}"
+: "${ENABLE_PSP:?Missing ENABLE_PSP}"
+: "${CUSTOMER_NAMESPACES:?Missing CUSTOMER_NAMESPACES}"
+: "${CUSTOMER_ADMIN_USERS:?Missing CUSTOMER_ADMIN_USERS}"
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
@@ -214,10 +214,6 @@ helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply
 #
 
 # Create namespace(s) and RBAC
-
-CUSTOMER_NAMESPACES=${CUSTOMER_NAMESPACES:-"demo"}
-CUSTOMER_ADMIN_USERS=${CUSTOMER_ADMIN_USERS:-"admin@example.com"}
-
 for namespace in ${CUSTOMER_NAMESPACES}
 do
     kubectl create namespace "${namespace}" \

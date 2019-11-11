@@ -56,7 +56,6 @@ export OS_PASSWORD=somelongsecret
 
 export CERT_TYPE="<staging|prod>"
 
-
 export ENABLE_HARBOR="<true|false>" # default true
 export ENABLE_PSP="<true|false>" # default true
 export ENABLE_OPA="<true|false>" # default true
@@ -71,11 +70,20 @@ export GOOGLE_CLIENT_SECRET=somelongsecret
 # Applies to Google as identity provider and Grafana oauth login.
 export OAUTH_ALLOWED_DOMAINS="example.com elastisys.com" # default "example.com"
 
-# Passwords for services
-export GRAFANA_PWD=somelongsecret
-export HARBOR_PWD=somelongsecret
-export INFLUXDB_PWD=somelongsecret
-
 # Customer access
 export CUSTOMER_NAMESPACES="demo1 demo2 demo3" # default "demo"
 export CUSTOMER_ADMIN_USERS="admin1@example.com admin2@example.com" # default "admin@example.com"
+
+# Create a static dex user "admin@example.com"
+export ENABLE_STATIC_DEX_LOGIN="<true|false>" # default false
+# Dex static user password bcrypt hash
+export DEX_STATIC_PWD="some-bcrypt-hash" # default hash of "password"
+
+# Passwords for services
+export GRAFANA_PWD=somelongsecret # default randomly generated
+export HARBOR_PWD=somelongsecret # default randomly generated
+export INFLUXDB_PWD=somelongsecret # default randomly generated
+
+# Alerting variables
+export ALERT_TO="slack" # default "slack", set to anything else to disable alerts
+export SLACK_API_URL="https://..." # Default URL is for sending to the #ck8s-ops channel
