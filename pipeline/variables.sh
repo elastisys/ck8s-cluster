@@ -31,3 +31,5 @@ export ENABLE_HARBOR=true
 export OAUTH_ALLOWED_DOMAINS="example.com"
 export CUSTOMER_NAMESPACES="demo"
 export CUSTOMER_ADMIN_USERS="admin@example.com"
+
+export KUBELOGIN_CLIENT_SECRET=17le97RfmMidKeoTTBxC
