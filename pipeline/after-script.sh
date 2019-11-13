@@ -1,12 +1,12 @@
 #!/bin/bash
 
 if [ "$BITBUCKET_EXIT_CODE" == "0" ]
-then 
+then
     exit 0
 fi
 
 if [[ "$#" -lt 1 ]]
-then 
+then
   >&2 echo "Usage: after-script.sh <init-script>"
   exit 1
 fi
@@ -21,14 +21,14 @@ source pipeline/vault-variables.sh
 export VAULT_TOKEN=$(cat vault-token.txt)
 
 # Revoke vault token, remove password secrets for services
-./pipeline/vault-cleanup.sh grafana harbor influxdb
+./pipeline/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashboard_client grafana_client
 
 export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
 if [ "$CLOUD_PROVIDER" == "exoscale" ]
-then 
+then
     cd terraform/exoscale
 elif [ "$CLOUD_PROVIDER" == "safespring" ]
-then 
+then
     cd terraform/safespring
 fi
 echo '1' | TF_WORKSPACE=pipeline terraform init
