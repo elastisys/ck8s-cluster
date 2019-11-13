@@ -30,6 +30,14 @@ infra="$1"
 : "${SLACK_API_URL:?Missing SLACK_API_URL}"
 : "${OAUTH_ALLOWED_DOMAINS:?Missing OAUTH_ALLOWED_DOMAINS}"
 
+# Check that passwords are set
+: "${INFLUXDB_PWD:?Missing INFLUXDB_PWD}"
+: "${HARBOR_PWD:?Missing HARBOR_PWD}"
+: "${GRAFANA_PWD:?Missing GRAFANA_PWD}"
+: "${DASHBOARD_CLIENT_SECRET:?Missing DASHBOARD_CLIENT_SECRET}"
+: "${GRAFANA_CLIENT_SECRET:?Missing GRAFANA_CLIENT_SECRET}"
+: "${KUBELOGIN_CLIENT_SECRET:?Missing KUBELOGIN_CLIENT_SECRET}"
+
 # If unset -> false
 ECK_RESTORE_CLUSTER=${ECK_RESTORE_CLUSTER:-false}
 
@@ -44,15 +52,6 @@ then
 else
     export STORAGE_CLASS=nfs-client
 fi
-
-# Generate passwords and client secrets if needed
-INFLUXDB_PWD=${INFLUXDB_PWD:-"$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"}
-HARBOR_PWD=${HARBOR_PWD:-"$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"}
-GRAFANA_PWD=${GRAFANA_PWD:-"$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"}
-DASHBOARD_CLIENT_SECRET=${DASHBOARD_CLIENT_SECRET:-"$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"}
-GRAFANA_CLIENT_SECRET=${GRAFANA_CLIENT_SECRET:-"$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"}
-# This one is special since it is used also by deploy-wc.sh
-: "${KUBELOGIN_CLIENT_SECRET:?Missing KUBELOGIN_CLIENT_SECRET}"
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then

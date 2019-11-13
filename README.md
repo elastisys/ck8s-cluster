@@ -54,6 +54,9 @@ The main difference between them is in setting up the cloud infrastructure. We h
 
 ## Get environment from Vault
 
+Configure the vault address: `export VAULT_ADDR=https://vault.eck.elastisys.se`
+and log in to Vault: `vault login`.
+
 Get environment data from vault:
 
 ```
@@ -125,11 +128,6 @@ export S3_VELERO_BUCKET_NAME=<velero-bucket>
 export S3_ES_BACKUP_BUCKET_NAME=<es-backup>
 export S3_INFLUX_BUCKET_URL=s3://<influxdb-bucket>
 
-# Generate a client secret for Oauth and add to env.sh
-# You can use this command to generate the secret:
-# cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20
-export KUBELOGIN_CLIENT_SECRET=<the-secret-here>
-
 # Cloud provider specific env. Add these to env.sh
 # Exoscale
 export TF_VAR_exoscale_api_key=<xxx>
@@ -170,6 +168,14 @@ ssh-keygen -q -N "" -f clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_
 # Add ssh-keys to agent:
 ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_sc
 ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_wc
+```
+
+Generate passwords and client secrets and store them in vault.
+This script also sets the passwords as environment variables to be used by other scripts.
+Note that you have to be logged in to vault for this (`vault login`).
+
+```
+source scripts/get-gen-secrets.sh
 ```
 
 Create the infrastructure using terraform:
