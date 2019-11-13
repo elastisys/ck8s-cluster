@@ -95,6 +95,12 @@ pipelines:
               script:
                 - source pipeline/init-exoscale.sh
                 - source pipeline/variables.sh
+                # Export vault variables
+                - source pipeline/vault-variables.sh
+                # Export vault token
+                - export VAULT_TOKEN=$(cat vault-token.txt)
+                # Export passwords
+                - source pipeline/get-pwds.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - ./scripts/deploy-wc.sh "$BITBUCKET_CLONE_DIR/infra.json"
@@ -258,6 +264,12 @@ pipelines:
               script:
                 - source pipeline/init-safespring.sh
                 - source pipeline/variables.sh
+                # Export vault variables
+                - source pipeline/vault-variables.sh
+                # Export vault token
+                - export VAULT_TOKEN=$(cat vault-token.txt)
+                # Export passwords
+                - source pipeline/get-pwds.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - ./scripts/deploy-wc.sh "$BITBUCKET_CLONE_DIR/infra.json"
