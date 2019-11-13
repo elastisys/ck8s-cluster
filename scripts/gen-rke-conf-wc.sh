@@ -15,7 +15,7 @@ then
 fi
 
 if [[ "$#" -ne 1 ]]
-then 
+then
   >&2 echo "Usage: gen-rke-conf-wc.sh <path-to-infra-file>"
   exit 1
 fi
@@ -111,7 +111,7 @@ cat <<EOF
       - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
       oidc-issuer-url: https://dex.${ECK_SC_DOMAIN}
-      oidc-client-id: kubernetes
+      oidc-client-id: kubelogin
       oidc-username-claim: email
       oidc-groups-claim: groups
       audit-policy-file: "/etc/kubernetes/conf/audit-policy.yaml"
@@ -125,7 +125,7 @@ EOF
 
 if [[ $ENABLE_PSP == "true" ]]
 then
-cat <<EOF 
+cat <<EOF
       # Enables PodTolerationRestriction, PodNodeSelector, and PSP admission plugin in apiserver
       enable-admission-plugins: "PodTolerationRestriction,PodNodeSelector,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction,PodSecurityPolicy"
 EOF
