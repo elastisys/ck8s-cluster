@@ -147,6 +147,7 @@ extraConfigMaps:
           @id elasticsearch
           @type elasticsearch
           @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+          include_tag_key true
           type_name _doc
           host "#{ENV['OUTPUT_HOST']}"
           port "#{ENV['OUTPUT_PORT']}"
@@ -156,31 +157,35 @@ extraConfigMaps:
           ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
           user "#{ENV['OUTPUT_USER']}"
           password "#{ENV['OUTPUT_PASSWORD']}"
+          #logstash_format true
+          #logstash_prefix "#{ENV['LOGSTASH_PREFIX']}"
           reconnect_on_error true
-          id_key _hash
+          # Custom parameters --START--
+          # Avoids congestion if the plugin is installed
+          id_key _hash 
           remove_keys _hash
-          log_es_400_reason true
-          include_tag_key true
-          include_timestamp true
-          time_key time
           flatten_hashes true
           flatten_hashes_separator .
-          index_name logstash-alias
+          # Fixes restrictions of not having logstash format
+          include_timestamp true
+          time_key time
           # Rollover index configuration
+          index_name logstash-alias
           rollover_index true
           deflector_alias logstash-alias
           index_prefix logstash
           index_separator "."
           index_date_pattern "now/d"
+          # Ilm configuration
           enable_ilm true
           # Policy is already created by init container so fluentd will skip it's creation
-          ilm_policy_id watch-history-ilm-policy
+          ilm_policy_id datastream_policy
           ilm_policy {}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name logstash_template
           template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.2/test/plugin/test_template.json
           customize_template {"<<index_prefix>>": "logstash"}
-          
+          # Custom parameters --END--
           <buffer>
             @type file
             path /var/log/fluentd-buffers/kubernetes.system.buffer

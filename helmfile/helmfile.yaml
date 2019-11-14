@@ -175,7 +175,7 @@ releases:
   labels:
     app: fluentd
   chart: kiwigrid/fluentd-elasticsearch
-  version: 5.1.1
+  version: 4.5.1
   missingFileHandler: error
   values:
   - values/fluentd.yaml.gotmpl

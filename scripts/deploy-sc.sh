@@ -302,13 +302,13 @@ curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_snapshot/s3_backup_repository?pre
     -H 'Content-Type: application/json' \
     -d' {"type": "s3", "settings":{ "bucket": "'"${S3_ES_BACKUP_BUCKET_NAME}"'", "client": "default"}}' \
     -k -u elastic:${ES_PW}
-
+# Creates a index template so the indexes created are marked with the correct ilm policy and rollover alias
 curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_template/logstash_template?pretty" \
     -H 'Content-Type: application/json' \
     -d' {"index_patterns": ["logstash-*"], "settings": {"number_of_shards": 1,"number_of_replicas": 1,"index.lifecycle.name": "datastream_policy", "index.lifecycle.rollover_alias": "logstash-alias"}}'\
     -k -u elastic:${ES_PW} \
-
-
+# Creates the ilm policy with hotphase of 3GB or 1d whichever comes first.
+# After the hot phase a index is moved to the delete phase for 30days before being deleted
 curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_ilm/policy/datastream_policy?pretty" \
     -H 'Content-Type: application/json' \
     -d '{"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "3GB","max_age": "1d"}}},"delete": {"min_age": "30d","actions": {"delete": {}}}}}}'\
