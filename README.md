@@ -200,14 +200,22 @@ ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_sc
 ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_wc
 ```
 
-Generate passwords and client secrets and store them in vault at https://vault.eck.elastisys.se.
-The current convention is that secrets for a specific environment are stored under `eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/`.
-This script also sets the passwords as environment variables to be used by other scripts.
-Note that you have to be logged in to vault for this (`vault login`).
+You can now choose how you want to manage passwords and other credentials.
+Either generate them automatically and store them in Vault or create them manually and add to your `env.sh` file.
+
+If you don't want to use vault, you need to set passwords using these environment variables: `HARBOR_PWD`, `GRAFANA_PWD INFLUXDB_PWD`, `KUBELOGIN_CLIENT_SECRET`, `GRAFANA_CLIENT_SECRET`, `DASHBOARD_CLIENT_SECRET`.
+Add them to your `env.sh` file and run `source env.sh` again to load them.
+
+If you want to use Vault, do this instead:
 
 ```
 source scripts/get-gen-secrets.sh
 ```
+
+The script generates passwords and client secrets and store them in vault at https://vault.eck.elastisys.se.
+The current convention is that secrets for a specific environment are stored under `eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/`.
+This script also sets the passwords as environment variables to be used by other scripts.
+Note that you need to have `vault` installed and be logged in to vault (`vault login`) to be able to run it.
 
 ### Phase 1 - Create infrastructure
 
