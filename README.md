@@ -129,16 +129,6 @@ source scripts/get-gen-secrets.sh
 
 In order to setup a new Compliant Kubernetes cluster you will need to do the following.
 
-Create 4 S3 buckets, one for each of Harbor, Velero, Elasticsearch and Influxdb.
-If you have `s3cmd` configured, you can do something like this:
-
-```
-s3cmd mb s3://<harbor-bucket>
-s3cmd mb s3://<velero-bucket>
-s3cmd mb s3://<es-backup>
-s3cmd mb s3://<influxdb-bucket>
-```
-
 Decide on a name for this environment, the cloud provider to use and add environment variables to the `env.sh` file.
 More details on available variables and an example is available in `example-env.sh`.
 The minimum you will need is documented here:
@@ -151,10 +141,10 @@ export CERT_TYPE={prod|staging}
 
 export S3_ACCESS_KEY=<exoscale_api_key>
 export S3_SECRET_KEY=<exoscale_secret_key>
-export S3_HARBOR_BUCKET_NAME=<harbor-bucket>
-export S3_VELERO_BUCKET_NAME=<velero-bucket>
-export S3_ES_BACKUP_BUCKET_NAME=<es-backup>
-export S3_INFLUX_BUCKET_URL=s3://<influxdb-bucket>
+export S3_HARBOR_BUCKET_NAME=harbor-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+export S3_VELERO_BUCKET_NAME=velero-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+export S3_ES_BACKUP_BUCKET_NAME=elasticsearch-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+export S3_INFLUX_BUCKET_URL=s3://influxdb-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 
 # Cloud provider specific env. Add these to env.sh
 # Exoscale
@@ -176,6 +166,19 @@ source env.sh
 source common-env.sh
 source ${CLOUD_PROVIDER}-common-env.sh
 ```
+
+Create 4 S3 buckets, one for each of Harbor, Velero, Elasticsearch and Influxdb.
+If you have `s3cmd` configured, you can do it like this:
+
+```
+s3cmd mb s3://harbor-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+s3cmd mb s3://velero-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+s3cmd mb s3://elasticsearch-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+s3cmd mb s3://influxdb-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+```
+
+*Note:* The names for the buckets are specified in the `env.sh` file and must match the buckets you create!
+If you run into problems, such as a bucket name already being taken, pick another name and modify `env.sh` to reflect this.
 
 Generate ssh-keys and folder structure:
 
@@ -460,5 +463,5 @@ ssh-add -d /path/to/key
 ssh-add -D
 ```
 
-As of yet it is not possible to change the default vaule of the **elastic** user that the elastisearch operator creates.
+As of yet it is not possible to change the default password of the **elastic** user that the elasticsearch operator creates.
 See https://github.com/elastic/cloud-on-k8s/issues/967
