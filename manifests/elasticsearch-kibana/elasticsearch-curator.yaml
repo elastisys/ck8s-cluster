@@ -5,7 +5,7 @@ metadata:
   namespace: elastic-system
 spec:
   # Run every 5 minutes
-  schedule: "5 * * * *"
+  schedule: "*/1 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -41,6 +41,7 @@ data:
     ---
     # Remember, leave a key empty if there is no value.  None will be a string,
     # not a Python "NoneType"
+    
     actions:
       1:
         action: delete_indices
@@ -68,15 +69,15 @@ data:
     # not a Python "NoneType"
     client:
       hosts:
-        - elasticsearch-logging
+        - elasticsearch-es-http
       port: 9200
       url_prefix:
-      use_ssl: False
-      certificate:
-      client_cert:
-      client_key:
-      ssl_no_validate: False
-      http_auth:
+      use_ssl: True 
+      certificate: 
+      client_cert: 
+      client_key: 
+      ssl_no_validate: True
+      http_auth: elastic:<<SECRET>>
       timeout: 30
       master_only: False
     logging:
