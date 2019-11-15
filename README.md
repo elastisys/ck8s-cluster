@@ -153,7 +153,8 @@ export TF_VAR_exoscale_secret_key=<xxx>
 # Safespring and Citycloud
 export OS_USERNAME=<username>
 export OS_PASSWORD=<password>
-# You should also have AWS credentials in ~/.aws/credentials, or add these:
+# For DNS entries created in AWS when running on Safespring you should also
+# have AWS credentials in ~/.aws/credentials, or add these:
 export AWS_ACCESS_KEY_ID=<xxx>
 export AWS_SECRET_ACCESS_KEY=<xxx>
 ```
