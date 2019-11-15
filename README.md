@@ -52,6 +52,11 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [helmfile](https://github.com/roboll/helmfile) (tested with v0.81.3)
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
 
+Soft (recommended) requirements:
+
+- [vault](https://www.vaultproject.io/downloads.html) (tested with v1.2.3)
+- [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)
+
 ## Get environment from Vault
 
 Configure the vault address: `export VAULT_ADDR=https://vault.eck.elastisys.se`
@@ -113,6 +118,14 @@ source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_
 In order to setup a new Compliant Kubernetes cluster you will need to do the following.
 
 Create 4 S3 buckets, one for each of Harbor, Velero, Elasticsearch and Influxdb.
+If you have `s3cmd` configured, you can do something like this:
+
+```
+s3cmd mb s3://<harbor-bucket>
+s3cmd mb s3://<velero-bucket>
+s3cmd mb s3://<es-backup>
+s3cmd mb s3://<influxdb-bucket>
+```
 
 Decide on a name for this environment, the cloud provider to use and add environment variables to the `env.sh` file.
 More details on available variables and an example is available in `example-env.sh`.
@@ -122,7 +135,10 @@ The minimum you will need is documented here:
 # Add these to env.sh
 export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|exoscale|citycloud}
+export CERT_TYPE={prod|staging}
 
+export S3_ACCESS_KEY=<exoscale_api_key>
+export S3_SECRET_KEY=<exoscale_secret_key>
 export S3_HARBOR_BUCKET_NAME=<harbor-bucket>
 export S3_VELERO_BUCKET_NAME=<velero-bucket>
 export S3_ES_BACKUP_BUCKET_NAME=<es-backup>
@@ -132,8 +148,6 @@ export S3_INFLUX_BUCKET_URL=s3://<influxdb-bucket>
 # Exoscale
 export TF_VAR_exoscale_api_key=<xxx>
 export TF_VAR_exoscale_secret_key=<xxx>
-export S3_ACCESS_KEY=<exoscale_api_key>
-export S3_SECRET_KEY=<exoscale_secret_key>
 # Safespring and Citycloud
 export OS_USERNAME=<username>
 export OS_PASSWORD=<password>
@@ -215,7 +229,7 @@ Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
 ```
-./scripts/gen-rke-conf-sc.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json  > clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-sc.yaml
+./scripts/gen-rke-conf-sc.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json > clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-sc.yaml
 ./scripts/gen-rke-conf-wc.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json > clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-wc.yaml
 
 rke up --config clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-sc.yaml
@@ -272,6 +286,13 @@ export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|citycloud|exoscale}
 FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
 rke/kube_config_eck-wc.yaml env/env.sh
+customer/kubeconfig.yaml
+grafana
+harbor
+influxdb
+kubelogin_client
+grafana_client
+dashboard_client
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
 certs/service_cluster/kube-system/certs/helm-key.pem
@@ -591,6 +612,11 @@ Example using the CLI:
     # Delete secret completely
     vault kv metadata delete $SECRET_PATH
 
+## Managing S3 buckets with s3cmd
+
+**Safespring:** See [docs](https://docs.safespring.com/storage/s3cmd/) for how to configure s3cmd for Safespring.
+
+**Exoscale:** See [docs](https://community.exoscale.com/documentation/storage/quick-start/#setup) for how to configure s3cmd for Exoscale.
 
 ## Issues and limitations
 
@@ -605,3 +631,15 @@ See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030112
 
 Currently cloud-init in RancherOS does not correctly handle when running with multiple network interfaces e.g. `eth0` and `eth1` - (privnet).
 See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030849
+
+If you have multiple ssh-keys loaded you may get errors along the lines of "Too many authentication failures" when running ansible or RKE.
+To solve this you can list and delete unnecessary entries:
+
+```
+# List all loaded keys
+ssh-add -l
+# Delete a specific key form the list (note that this does not delete the actual file)
+ssh-add -d /path/to/key
+# Delete all keys from the list (this does not delete the actual files)
+ssh-add -D
+```

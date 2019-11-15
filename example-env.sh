@@ -1,4 +1,5 @@
 export ENVIRONMENT_NAME=test
+export CERT_TYPE="<staging|prod>"
 
 #
 # Infrastructure
@@ -14,6 +15,8 @@ export AWS_ACCESS_KEY_ID=12345abcde
 export AWS_SECRET_ACCESS_KEY=somelongsecret
 
 # S3 buckets
+export S3_ACCESS_KEY=12345abcde
+export S3_SECRET_KEY=somelongsecret
 export S3_HARBOR_BUCKET_NAME=harbor-bucket-name
 export S3_VELERO_BUCKET_NAME=velero-bucket-name
 export S3_ES_BACKUP_BUCKET_NAME=es-backup-name
@@ -38,8 +41,6 @@ export TF_VAR_wc_worker_size="<Small|Medium|Large|Extra-large>" # default "Large
 
 export TF_VAR_exoscale_api_key=12345abcde
 export TF_VAR_exoscale_secret_key=somelongsecret
-export S3_ACCESS_KEY=12345abcde
-export S3_SECRET_KEY=somelongsecret
 
 #
 # Safespring
@@ -53,8 +54,6 @@ export OS_PASSWORD=somelongsecret
 #
 # Services
 #
-
-export CERT_TYPE="<staging|prod>"
 
 export ENABLE_HARBOR="<true|false>" # default true
 export ENABLE_PSP="<true|false>" # default true
