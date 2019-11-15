@@ -113,6 +113,18 @@ source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_
 source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster/kube-system/certs "helm"
 ```
 
+Set up the same environment variables that were used to deploy:
+
+```
+# Source all environment files
+source clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/env/env.sh
+source common-env.sh
+source ${CLOUD_PROVIDER}-common-env.sh
+# Set env vars for passwords from vault
+source scripts/get-gen-secrets.sh
+```
+
+
 ## Quick setup of a new environment
 
 In order to setup a new Compliant Kubernetes cluster you will need to do the following.
@@ -184,7 +196,8 @@ ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_sc
 ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_wc
 ```
 
-Generate passwords and client secrets and store them in vault.
+Generate passwords and client secrets and store them in vault at https://vault.eck.elastisys.se.
+The current convention is that secrets for a specific environment are stored under `eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/`.
 This script also sets the passwords as environment variables to be used by other scripts.
 Note that you have to be logged in to vault for this (`vault login`).
 
@@ -192,7 +205,10 @@ Note that you have to be logged in to vault for this (`vault login`).
 source scripts/get-gen-secrets.sh
 ```
 
-Create the infrastructure using terraform:
+### Phase 1 - Create infrastructure
+
+Create the infrastructure using terraform.
+See [terraform/README.md](terraform/README.md) for more details on this.
 
 ```
 cd ./terraform/${CLOUD_PROVIDER}
@@ -204,6 +220,9 @@ cd ../..
 
 *Note:* if using a new workspace set execution mode to local by `export TF_TOKEN=xxx`
 (should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`.
+
+*Note:* For citycloud we are not responsible for creating the infrastructure, they will provides us with VMs, loadbalancer, etc., though we do have access to the infrastructure (so far the infrastructure for Getinge).
+After getting the VMs we must first manually create the `infra.json` file and then continue with the ansible playbook below to install docker and add some files.
 
 When terraform is done, you need to create a JSON file with the details of the infrastructure:
 
@@ -225,6 +244,8 @@ pipenv shell
 ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
 ```
 
+### Phase 2 - Install Kubernetes
+
 Next, install the Kubernetes clusters on the cloud infrastructure that
 Terraform created.
 
@@ -236,7 +257,9 @@ rke up --config clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-sc.yaml
 rke up --config clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-wc.yaml
 ```
 
-Install services:
+### Phase 3 - Install services in the clusters
+
+Install services using the deploy scripts:
 
 ```
 export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/kube_config_eck-sc.yaml
@@ -246,6 +269,10 @@ export ECK_SC_KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke
 export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/kube_config_eck-wc.yaml
 ./scripts/deploy-wc.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json
 ```
+
+The option `--interactive` mode can be used when running `deploy-wc/sc.sh` to decide whether or not you want to apply upgrades to helm charts.
+
+### Store environment in Vault
 
 You can use Vault to store all data about the environment securely.
 This includes ssh-keys, passwords, IP addresses, etc.
@@ -319,169 +346,6 @@ do
 done
 ```
 
-## Cloud infrastructure
-
-See [terraform/README.md](terraform/README.md) for more details on the steps below.
-
-Begin with setting up the cloud infrastructure using Terraform.
-
-For exoscale:
-
-    export AWS_ACCESS_KEY_ID=<xxx> (not needed if credentials are located in ~/.aws/credentials)
-    export AWS_SECRET_ACCESS_KEY=<xxx> (not needed if credentials are located in ~/.aws/credentials)
-    export TF_VAR_exoscale_api_key=<xxx>
-    export TF_VAR_exoscale_secret_key=<xxx>
-    export TF_VAR_ssh_pub_key_file_sc=<Path to pub key for service cluster>
-    export TF_VAR_ssh_pub_key_file_wc=<Path to pub key for workload cluster>
-    export TF_VAR_dns_prefix=<xxx>
-
-    export CLOUD_PROVIDER=exoscale
-
-    cd ./terraform/exoscale
-    terraform init
-    terraform workspace select <Name>
-    terraform apply
-
-For safespring:
-
-    export AWS_ACCESS_KEY_ID=<xxx> (not needed if credentials are located in ~/.aws/credentials)
-    export AWS_SECRET_ACCESS_KEY=<xxx> (not needed if credentials are located in ~/.aws/credentials)
-    export TF_VAR_ssh_pub_key_file_sc=<Path to pub key for service cluster>
-    export TF_VAR_ssh_pub_key_file_wc=<Path to pub key for workload cluster>
-    export TF_VAR_dns_prefix=<xxx>
-
-    export OS_IDENTITY_API_VERSION=3
-    export OS_AUTH_URL=https://keystone.api.cloud.ipnett.se/v3
-    export OS_PROJECT_DOMAIN_NAME=elastisys.se
-    export OS_USER_DOMAIN_NAME=elastisys.se
-    export OS_PROJECT_NAME=infra.elastisys.se
-    export OS_USERNAME=<username>
-    export OS_PASSWORD=<password>
-    export OS_REGION_NAME=se-east-1
-    export OS_PROJECT_ID=9f91e56185fb4f929c36430ac4bcbe6e
-
-    export CLOUD_PROVIDER=safespring
-
-    cd ./terraform/safespring
-    terraform init
-    terraform workspace select <Name>
-    terraform apply
-
-For citycloud we are not responsible for creating the infrastructure, they will provides us with VMs, loadbalancer, etc. Though we do have access to the infrastructure (so far the infrastructure for Getinge). And after getting the VMs we must first manually create the `infra.json` file and then run an ansible script to install docker and add some files.
-
-    export OS_USERNAME=<username>
-    export OS_PASSWORD=<password>
-    export OS_AUTH_URL=https://fra1.citycloud.com:5000
-    export OS_USER_DOMAIN_NAME=CCP_Domain_37642
-    export OS_PROJECT_DOMAIN_NAME=CCP_Domain_37642
-    export OS_REGION_NAME=Fra1
-    export OS_PROJECT_NAME="Spider"
-    export OS_TENANT_NAME="Spider"
-    export OS_AUTH_VERSION=3
-    export OS_IDENTITY_API_VERSION=3
-    export OS_PROJECT_ID=ba47a6b513b645dd94fa31ea5e2becbd
-
-    export CLOUD_PROVIDER=citycloud
-
-Obs if using a new workspace set execution mode to local by `export TF_TOKEN=xxx`
-(should be located in ~/.terraformrc) and run `bash set-execution-mode.sh`.
-
-The commands listed above will set up the cloud infrastructure using a "default" configuration. Changing the number of machines and their size can be done by exporting the following values before running `terraform apply`.
-
-    export TF_VAR_sc_master_count=<x | default 1>
-    export TF_VAR_sc_master_size=<x | default "Large">
-
-    export TF_VAR_wc_master_count=<x | default 1>
-    export TF_VAR_wc_master_size=<x | default "Large">
-
-    export TF_VAR_sc_nfs_size=<x | default "Medium">
-    export TF_VAR_wc_nfs_size=<x | default "Medium">
-
-When terraform is done, you need to create a JSON file with the details of the infrastructure:
-
-    ./scripts/gen-infra.sh > infra.json
-
-If the base image used to create the virtual machines does not include docker, you will also need to install it first on all machines.
-(This is currently the case for Safespring and Citycloud.)
-This can be done with ansible like this:
-
-    # Set up a python environment with ansible:
-    pipenv install
-    pipenv shell
-
-    # (Optional) If your ssh keys are not picked up by the authentication agent
-    # you need to add them for ansible to be able to use them:
-    ssh-add ${TF_VAR_ssh_pub_key_file_sc%.pub} ${TF_VAR_ssh_pub_key_file_wc%.pub}
-
-    # Install docker on all nodes:
-    ./scripts/generate-inventory.sh infra.json > ansible/hosts.ini
-    ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
-
-## Service passwords - optional
-
-Once the cloud infrastructure is running it is time to generate and store passwords in vault for some of the services.
-
-Begin by getting a hold of a vault token. (Most likley via the elastisys secrets repo)
-Set the environment variables
-
-    export CUSTOMER_ID=<the customer identifier>
-    export VAULT_ADDR=<the url to vault | https://vault.eck.elastisys.se>
-    export VAULT_TOKEN=<...>
-    export PWD_LENGTH=<desired length for the passwords>
-
-The secrets for a given customer should be stored at the path `eck/v1/${CUSTOMER_ID}/1/*`.
-To use the a more correct terminology the _path_ really is `v1/${CUSTOMER_ID}/1/*`, while `eck/` is the location of the secrets engine used - [KV v2](https://www.vaultproject.io/api/secret/kv/kv-v2.html).
-
-The `1` can be used to reference secrets in different eck clusters if a customer happens to have more than just one.
-If a customer has more than one eck cluster than the `1` can be changed accordingly to reference the correct cluster.
-The API endpoint for KV v2 is `eck/data/<path>`. Therefore to write secrets to `eck/v1/${CUSTOMER_ID}/1/*`, the API endpoint becomes `eck/data/v1/${CUSTOMER_ID}/1/*`.
-The passwords for the services will be located at `eck/v1/${CUSTOMER_ID}/1/{service_name}` with the key `password`.
-The environment variable `BASE_PATH` is used to reference the API endpoint excluding the name of the service to store password for.
-
-Set the following environment variable
-
-    export BASE_PATH=<"eck/data/v1/${CUSTOMER_ID}/1">
-
-To generate and store the passwords for the services - `grafana`, `harbor`, and `influxdb` - execute the following command
-
-    ./scripts/store-pwds.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$PWD_LENGTH" "$BASE_PATH" "grafana" "influxdb" "harbor"
-
-If you do not want to generate passwords for a certain service then simply remove it from command above.
-
-Now the passwords have been generated and stored in vault!
-
-
-To use the generated password for the services run the following commands to fetch the passwords and export them as environment variables
-
-    # Get grafana password
-    export GRAFANA_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/grafana" | jq -r '.data.data.password')
-
-    # Get harbor password
-    export HARBOR_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/harbor" | jq -r '.data.data.password')
-
-    # Get influxdb password
-    export INFLUXDB_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/influxdb" | jq -r '.data.data.password')
-
-**Note**: As of yet it is not possible to change the default vaule of the **elastic** user that the elastisearch operator creates. See https://github.com/elastic/cloud-on-k8s/issues/967
-
-
-## Kubernetes clusters
-
-Next, install the Kubernetes clusters on the cloud infrastructure that
-Terraform created.
-
-    export ECK_SC_DOMAIN=$(cat infra.json | jq -r '.service_cluster.dns_name' | sed 's/[^.]*[.]//')
-    export ECK_WC_DOMAIN=$(cat infra.json | jq -r '.workload_cluster.dns_name' | sed 's/[^.]*[.]//')
-
-    ./scripts/gen-rke-conf-sc.sh infra.json  > eck-sc.yaml
-    ./scripts/gen-rke-conf-wc.sh infra.json > eck-wc.yaml
-
-    rke up --config eck-sc.yaml
-    rke up --config eck-wc.yaml
-
-To create a cluster without PodSecurityPoslicy, OPA, and Harbor set the environments variables `ENABLE_PSP`, `ENABLE_OPA`, `ENABLE_HARBOR` to `false`.
-
-
 ## DNS
 
 The dns-name will be automatically created with the name `<dns_prefix>-wc/sc.a1ck.io` for exoscale and `<dns_prefix>-wc/sc.elastisys.se` for safespring.
@@ -493,62 +357,14 @@ in aws route53.
 
 ## Setting up Google as identity provider for dex.
 
-1. Go to GCP and create a project.
-Select `APIs &Services` in the menu.
+1. Go to the [Google console](https://console.cloud.google.com/) and create a project.
 
-2. Select `Oauth consent screen` and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains.
+2. Go to the [Oauth consent screen](https://console.cloud.google.com/apis/credentials/consent) and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains.
 
-3. Go to `Credentials` and press `Create credentials` and select `OAuth client ID`.
+3. Go to [Credentials](https://console.cloud.google.com/apis/credentials) and press `Create credentials` and select `OAuth client ID`.
 Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.elastisys.se`.
-Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`
+Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`.
 
-
-## Kubernetes resources
-
-Lastly, create all of the Kubernetes resources in the clusters.
-If the Oauth2 is to work a OAuth2 client need to be created in [google console](https://console.cloud.google.com/apis/credentials) under
-APIs & Services -> credentials.
-
-The certificates for the ingresses in the system can have either staging or production certificates from letsencrypt.
-There is a limit to the number of production certificates we can get per week. So staging is recommended during development, but it will yield untrusted certificates.
-Note that docker will not trust Harbor with staging certs, so you can't push images to Harbor and pods can't pull images from Harbor.
-
-The option `--interactive` mode can be used when running `deploy-wc/sc.sh` to decide whether or not you want to apply upgrades to helm charts.
-The default is not to use that option.
-
-There are two optional identity providers for dex: Google and A1 AAA.
-You can activate them by setting environment variables with client ID and secret before running the deploy script as seen below.
-
-
-    export GOOGLE_CLIENT_ID=<xxx>
-    export GOOGLE_CLIENT_SECRET=<xxx>
-    export AAA_CLIENT_ID=<xxx>
-    export AAA_CLIENT_SECRET=<xxx>
-
-    export CERT_TYPE=<prod|staging>
-
-    # For harbor image chart storage and velero backup storage
-    export S3_ACCESS_KEY=<exoscale_api_key>
-    export S3_SECRET_KEY=<exoscale_secret_key>
-    export S3_REGION=de-fra-1
-    export S3_REGION_ENDPOINT=https://sos-de-fra-1.exo.io
-    export S3_HARBOR_BUCKET_NAME=harbor-bucket
-    export S3_VELERO_BUCKET_NAME=velero-bucket
-    export S3_ES_BACKUP_BUCKET_NAME=harbor-backup
-
-    # Influx cronjob backup variables.
-    export INFLUX_ADDR=influx.influxdb-prometheus.svc:8088
-    export S3_INFLUX_BUCKET_URL=s3://influxdb-backups
-    export INFLUX_BACKUP_SCHEDULE="0 0 * * *"
-
-    KUBELOGIN_CLIENT_SECRET="$(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c20)"
-
-    export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-    ./scripts/deploy-sc.sh infra.json <--interactive>
-
-    export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-    export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
-    ./scripts/deploy-wc.sh infra.json <--interactive>
 
 ## OpenID Connect with kubectl
 
@@ -643,3 +459,6 @@ ssh-add -d /path/to/key
 # Delete all keys from the list (this does not delete the actual files)
 ssh-add -D
 ```
+
+As of yet it is not possible to change the default vaule of the **elastic** user that the elastisearch operator creates.
+See https://github.com/elastic/cloud-on-k8s/issues/967
