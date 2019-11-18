@@ -5,7 +5,7 @@ metadata:
   namespace: elastic-system
 spec:
   # Run every 5 minutes
-  schedule: "*/1 * * * *"
+  schedule: "*/5 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -16,7 +16,7 @@ spec:
             # https://hub.docker.com/r/bobrik/curator/tags/
             image: bobrik/curator:5.7.6
             imagePullPolicy: IfNotPresent
-            args:
+            args: 
             - --config
             - /etc/config/config.yml
             - /etc/config/action_file.yml
@@ -52,6 +52,9 @@ data:
           allow_ilm_indices: True
         filters:
         # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'logstash-*'
         - filtertype: space
           disk_space: 1
           use_age: True
@@ -60,29 +63,45 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: 30
+          unit_count: 1
+        - filtertype: kibana
+          exclude: True
+      2:
+        action: delete_indices
+        description: "Clean up elasticsearch by deleting old indices."
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'kubecomponents-*'
+        - filtertype: space
+          disk_space: 1
+          use_age: True
+          source: creation_date
+        - filtertype: age
+          source: creation_date
+          direction: older
+          unit: hours
+          unit_count: 1
         - filtertype: kibana
           exclude: True
   config.yml: |-
     ---
-    # Remember, leave a key empty if there is no value.  None will be a string,
-    # not a Python "NoneType"
     client:
       hosts:
         - elasticsearch-es-http
       port: 9200
-      url_prefix:
       use_ssl: True 
-      certificate: 
-      client_cert: 
-      client_key: 
       ssl_no_validate: True
-      http_auth: elastic:<<SECRET>>
+      http_auth: elastic:$ES_PW
       timeout: 30
       master_only: False
     logging:
-      loglevel: INFO
-      logfile:
+      loglevel: DEBUG
       logformat: default
       # This is the default blacklist
       blacklist: ['elasticsearch', 'urllib3']

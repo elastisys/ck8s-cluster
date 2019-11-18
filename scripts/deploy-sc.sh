@@ -297,25 +297,36 @@ do
     sleep 2
 done
 
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch-curator.yaml
 
 
-ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+export ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+envsubst < ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch-curator.yaml | kubectl -n elastic-system apply -f -
+
 curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_snapshot/s3_backup_repository?pretty" \
     -H 'Content-Type: application/json' \
     -d' {"type": "s3", "settings":{ "bucket": "'"${S3_ES_BACKUP_BUCKET_NAME}"'", "client": "default"}}' \
     -k -u elastic:${ES_PW}
 # Creates a index template so the indexes created are marked with the correct ilm policy and rollover alias
-curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_template/logstash_template?pretty" \
-    -H 'Content-Type: application/json' \
-    -d' {"index_patterns": ["logstash-*"], "settings": {"index.refresh_interval" : "10s","index.lifecycle.name": "datastream_policy", "index.lifecycle.rollover_alias": "logstash-alias"}}'\
-    -k -u elastic:${ES_PW} \
+#curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_template/logstash_template?pretty" \
+#    -H 'Content-Type: application/json' \
+#    -d' {"index_patterns": ["logstash-*"], "settings": {"index.refresh_interval" : "10s","index.lifecycle.name": "datastream_policy", "index.lifecycle.rollover_alias": "logstash-alias"}}'\
+#    -k -u elastic:${ES_PW} \
+
+#curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_template/kubecomponents_template?pretty" \
+#    -H 'Content-Type: application/json' \
+#    -d' {"index_patterns": ["kubecomponents-*"], "settings": {"index.refresh_interval" : "10s","index.lifecycle.name": "kubecomponents_policy", "index.lifecycle.rollover_alias": "kubecomponents-alias"}}'\
+#    -k -u elastic:${ES_PW} \
 # Creates the ilm policy with hotphase of 3GB or 1d whichever comes first.
 # After the hot phase a index is moved to the delete phase for 30days before being deleted
-curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_ilm/policy/datastream_policy?pretty" \
-    -H 'Content-Type: application/json' \
-    -d '{"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}},"delete": {"min_age": "30d","actions": {"delete": {}}}}}}'\
-    -k -u elastic:${ES_PW} \
+#curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_ilm/policy/datastream_policy?pretty" \
+#    -H 'Content-Type: application/json' \
+#    -d '{"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}},"delete": {"min_age": "30d","actions": {"delete": {}}}}}}'\
+#    -k -u elastic:${ES_PW} \
+
+#curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_ilm/policy/kubecomponents_policy?pretty" \
+#    -H 'Content-Type: application/json' \
+#    -d '{"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}},"delete": {"min_age": "30d","actions": {"delete": {}}}}}}'\
+#    -k -u elastic:${ES_PW} \
 
 curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_cluster/settings?pretty" \
     -H 'Content-Type: application/json' \
