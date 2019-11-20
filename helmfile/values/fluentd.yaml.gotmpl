@@ -1,7 +1,3 @@
-image:
-  repository: elandf/fluentd_elasticsearch
-  tag: latest
-  pullPolicy: Always
 elasticsearch:
   scheme: https
   port: 443
@@ -166,27 +162,28 @@ extraConfigMaps:
           reconnect_on_error true
           # Custom parameters --START--
           # Avoids congestion if the plugin is installed
-          #id_key _hash 
-          #remove_keys _hash
-          #flatten_hashes true
-          #flatten_hashes_separator .
+          id_key _hash 
+          remove_keys _hash
+          flatten_hashes true
+          flatten_hashes_separator .
           # Fixes restrictions of not having logstash format
           include_timestamp true
-          #time_key time
+          time_key time
           # Rollover index configuration
           index_name kubecomponents-alias
           rollover_index true
           deflector_alias kubecomponents-alias
+          index_prefix kubecomponents
           index_separator "."
           index_date_pattern "now/d"
           # Ilm configuration
           enable_ilm true
           # Policy is already created by init container so fluentd will skip it's creation
           ilm_policy_id kubecomponents_policy
-          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+          #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name kubecomponents_template
-          template_file /var/kubecomponents_template.json
+          template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.2/test/plugin/test_template.json
           customize_template {"<<index_prefix>>": "kubecomponents"}
           # Custom parameters --END--
           <buffer>
@@ -228,21 +225,22 @@ extraConfigMaps:
           #flatten_hashes_separator .
           # Fixes restrictions of not having logstash format
           include_timestamp true
-          #time_key time
+          time_key time
           # Rollover index configuration
           index_name logstash-alias
           rollover_index true
           deflector_alias logstash-alias
+          index_prefix logstash
           index_separator "."
           index_date_pattern "now/d"
           # Ilm configuration
           enable_ilm true
           # Policy is already created by init container so fluentd will skip it's creation
           ilm_policy_id datastream_policy
-          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+          #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name logstash_template
-          template_file /var/logstash_template.json
+          template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.2/test/plugin/test_template.json
           customize_template {"<<index_prefix>>": "logstash"}
           # Custom parameters --END--
           <buffer>
