@@ -39,7 +39,7 @@ variable sc_worker_count {
 variable sc_worker_size {
   description = "The size of the worker VMs."
   type        = string
-  default     = "Extra-large"
+  default     = "Huge"
 }
 
 variable sc_nfs_size {
