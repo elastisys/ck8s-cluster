@@ -191,6 +191,13 @@ fi
 
 # FLUENTD
 
+
+while [[ $(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get elasticsearches.elasticsearch.k8s.elastic.co -n elastic-system elasticsearch -o 'jsonpath={.status.health}') != "green" ]]
+do
+    echo "Waiting until elasticsearch is ready"
+    sleep 2
+done
+
 # Get elastisearch password from service_cluster cluster
 ES_PW=$(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 

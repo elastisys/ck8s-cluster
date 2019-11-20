@@ -140,7 +140,7 @@ pipelines:
                 # Services
                 - ./pipeline/test/services/test-wc.sh
               after-script:
-                - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+               - ./pipeline/after-script.sh pipeline/init-exoscale.sh
 
       - step:
           name: Clean up

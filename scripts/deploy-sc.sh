@@ -261,22 +261,22 @@ then
     kubectl -n harbor rollout status deployment harbor-harbor-clair
 
     # Set up initial state for harbor.
-    EXISTS=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.code')
+    EXISTS=$(curl -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.code')
 
     if [ $EXISTS != "404" ]
     then
-        NAME=$(curl -s -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
+        NAME=$(curl -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
 
         if [ $NAME == "\"library\"" ]
         then
             # Deletes the default project "library"
             echo Removing project library from harbor
             # Curl will retrun status 500 even though it successfully removed the project.
-            curl -s -k -X DELETE -u admin:${HARBOR_PWD} https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
+            curl -k -X DELETE -u admin:${HARBOR_PWD} https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
 
             # Creates new private project "default"
             echo Creating new private project default
-            curl -s -k -X POST -u admin:${HARBOR_PWD} --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
+            curl -k -X POST -u admin:${HARBOR_PWD} --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
                 "project_name": "default",
                 "metadata": {
                     "public": "0",

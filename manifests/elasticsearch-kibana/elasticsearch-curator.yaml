@@ -42,7 +42,7 @@ data:
     actions:
       1:
         action: delete_indices
-        description: "Clean up elasticsearch by deleting old indices."
+        description: "Clean up the oldest logstash-* indices that exceeds total disk space 100GB "
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -56,16 +56,30 @@ data:
           disk_space: 100
           use_age: True
           source: creation_date
+        - filtertype: kibana
+          exclude: True
+      2:
+        action: delete_indices
+        description: "Clean up the logstash-* indices that are older then 30 days"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'logstash-*'
         - filtertype: age
           source: creation_date
           direction: older
           unit: days
           unit_count: 30
         - filtertype: kibana
-          exclude: True
-      2:
+          exclude: True  
+      3:
         action: delete_indices
-        description: "Clean up elasticsearch by deleting old indices."
+        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space 10GB"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -79,13 +93,28 @@ data:
           disk_space: 10
           use_age: True
           source: creation_date
+        - filtertype: kibana
+          exclude: True
+      4:
+        action: delete_indices
+        description: "Clean up the kubecomponents-* indices that are older then 30 days"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'kubecomponents-*'
         - filtertype: age
           source: creation_date
           direction: older
-          unit: hours
+          unit: days
           unit_count: 10
         - filtertype: kibana
           exclude: True
+
   config.yml: |-
     ---
     client:
