@@ -104,6 +104,15 @@ grafana:
     pspUseAppArmor: false
     pspEnabled: {{ requiredEnv "ENABLE_PSP" }}
 
+  persistence:
+    type: pvc
+    enabled: true
+    # Specify a storage class to use or comment out to use the default
+    # storageClassName:
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+
   serviceAccount:
     create: true
     name:
