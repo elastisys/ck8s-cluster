@@ -60,7 +60,6 @@ then
     # Deploy common roles and rolebindings.
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/kube-system-role-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/rke-job-deployer-psp.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nginx-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/tiller-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nfs-client-provisioner-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/cert-manager-psp.yaml
@@ -146,10 +145,10 @@ cd ${SCRIPTS_PATH}/../helmfile
 if [ $CLOUD_PROVIDER == "citycloud" ]
 then
     # Install cert-manager.
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nginx-ingress $INTERACTIVE apply
 else
     # Install cert-manager and nfs-client-provisioner.
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner -l app=nginx-ingress $INTERACTIVE apply
 fi
 
 
@@ -167,10 +166,10 @@ fi
 if [[ $ENABLE_OPA == "true" ]]
 then
     # Install rest of the charts excluding fluentd and prometheus.
-    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=nginx-ingress $INTERACTIVE apply
 else
     # Install rest of the charts excluding fluentd, prometheus, and opa.
-    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=opa $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=opa,app!=nginx-ingress $INTERACTIVE apply
 fi
 
 # Install prometheus-operator. Retry three times.

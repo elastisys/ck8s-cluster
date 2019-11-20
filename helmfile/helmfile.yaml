@@ -44,6 +44,18 @@ environments:
 
 # The desired state of Helm releases.
 releases:
+# Nginx-ingress
+- name: nginx-ingress
+  namespace: nginx-ingress
+  labels:
+    app: nginx-ingress
+  chart: stable/nginx-ingress
+  version: 1.25.0
+  missingFileHandler: error
+  wait: true
+  values:
+  - values/nginx-ingress.yaml.gotmpl
+
 # NFS
 - name: nfs-client-provisioner
   namespace: kube-system
