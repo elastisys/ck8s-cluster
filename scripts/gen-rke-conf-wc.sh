@@ -147,9 +147,7 @@ cat <<EOF
     retention: 24h
 
 ingress:
-  provider: "nginx"
-  extra_args:
-    enable-ssl-passthrough: ""
+    provider: none
 
 private_registries:
     - url: harbor.${ECK_SC_DOMAIN}

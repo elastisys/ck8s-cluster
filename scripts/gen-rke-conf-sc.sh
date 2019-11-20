@@ -140,9 +140,7 @@ cat <<EOF
     retention: 24h
 
 ingress:
-  provider: "nginx"
-  extra_args:
-    enable-ssl-passthrough: ""
+    provider: none
 EOF
 
 if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
