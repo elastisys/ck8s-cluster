@@ -9,5 +9,34 @@ roleRef:
   name: kube-system:default-psp
 subjects:
 - kind: ServiceAccount
-  name: fluentd
+  name: fluentd-system-fluentd-elasticsearch
   namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fluentd-psp
+  namespace: fluentd
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - default-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fluentd-psp
+  namespace: fluentd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: fluentd-psp
+subjects:
+- kind: ServiceAccount
+  name: fluentd-fluentd-elasticsearch
+  namespace: fluentd

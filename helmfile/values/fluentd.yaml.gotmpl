@@ -9,7 +9,7 @@ elasticsearch:
   sslVerify: {{ requiredEnv "TLS_VERIFY" }}
   logLevel: "debug"
 
-# Default args include "-q" which sets loglevel to warning. 
+# Default args include "-q" which sets loglevel to warning.
 fluentdArgs: "--no-supervisor"
 configMaps:
   useDefaults:
@@ -70,7 +70,7 @@ extraConfigMaps:
       @type record_transformer
       remove_keys responseObject,requestObject
     </filter>
-  
+
   containers.input.conf: |-
     #This config is taken from a default config that we have disabled
     #See the value "configMaps.useDefaults.containersInputConf: false" above
@@ -275,3 +275,7 @@ tolerations:
 - effect: NoSchedule
   key: "node-role.kubernetes.io/controlplane"
   value: "true"
+
+# Only run on control plane nodes
+nodeSelector:
+  node-role.kubernetes.io/controlplane: "true"

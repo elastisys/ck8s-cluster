@@ -170,7 +170,7 @@ releases:
   - values/falco.yaml.gotmpl
 
 # Fluentd
-- name: fluentd
+- name: fluentd-system
   namespace: kube-system
   labels:
     app: fluentd
@@ -179,6 +179,17 @@ releases:
   missingFileHandler: error
   values:
   - values/fluentd.yaml.gotmpl
+
+# Fluentd configurable by the customer
+- name: fluentd
+  namespace: fluentd
+  labels:
+    app: fluentd
+  chart: kiwigrid/fluentd-elasticsearch
+  version: 4.5.1
+  missingFileHandler: error
+  values:
+  - values/fluentd-customer.yaml.gotmpl
 
 # opa
 - name: opa

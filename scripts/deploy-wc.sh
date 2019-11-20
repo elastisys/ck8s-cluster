@@ -44,6 +44,7 @@ INTERACTIVE=${2:-""}
 kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
 kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace fluentd --dry-run -o yaml | kubectl apply -f -
 
 if [[ $ENABLE_OPA == "true" ]]
 then
@@ -160,10 +161,10 @@ fi
 if [[ $ENABLE_OPA == "true" ]]
 then
     # Install rest of the charts excluding fluentd and prometheus.
-    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd,app!=prometheus-operator $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator $INTERACTIVE apply
 else
     # Install rest of the charts excluding fluentd, prometheus, and opa.
-    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd,app!=prometheus-operator,app!=opa $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=opa $INTERACTIVE apply
 fi
 
 # Install prometheus-operator. Retry three times.
@@ -210,6 +211,8 @@ done
 echo "Got elsticsearch password"
 
 kubectl -n kube-system create secret generic elasticsearch \
+    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
+kubectl -n fluentd create secret generic elasticsearch \
     --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
 
 # Install fluentd
