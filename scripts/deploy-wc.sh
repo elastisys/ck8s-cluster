@@ -228,9 +228,14 @@ for namespace in ${CUSTOMER_NAMESPACES}
 do
     kubectl create namespace "${namespace}" \
         --dry-run -o yaml | kubectl apply -f -
-    kubectl -n "${namespace}" create rolebinding workload-admins \
-        --clusterrole=admin --user="${CUSTOMER_ADMIN_USERS}" \
-        --dry-run -o yaml | kubectl apply -f -
+    for user in ${CUSTOMER_ADMIN_USERS}
+    do
+        # By using "auth reconcile" instead of "apply" we can add one
+        # user at a time.
+        kubectl -n "${namespace}" create rolebinding workload-admins \
+            --clusterrole=admin --user="${user}" \
+            --dry-run -o yaml | kubectl auth reconcile -f -
+    done
 done
 
 
@@ -270,3 +275,24 @@ kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config use-context \
     user@compliantk8s
 
 rm ${CUSTOMER_CERTIFICATE_AUTHORITY}
+
+# Allow customer admins to edit the fluentd-extra-config configmap and
+# restart fluentd by deleting pods.
+kubectl -n fluentd create role fluentd-configurer \
+    --verb=get,list,watch,create,update,patch,delete \
+    --resource=configmaps --resource-name=fluentd-extra-config \
+    --dry-run -o yaml | kubectl apply -f -
+kubectl -n fluentd create role fluentd-restarter \
+    --verb=delete --resource=pods --dry-run -o yaml | kubectl apply -f -
+for user in ${CUSTOMER_ADMIN_USERS}
+do
+    kubectl -n fluentd create rolebinding fluentd-configurer \
+        --role=fluentd-configurer --user="${user}" \
+        --dry-run -o yaml | kubectl auth reconcile -f -
+    kubectl -n fluentd create rolebinding fluentd-restarter \
+        --role=fluentd-restarter --user="${user}" \
+        --dry-run -o yaml | kubectl auth reconcile -f -
+done
+
+# Add an example configmap
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml
