@@ -1,0 +1,89 @@
+## nginx configuration
+## Ref: https://github.com/kubernetes/ingress/blob/master/controllers/nginx/configuration.md
+##
+controller:
+  image:
+    allowPrivilegeEscalation: true
+
+  # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
+  # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
+  # is merged
+  hostNetwork: true
+
+  ## Use host ports 80 and 443
+  daemonset:
+    useHostPort: true
+
+    hostPorts:
+      http: 80
+      https: 443
+
+  tolerations:
+  - key: "nodeType"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+  ## DaemonSet or Deployment
+  ##
+  kind: DaemonSet
+
+  # The update strategy to apply to the Deployment or DaemonSet
+  ##
+  updateStrategy:
+    type: OnDelete
+    maxUnavailable: 1
+
+  # minReadySeconds to avoid killing pods before we are ready
+  ##
+  minReadySeconds: 10
+
+  ## terminationGracePeriodSeconds
+  ##
+  terminationGracePeriodSeconds: 60
+  
+  service:
+    enabled: false
+
+## Default 404 backend
+##
+defaultBackend:
+
+  ## If false, controller.defaultBackendService must be provided
+  ##
+  enabled: true
+
+  name: default-backend
+  image:
+    repository: k8s.gcr.io/defaultbackend-amd64
+    tag: "1.5"
+    pullPolicy: IfNotPresent
+    # nobody user -> uid 65534
+    runAsUser: 65534
+
+  extraArgs: {}
+
+  serviceAccount:
+    create: true
+    name:
+  ## Additional environment variables to set for defaultBackend pods
+  extraEnvs: []
+
+  port: 8080
+
+  ## Node tolerations for server scheduling to nodes with taints
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  tolerations:
+  - key: "nodeType"
+    operator: "Equal"
+    values: "elastisys"
+    effect: "NoSchedule"
+
+# If true, create & use Pod Security Policy resources
+# https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+podSecurityPolicy:
+  enabled: {{ requiredEnv "ENABLE_PSP" }}
+
+serviceAccount:
+  create: true
+  name:
