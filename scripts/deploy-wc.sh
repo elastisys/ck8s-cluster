@@ -276,21 +276,13 @@ kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config use-context \
 
 rm ${CUSTOMER_CERTIFICATE_AUTHORITY}
 
-# Allow customer admins to edit the fluentd-extra-config configmap and
-# restart fluentd by deleting pods.
-kubectl -n fluentd create role fluentd-configurer \
-    --verb=get,list,watch,create,update,patch,delete \
-    --resource=configmaps --resource-name=fluentd-extra-config \
-    --dry-run -o yaml | kubectl apply -f -
-kubectl -n fluentd create role fluentd-restarter \
-    --verb=delete --resource=pods --dry-run -o yaml | kubectl apply -f -
+# Allow customer admins to configure fluentd
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/customer-rbac/fluentd.yaml
+
 for user in ${CUSTOMER_ADMIN_USERS}
 do
     kubectl -n fluentd create rolebinding fluentd-configurer \
         --role=fluentd-configurer --user="${user}" \
-        --dry-run -o yaml | kubectl auth reconcile -f -
-    kubectl -n fluentd create rolebinding fluentd-restarter \
-        --role=fluentd-restarter --user="${user}" \
         --dry-run -o yaml | kubectl auth reconcile -f -
 done
 
