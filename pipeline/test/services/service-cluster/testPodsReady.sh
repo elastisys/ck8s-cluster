@@ -89,14 +89,15 @@ do
     fi
 done
 
-echo -e "\nTesting other pods"
-echo elasticsearch
-# The following command looks at the status conditions for the elasticsearch pods.
-# It assumes that the "Ready" condition is the second condition in the list,
-# if that is somehow wrong then this test will fail.
-# It also assumes that there is supposed to be three pods.
-RES=$(kubectl get pods -n elastic-system -l common.k8s.elastic.co/type=elasticsearch -o jsonpath="{.items[*].status.conditions[1].type},{.items[*].status.conditions[1].status}")
-if [[ $RES == "Ready Ready Ready,True True True" ]]
-then echo "ready"; SUCCESSES=$((SUCCESSES+1))
-else echo "not ready"; FAILURES=$((FAILURES+1))
+echo
+echo
+echo "Testing other services"
+echo "======================"
+
+echo -n -e "\nelasticsearch\t"
+# This checks the health status of the elasticsearch custom resource
+RES=$(kubectl -n elastic-system get elasticsearches.elasticsearch.k8s.elastic.co -o jsonpath="{.items[0].status.health}")
+if [[ $RES == "green" ]]
+then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
 fi
