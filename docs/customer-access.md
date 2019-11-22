@@ -65,6 +65,27 @@ Log in to the services using your A1 AAA or Google credentials.
 - **Prometheus** URL: TODO
 - **Alertmanager** URL: TODO
 
+### Fluentd
+
+Fluentd gathers logs from all pods in the cluster and forwards them to Elasticsearch.
+It also adds metadata to the logs (e.g. namespace and pod where they come from).
+In addition to this, you may want to configure specific rules for how to parse the logs and process the messages in some way before they end up in Elasticsearch.
+
+To add extra configuration to fluentd you can edit the configmap `fluentd-extra-config` in the `fluentd` namespace.
+This config will be included together with the default configuration for where to find logs and where to send them.
+Since fluentd does not actively watch the configmap for changes, you will need to restart it by deleting the fluentd pods.
+This will cause new pods to start and read in the configuration.
+
+You can edit the configmap using this command:
+```
+kubectl -n fluentd edit configmap fluentd-extra-config
+```
+
+Restart fluentd by killing the pods:
+```
+kubectl -n fluentd delete pods -l app.kubernetes.io/instance=fluentd
+```
+
 ### Other services
 
 Falco, Fluentd and Dex are currently not configurable directly.
