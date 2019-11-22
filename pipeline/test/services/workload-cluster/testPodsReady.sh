@@ -23,11 +23,12 @@ echo -e "\nTesting deployments"
 for DEPLOYMENT in "${DEPLOYMENTS[@]}"
 do
     testDeploymentStatus $DEPLOYMENT
-done 
+done
 
 DAEMONSETS=(
     "falco falco"
-    "kube-system fluentd-fluentd-elasticsearch"
+    "fluentd fluentd-fluentd-elasticsearch"
+    "kube-system fluentd-system-fluentd-elasticsearch"
     "kube-system canal"
     "ingress-nginx nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
@@ -39,7 +40,7 @@ echo -e "\nTesting daemonsets"
 for DAEMONSET in "${DAEMONSETS[@]}"
 do
     testDaemonsetStatus $DAEMONSET
-done 
+done
 
 STATEFULSETS=(
     "monitoring prometheus-prometheus-operator-prometheus"
