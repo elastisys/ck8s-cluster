@@ -1,4 +1,19 @@
 #Args:
+#   1. kind
+#   2. namespace
+#   3. name of resource
+function testResourceExistence {
+    if kubectl get $1 -n $2 $3 &> /dev/null
+    then
+        echo -n -e "\texists ✔"; SUCCESSES=$((SUCCESSES+1))
+        return 0
+    else
+        echo -n -e "\tmissing ❌"; FAILURES=$((FAILURES+1))
+        return 1
+    fi
+}
+
+#Args:
 #   1. namespace
 #   2. name of deployment
 function testDeploymentStatus {

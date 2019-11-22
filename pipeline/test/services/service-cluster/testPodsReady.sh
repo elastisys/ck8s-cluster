@@ -33,8 +33,13 @@ echo -e "\nTesting deployments"
 
 for DEPLOYMENT in "${DEPLOYMENTS[@]}"
 do
-    testDeploymentStatus $DEPLOYMENT
-done 
+    arguments=($DEPLOYMENT)
+    echo -n -e "\n${arguments[1]}\t"
+    if testResourceExistence deployment $DEPLOYMENT
+    then
+        testDeploymentStatus $DEPLOYMENT
+    fi
+done
 
 DAEMONSETS=(
     "kube-system canal"
@@ -46,8 +51,13 @@ echo -e "\nTesting daemonsets"
 
 for DAEMONSET in "${DAEMONSETS[@]}"
 do
-    testDaemonsetStatus $DAEMONSET
-done 
+    arguments=($DAEMONSET)
+    echo -n -e "\n${arguments[1]}\t"
+    if testResourceExistence daemonset $DAEMONSET
+    then
+        testDaemonsetStatus $DAEMONSET
+    fi
+done
 
 STATEFULSETS=(
     "monitoring prometheus-prometheus-operator-prometheus"
@@ -62,13 +72,18 @@ echo -e "\nTesting statefulsets"
 
 for STATEFULSET in "${STATEFULSETS[@]}"
 do
-    testStatefulsetStatus $STATEFULSET
+    arguments=($STATEFULSET)
+    echo -n -e "\n${arguments[1]}\t"
+    if testResourceExistence statefulset $STATEFULSET
+    then
+        testStatefulsetStatus $STATEFULSET
+    fi
 done
 
 echo -e "\nTesting other pods"
 echo elasticsearch
 # The following command looks at the status conditions for the elasticsearch pods.
-# It assumes that the "Ready" condition is the second condition in the list, 
+# It assumes that the "Ready" condition is the second condition in the list,
 # if that is somehow wrong then this test will fail.
 # It also assumes that there is supposed to be three pods.
 RES=$(kubectl get pods -n elastic-system -l common.k8s.elastic.co/type=elasticsearch -o jsonpath="{.items[*].status.conditions[1].type},{.items[*].status.conditions[1].status}")

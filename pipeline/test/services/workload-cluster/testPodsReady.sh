@@ -22,7 +22,12 @@ echo -e "\nTesting deployments"
 
 for DEPLOYMENT in "${DEPLOYMENTS[@]}"
 do
-    testDeploymentStatus $DEPLOYMENT
+    arguments=($DEPLOYMENT)
+    echo -n -e "\n${arguments[1]}\t"
+    if testResourceExistence deployment $DEPLOYMENT
+    then
+        testDeploymentStatus $DEPLOYMENT
+    fi
 done
 
 DAEMONSETS=(
@@ -39,7 +44,12 @@ echo -e "\nTesting daemonsets"
 
 for DAEMONSET in "${DAEMONSETS[@]}"
 do
-    testDaemonsetStatus $DAEMONSET
+    arguments=($DAEMONSET)
+    echo -n -e "\n${arguments[1]}\t"
+    if testResourceExistence daemonset $DAEMONSET
+    then
+        testDaemonsetStatus $DAEMONSET
+    fi
 done
 
 STATEFULSETS=(
@@ -50,5 +60,10 @@ echo -e "\nTesting statefulsets"
 
 for STATEFULSET in "${STATEFULSETS[@]}"
 do
-    testStatefulsetStatus $STATEFULSET
+    arguments=($STATEFULSET)
+    echo -n -e "\n${arguments[1]}\t"
+    if testResourceExistence statefulset $STATEFULSET
+    then
+        testStatefulsetStatus $STATEFULSET
+    fi
 done
