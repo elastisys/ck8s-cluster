@@ -1,7 +1,10 @@
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
-echo -e "\nTesting endpoints"
+echo
+echo
+echo "Testing endpoints"
+echo "=================="
 
 GRAFANA_PWD=${GRAFANA_PWD:-"prom-operator"}
 HARBOR_PWD=${HARBOR_PWD:-"Harbor12345"}

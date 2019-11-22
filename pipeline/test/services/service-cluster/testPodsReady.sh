@@ -29,7 +29,10 @@ DEPLOYMENTS=(
     "influxdb-prometheus influxdb"
 )
 
-echo -e "\nTesting deployments"
+echo
+echo
+echo "Testing deployments"
+echo "==================="
 
 for DEPLOYMENT in "${DEPLOYMENTS[@]}"
 do
@@ -47,7 +50,10 @@ DAEMONSETS=(
     "monitoring prometheus-operator-prometheus-node-exporter"
 )
 
-echo -e "\nTesting daemonsets"
+echo
+echo
+echo "Testing daemonsets"
+echo "=================="
 
 for DAEMONSET in "${DAEMONSETS[@]}"
 do
@@ -68,7 +74,10 @@ STATEFULSETS=(
     "harbor harbor-harbor-redis"
 )
 
-echo -e "\nTesting statefulsets"
+echo
+echo
+echo "Testing statefulsets"
+echo "===================="
 
 for STATEFULSET in "${STATEFULSETS[@]}"
 do

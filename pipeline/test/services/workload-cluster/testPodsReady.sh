@@ -18,7 +18,10 @@ DEPLOYMENTS=(
     "velero velero"
 )
 
-echo -e "\nTesting deployments"
+echo
+echo
+echo "Testing deployments"
+echo "==================="
 
 for DEPLOYMENT in "${DEPLOYMENTS[@]}"
 do
@@ -40,7 +43,10 @@ DAEMONSETS=(
     "velero restic"
 )
 
-echo -e "\nTesting daemonsets"
+echo
+echo
+echo "Testing daemonsets"
+echo "=================="
 
 for DAEMONSET in "${DAEMONSETS[@]}"
 do
@@ -56,7 +62,10 @@ STATEFULSETS=(
     "monitoring prometheus-prometheus-operator-prometheus"
 )
 
-echo -e "\nTesting statefulsets"
+echo
+echo
+echo "Testing statefulsets"
+echo "===================="
 
 for STATEFULSET in "${STATEFULSETS[@]}"
 do

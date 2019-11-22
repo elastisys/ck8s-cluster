@@ -1,7 +1,9 @@
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
-echo -e "\nTesting endpoints"
+echo
+echo
+echo "Testing endpoints"
+echo "=================="
 
 testEndpoint Prometheus https://prometheus.${ECK_WC_DOMAIN}/
-
