@@ -76,7 +76,7 @@ do
 done
 
 FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
-rke/kube_config_eck-wc.yaml env/env.sh customer/kubeconfig.yaml
+rke/kube_config_eck-wc.yaml env/env.sh customer/kubeconfig.yaml infra/infra.json
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
 certs/service_cluster/kube-system/certs/helm-key.pem
@@ -296,7 +296,7 @@ You can now store all the important credentials and state used so far in vault:
 ```
 cp env.sh clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/env/env.sh
 cd clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}
-FILES="ssh-keys/* rke/* customer/* certs/service_cluster/kube-system/certs/* certs/workload_cluster/kube-system/certs/* env/*"
+FILES="ssh-keys/* rke/* customer/* certs/service_cluster/kube-system/certs/* certs/workload_cluster/kube-system/certs/* env/* infra/*"
 for file in ${FILES}
 do
     cat ${file} | base64 | vault kv put eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file} base64-content=-
@@ -324,7 +324,7 @@ Delete secrets:
 export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|citycloud|exoscale}
 FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
-rke/kube_config_eck-wc.yaml env/env.sh
+rke/kube_config_eck-wc.yaml env/env.sh infra/infra.json
 customer/kubeconfig.yaml
 grafana
 harbor
