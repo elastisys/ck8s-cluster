@@ -35,7 +35,7 @@ If you want to replace `CK8S_DOMAIN` with your actual domain in this document, d
 sed 's/CK8S_DOMAIN/customer-1.compliantk8s.com/g' docs/customer-access.md
 ```
 
-Log in to the services using your A1 AAA or Google credentials unless otherwise noted.
+Log in to the services using the same identity provider you specified earlier as part of the environment setup (e.g. Google or LDAP) unless otherwise noted.
 
 ### Service endpoints
 
