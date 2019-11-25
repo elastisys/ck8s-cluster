@@ -260,8 +260,9 @@ kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-cluster compliantk8s \
     --server=${CUSTOMER_SERVER} \
     --certificate-authority=${CUSTOMER_CERTIFICATE_AUTHORITY} --embed-certs=true
 kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-credentials user \
-    --exec-command=kubelogin \
+    --exec-command=kubectl \
     --exec-api-version=client.authentication.k8s.io/v1beta1 \
+    --exec-arg=oidc-login \
     --exec-arg=get-token \
     --exec-arg=--oidc-issuer-url=https://dex.${ECK_SC_DOMAIN} \
     --exec-arg=--oidc-client-id=kubelogin \
