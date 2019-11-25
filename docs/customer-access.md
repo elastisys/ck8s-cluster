@@ -35,12 +35,13 @@ If you want to replace `CK8S_DOMAIN` with your actual domain in this document, d
 sed 's/CK8S_DOMAIN/customer-1.compliantk8s.com/g' docs/customer-access.md
 ```
 
-Log in to the services using your A1 AAA or Google credentials.
+Log in to the services using your A1 AAA or Google credentials unless otherwise noted.
 
 ### Service endpoints
 
 - **Kubernetes Dashboard** URL: https://dashboard.CK8S_DOMAIN
 - **Kibana** URL: https://kibana.CK8S_DOMAIN
+  Log in using a temporary password that you can change later.
 - **Harbor** URL: https://harbor.CK8S_DOMAIN
 - **Grafana** URL: https://grafana.CK8S_DOMAIN
 - **Prometheus** URL: TODO
@@ -67,16 +68,75 @@ Restart fluentd by killing the pods:
 kubectl -n fluentd delete pods -l app.kubernetes.io/instance=fluentd
 ```
 
+### Ingress controller
+
+The [Nginx ingress controller](https://kubernetes.github.io/ingress-nginx/) is included and can be used to expose applications running in the cluster by creating [Ingresses](https://kubernetes.io/docs/concepts/services-networking/ingress/).
+
+### Cert-manager
+
+Cert-manager is included and can be used by creating one or more [Issuers](https://docs.cert-manager.io/en/latest/tasks/issuers/index.html).
+To get a certificate you will need to either create a [Certificate resource](https://docs.cert-manager.io/en/latest/tasks/issuing-certificates/index.html) or add the proper [annotations to an Ingress](https://docs.cert-manager.io/en/latest/tasks/issuing-certificates/ingress-shim.html) in your cluster.
+
+### Backup
+
+Kubernetes resources with the label `velero: backup` will be backed up daily.
+Persistent volumes will be backed up if they are tied to a Pod with the previously mentioned label and the annotation `backup.velero.io/backup-volumes=<volume1>,<volume2>,...`.
+
+### Monitoring with Prometheus
+
+Compliant Kubernetes includes the Prometheus operator and a Prometheus instance, which can be used for monitoring applications in the cluster.
+You can use a Custom Resource called [ServiceMonitor](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#servicemonitor) to define what endpoints to scrape metrics from.
+The API reference for ServiceMonitors is available [here](https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#servicemonitor).
+A simple example is provided here below:
+
+```
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: customer-jar-monitor
+  namespace: test
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      name: my-application
+  endpoints:
+  - port: metrics-port
+```
+
+If your application doesn't already publish metrics in a suitable way for Prometheus to scrape, you may need to use an exporter of some kind.
+For example, the [JMX exporter](https://github.com/prometheus/jmx_exporter) exoses JMX metrics from Java applications.
+
+### Persistent storage
+
+PersistentVolumes are supported with a default StorageClass `nfs-client`.
+As the name suggests, this storage is backed by an NFS server.
+In cases where this is not enough, contact Elastisys for other options, including high performance Node local storage.
+
 ### Other services
 
 Falco, Fluentd and Dex are currently not configurable directly.
 Access to Alertmanager and Prometheus is not yet available.
 If you require changes/access to these services, please contact us.
 
-TODO:
+## Known issues and limitations
+
+- [Load balancer Services](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) are currently not supported.
+
+### Limited privileges
+
+To keep the Compliant Kubernetes platform secure and to be able to take responsibility for as much as possible of it, users will not have the normal `cluster-admin` privileges.
+Instead, users are given `admin` privileges in specific Namespaces with access to a restrictive PodSecurityPolicy.
+This means that users will not be able to control resources at the cluster level (e.g. ClusterRoles) or run containers with the `root` user.
+Access to Nodes is also restricted (e.g. it is not allowed to mount host paths to a Pod).
+
+## Contact support
+
+If you are having issues with your cluster or questions about how things work, reach out to Elastisys support team at support@elastisys.com!
+
+## TODO
 
 - Falco: Customers should be able to set up notifications and maybe also change/add rules to falco.
-- Dex: Should customers be able to configure this? Should they be able to add their own IDPs?
 - Fluentd/Elasticsearch/Kibana: Customers may need to parse application logs in specific ways.
-- Prometheus: Customers probably want to collect (custom) metrics from their applications. Should they set up their own prometheus for this or use the built in? How?
 - Alertmanager: Customers may want to define their own alerts and configure where notifications go.
