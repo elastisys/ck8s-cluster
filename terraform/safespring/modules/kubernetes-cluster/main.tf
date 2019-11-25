@@ -145,6 +145,15 @@ resource "openstack_compute_secgroup_v2" "worker_sg" {
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
   }
+
+  # We allow the default NodePort range
+  # https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
+  rule {
+    from_port   = 30000
+    to_port     = 32767
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
 }
 
 module "worker" {
