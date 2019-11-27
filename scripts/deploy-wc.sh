@@ -91,9 +91,15 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
-export CERT_NAMESPACE=monitoring
-envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml | kubectl apply -f -
-envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml | kubectl apply -f -
+
+issuer_namespaces='kube-system monitoring'
+for ns in $issuer_namespaces
+do
+    export CERT_NAMESPACE=$ns
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml | kubectl apply -f -
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml | kubectl apply -f -
+done
+
 
 # OPA
 if [[ $ENABLE_OPA == "true" ]]

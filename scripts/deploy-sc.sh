@@ -127,22 +127,25 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
-declare -A name_array
-name_array=(["harbor"]="harbor" ["dex"]="dex" ["elastic-system"]="elastic-system" ["kube-system"]="kube-system" ["monitoring"]="monitoring")
 
-for i in "${!name_array[@]}"
+issuer_namespaces='dex elastic-system kube-system monitoring'
+for ns in $issuer_namespaces
 do
-    export CERT_NAMESPACE=${name_array[$i]}
+    export CERT_NAMESPACE=$ns
     envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml | kubectl apply -f -
     envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml | kubectl apply -f -
 done
 
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer-harbor.yaml
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer-harbor.yaml
     envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-core-cert.yaml | kubectl apply -f -
     envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-notary-cert.yaml | kubectl apply -f -
+
+    export CERT_NAMESPACE=harbor
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml | kubectl apply -f -
+    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml | kubectl apply -f -
 fi
 
 # Elasticsearch and kibana.
