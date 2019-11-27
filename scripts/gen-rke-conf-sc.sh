@@ -117,6 +117,8 @@ cat <<EOF
       delete-collection-workers: 3
       # Set the level of log output to debug-level
       v: 4
+      # Set max age for audit logs
+      audit-log-maxage: 7
 EOF
 
 if [[ $ENABLE_PSP == "true" ]]

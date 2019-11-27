@@ -120,6 +120,8 @@ cat <<EOF
       delete-collection-workers: 3
       # Set the level of log output to debug-level
       v: 4
+      # Set max age for audit logs
+      audit-log-maxage: 7
       admission-control-config-file: "/etc/kubernetes/conf/admission-control-config.yaml"
 EOF
 
