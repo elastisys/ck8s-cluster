@@ -8,6 +8,7 @@ env_vars=(
     ["kubelogin_client"]="KUBELOGIN_CLIENT_SECRET"
     ["grafana_client"]="GRAFANA_CLIENT_SECRET"
     ["dashboard_client"]="DASHBOARD_CLIENT_SECRET"
+    ["prometheus_client"]="PROMETHEUS_CLIENT_SECRET"
 )
 
 for key in ${!env_vars[@]}

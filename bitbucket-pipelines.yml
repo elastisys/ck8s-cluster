@@ -94,6 +94,7 @@ pipelines:
           - step:
               name: Workload cluster deploy
               script:
+                - apt-get -y install apache2-utils
                 - source pipeline/init-exoscale.sh
                 - source pipeline/variables.sh
                 # Export vault variables
@@ -263,6 +264,7 @@ pipelines:
           - step:
               name: Workload cluster deploy
               script:
+                - apt-get -y install apache2-utils
                 - source pipeline/init-safespring.sh
                 - source pipeline/variables.sh
                 # Export vault variables

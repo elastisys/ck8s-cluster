@@ -42,6 +42,9 @@
       - '{job="prometheus-operator-operator"}'
       - '{__name__=~"job:.*"}'
       - '{__name__=~"namespace(_|:).*"}'
+  basic_auth:
+    username: prometheus 
+    password: ${PROMETHEUS_CLIENT_SECRET}
 
   tls_config:
     insecure_skip_verify: ${TLS_SKIP_VERIFY}

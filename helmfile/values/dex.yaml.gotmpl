@@ -55,7 +55,6 @@ config:
       name: 'Grafana'
       redirectURIs:
         - https://grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}/login/generic_oauth
-
 {{ if eq (env "ENABLE_STATIC_DEX_LOGIN") "true" }}
   enablePasswordDB: true
   staticPasswords:
