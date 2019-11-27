@@ -53,7 +53,7 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
+            storage: 40Gi
         storageClassName: ${STORAGE_CLASS}
   secureSettings:
     secretName: s3-credentials
