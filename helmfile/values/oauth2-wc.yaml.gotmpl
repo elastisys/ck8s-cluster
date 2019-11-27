@@ -1,9 +1,9 @@
 # Oauth client configuration specifics
 config:
   # OAuth client ID
-  clientID: "dashboard"
+  clientID: "kubelogin"
   # OAuth client secret
-  clientSecret: "{{ requiredEnv "DASHBOARD_CLIENT_SECRET" }}"
+  clientSecret: "{{ requiredEnv "KUBELOGIN_CLIENT_SECRET" }}"
   # Create a new secret with the following command
   # openssl rand -base64 32 | head -c 32 | base64
   # Use an existing secret for OAuth2 credentials (see secret.yaml for required fields)

@@ -43,17 +43,13 @@ config:
       insecureSkipEmailVerified: true
   {{ end }}
   staticClients:
-    - id: dashboard
-      name: 'Kubernetes dashboard'
-      secret: {{ requiredEnv "DASHBOARD_CLIENT_SECRET" }}
-      redirectURIs:
-      - https://dashboard.{{ requiredEnv "ECK_SC_DOMAIN" }}/oauth2/callback
-      - https://dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}/oauth2/callback
     - id: kubelogin
       name: 'Kubernetes CLI'
       secret: {{ requiredEnv "KUBELOGIN_CLIENT_SECRET" }}
       redirectURIs:
       - http://localhost:8000
+      - https://dashboard.{{ requiredEnv "ECK_SC_DOMAIN" }}/oauth2/callback
+      - https://dashboard.{{ requiredEnv "ECK_WC_DOMAIN" }}/oauth2/callback
     - id: grafana
       secret: {{ requiredEnv "GRAFANA_CLIENT_SECRET" }}
       name: 'Grafana'
