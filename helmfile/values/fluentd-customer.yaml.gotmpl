@@ -173,7 +173,7 @@ extraConfigMaps:
         reconnect_on_error true
         # Custom parameters --START--
         # Avoids congestion if the plugin is installed
-        id_key _hash 
+        id_key _hash
         remove_keys _hash
         flatten_hashes true
         flatten_hashes_separator .
@@ -187,15 +187,15 @@ extraConfigMaps:
         index_prefix kubecomponents
         index_separator "."
         index_date_pattern "now/d"
-        # Ilm configuration
-        enable_ilm true
-        # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id kubecomponents_policy
-        #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
-        # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name kubecomponents_template
-        template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.4/test/plugin/test_template.json
-        customize_template {"<<index_prefix>>": "kubecomponents"}
+        # # Ilm configuration
+        # enable_ilm true
+        # # Policy is already created by init container so fluentd will skip it's creation
+        # ilm_policy_id kubecomponents_policy
+        # #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+        # # Template name is not used if ilm is in effect but it's mandatory parameter
+        # template_name kubecomponents_template
+        # template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.4/test/plugin/test_template.json
+        # customize_template {"<<index_prefix>>": "kubecomponents"}
         # Custom parameters --END--
         <buffer>
           @type file
@@ -230,7 +230,7 @@ extraConfigMaps:
         reconnect_on_error true
         # Custom parameters --START--
         # Avoids congestion if the plugin is installed
-        #id_key _hash 
+        #id_key _hash
         #remove_keys _hash
         #flatten_hashes true
         #flatten_hashes_separator .
@@ -244,15 +244,15 @@ extraConfigMaps:
         index_prefix logstash
         index_separator "."
         index_date_pattern "now/d"
-        # Ilm configuration
-        enable_ilm true
-        # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id datastream_policy
-        #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
-        # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name logstash_template
-        template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.4/test/plugin/test_template.json
-        customize_template {"<<index_prefix>>": "logstash"}
+        # # Ilm configuration
+        # enable_ilm true
+        # # Policy is already created by init container so fluentd will skip it's creation
+        # ilm_policy_id datastream_policy
+        # #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+        # # Template name is not used if ilm is in effect but it's mandatory parameter
+        # template_name logstash_template
+        # template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.4/test/plugin/test_template.json
+        # customize_template {"<<index_prefix>>": "logstash"}
         # Custom parameters --END--
         <buffer>
           @type file
