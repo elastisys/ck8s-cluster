@@ -17,6 +17,7 @@ Later on, this could be automated and turned into an online form to fill in.
   For example, if using Google as identity provider, we will need to know if we should restrict authentication to a specific domain.
   We will also need a list of at least one account that should get admin access.
   These users will be able to configure permissions for other users.
+- What **optional services** should be deployed (e.g. Harbor and OPA)?
 - What **namespaces** should be created for the customer?
 
 ## Step 2 - Deploy environment
@@ -35,7 +36,7 @@ This step can also include fine-tuning of the environment initially (e.g. give t
 However, this should preferably be done during steps 1 and 2 if possible.
 
 We (Elastisys) send details on the new environment to the customer.
-This includes any needed credentials and access endpoints.
+This includes any needed credentials and access endpoints as well as information about procedures (upgrades, maintenance, etc.).
 We should also include some getting started instructions and help the customer to get started with the environment.
 
 After this step the customer should
