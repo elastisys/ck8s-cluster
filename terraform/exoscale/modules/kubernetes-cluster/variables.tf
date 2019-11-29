@@ -40,7 +40,10 @@ variable "public_ingress_cidr_whitelist" {
 
 ## DNS
 
-variable "dns_name" {}
+#variable "dns_name" {}
+variable "dns_list" {
+  type = list(string)
+}
 
 variable "aws_dns_zone_id" {
   default = "Z2STJRQSJO5PZ0" # elastisys.com

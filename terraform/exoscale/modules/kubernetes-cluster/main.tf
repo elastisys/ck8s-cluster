@@ -18,11 +18,24 @@ locals {
     local.internal_cidr_prefix,
     local.nfs_internal_host_num
   )
+
+  domains = flatten([
+    for worker in exoscale_compute.worker : [
+      for dns in var.dns_list : {
+        ip_address = worker.ip_address
+        dns = dns
+      }
+    ]
+  ])
+
+  domain_map = {
+    for domain in local.domains: "${domain.ip_address}:${domain.dns}" => domain
+  }
 }
 
 resource "exoscale_network" "net" {
-  zone             = "${var.zone}"
-  name             = "${var.network_name}"
+  zone             = var.zone
+  name             = var.network_name
   network_offering = "PrivNet"
 
   start_ip = cidrhost(local.internal_cidr_prefix, 1)
@@ -31,16 +44,16 @@ resource "exoscale_network" "net" {
 }
 
 resource "exoscale_compute" "master" {
-  count = "${var.master_count}"
+  count = var.master_count
 
   display_name    = "${var.master_name}-${count.index}"
   template        = "Linux RancherOS 1.5.1 64-bit"
-  size            = "${var.master_size}"
+  size            = var.master_size
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.ssh_key.name}"
+  key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
-  zone            = "${var.zone}"
-  security_groups = ["${exoscale_security_group.master_sg.name}"]
+  zone            = var.zone
+  security_groups = [exoscale_security_group.master_sg.name]
 
   user_data = templatefile(
     "${path.module}/templates/master-cloud-init.tmpl",
@@ -56,39 +69,39 @@ resource "exoscale_compute" "master" {
 }
 
 #resource "exoscale_nic" "master_internal" {
-#  compute_id = "${exoscale_compute.master.id}"
-#  network_id = "${exoscale_network.net.id}"
+#  compute_id = exoscale_compute.master.id
+#  network_id = exoscale_network.net.id
 #
 #  # TODO: Remove when managed virtual router/DHCP is working properly.
-#  ip_address = "${local.master_internal_ip_address}"
+#  ip_address = local.master_internal_ip_address
 #}
 
 resource "exoscale_compute" "worker" {
-  count = "${var.worker_count}"
+  count = var.worker_count
 
   display_name    = "${var.worker_name}-${count.index}"
   template        = "Linux RancherOS 1.5.1 64-bit"
-  size            = "${var.worker_size}"
+  size            = var.worker_size
   disk_size       = 50
-  key_pair        = "${exoscale_ssh_keypair.ssh_key.name}"
+  key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
-  zone            = "${var.zone}"
-  security_groups = ["${exoscale_security_group.worker_sg.name}"]
+  zone            = var.zone
+  security_groups = [exoscale_security_group.worker_sg.name]
 
   user_data = templatefile(
     "${path.module}/templates/worker-cloud-init.tmpl",
     {
       # TODO: Remove when managed virtual router/DHCP is working properly.
-      # address = "${cidrhost(local.internal_cidr_prefix, local.worker_internal_host_num_start + count.index)}/${local.internal_cidr_prefix_length}"
+      # address = "${cidrhost(local.internal_cidr_prefix, local.worker_internal_host_num_start + count.index)}/${local.internal_cidr_prefix_length
     }
   )
 }
 
 #resource "exoscale_nic" "worker_internal" {
-#  count = "${var.worker_count}"
+#  count = var.worker_count
 #
-#  compute_id = "${element(exoscale_compute.worker.*.id, count.index)}"
-#  network_id = "${exoscale_network.net.id}"
+#  compute_id = element(exoscale_compute.worker.*.id, count.index)
+#  network_id = exoscale_network.net.id
 #
 #  # TODO: Remove when managed virtual router/DHCP is working properly.
 #  ip_address = cidrhost(
@@ -98,47 +111,47 @@ resource "exoscale_compute" "worker" {
 #}
 
 resource "exoscale_compute" "nfs" {
-  display_name    = "${var.nfs_name}"
+  display_name    = var.nfs_name
   template        = "Linux Ubuntu 18.04 LTS 64-bit"
-  size            = "${var.nfs_size}"
+  size            = var.nfs_size
   disk_size       = 200
-  key_pair        = "${exoscale_ssh_keypair.ssh_key.name}"
+  key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
-  zone            = "${var.zone}"
-  security_groups = ["${exoscale_security_group.nfs_sg.name}"]
+  zone            = var.zone
+  security_groups = [exoscale_security_group.nfs_sg.name]
 
   user_data = templatefile(
     "${path.module}/templates/nfs-cloud-init.tmpl",
     {
-      worker_ips = "${exoscale_compute.worker.*.ip_address}"
-      # internal_cidr_prefix = "${local.internal_cidr_prefix}"
+      worker_ips = exoscale_compute.worker.*.ip_address
+      # internal_cidr_prefix = local.internal_cidr_prefix
 
       # TODO: Remove when managed virtual router/DHCP is working properly.
-      # address = "${local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length}",
+      # address = local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length,
     }
   )
 }
 
 #resource "exoscale_nic" "nfs_internal" {
-#  compute_id = "${exoscale_compute.nfs.id}"
-#  network_id = "${exoscale_network.net.id}"
+#  compute_id = exoscale_compute.nfs.id
+#  network_id = exoscale_network.net.id
 #
 #  # TODO: Remove when managed virtual router/DHCP is working properly.
-#  ip_address = "${local.nfs_internal_ip_address}"
+#  ip_address = local.nfs_internal_ip_address
 #}
 
 resource "exoscale_security_group" "master_sg" {
-  name        = "${var.master_security_group_name}"
+  name        = var.master_security_group_name
   description = "Security group for Kubernetes masters"
 }
 
 resource "exoscale_security_group_rules" "master_sg_rules" {
-  security_group_id = "${exoscale_security_group.master_sg.id}"
+  security_group_id = exoscale_security_group.master_sg.id
 
   # SSH
   ingress {
     protocol  = "TCP"
-    cidr_list = "${var.public_ingress_cidr_whitelist}"
+    cidr_list = var.public_ingress_cidr_whitelist
     ports     = ["22"]
   }
 
@@ -155,34 +168,34 @@ resource "exoscale_security_group_rules" "master_sg_rules" {
     protocol = "TCP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${exoscale_security_group.master_sg.name}",
-      "${exoscale_security_group.worker_sg.name}",
-      "${exoscale_security_group.nfs_sg.name}",
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
     ]
   }
   ingress {
     protocol = "UDP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${exoscale_security_group.master_sg.name}",
-      "${exoscale_security_group.worker_sg.name}",
-      "${exoscale_security_group.nfs_sg.name}",
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
     ]
   }
 }
 
 resource "exoscale_security_group" "worker_sg" {
-  name        = "${var.worker_security_group_name}"
+  name        = var.worker_security_group_name
   description = "security group for kubernetes worker nodes"
 }
 
 resource "exoscale_security_group_rules" "worker_sg_rules" {
-  security_group_id = "${exoscale_security_group.worker_sg.id}"
+  security_group_id = exoscale_security_group.worker_sg.id
 
   # SSH
   ingress {
     protocol  = "TCP"
-    cidr_list = "${var.public_ingress_cidr_whitelist}"
+    cidr_list = var.public_ingress_cidr_whitelist
     ports     = ["22"]
   }
 
@@ -199,34 +212,34 @@ resource "exoscale_security_group_rules" "worker_sg_rules" {
     protocol = "TCP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${exoscale_security_group.master_sg.name}",
-      "${exoscale_security_group.worker_sg.name}",
-      "${exoscale_security_group.nfs_sg.name}",
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
     ]
   }
   ingress {
     protocol = "UDP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${exoscale_security_group.master_sg.name}",
-      "${exoscale_security_group.worker_sg.name}",
-      "${exoscale_security_group.nfs_sg.name}",
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
     ]
   }
 }
 
 resource "exoscale_security_group" "nfs_sg" {
-  name        = "${var.nfs_security_group_name}"
+  name        = var.nfs_security_group_name
   description = "Security group for NFS node"
 }
 
 resource "exoscale_security_group_rules" "nfs_sg_rules" {
-  security_group_id = "${exoscale_security_group.nfs_sg.id}"
+  security_group_id = exoscale_security_group.nfs_sg.id
 
   # SSH
   ingress {
     protocol  = "TCP"
-    cidr_list = "${var.public_ingress_cidr_whitelist}"
+    cidr_list = var.public_ingress_cidr_whitelist
     ports     = ["22"]
   }
 
@@ -236,24 +249,24 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
     protocol = "TCP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${exoscale_security_group.master_sg.name}",
-      "${exoscale_security_group.worker_sg.name}",
-      "${exoscale_security_group.nfs_sg.name}",
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
     ]
   }
   ingress {
     protocol = "UDP"
     ports    = ["0-65535"]
     user_security_group_list = [
-      "${exoscale_security_group.master_sg.name}",
-      "${exoscale_security_group.worker_sg.name}",
-      "${exoscale_security_group.nfs_sg.name}",
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
     ]
   }
 }
 
 #resource "exoscale_ipaddress" "eip" {
-#  zone                     = "${var.zone}"
+#  zone                     = var.zone
 #  healthcheck_mode         = "http"
 #  healthcheck_port         = 10254
 #  healthcheck_path         = "/healthz"
@@ -264,22 +277,31 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
 #}
 #
 #resource "exoscale_secondary_ipaddress" "eip_worker_association" {
-#  count = "${var.worker_count}"
+#  count = var.worker_count
 #
-#  compute_id = "${element(exoscale_compute.worker.*.id, count.index)}"
-#  ip_address = "${exoscale_ipaddress.eip.ip_address}"
+#  compute_id = element(exoscale_compute.worker.*.id, count.index)
+#  ip_address = exoscale_ipaddress.eip.ip_address
 #}
 
 resource "exoscale_ssh_keypair" "ssh_key" {
-  name       = "${var.ssh_key_name}"
-  public_key = trimspace(file(pathexpand("${var.ssh_pub_key_file}")))
+  name       = var.ssh_key_name
+  public_key = trimspace(file(pathexpand(var.ssh_pub_key_file)))
 }
 
 resource "exoscale_domain_record" "worker" {
-  count = "${var.worker_count}"
+  #for_each    = toset(exoscale_compute.worker[*].ip_address)
+  
+  #for_each    = setproduct(toset(exoscale_compute.worker[*].ip_address), toset(var.dns_list))
+  for_each = local.domain_map
+  #count = "${var.worker_count}"
 
   domain = "a1ck.io"
-  content = "${element(exoscale_compute.worker.*.ip_address, count.index)}"
-  name = "*.${var.dns_name}"
+  #content = "${element(exoscale_compute.worker.*.ip_address, count.index)}"
+  name = each.value.dns
   record_type = "A"
+
+  #domain      = "a1ck.io"
+  content     = each.value.ip_address
+  #name        = var.dns_name
+  #record_type = "A"
 }

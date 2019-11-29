@@ -3,7 +3,7 @@ output "master_ip_addresses" {
 }
 
 output "worker_ip_addresses" {
-  value = "${exoscale_compute.worker.*.ip_address}"
+  value = exoscale_compute.worker[*].ip_address
 }
 
 output "nfs_ip_address" {
@@ -11,7 +11,7 @@ output "nfs_ip_address" {
 }
 
 output "dns_record_name" {
-  value = "${exoscale_domain_record.worker.0.name}.${exoscale_domain_record.worker.0.domain}"
+  value = exoscale_domain_record.worker[*]
 }
 
 #  value = "${exoscale_nic.master_internal.ip_address}"
