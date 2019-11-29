@@ -14,7 +14,7 @@ elasticsearch:
   logLevel: "debug"
 
 # Default args include "-q" which sets loglevel to warning.
-fluentdArgs: 
+fluentdArgs: "--no-supervisor"
 configMaps:
   useDefaults:
     systemConf: false
@@ -169,30 +169,19 @@ extraConfigMaps:
           ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
           user "#{ENV['OUTPUT_USER']}"
           password "#{ENV['OUTPUT_PASSWORD']}"
-          #logstash_format true
-          #logstash_prefix "#{ENV['LOGSTASH_PREFIX']}"
           reconnect_on_error true
           # Custom parameters --START--
-          # Avoids congestion if the plugin is installed
-          id_key _hash
-          remove_keys _hash
-          flatten_hashes true
-          flatten_hashes_separator .
-          # Fixes restrictions of not having logstash format
-          include_timestamp true
-          time_key time
           # Rollover index configuration
-          index_name kubecomponents-alias
+          index_name kubecomponents
           rollover_index true
-          deflector_alias kubecomponents-alias
+          deflector_alias kubecomponents
           index_prefix kubecomponents
-          index_separator "."
           index_date_pattern "now/d"
           # Ilm configuration
           enable_ilm true
           # Policy is already created by init container so fluentd will skip it's creation
           ilm_policy_id kubecomponents_policy
-          #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "1GB","max_age": "1d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name kubecomponents_template
           template_file /etc/templates/kubecomponents_template.json
@@ -226,30 +215,19 @@ extraConfigMaps:
           ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
           user "#{ENV['OUTPUT_USER']}"
           password "#{ENV['OUTPUT_PASSWORD']}"
-          #logstash_format true
-          #logstash_prefix "#{ENV['LOGSTASH_PREFIX']}"
           reconnect_on_error true
           # Custom parameters --START--
-          # Avoids congestion if the plugin is installed
-          #id_key _hash
-          #remove_keys _hash
-          #flatten_hashes true
-          #flatten_hashes_separator .
-          # Fixes restrictions of not having logstash format
-          include_timestamp true
-          time_key time
           # Rollover index configuration
-          index_name logstash-alias
+          index_name logstash
           rollover_index true
-          deflector_alias logstash-alias
+          deflector_alias logstash
           index_prefix logstash
-          index_separator "."
           index_date_pattern "now/d"
           # Ilm configuration
           enable_ilm true
           # # Policy is already created by init container so fluentd will skip it's creation
           ilm_policy_id datastream_policy
-          #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "1GB","max_age": "1d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name logstash_template
           template_file /etc/templates/logstash_template.json
