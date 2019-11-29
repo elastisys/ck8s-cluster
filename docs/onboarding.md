@@ -19,6 +19,7 @@ Later on, this could be automated and turned into an online form to fill in.
   These users will be able to configure permissions for other users.
 - What **optional services** should be deployed (e.g. Harbor and OPA)?
 - What **namespaces** should be created for the customer?
+- How would you like to be **notified** about upgrades, maintenance and similar?
 
 ## Step 2 - Deploy environment
 
@@ -54,3 +55,6 @@ After this step the customer should
 - know how to configure backups
 - know how to contact us in case of problems
 - know about known issues with the platform
+- know about common processes that are part of the managed platform
+
+See [customer-access.md](customer-access.md) and [processes.md](processes.md).
