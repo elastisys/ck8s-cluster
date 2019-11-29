@@ -1,3 +1,7 @@
+image:
+  repository: elandf/fluentd_elasticsearch
+  tag: latest
+  pullPolicy: Always
 elasticsearch:
   scheme: https
   port: 443
@@ -10,7 +14,7 @@ elasticsearch:
   logLevel: "debug"
 
 # Default args include "-q" which sets loglevel to warning.
-fluentdArgs: "--no-supervisor"
+fluentdArgs: 
 configMaps:
   useDefaults:
     systemConf: false
@@ -187,15 +191,15 @@ extraConfigMaps:
         index_prefix kubecomponents
         index_separator "."
         index_date_pattern "now/d"
-        # # Ilm configuration
-        # enable_ilm true
-        # # Policy is already created by init container so fluentd will skip it's creation
-        # ilm_policy_id kubecomponents_policy
-        # #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
-        # # Template name is not used if ilm is in effect but it's mandatory parameter
-        # template_name kubecomponents_template
-        # template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.4/test/plugin/test_template.json
-        # customize_template {"<<index_prefix>>": "kubecomponents"}
+        # Ilm configuration
+        enable_ilm true
+        # Policy is already created by init container so fluentd will skip it's creation
+        ilm_policy_id kubecomponents_policy
+        #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+        # Template name is not used if ilm is in effect but it's mandatory parameter
+        template_name kubecomponents_template
+        template_file /etc/templates/kubecomponents_template.json
+        customize_template {"<<index_prefix>>": "kubecomponents"}
         # Custom parameters --END--
         <buffer>
           @type file
@@ -244,15 +248,15 @@ extraConfigMaps:
         index_prefix logstash
         index_separator "."
         index_date_pattern "now/d"
-        # # Ilm configuration
-        # enable_ilm true
-        # # Policy is already created by init container so fluentd will skip it's creation
-        # ilm_policy_id datastream_policy
-        # #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
-        # # Template name is not used if ilm is in effect but it's mandatory parameter
-        # template_name logstash_template
-        # template_file template_file /var/lib/gems/2.3.0/gems/fluent-plugin-elasticsearch-3.5.4/test/plugin/test_template.json
-        # customize_template {"<<index_prefix>>": "logstash"}
+        # Ilm configuration
+        enable_ilm true
+        # Policy is already created by init container so fluentd will skip it's creation
+        ilm_policy_id datastream_policy
+        #ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "100MB","max_age": "1d"}}}}}}
+        # Template name is not used if ilm is in effect but it's mandatory parameter
+        template_name logstash_template
+        template_file /etc/templates/logstash_template.json
+        customize_template {"<<index_prefix>>": "logstash"}
         # Custom parameters --END--
         <buffer>
           @type file
