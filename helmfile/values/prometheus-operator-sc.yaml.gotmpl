@@ -42,6 +42,26 @@ alertmanager:
           # See this: https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/108
           alertname: CPUThrottlingHigh
         receiver: 'null'
+      - match:
+          # This alert is a bit over sensitive at the moment (always active for a cluster with one worker node), send to null.
+          alertname: KubeCPUOvercommit
+          cluster: workload_cluster
+        receiver: 'null'
+      - match:
+          # This alert is a bit over sensitive at the moment (always active for a cluster with one worker node), send to null.
+          alertname: KubeMemOvercommit
+          cluster: workload_cluster
+        receiver: 'null'
+      - match:
+          # This alert should be followed by KubeJobFailed if critical, send to null.
+          alertname: KubeCronJobRunning
+          cluster: workload_cluster
+        receiver: 'null'
+      - match:
+          # This alert should be followed by KubeJobFailed if critical, send to null.
+          alertname: KubeJobCompletion
+          cluster: workload_cluster
+        receiver: 'null'
     receivers:
     - name: 'null'
     - name: techteam
