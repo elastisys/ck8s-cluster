@@ -30,8 +30,7 @@ controller:
   # The update strategy to apply to the Deployment or DaemonSet
   ##
   updateStrategy:
-    type: OnDelete
-    maxUnavailable: 1
+    type: RollingUpdate
 
   # minReadySeconds to avoid killing pods before we are ready
   ##
@@ -40,7 +39,7 @@ controller:
   ## terminationGracePeriodSeconds
   ##
   terminationGracePeriodSeconds: 60
-  
+
   service:
     enabled: false
 
