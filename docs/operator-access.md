@@ -48,6 +48,17 @@ sed 's/ECK_WC_DOMAIN/customer-1.compliantk8s.com/g' docs/operator-access.md
 
 Log in to the services using your A1 AAA or Google credentials.
 
+### Alerting to Slack
+
+Alertmanager can be used to send alerts to slack.
+See [example-env.sh](../example-env.sh) for available environment variables for alerting.
+
+Alerts through Slack requires a [slack app](https://api.slack.com/).
+The one we are currently using can be found [here](https://api.slack.com/apps/ANJ11SFK3/general?).
+You will need to create a [webhook URL](https://api.slack.com/apps/ANJ11SFK3/incoming-webhooks?) for each channel you want to send alerts to.
+
+The alertmanager configuration can be found in [prometheus-operator-sc.yaml.gotmpl](../helmfile/values/prometheus-operator-sc.yaml.gotmpl)
+
 ### Service endpoints
 
 - **Kubernetes workload cluster Dashboard** URL: https://dashboard.ECK_WC_DOMAIN
