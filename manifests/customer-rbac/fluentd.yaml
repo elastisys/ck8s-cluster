@@ -22,10 +22,8 @@ rules:
   - get
   - list
   - watch
-  - create
   - update
   - patch
-  - delete
 # Allow restarting fluentd pods by deleting them
 - apiGroups:
   - ""
