@@ -41,10 +41,12 @@ fi
 INTERACTIVE=${2:-""}
 
 # NAMESPACES
-kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace falco --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace fluentd --dry-run -o yaml | kubectl apply -f -
+NAMESPACES="cert-manager falco monitoring fluentd"
+for namespace in ${NAMESPACES}
+do
+    kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
+    kubectl label --overwrite namespace ${namespace} owner=operator
+done
 
 if [[ $ENABLE_OPA == "true" ]]
 then

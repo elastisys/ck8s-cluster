@@ -74,12 +74,12 @@ INTERACTIVE=${2:-""}
 
 
 # NAMESPACES
-kubectl create namespace cert-manager --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace elastic-system --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace dex --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace nfs-provisioner --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace influxdb-prometheus --dry-run -o yaml | kubectl apply -f -
-kubectl create namespace monitoring --dry-run -o yaml | kubectl apply -f -
+NAMESPACES="cert-manager elastic-system dex nfs-provisioner influxdb-prometheus monitoring"
+for namespace in ${NAMESPACES}
+do
+    kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
+    kubectl label --overwrite namespace ${namespace} owner=operator
+done
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then

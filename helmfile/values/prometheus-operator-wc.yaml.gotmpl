@@ -53,6 +53,11 @@ prometheus:
       - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
 
   prometheusSpec:
+    serviceMonitorNamespaceSelector:
+      # We don't want to pick up all (customer) ServiceMonitors that may exist
+      # in the cluster. Just select namespaces we own.
+      matchLabels:
+        owner: operator
     resources:
       requests:
         memory: 1Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
