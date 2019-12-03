@@ -1,13 +1,12 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: customer-jar-monitor
-  namespace: monitoring
+  name: custom-jar-monitor
   labels:
-    release: prometheus-operator
+    scrape: "true"
 spec:
   selector:
     matchLabels:
-      name: customer-jar-service
+      name: custom-jar-service
   endpoints:
   - port: jar-port
