@@ -39,8 +39,6 @@ variable "public_ingress_cidr_whitelist" {
 }
 
 ## DNS
-
-#variable "dns_name" {}
 variable "dns_list" {
   type = list(string)
 }

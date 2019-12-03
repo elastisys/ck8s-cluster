@@ -289,19 +289,9 @@ resource "exoscale_ssh_keypair" "ssh_key" {
 }
 
 resource "exoscale_domain_record" "worker" {
-  #for_each    = toset(exoscale_compute.worker[*].ip_address)
-  
-  #for_each    = setproduct(toset(exoscale_compute.worker[*].ip_address), toset(var.dns_list))
   for_each = local.domain_map
-  #count = "${var.worker_count}"
-
   domain = "a1ck.io"
-  #content = "${element(exoscale_compute.worker.*.ip_address, count.index)}"
   name = each.value.dns
   record_type = "A"
-
-  #domain      = "a1ck.io"
   content     = each.value.ip_address
-  #name        = var.dns_name
-  #record_type = "A"
 }
