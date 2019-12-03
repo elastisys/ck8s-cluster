@@ -11,7 +11,7 @@ DEPLOYMENTS=(
     "kube-system kubernetes-dashboard"
     "kube-system kubernetes-metrics-scraper"
     "kube-system metrics-server"
-    "ingress-nginx default-http-backend"
+    "nginx-ingress nginx-ingress-default-backend"
     "opa opa"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
@@ -38,7 +38,7 @@ DAEMONSETS=(
     "fluentd fluentd-fluentd-elasticsearch"
     "kube-system fluentd-system-fluentd-elasticsearch"
     "kube-system canal"
-    "ingress-nginx nginx-ingress-controller"
+    "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
     "velero restic"
 )

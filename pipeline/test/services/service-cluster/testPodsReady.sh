@@ -22,7 +22,7 @@ DEPLOYMENTS=(
     "kube-system kubernetes-metrics-scraper"
     "kube-system metrics-server"
     "kube-system nfs-client-provisioner"
-    "ingress-nginx default-http-backend"
+    "nginx-ingress nginx-ingress-default-backend"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-grafana"
     "monitoring prometheus-operator-kube-state-metrics"
@@ -46,7 +46,7 @@ done
 
 DAEMONSETS=(
     "kube-system canal"
-    "ingress-nginx nginx-ingress-controller"
+    "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
 )
 
