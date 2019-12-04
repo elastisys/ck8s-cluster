@@ -50,14 +50,6 @@ alertmanager:
           # This alert is a bit over sensitive at the moment (always active for a cluster with one worker node), send to null.
           alertname: KubeMemOvercommit
         receiver: 'null'
-      - match:
-          # This alert should be followed by KubeJobFailed if critical, send to null.
-          alertname: KubeCronJobRunning
-        receiver: 'null'
-      - match:
-          # This alert should be followed by KubeJobFailed if critical, send to null.
-          alertname: KubeJobCompletion
-        receiver: 'null'
     receivers:
     - name: 'null'
     - name: techteam
