@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+spec:
+  replicas: 1
+  retention: 2d
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 0.3
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceMonitorSelector:
+    matchLabels:
+      scrape: "true"
+  # Set to {} to select all namespaces
+  # Comment out to select the namespace this instance is running in
+  serviceMonitorNamespaceSelector: {}
+  #   matchLabels:
+  #     key: value
+  # externalLabels:
+  #   # Add labels you want to add to all metrics
+  #   cluster: workload_cluster

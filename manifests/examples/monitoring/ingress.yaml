@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    certmanager.k8s.io/issuer: self-signed
+  labels:
+    app: prometheus
+  name: prometheus
+spec:
+  rules:
+  - host: scrape.${ECK_WC_DOMAIN}
+    http:
+      paths:
+      - backend:
+          # This service is created automatically by the operator
+          serviceName: prometheus-operated
+          servicePort: 9090
+        path: /
+  tls:
+  - hosts:
+    - scrape.${ECK_WC_DOMAIN}
+    secretName: prometheus-certs

@@ -40,7 +40,8 @@ scrapeConfig:
       - '{job=~".+"}'
 
   tls_config:
-    insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}
+    # Using selfsigned issuer here
+    insecure_skip_verify: true
 
   static_configs:
     - labels:

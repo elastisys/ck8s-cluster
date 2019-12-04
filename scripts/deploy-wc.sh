@@ -300,5 +300,21 @@ do
         --dry-run -o yaml | kubectl auth reconcile -f -
 done
 
-# Add an example configmap
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml
+# Add example resources.
+# We use `create` here instead of `apply` to avoid overwriting any changes the
+# customer may have done.
+kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml \
+    2> /dev/null || echo "fluentd-extra-config configmap already in place. Ignoring."
+# This Prometheus instance could be added just as we do with other prometheus
+# instances in the service cluster using helm, but then we risk overwriting
+# customer changes.
+envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/rbac.yaml | \
+    kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
+    echo "Example prometheus RBAC alredy in place. Ignoring."
+envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/ingress.yaml | \
+    kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
+    echo "Example ingress alredy in place. Ignoring."
+kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
+    2> /dev/null || echo "Example issuer alredy in place. Ignoring."
+kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus.yaml \
+    2> /dev/null || echo "Example prometheus alredy in place. Ignoring."
