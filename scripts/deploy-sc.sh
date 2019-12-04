@@ -257,28 +257,32 @@ fi
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then
+    echo "Setting up initial harbor state"
+    HARBOR_URL="https://harbor.${ECK_BASE_DOMAIN}/api/projects/1"
     # Check harbor rollout status.
     # Should not be needed due to 'wait' when installing/upgrading harbor!
     # Just keeping it for now but should be removed.
     kubectl -n harbor rollout status deployment harbor-harbor-clair
 
     # Set up initial state for harbor.
-    EXISTS=$(curl -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.code')
-
+    EXISTS=$(curl -k -X GET -u admin:Harbor12345 $HARBOR_URL | jq '.code') || {
+      echo "ERROR L.${LINENO} - Harbor url $HARBOR_URL cannot be reached."
+      exit 1
+    }
     if [ $EXISTS != "404" ]
     then
-        NAME=$(curl -k -X GET -u admin:Harbor12345 https://harbor.${ECK_SC_DOMAIN}/api/projects/1 | jq '.name')
+        NAME=$(curl -k -X GET -u admin:Harbor12345 $HARBOR_URL | jq '.name')
 
         if [ $NAME == "\"library\"" ]
         then
             # Deletes the default project "library"
             echo Removing project library from harbor
             # Curl will retrun status 500 even though it successfully removed the project.
-            curl -k -X DELETE -u admin:${HARBOR_PWD} https://harbor.${ECK_SC_DOMAIN}/api/projects/1 > /dev/null
+            curl -k -X DELETE -u admin:${HARBOR_PWD} $HARBOR_URL > /dev/null
 
             # Creates new private project "default"
             echo Creating new private project default
-            curl -k -X POST -u admin:${HARBOR_PWD} --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_SC_DOMAIN}/api/projects --data '{
+            curl -k -X POST -u admin:${HARBOR_PWD} --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_BASE_DOMAIN}/api/projects --data '{
                 "project_name": "default",
                 "metadata": {
                     "public": "0",
@@ -288,7 +292,10 @@ then
                     "auto_scan": "true"
                 }
             }'
+            echo "Harbor initialized"
         fi
+    else
+        echo "Harbor was already initilized"
     fi
 fi
 
@@ -304,11 +311,34 @@ done
 export ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 envsubst < ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch-curator.yaml | kubectl -n elastic-system apply -f -
 
-curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_snapshot/s3_backup_repository?pretty" \
+curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_snapshot/s3_backup_repository?pretty" \
     -H 'Content-Type: application/json' \
     -d' {"type": "s3", "settings":{ "bucket": "'"${S3_ES_BACKUP_BUCKET_NAME}"'", "client": "default"}}' \
     -k -u elastic:${ES_PW}
-curl -X PUT "https://elastic.${ECK_SC_DOMAIN}/_cluster/settings?pretty" \
+curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_cluster/settings?pretty" \
+#Creates a index template so the indexes created are marked with the correct ilm policy and rollover alias
+curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_template/logstash_template?pretty" \
+    -H 'Content-Type: application/json' \
+    -d' {"index_patterns": ["logstash-*"], "settings": {"index.refresh_interval" : "10s","index.lifecycle.name": "datastream_policy", "index.lifecycle.rollover_alias": "logstash-alias"}}'\
+    -k -u elastic:${ES_PW} \
+
+curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_template/kubecomponents_template?pretty" \
+    -H 'Content-Type: application/json' \
+    -d' {"index_patterns": ["kubecomponents-*"], "settings": {"index.refresh_interval" : "10s","index.lifecycle.name": "kubecomponents_policy", "index.lifecycle.rollover_alias": "kubecomponents-alias"}}'\
+    -k -u elastic:${ES_PW} \
+# Creates the ilm policy with hotphase of 3GB or 1d whichever comes first.
+# After the hot phase a index is moved to the delete phase for 30days before being deleted
+curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_ilm/policy/datastream_policy?pretty" \
+    -H 'Content-Type: application/json' \
+    -d '{"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "3GB","max_age": "1d"}}}}}}'\
+    -k -u elastic:${ES_PW} \
+
+curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_ilm/policy/kubecomponents_policy?pretty" \
+    -H 'Content-Type: application/json' \
+    -d '{"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "3GB","max_age": "1d"}}}}}}'\
+    -k -u elastic:${ES_PW} \
+
+curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_cluster/settings?pretty" \
     -H 'Content-Type: application/json' \
     -k -u elastic:${ES_PW} \
     -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'\
@@ -323,7 +353,7 @@ then
     exit 1
 fi
 
-curl -kL -X POST "kibana.${ECK_SC_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
+curl -kL -X POST "kibana.${ECK_OPS_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
     --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ES_PW}
 
 # Restore InfluxDB from backup

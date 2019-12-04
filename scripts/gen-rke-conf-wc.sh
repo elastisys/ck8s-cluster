@@ -2,7 +2,7 @@
 
 set -e
 
-: "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
+: "${ECK_OPS_DOMAIN:?Missing ECK_OPS_DOMAIN}"
 : "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 
 if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
@@ -110,7 +110,7 @@ cat <<EOF
       - "/etc/kubernetes/conf:/etc/kubernetes/conf"
       - "/var/log/kube-audit:/var/log/kube-audit"
     extra_args:
-      oidc-issuer-url: https://dex.${ECK_SC_DOMAIN}
+      oidc-issuer-url: https://dex.${ECK_BASE_DOMAIN}
       oidc-client-id: kubelogin
       oidc-username-claim: email
       oidc-groups-claim: groups
@@ -150,7 +150,7 @@ ingress:
     provider: none
 
 private_registries:
-    - url: harbor.${ECK_SC_DOMAIN}
+    - url: harbor.${ECK_BASE_DOMAIN}
       user: admin
       password: ${HARBOR_PWD}
 EOF

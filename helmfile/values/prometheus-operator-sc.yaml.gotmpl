@@ -66,7 +66,7 @@ alertmanager:
         # See: https://github.com/helm/helm/issues/2798#issuecomment-467319526
         text: |-
           <!channel>
-          *Cluster:* {{ requiredEnv "ECK_SC_DOMAIN" }}
+          *Cluster:* {{ requiredEnv "ECK_OPS_DOMAIN" }}
           {{`
           *Common summary:* {{ .CommonAnnotations.summary }}
           *Common description:* {{ .CommonAnnotations.description }}
@@ -101,13 +101,13 @@ grafana:
       ingress.kubernetes.io/rewrite-target: /
       certmanager.k8s.io/issuer: letsencrypt-monitoring-{{ requiredEnv "CERT_TYPE" }}
     hosts:
-    - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}
+    - grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     tls:
     - secretName: grafana-general-tls
       hosts:
-      - grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}
+      - grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
   rbac:
     pspUseAppArmor: false
     pspEnabled: {{ requiredEnv "ENABLE_PSP" }}
@@ -169,16 +169,16 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: https://grafana.{{ requiredEnv "ECK_SC_DOMAIN" }}
+      root_url: https://grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
     auth.generic_oauth:
       name: dex
       enabled: true
       client_id: grafana
       client_secret: {{ requiredEnv "GRAFANA_CLIENT_SECRET" }}
       scopes: profile email openid
-      auth_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/auth
-      token_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/token
-      api_url: https://dex.{{ requiredEnv "ECK_SC_DOMAIN" }}/api
+      auth_url: https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}/auth
+      token_url: https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}/token
+      api_url: https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}/api
       allowed_domains: {{ requiredEnv "OAUTH_ALLOWED_DOMAINS" }}
       allow_sign_up: true
       tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}

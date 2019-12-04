@@ -22,7 +22,7 @@
     - labels:
         cluster: workload_cluster
       targets:
-      - prometheus.${ECK_WC_DOMAIN}
+      - prometheus.${ECK_BASE_DOMAIN}
 
 - job_name: 'federate-others'
   scrape_interval: 30s
@@ -53,4 +53,4 @@
     - labels:
         cluster: workload_cluster
       targets:
-      - prometheus.${ECK_WC_DOMAIN}
+      - prometheus.${ECK_BASE_DOMAIN}

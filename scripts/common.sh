@@ -1,8 +1,8 @@
 # Common environment variables needed for deploy-*.sh
 
 # Domains
-: "${ECK_SC_DOMAIN:?Missing ECK_SC_DOMAIN}"
-: "${ECK_WC_DOMAIN:?Missing ECK_WC_DOMAIN}"
+: "${ECK_OPS_DOMAIN:?Missing ECK_OPS_DOMAIN}"
+: "${ECK_BASE_DOMAIN:?Missing ECK_BASE_DOMAIN}"
 
 # Cert type
 : "${CERT_TYPE:?Missing CERT_TYPE}"

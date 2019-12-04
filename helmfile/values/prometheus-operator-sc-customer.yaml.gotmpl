@@ -54,7 +54,7 @@ prometheus:
         - labels:
             cluster: workload_cluster
           targets:
-          - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
+          - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
 
     serviceMonitorSelector:
       matchLabels:

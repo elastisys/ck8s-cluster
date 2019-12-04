@@ -37,14 +37,16 @@ You are now ready use helm with this cluster.
 
 ## Available Services
 
-All services are available on a domain relative to the workload environment.
-If the workload cluster has the domain https://company-1.compliantk8s.com you will for example be able to access the system cluster dashboard at https://dashboard.company-1-system.compliantk8s.com.
-In this document, the placeholder `ECK_WC_DOMAIN` will be used to represent the workload domain and `ECK_SC_DOMAIN` the service domain.
-If you want to replace `ECK_WC_DOMAIN` with your actual domain in this document, do the following:
+All services which are opened to the customers will have the endpoint `https://<service>.<customer>.<domain>`. 
+For example the dashboard for a customer could have enpoint `https://dashboard.customer.elastisys.se`. 
+The placeholder `ECK_BASE_DOMAIN` is used throughout the documentaion and script
+for `<customer>.<domain>`. 
 
-```shell
-sed 's/ECK_WC_DOMAIN/customer-1.compliantk8s.com/g' docs/operator-access.md
-```
+All services only available to operators and hosted in the service cluster will have
+the endpoint `https://<service>.ops.<customer>.<domain>`. The placeholder `ECK_OPS_DOMAIN`
+is used for `ops.<customer>.<domain>`.
+
+If you want to replace `ECK_BASE_DOMAIN` with your actual domain in this document, do the following:
 
 Log in to the services using your A1 AAA or Google credentials.
 
@@ -59,15 +61,20 @@ You will need to create a [webhook URL](https://api.slack.com/apps/ANJ11SFK3/inc
 
 The alertmanager configuration can be found in [prometheus-operator-sc.yaml.gotmpl](../helmfile/values/prometheus-operator-sc.yaml.gotmpl)
 
-### Service endpoints
+### Customer accessable Service endpoints
 
-- **Kubernetes workload cluster Dashboard** URL: https://dashboard.ECK_WC_DOMAIN
-- **Kubernetes service cluster Dashboard** URL: https://dashboard.ECK_SC_DOMAIN
-- **Kibana** URL: https://kibana.ECK_WC_DOMAIN
-- **Harbor** URL: https://harbor.ECK_WC_DOMAIN
-- **Grafana** URL: https://grafana.ECK_SC_DOMAIN
+- **Kubernetes workload cluster Dashboard** URL: https://dashboard.ECK_BASE_DOMAIN
+- **Kibana** URL: https://kibana.ECK_BASE_DOMAIN
+- **Harbor** URL: https://harbor.ECK_BASE_DOMAIN
+- **Grafana** URL: https://grafana.ECK_BASE_DOMAIN
+
 - **Prometheus** URL: TODO
 - **Alertmanager** URL: TODO
+
+### Only operator accessable endpoints
+
+- **Kubernetes service cluster Dashboard** URL: https://dashboard.ECK_OPS_DOMAIN
+- **elasticsearch** URL: https://elastic.ECK_OPS_DOMAIN
 
 ### Other services
 

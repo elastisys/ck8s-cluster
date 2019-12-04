@@ -8,10 +8,38 @@ This document describes how and what services customers can access.
 
 ## Kubernetes API
 
+<<<<<<< HEAD
 You can access the Kubernetes API by using [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) and [kubelogin](https://github.com/int128/kubelogin).
 Install both tools (`kubectl` first and then `kubelogin`).
 Next, you will need to point `kubectl` to the `kubeconfig.yaml` file you should have received when your environment was created.
 You can do this either by moving and renaming the `kubeconfig.yaml` to `~/.kube/config`, as this is the default location, or by setting the environment variable `KUBECONFIG` to the path of the `kubeconfig.yaml` file.
+=======
+You can access the Kubernetes API by using [kubelogin](https://github.com/int128/kubelogin).
+Simply install the plugin and then create a kubeconfig context for your cluster.
+
+You can use the snippet below to set up your kubeconfig file.
+Start by setting the four environment variables (`ECK_BASE_DOMAIN`, `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET`).
+The snippet creates an entry in your kubeconfig file with a cluster named `compliantk8s`, a user named `developer` and a context named `developer@compliantk8s`.
+Feel free to change these names if you like.
+
+```
+ECK_BASE_DOMAIN=<your-eck-domain-here>
+OIDC_ISSUER_URL=<your-issuer-url-here>
+OIDC_CLIENT_ID=<your-client-id-here>
+OIDC_CLIENT_SECRET=<your-client-secret-here>
+
+kubectl config set-cluster compliantk8s --server=https://${ECK_BASE_DOMAIN}:6443
+kubectl config set-credentials developer --exec-command=kubelogin \
+  --exec-api-version=client.authentication.k8s.io/v1beta \
+  --exec-arg=get-token \
+  --exec-arg=--oidc-issuer-url=${OIDC_ISSUER_URL} \
+  --exec-arg=--oidc-client-id=${OIDC_CLIENT_ID} \
+  --exec-arg=--oidc-client-secret=${OIDC_CLIENT_SECRET} \
+  --exec-arg=--oidc-extra-scope=email
+kubectl config set-context developer@compliantk8s --user developer --cluster=compliantk8s
+kubectl config use-context developer@compliantk8s
+```
+>>>>>>> replaced ECK_WC_DOMAIN and ECK_SC_DOMAIN with ECK_BASE_DOMAIN and ECK_OPS_DOMAIN
 
 You are now ready to log in and start using the Kubernetes API.
 The kubelogin plugin will ask you to log in using your browser the first time try to access the API and again when your token expires.
@@ -28,22 +56,37 @@ You should log in using the same identity provider you specified earlier as part
 
 All services are available on a domain relative to your environment.
 If your cluster has the domain https://company-1.compliantk8s.com you will for example be able to access the dashboard at https://dashboard.company-1.compliantk8s.com.
+<<<<<<< HEAD
 In this document, the placeholder `CK8S_DOMAIN` will be used to represent the cluster domain.
 If you want to replace `CK8S_DOMAIN` with your actual domain in this document, do the following:
 
 ```shell
 sed 's/CK8S_DOMAIN/customer-1.compliantk8s.com/g' docs/customer-access.md
+=======
+In this document, the placeholder `ECK_BASE_DOMAIN` will be used to represent the cluster domain.
+If you want to replace `ECK_BASE_DOMAIN` with your actual domain in this document, do the following:
+
+```shell
+sed 's/ECK_BASE_DOMAIN/customer-1.compliantk8s.com/g' docs/customer-access.md
+>>>>>>> replaced ECK_WC_DOMAIN and ECK_SC_DOMAIN with ECK_BASE_DOMAIN and ECK_OPS_DOMAIN
 ```
 
 Log in to the services using the same identity provider you specified earlier as part of the environment setup (e.g. Google or LDAP) unless otherwise noted.
 
 ### Service endpoints
 
+<<<<<<< HEAD
 - **Kubernetes Dashboard** URL: https://dashboard.CK8S_DOMAIN
 - **Kibana** URL: https://kibana.CK8S_DOMAIN
   Log in using a temporary password that you can change later.
 - **Harbor** URL: https://harbor.CK8S_DOMAIN
 - **Grafana** URL: https://grafana.CK8S_DOMAIN
+=======
+- **Kubernetes Dashboard** URL: https://dashboard.ECK_BASE_DOMAIN
+- **Kibana** URL: https://kibana.ECK_BASE_DOMAIN
+- **Harbor** URL: https://harbor.ECK_BASE_DOMAIN
+- **Grafana** URL: https://grafana.ECK_BASE_DOMAIN
+>>>>>>> replaced ECK_WC_DOMAIN and ECK_SC_DOMAIN with ECK_BASE_DOMAIN and ECK_OPS_DOMAIN
 - **Prometheus** URL: TODO
 - **Alertmanager** URL: TODO
 

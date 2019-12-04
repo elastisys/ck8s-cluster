@@ -30,8 +30,8 @@ Note: These are required for explicit use with `helmfile`. All might not be requ
 
 * `NFS_WC_SERVER_IP`
 * `NFS_SC_SERVER_IP`
-* `ECK_WC_DOMAIN`
-* `ECK_SC_DOMAIN`
+* `ECK_BASE_DOMAIN`
+* `ECK_OPS_DOMAIN`
 * `GOOGLE_CLIENT_ID`
 * `GOOGLE_CLIENT_SECRET`
 * `TF_VAR_exoscale_secret_key`

@@ -4,7 +4,7 @@ Elasticsearch is set up to be able to store backups in a S3 bucket. There is als
 
 To perform an on-demand backup, run the following command:
 
-`curl -s -i -k -u "elastic:<password>" -XPUT "https://elastic.${ECK_SC_DOMAIN}/_snapshot/s3_backup_repository/<snapshot_name>"`
+`curl -s -i -k -u "elastic:<password>" -XPUT "https://elastic.${ECK_OPS_DOMAIN}/_snapshot/s3_backup_repository/<snapshot_name>"`
 
 Where `<password>` should be changed to the elasticsearch password and `<snapshot_name>` should be changed to the name you want for the backup. The command will save the backup in the same bucket as the daily backups. 
 
@@ -21,7 +21,7 @@ During deployment, the following environment variables determine where the backu
 
 To restore elasticsearch from a backup, run the following command:
 
-`curl -X POST "elastic.${ECK_SC_DOMAIN}/_snapshot/my_s3_repository/<snapshot_name>/_restore?pretty" -kL -u elastic:<password> -d '{"indices": "log*"}' -H 'Content-Type: application/json'`
+`curl -X POST "elastic.${ECK_OPS_DOMAIN}/_snapshot/my_s3_repository/<snapshot_name>/_restore?pretty" -kL -u elastic:<password> -d '{"indices": "log*"}' -H 'Content-Type: application/json'`
 
 Where `<password>` should be changed to the elasticsearch password and `<snapshot_name>` should be changed to the name of the backup to restore from. The daily backups will be named `snapshot-<year>.<month>.<day>` (e.g. `snapshot-2019.10.07`).
 

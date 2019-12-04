@@ -8,8 +8,8 @@ expose:
     annotations:
       certmanager.k8s.io/issuer: letsencrypt-harbor-{{ requiredEnv "CERT_TYPE" }}
     hosts:
-      core: harbor.{{ requiredEnv "ECK_SC_DOMAIN" }}
-      notary: notary.harbor.{{ requiredEnv "ECK_SC_DOMAIN" }}
+      core: harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}
+      notary: notary.harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}
 
 persistence:
   enabled: true
@@ -34,7 +34,7 @@ persistence:
       secretkey: {{ requiredEnv "S3_SECRET_KEY" }}
       accesskey: {{ requiredEnv "S3_ACCESS_KEY" }}
 
-externalURL: https://harbor.{{ requiredEnv "ECK_SC_DOMAIN" }}
+externalURL: https://harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}
 
 harborAdminPassword: {{ requiredEnv "HARBOR_PWD" }}
 

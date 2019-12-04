@@ -44,13 +44,13 @@ prometheus:
       certmanager.k8s.io/issuer: letsencrypt-monitoring-{{ requiredEnv "CERT_TYPE" }}
     labels: {}
     hosts:
-    - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
+    - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
     paths:
     - /
     tls:
     - secretName: prometheus-general-tls
       hosts:
-      - prometheus.{{ requiredEnv "ECK_WC_DOMAIN"}}
+      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
 
   prometheusSpec:
     resources:
