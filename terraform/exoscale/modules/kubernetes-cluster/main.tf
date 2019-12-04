@@ -19,18 +19,7 @@ locals {
     local.nfs_internal_host_num
   )
 
-  domains = flatten([
-    for worker in exoscale_compute.worker : [
-      for dns in var.dns_list : {
-        ip_address = worker.ip_address
-        dns = dns
-      }
-    ]
-  ])
-
-  domain_map = {
-    for domain in local.domains: "${domain.ip_address}:${domain.dns}" => domain
-  }
+  set = setproduct(var.dns_list, exoscale_compute.worker[*].ip_address)
 }
 
 resource "exoscale_network" "net" {
@@ -289,9 +278,9 @@ resource "exoscale_ssh_keypair" "ssh_key" {
 }
 
 resource "exoscale_domain_record" "worker" {
-  for_each = local.domain_map
+  count = length(local.set)
   domain = "a1ck.io"
-  name = each.value.dns
+  name = local.set[count.index][0]
   record_type = "A"
-  content     = each.value.ip_address
+  content     = local.set[count.index][1]
 }
