@@ -93,10 +93,10 @@ A simple example is provided here below:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: customer-jar-monitor
+  name: custom-jar-monitor
   namespace: test
   labels:
-    release: prometheus-operator
+    scrape: "true"
 spec:
   selector:
     matchLabels:
@@ -107,6 +107,30 @@ spec:
 
 If your application doesn't already publish metrics in a suitable way for Prometheus to scrape, you may need to use an exporter of some kind.
 For example, the [JMX exporter](https://github.com/prometheus/jmx_exporter) exoses JMX metrics from Java applications.
+
+#### Configure Prometheus
+
+The default Prometheus instance that comes with Compliant Kubernetes is in the namespace that is default for your kubeconfig context.
+By default it will detect ServiceMonitors in all namespaces and include metrics from them if they have the label `scrape: "true"`.
+You can edit the Prometheus instance using this command:
+
+```
+kubectl edit prometheuses prometheus
+```
+
+Note that if you do not filter the ServiceMonitors in any way, you may end up scraping metrics from some system resources.
+To keep the number of metrics (and the storage capacity they require) down, we recommend that you keep the default `serviceMonitorSelector` setting.
+
+#### Federation
+
+For redundancy, the metrics collected by this Prometheus instance are also federated to a separate Prometheus instance with a more durable storage backend.
+This is possible only because the default Prometheus instance is exposed using an Ingress, as you can see by running `kubectl get ingress`.
+The Ingress is protected with basic authentication.
+If you remove this Ingress, you risk loosing metrics data, but you may do so if you wish.
+
+#### Grafana integration
+
+Grafana has access to the redundancy Prometheus and can be used to graph any metrics that are federated.
 
 ### Persistent storage
 
