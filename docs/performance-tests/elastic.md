@@ -8,7 +8,7 @@ A full ck8s deployment is required.
 
 In order to run the benchmark follow the steps below.
 
-*Remarks: [http_logs](https://github.com/elastic/rally-tracks/tree/master/http_logs) track requires over 30 GiB storage space. The execution takes approx. 2.5 hour.*
+*Remarks: [http_logs](https://github.com/elastic/rally-tracks/tree/master/http_logs) track requires over 30 GiB of storage space (that is a local storage by default, so we might need to run it on a node with more storage than normal or add a persistent volume for it). The execution takes approx. 2.5 hour.*
 
 1. Get IP addresses of Elasticsearch nodes
 
