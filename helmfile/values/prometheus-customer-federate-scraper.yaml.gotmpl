@@ -1,0 +1,49 @@
+prometheusSpec:
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 0.3
+    limits:
+      memory: 2Gi
+      cpu: 1
+
+  remoteRead:
+  - read_recent: true
+    url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD"}}
+  remoteWrite:
+  - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=workload_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD"}}
+  replicas: 1
+  retention: 10d
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: prometheus-operator-prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      target: none  # so that operator wont generate new config
+  externalLabels:
+    cluster: workload_cluster
+
+scrapeConfig:
+- job_name: 'federate'
+  scrape_interval: 30s
+
+  honor_labels: true
+  metrics_path: '/federate'
+
+  scheme: https
+
+  params:
+    # Match all metrics with a job label
+    'match[]':
+      - '{job=~".+"}'
+
+  tls_config:
+    insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}
+
+  static_configs:
+    - labels:
+        cluster: workload_cluster
+      targets:
+        - scrape.{{ requiredEnv "ECK_BASE_DOMAIN"}}

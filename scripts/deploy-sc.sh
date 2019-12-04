@@ -174,18 +174,6 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
 
 
-# Prometheus workload_cluster reader
-# Generate workload_cluster scrape configs
-envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-federate-additional.yaml | \
-    kubectl create secret generic prometheus-wc-scrape-configs -n monitoring --dry-run \
-    -o yaml --from-file=prometheus-federate-additional.yaml=/dev/stdin | \
-    kubectl apply -f -
-# Create prometheus workload_cluster reader
-envsubst < "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-reader.yaml | kubectl apply -f -
-# Expose prometheus workload_cluster reader
-kubectl apply -f "$SCRIPTS_PATH"/../manifests/prometheus-wc-reader/prometheus-wc-service.yaml
-
-
 if [ $CLOUD_PROVIDER == "citycloud" ]
 then
     storage=$(kubectl get storageclasses.storage.k8s.io cinder-storage)

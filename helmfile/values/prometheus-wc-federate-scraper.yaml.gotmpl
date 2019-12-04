@@ -1,3 +1,41 @@
+prometheusSpec:
+  alerting:
+    # Use the default alertmanager that comes with prometheus-operator
+    alertmanagers:
+    - name: prometheus-operator-alertmanager
+      namespace: monitoring
+      pathPrefix: /
+      port: web
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 0.3
+    limits:
+      memory: 2Gi
+      cpu: 1
+
+  enableAdminAPI: false
+  logFormat: logfmt
+  logLevel: info
+  remoteRead:
+  - read_recent: true
+    url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD"}}
+  remoteWrite:
+  - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=workload_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD"}}
+  replicas: 1
+  retention: 10d
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: prometheus-operator-prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      target: none  # so that operator wont generate new config
+  externalLabels:
+    cluster: workload_cluster
+
+scrapeConfig:
 #The idea with splitting the federation in two is to (hopefully) reduce the resources needed for prometheus.
 #If I have understood it correctly prometheus will use more resources (primarily memory) if you have larger scrapes.
 #So if we scrape everything from another prometheus it will be a large job where prometheus might run out of memory.
@@ -16,13 +54,13 @@
       - '{job="kubelet"}'
 
   tls_config:
-    insecure_skip_verify: ${TLS_SKIP_VERIFY}
+    insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}
 
   static_configs:
     - labels:
         cluster: workload_cluster
       targets:
-      - prometheus.${ECK_BASE_DOMAIN}
+      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
 
 - job_name: 'federate-others'
   scrape_interval: 30s
@@ -43,14 +81,14 @@
       - '{__name__=~"job:.*"}'
       - '{__name__=~"namespace(_|:).*"}'
   basic_auth:
-    username: prometheus 
+    username: prometheus
     password: ${PROMETHEUS_CLIENT_SECRET}
 
   tls_config:
-    insecure_skip_verify: ${TLS_SKIP_VERIFY}
+    insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}
 
   static_configs:
     - labels:
         cluster: workload_cluster
       targets:
-      - prometheus.${ECK_BASE_DOMAIN}
+      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
