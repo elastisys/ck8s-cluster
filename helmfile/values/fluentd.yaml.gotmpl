@@ -1,7 +1,3 @@
-image:
-  repository: elastisys/fluentd_elasticsearch
-  tag: latest
-  pullPolicy: Always
 elasticsearch:
   scheme: https
   port: 443
@@ -24,6 +20,16 @@ secret:
 - name: OUTPUT_PASSWORD
   secret_name: elasticsearch
   secret_key: password
+
+additionalPlugins:
+- name: fluent-plugin-s3
+  version: 1.1.11
+- name: fluent-plugin-elasticsearch
+  version: 3.6.0
+- name: fluent-plugin-prometheus
+  version: 1.6.1 
+- name: elasticsearch-xpack
+  version: 7.4
 
 extraConfigMaps:
   system.conf: |-
@@ -184,7 +190,7 @@ extraConfigMaps:
           ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "1GB","max_age": "1d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name kubecomponents_template
-          template_file /etc/templates/kubecomponents_template.json
+          template_file /etc/templates/kubecomponents_template
           customize_template {"<<index_prefix>>": "kubecomponents"}
           # Custom parameters --END--
           <buffer>
@@ -230,7 +236,7 @@ extraConfigMaps:
           ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "1GB","max_age": "1d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name logstash_template
-          template_file /etc/templates/logstash_template.json
+          template_file /etc/templates/logstash_template
           customize_template {"<<index_prefix>>": "logstash"}
           # Custom parameters --END--
           <buffer>
@@ -252,10 +258,16 @@ extraVolumes:
   - name: rkelogs
     hostPath:
       path: /var/lib/rancher/rke/log
-
+  - name: template-secret
+    secret:
+      defaultMode: 420
+      secretName: template-secret
 extraVolumeMounts:
   - name: rkelogs
     mountPath: /var/lib/rancher/rke/log
+    readOnly: true
+  - name: template-secret
+    mountPath: /etc/templates/
     readOnly: true
 
 tolerations:
