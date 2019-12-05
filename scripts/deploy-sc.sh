@@ -284,7 +284,7 @@ fi
 
 ## Maybe this can become problematic if cluster is being restored?
 echo "Install InfluxDB backup cron-job" >&2
-envsubst < ${SCRIPTS_PATH}/../manifests/backup/backup-influx-cronjob.yaml | kubectl -n influxdb-prometheus apply -f -
+envsubst < ${SCRIPTS_PATH}/../manifests/influx/backup-influx-cronjob.yaml | kubectl -n influxdb-prometheus apply -f -
 
 if [ "${RESTORE_VELERO}" = "true" ]
 then
