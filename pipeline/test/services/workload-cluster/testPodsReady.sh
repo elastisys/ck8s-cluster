@@ -60,6 +60,7 @@ done
 
 STATEFULSETS=(
     "monitoring prometheus-prometheus-operator-prometheus"
+    "demo prometheus-prometheus"
 )
 
 echo
