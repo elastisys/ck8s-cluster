@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: influx-metric-retention
+spec:
+  containers:
+  - name: influx-metric-retention
+    image: jakubkrzywda/influx-metric-retention:latest
+  imagePullSecrets:
+  - name: regcred

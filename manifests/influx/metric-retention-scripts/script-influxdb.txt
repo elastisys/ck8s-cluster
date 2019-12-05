@@ -1,0 +1,159 @@
+
+env | grep PWD
+
+# copy INFLUXDB_PWD
+
+# Get into the Influxdb pod
+
+kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" exec -n influxdb-prometheus influxdb-68645c5b47-tnb7b -it -- sh
+
+# Start influx command line
+
+influx
+
+# Log in
+
+auth
+
+# username: demo
+# password: <INFLUXDB_PWD> # xNRZXQweUzAxxScyteEi
+
+use _internal
+
+use workload_cluster
+use service_cluster
+
+SHOW RETENTION POLICIES
+
+name    duration shardGroupDuration replicaN default
+----    -------- ------------------ -------- -------
+autogen 0s       168h0m0s           1        true
+
+SHOW SHARDS
+
+
+
+# Port forwarding
+
+kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" port-forward -n influxdb-prometheus influxdb-68645c5b47-tnb7b 8086
+
+# Running Python script
+
+python3 influxdb-size-based-metrics-retention.py
+
+
+
+
+
+
+
+
+
+In influxdb.yaml.gotmpl change:
+
+CREATE RETENTION POLICY service_cluster_rp ON service_cluster DURATION 3h REPLICATION 1 SHARD DURATION 1h DEFAULT; # for tests
+
+
+
+
+# Update config
+
+helmfile -f helmfile/helmfile.yaml -e service_cluster -l app=influxdb-prometheus apply
+
+
+SELECT SUM(last) FROM (SELECT last("diskBytes") FROM "monitor"."shard" WHERE ("database" =~/workload_cluster/) AND time >= now() -1h GROUP BY "database", "path" fill(null))
+
+SELECT "database", "id", "time", "diskBytes", "path"  FROM "monitor"."shard" WHERE ("database" =~/service_cluster/) GROUP BY "database", "id" fill(null) ORDER BY time LIMIT 1
+
+
+SELECT "database", "id", "time", "diskBytes"  FROM "monitor"."shard" WHERE ("database" =~/service_cluster/) GROUP BY "database", "id" fill(null) ORDER BY time LIMIT 1
+
+SELECT "database", "id", "time", "diskBytes" FROM "monitor"."shard" WHERE ("database" =~/service_cluster/) ORDER BY time LIMIT 1
+
+SELECT FIRST("diskBytes"), "database", "id" FROM "monitor"."shard" WHERE ("database" =~/service_cluster/)
+
+SELECT id FROM (SELECT FIRST("diskBytes"), "database", "id" FROM "monitor"."shard" WHERE ("database" =~/service_cluster/))
+
+
+
+
+curl -G 'http://localhost:8086/query?u=demo&p=xNRZXQweUzAxxScyteEi' --data-urlencode 'q=SELECT * FROM "mymeas"'
+
+
+curl -G 'http://localhost:8086/query?u=demo&p=xNRZXQweUzAxxScyteEi' --data-urlencode 'q=SHOW SHARDS'
+
+curl -XPOST 'http://localhost:8086/query?u=demo&p=xNRZXQweUzAxxScyteEi' --data-urlencode 'q=DROP SHARD 4'
+
+
+
+ls /var/lib/influxdb/data/<database>/<retention_policy>/<id>
+
+
+du -s /var/lib/influxdb/data/<database>/
+
+
+kubectl run influx-prometheus-node-exporter --image=prom/node-exporter
+
+
+
+kubectl run influx-prometheus-node-exporter --image=prom/node-exporter
+
+kubectl delete pod influx-prometheus-node-exporter
+
+kubectl delete -n default deployment influx-prometheus-node-exporter
+
+
+kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" exec -n influxdb-prometheus $(kubectl get pods -o name -n influxdb-prometheus | grep -v "backup") -- du -s /var/lib/influxdb/data/workload_cluster
+
+
+$(kubectl get pods -o name -n influxdb-prometheus | grep -v "backup")
+
+kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" exec -n influxdb-prometheus $(kubectl get pods -o name -n influxdb-prometheus | grep -v "backup") -- du -s /var/lib/influxdb/data/workload_cluster | cut -f 1
+
+
+
+kubectl run influx-metric-retention --image=python:3.8-alpine -n influxdb-prometheus -it
+
+
+
+kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" exec -n influxdb-prometheus $(kubectl get pods -o name -n influxdb-prometheus | grep "influx-metric-retention" | cut -d'/' -f 2) -it -- sh
+
+kubectl -n influxdb-prometheus exec $(kubectl get pods -o name -n influxdb-prometheus | grep "influx-metric-retention" | cut -d'/' -f 2) -it -- sh
+
+kubectl -n influxdb-prometheus exec influx-metric-retention-57f69ccc7-4bzsk
+
+kubectl -n influxdb-prometheus delete pod influx-metric-retention
+kubectl -n influxdb-prometheus delete deployment influx-metric-retention
+
+kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" logs -n influxdb-prometheus influx-metric-retention-57f69ccc7-4bzsk
+
+kubectl -n influxdb-prometheus get pods
+
+kubectl -n influxdb-prometheus logs influx-metric-retention
+
+kubectl -n influxdb-prometheus attach influx-metric-retention-6ff9556459-dsx9n
+
+kubectl run influx-metric-retention --image=influx-metric-retention:latest -n influxdb-prometheus
+
+
+
+
+
+
+docker build -t jakubkrzywda/influx-metric-retention:latest .
+docker push jakubkrzywda/influx-metric-retention:latest
+
+docker rm influx-metric-retention
+docker run --name influx-metric-retention jakubkrzywda/influx-metric-retention:latest
+
+
+
+kubectl create secret generic regcred \
+    --from-file=.dockerconfigjson=/home/jakub/.docker/config.json \
+    --type=kubernetes.io/dockerconfigjson
+
+
+kubectl -n influxdb-prometheus delete pod influx-metric-retention
+kubectl -n influxdb-prometheus apply -f influx-metric-retention.yaml
+
+kubectl -n influxdb-prometheus logs influx-metric-retention
