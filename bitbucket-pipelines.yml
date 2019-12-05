@@ -14,7 +14,7 @@ pipelines:
             - export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
             - echo $VAULT_TOKEN > vault-token.txt
             # Generate and store passwords
-            - ./scripts/store-pwds.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$PWD_LENGTH" "$BASE_PATH" "grafana" "influxdb" "harbor" "kubelogin_client" "dashboard_client" "grafana_client"
+            - ./scripts/store-pwds.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$PWD_LENGTH" "$BASE_PATH" "grafana" "influxdb" "harbor" "kubelogin_client" "dashboard_client" "grafana_client" "prometheus_client"
             # Infrastructure
             - cd terraform/exoscale
             - echo '1' | TF_WORKSPACE=pipeline terraform init
