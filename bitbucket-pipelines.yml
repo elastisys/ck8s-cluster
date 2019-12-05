@@ -138,6 +138,12 @@ pipelines:
                 - source pipeline/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - source ./scripts/common.sh
+                # Export vault variables
+                - source pipeline/vault-variables.sh
+                # Export vault token
+                - export VAULT_TOKEN=$(cat vault-token.txt)
+                # Export passwords
+                - source pipeline/get-pwds.sh
                 # Services
                 - ./pipeline/test/services/test-wc.sh
               after-script:
@@ -152,7 +158,7 @@ pipelines:
             # Export vault token
             - export VAULT_TOKEN=$(cat vault-token.txt)
             # Revoke vault token and remove secrets
-            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client
+            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus_client
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             - cd terraform/exoscale
             - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
@@ -322,7 +328,7 @@ pipelines:
             # Export vault token
             - export VAULT_TOKEN=$(cat vault-token.txt)
             # Revoke vault token and remove secrets
-            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client
+            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus_client
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             - cd terraform/safespring
             - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init

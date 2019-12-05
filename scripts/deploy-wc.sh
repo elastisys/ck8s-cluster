@@ -173,7 +173,7 @@ else
 fi
 
 htpasswd -c -b auth prometheus ${PROMETHEUS_CLIENT_SECRET}
-kubectl -n monitoring create secret generic prometheus-auth --from-file=auth  --dry-run -o yaml | kubectl apply -f -
+kubectl -n monitoring create secret generic prometheus-auth --from-file=auth --dry-run -o yaml | kubectl apply -f -
 kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" -n monitoring create secret generic prometheus-auth --from-file=auth --dry-run -o yaml | kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" apply -f -
 rm auth
 
