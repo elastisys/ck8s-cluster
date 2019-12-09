@@ -32,6 +32,11 @@ prometheusSpec:
   serviceMonitorSelector:
     matchLabels:
       target: none  # so that operator wont generate new config
+  ruleNamespaceSelector: {}
+  ruleSelector:
+    matchLabels:
+      app: prometheus-operator
+      release: prometheus-operator
   externalLabels:
     cluster: workload_cluster
 
