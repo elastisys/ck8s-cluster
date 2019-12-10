@@ -279,7 +279,7 @@ resource "exoscale_ssh_keypair" "ssh_key" {
 
 resource "exoscale_domain_record" "worker" {
   count = length(local.set)
-  domain = "a1ck.io"
+  domain = var.dns_suffix
   name = local.set[count.index][0]
   record_type = "A"
   content     = local.set[count.index][1]

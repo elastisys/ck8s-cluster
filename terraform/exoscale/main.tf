@@ -32,6 +32,7 @@ module "service_cluster" {
   nfs_size                    = var.sc_nfs_size
 
   network_name                = "${terraform.workspace}-sc-network"
+  dns_suffix                  = "a1ck.io"
   dns_list                    = [ 
                                   "*.ops.${var.dns_prefix}",
                                   "grafana.${var.dns_prefix}",
@@ -67,7 +68,8 @@ module "workload_cluster" {
   nfs_size                    = var.wc_nfs_size
 
   network_name                = "${terraform.workspace}-wc-network"
-  dns_list                   = ["*.${var.dns_prefix}"]
+  dns_suffix                  = "a1ck.io"
+  dns_list                    = ["*.${var.dns_prefix}"]
 
   master_security_group_name  = "${terraform.workspace}-wc-master-sg"
   worker_security_group_name  = "${terraform.workspace}-wc-worker-sg"

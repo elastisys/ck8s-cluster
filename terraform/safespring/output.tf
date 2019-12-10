@@ -26,9 +26,9 @@ output "sc_nfs_device_path" {
   value = module.service_cluster.nfs_device_path
 }
 
-#output "sc_dns_name" {
-#  value = module.service_cluster.dns_record_name
-#}
+output "sc_dns_name" {
+  value = module.service_cluster.dns_record_name
+}
 
 output "wc_master_ip_addresses" {
   value = module.workload_cluster.master_floating_ip
@@ -58,6 +58,10 @@ output "wc_nfs_device_path" {
   value = module.workload_cluster.nfs_device_path
 }
 
-#output "wc_dns_name" {
-#  value = module.workload_cluster.dns_record_name
-#}
+output "wc_dns_name" {
+  value = module.workload_cluster.dns_record_name
+}
+
+output "domain_name" {
+  value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
+}

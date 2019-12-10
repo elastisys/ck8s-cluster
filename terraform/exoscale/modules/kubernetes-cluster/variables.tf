@@ -43,6 +43,8 @@ variable "dns_list" {
   type = list(string)
 }
 
+variable "dns_suffix" {}
+
 variable "aws_dns_zone_id" {
   default = "Z2STJRQSJO5PZ0" # elastisys.com
 }

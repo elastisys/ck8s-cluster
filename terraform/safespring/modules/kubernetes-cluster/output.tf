@@ -26,6 +26,12 @@ output "nfs_device_path" {
   value = openstack_compute_volume_attach_v2.nfs_va.device
 }
 
-#output "dns_record_name" {
-#  value = aws_route53_record.dns.names
-#}
+output "dns_record_name" {
+  value = [ 
+    for dns in aws_route53_record.dns: dns.name
+  ]
+}
+
+output "dns_suffix" {
+  value = data.aws_route53_zone.zone.name
+}

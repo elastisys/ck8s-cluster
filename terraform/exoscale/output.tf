@@ -49,6 +49,10 @@ output "wc_dns_name" {
   value = "${module.workload_cluster.dns_record_name}"
 }
 
+output "domain_name" {
+  value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
+}
+
 
 # Unused variables for elastic-ip and internal ips.
 

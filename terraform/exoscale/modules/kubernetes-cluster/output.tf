@@ -11,9 +11,12 @@ output "nfs_ip_address" {
 }
 
 output "dns_record_name" {
-  value = exoscale_domain_record.worker[*]
+  value = exoscale_domain_record.worker[*].hostname
 }
 
+output "dns_suffix" {
+  value = "${var.dns_suffix}"
+}
 #  value = "${exoscale_nic.master_internal.ip_address}"
 #output "master_internal_ip_address" {
 #}
