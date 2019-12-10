@@ -39,8 +39,7 @@ prometheus:
       # name of the secret that contains the user/password definitions
       nginx.ingress.kubernetes.io/auth-secret: prometheus-auth
       # message to display with an appropriate context why the authentication is required
-      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - '
-      ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
       certmanager.k8s.io/issuer: letsencrypt-monitoring-{{ requiredEnv "CERT_TYPE" }}
     labels: {}
     hosts:

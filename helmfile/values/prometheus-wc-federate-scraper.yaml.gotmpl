@@ -87,7 +87,7 @@ scrapeConfig:
       - '{__name__=~"namespace(_|:).*"}'
   basic_auth:
     username: prometheus
-    password: ${PROMETHEUS_CLIENT_SECRET}
+    password: {{ requiredEnv "PROMETHEUS_CLIENT_SECRET"}}
 
   tls_config:
     insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}

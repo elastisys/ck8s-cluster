@@ -51,6 +51,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [helmfile](https://github.com/roboll/helmfile) (tested with v0.81.3)
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.5-1-a5b5cbe)
+- htpasswd available directly in ubuntus repositories
 
 Soft (recommended) requirements:
 
@@ -332,6 +333,8 @@ influxdb
 kubelogin_client
 grafana_client
 dashboard_client
+prometheus_client
+customer_prometheus_client
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
 certs/service_cluster/kube-system/certs/helm-key.pem
