@@ -269,11 +269,11 @@ then
       echo "ERROR L.${LINENO} - Harbor url $HARBOR_URL cannot be reached."
       exit 1
     }
-    if [ $EXISTS != "404" ]
+    if [ "$EXISTS" != "404" ]
     then
         NAME=$(curl -k -X GET -u admin:Harbor12345 $HARBOR_URL | jq '.name')
 
-        if [ $NAME == "\"library\"" ]
+        if [ "$NAME" == "\"library\"" ]
         then
             # Deletes the default project "library"
             echo Removing project library from harbor
