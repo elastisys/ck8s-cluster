@@ -38,6 +38,9 @@ scrapeConfig:
     # Match all metrics with a job label
     'match[]':
       - '{job=~".+"}'
+  basic_auth:
+    username: prometheus
+    password: {{ requiredEnv "CUSTOMER_PROMETHEUS_CLIENT_SECRET"}}
 
   tls_config:
     # Using selfsigned issuer here

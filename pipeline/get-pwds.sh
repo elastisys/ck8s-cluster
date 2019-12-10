@@ -22,5 +22,8 @@ export DASHBOARD_CLIENT_SECRET=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TO
 # Export grafana client secret for oath
 export GRAFANA_CLIENT_SECRET=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/grafana_client" | jq -r '.data.data.password')
 
-# Export prometheus  client secret 
+# Export prometheus client secret
 export PROMETHEUS_CLIENT_SECRET=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/prometheus_client" | jq -r '.data.data.password')
+
+# Export customer prometheus client secret
+export CUSTOMER_PROMETHEUS_CLIENT_SECRET=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/customer_prometheus_client" | jq -r '.data.data.password')

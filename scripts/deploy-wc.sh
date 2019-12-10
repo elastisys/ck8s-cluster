@@ -318,3 +318,8 @@ kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/
     2> /dev/null || echo "Example issuer alredy in place. Ignoring."
 kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus.yaml \
     2> /dev/null || echo "Example prometheus alredy in place. Ignoring."
+# Create basic auth credentials for the customers prometheus instance
+htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_CLIENT_SECRET}
+kubectl -n ${CONTEXT_NAMESPACE} create secret generic prometheus-auth --from-file=auth \
+    2> /dev/null || echo "Example prometheus auth secret alredy in place. Ignoring."
+rm auth

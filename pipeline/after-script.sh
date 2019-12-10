@@ -21,7 +21,7 @@ source pipeline/vault-variables.sh
 export VAULT_TOKEN=$(cat vault-token.txt)
 
 # Revoke vault token, remove password secrets for services
-./pipeline/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashboard_client grafana_client prometheus_client
+./pipeline/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashboard_client grafana_client prometheus_client customer_prometheus_client
 
 export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
 if [ "$CLOUD_PROVIDER" == "exoscale" ]
