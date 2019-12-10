@@ -68,12 +68,15 @@ done
 STATEFULSETS=(
     "monitoring prometheus-prometheus-operator-prometheus"
     "monitoring prometheus-wc-scraper-prometheus-instance"
-    "monitoring prometheus-customer-scraper-prometheus-instance"
     "monitoring alertmanager-prometheus-operator-alertmanager"
     "elastic-system elastic-operator"
     "harbor harbor-harbor-database"
     "harbor harbor-harbor-redis"
 )
+if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
+then
+    STATEFULSETS+=("monitoring prometheus-customer-scraper-prometheus-instance")
+fi
 
 echo
 echo

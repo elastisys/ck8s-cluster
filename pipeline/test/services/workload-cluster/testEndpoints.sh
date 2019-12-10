@@ -7,4 +7,7 @@ echo "Testing endpoints"
 echo "=================="
 
 testEndpoint Prometheus-wc https://prometheus.${ECK_BASE_DOMAIN}/ prometheus:${PROMETHEUS_CLIENT_SECRET}
-testEndpoint Prometheus-customer https://scrape.${ECK_BASE_DOMAIN}/ prometheus:${CUSTOMER_PROMETHEUS_CLIENT_SECRET}
+if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
+then
+    testEndpoint Prometheus-customer https://scrape.${ECK_BASE_DOMAIN}/ prometheus:${CUSTOMER_PROMETHEUS_CLIENT_SECRET}
+fi

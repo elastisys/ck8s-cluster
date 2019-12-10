@@ -305,21 +305,25 @@ done
 # customer may have done.
 kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml \
     2> /dev/null || echo "fluentd-extra-config configmap already in place. Ignoring."
-# This Prometheus instance could be added just as we do with other prometheus
-# instances in the service cluster using helm, but then we risk overwriting
-# customer changes.
-envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/rbac.yaml | \
-    kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
-    echo "Example prometheus RBAC alredy in place. Ignoring."
-envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/ingress.yaml | \
-    kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
-    echo "Example ingress alredy in place. Ignoring."
-kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
-    2> /dev/null || echo "Example issuer alredy in place. Ignoring."
-kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus.yaml \
-    2> /dev/null || echo "Example prometheus alredy in place. Ignoring."
-# Create basic auth credentials for the customers prometheus instance
-htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_CLIENT_SECRET}
-kubectl -n ${CONTEXT_NAMESPACE} create secret generic prometheus-auth --from-file=auth \
-    2> /dev/null || echo "Example prometheus auth secret alredy in place. Ignoring."
-rm auth
+
+if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
+then
+    # This Prometheus instance could be added just as we do with other prometheus
+    # instances in the service cluster using helm, but then we risk overwriting
+    # customer changes.
+    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/rbac.yaml | \
+        kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
+        echo "Example prometheus RBAC alredy in place. Ignoring."
+    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/ingress.yaml | \
+        kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
+        echo "Example ingress alredy in place. Ignoring."
+    kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
+        2> /dev/null || echo "Example issuer alredy in place. Ignoring."
+    kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus.yaml \
+        2> /dev/null || echo "Example prometheus alredy in place. Ignoring."
+    # Create basic auth credentials for the customers prometheus instance
+    htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_CLIENT_SECRET}
+    kubectl -n ${CONTEXT_NAMESPACE} create secret generic prometheus-auth --from-file=auth \
+        2> /dev/null || echo "Example prometheus auth secret alredy in place. Ignoring."
+    rm auth
+fi

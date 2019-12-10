@@ -58,6 +58,7 @@ export OS_PASSWORD=somelongsecret
 export ENABLE_HARBOR="<true|false>" # default true
 export ENABLE_PSP="<true|false>" # default true
 export ENABLE_OPA="<true|false>" # default true
+export ENABLE_CUSTOMER_PROMETHEUS="<true|false>" # default false
 
 # Identity providers
 export AAA_CLIENT_ID=1234

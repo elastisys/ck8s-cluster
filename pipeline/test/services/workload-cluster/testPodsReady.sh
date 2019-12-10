@@ -60,8 +60,11 @@ done
 
 STATEFULSETS=(
     "monitoring prometheus-prometheus-operator-prometheus"
-    "demo prometheus-prometheus"
 )
+if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
+then
+    STATEFULSETS+=("demo prometheus-prometheus")
+fi
 
 echo
 echo

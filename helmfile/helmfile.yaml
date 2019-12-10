@@ -130,6 +130,7 @@ releases:
   values:
   - values/dex.yaml.gotmpl
 
+{{ if eq (env "ENABLE_CUSTOMER_PROMETHEUS") "true" }}
 # Prometheus-instance for scraping customer metrics
 - name: customer-scraper
   namespace: monitoring
@@ -140,6 +141,7 @@ releases:
   missingFileHandler: error
   values:
   - values/prometheus-customer-federate-scraper.yaml.gotmpl
+{{ end }}
 # Prometheus-instance for scraping workload cluster metrics
 - name: wc-scraper
   namespace: monitoring
