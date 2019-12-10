@@ -11,10 +11,14 @@ variable "key_pair" {}
 variable "master_flavor_id" {}
 variable "worker_flavor_id" {}
 variable "nfs_flavor_id" {}
+variable "nfs_storage_size" {}
 
 ## DNS
 
-variable "dns_name" {}
+#variable "dns_name" {}
+variable "dns_list" {
+  type = list(string)
+}
 
 variable "aws_dns_zone_id" {
   default = "Z2STJRQSJO5PZ0" # elastisys.se

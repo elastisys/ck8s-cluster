@@ -6,7 +6,7 @@ resource "openstack_networking_network_v2" "network" {
 resource "openstack_networking_subnet_v2" "subnet" {
   name = "${var.prefix}-subnet"
 
-  network_id = "${openstack_networking_network_v2.network.id}"
+  network_id = openstack_networking_network_v2.network.id
 
   cidr       = "172.16.0.0/24"
   ip_version = 4
@@ -115,15 +115,15 @@ module "master" {
   instance_name = "${var.prefix}-master"
   instance_count = var.master_count
 
-  image_id  = "${var.image_id}"
-  flavor_id = "${var.master_flavor_id}"
-  key_pair  = "${var.key_pair}"
+  image_id  = var.image_id
+  flavor_id = var.master_flavor_id
+  key_pair  = var.key_pair
 
-  network_id = "${openstack_networking_network_v2.network.id}"
-  subnet_id  = "${openstack_networking_subnet_v2.subnet.id}"
+  network_id = openstack_networking_network_v2.network.id
+  subnet_id  = openstack_networking_subnet_v2.subnet.id
   security_group_ids = [
-    "${openstack_compute_secgroup_v2.cluster_sg.id}",
-    "${openstack_compute_secgroup_v2.master_sg.id}",
+    openstack_compute_secgroup_v2.cluster_sg.id,
+    openstack_compute_secgroup_v2.master_sg.id,
   ]
 }
 
@@ -162,15 +162,15 @@ module "worker" {
   instance_name  = "${var.prefix}-worker"
   instance_count = var.worker_count
 
-  image_id  = "${var.image_id}"
-  flavor_id = "${var.worker_flavor_id}"
-  key_pair  = "${var.key_pair}"
+  image_id  = var.image_id
+  flavor_id = var.worker_flavor_id
+  key_pair  = var.key_pair
 
-  network_id = "${openstack_networking_network_v2.network.id}"
-  subnet_id  = "${openstack_networking_subnet_v2.subnet.id}"
+  network_id = openstack_networking_network_v2.network.id
+  subnet_id  = openstack_networking_subnet_v2.subnet.id
   security_group_ids = [
-    "${openstack_compute_secgroup_v2.cluster_sg.id}",
-    "${openstack_compute_secgroup_v2.worker_sg.id}",
+    openstack_compute_secgroup_v2.cluster_sg.id,
+    openstack_compute_secgroup_v2.worker_sg.id,
   ]
 }
 
@@ -179,23 +179,23 @@ module "nfs" {
 
   instance_name = "${var.prefix}-nfs"
 
-  image_id  = "${var.image_id}"
-  flavor_id = "${var.nfs_flavor_id}"
-  key_pair  = "${var.key_pair}"
+  image_id  = var.image_id
+  flavor_id = var.nfs_flavor_id
+  key_pair  = var.key_pair
 
-  network_id = "${openstack_networking_network_v2.network.id}"
-  subnet_id  = "${openstack_networking_subnet_v2.subnet.id}"
+  network_id = openstack_networking_network_v2.network.id
+  subnet_id  = openstack_networking_subnet_v2.subnet.id
   security_group_ids = [
-    "${openstack_compute_secgroup_v2.cluster_sg.id}",
+    openstack_compute_secgroup_v2.cluster_sg.id,
   ]
 }
 
 resource "openstack_blockstorage_volume_v2" "nfs_volume" {
   name = "${var.prefix}-nfs-volume"
-  size = 200
+  size = var.nfs_storage_size
 }
 
 resource "openstack_compute_volume_attach_v2" "nfs_va" {
-  instance_id = "${module.nfs.instance_ids[0]}"
-  volume_id   = "${openstack_blockstorage_volume_v2.nfs_volume.id}"
+  instance_id = module.nfs.instance_ids[0]
+  volume_id   = openstack_blockstorage_volume_v2.nfs_volume.id
 }
