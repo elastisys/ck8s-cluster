@@ -181,6 +181,7 @@ extraConfigMaps:
           reconnect_on_error true
           # Custom parameters --START--
           # Rollover index configuration
+          include_timestamp true # defaults to false
           index_name kubecomponents
           rollover_index true
           deflector_alias kubecomponents
@@ -227,6 +228,7 @@ extraConfigMaps:
           reconnect_on_error true
           # Custom parameters --START--
           # Rollover index configuration
+          include_timestamp true # defaults to false
           index_name logstash
           rollover_index true
           deflector_alias logstash
