@@ -3,8 +3,8 @@
 SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 pushd "${SCRIPTS_PATH}/../" > /dev/null
 
-export ECK_BASE_DOMAIN=$(cat infra.json | jq -r '.workload_cluster.dns_name' | sed 's/[^.]*[.]//')
-export ECK_OPS_DOMAIN=$(cat infra.json | jq -r '.service_cluster.dns_name' | sed 's/[^.]*[.]//')
+export ECK_BASE_DOMAIN=$(cat infra.json | jq -r '.service_cluster.domain_name')
+export ECK_OPS_DOMAIN=$(cat infra.json | jq -r '.service_cluster.domain_name' | sed 's/^/ops./')
 
 popd > /dev/null
 

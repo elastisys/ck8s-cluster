@@ -33,5 +33,5 @@ output "dns_record_name" {
 }
 
 output "dns_suffix" {
-  value = data.aws_route53_zone.zone.name
+  value = trimsuffix(data.aws_route53_zone.zone.name, ".")
 }
