@@ -126,7 +126,7 @@ To keep the number of metrics (and the storage capacity they require) down, we r
 For redundancy, the metrics collected by this Prometheus instance are also federated to a separate Prometheus instance with a more durable storage backend.
 This is possible only because the default Prometheus instance is exposed using an Ingress, as you can see by running `kubectl get ingress`.
 The Ingress is protected with basic authentication.
-If you remove this Ingress, you risk loosing metrics data, but you may do so if you wish.
+If you remove or change this Ingress or the authentication credentials you risk loosing metrics data, but you may do so if you wish.
 
 #### Grafana integration
 
