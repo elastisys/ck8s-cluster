@@ -6,4 +6,4 @@ echo
 echo "Testing endpoints"
 echo "=================="
 
-testEndpoint Prometheus https://prometheus.${ECK_BASE_DOMAIN}/
+testEndpoint Prometheus https://prometheus.${ECK_BASE_DOMAIN}/ prometheus:${PROMETHEUS_CLIENT_SECRET}
