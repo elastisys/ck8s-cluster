@@ -195,6 +195,10 @@ grafana:
 prometheusOperator:
   createCustomResource: false
 
+defaultRules:
+  labels:
+    role: alert-rules
+
 prometheus:
   prometheusSpec:
     resources:
@@ -209,3 +213,6 @@ prometheus:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD" }}
     externalLabels:
       cluster: service_cluster
+    ruleSelector:
+      matchLabels:
+        role: alert-rules
