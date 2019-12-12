@@ -490,3 +490,4 @@ ssh-add -D
 
 As of yet it is not possible to change the default password of the **elastic** user that the elasticsearch operator creates.
 See https://github.com/elastic/cloud-on-k8s/issues/967
+
