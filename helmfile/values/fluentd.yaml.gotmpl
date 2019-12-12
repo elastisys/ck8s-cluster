@@ -191,7 +191,7 @@ extraConfigMaps:
           enable_ilm true
           # Policy is already created by init container so fluentd will skip it's creation
           ilm_policy_id kubecomponents_policy
-          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "1GB","max_age": "1d"}}}}}}
+          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name kubecomponents_template
           template_file /etc/templates/kubecomponents_template
@@ -238,7 +238,7 @@ extraConfigMaps:
           enable_ilm true
           # # Policy is already created by init container so fluentd will skip it's creation
           ilm_policy_id datastream_policy
-          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "1GB","max_age": "1d"}}}}}}
+          ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
           # Template name is not used if ilm is in effect but it's mandatory parameter
           template_name logstash_template
           template_file /etc/templates/logstash_template

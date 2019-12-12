@@ -221,10 +221,10 @@ helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
 if [[ $ENABLE_HARBOR == "true" ]]
 then
     # Install the rest of the charts, excluding prometheus-operator.
-    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter $INTERACTIVE apply
 else
     # Install the rest of the charts, excluding prometheus-operator.
-    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=harbor $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter,app!=harbor $INTERACTIVE apply
 fi
 
 # Install prometheus-operator. Retry three times.
@@ -315,6 +315,9 @@ curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_cluster/settings?pretty" \
     -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'\
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
+
+#install elasticsearch-prometheus-exporter
+helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply
 
 # Adding dashboards to kibana
 echo "Waiting until kibana is ready"

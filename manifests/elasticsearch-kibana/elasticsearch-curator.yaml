@@ -42,7 +42,7 @@ data:
     actions:
       1:
         action: delete_indices
-        description: "Clean up the oldest logstash-* indices that exceeds total disk space 100GB "
+        description: "Clean up the oldest logstash-* indices that exceeds total disk space $AL_RETENTION_SIZE GB "
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -53,14 +53,14 @@ data:
           kind: regex
           value: 'logstash-*'
         - filtertype: space
-          disk_space: 100
+          disk_space: $AL_RETENTION_SIZE
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       2:
         action: delete_indices
-        description: "Clean up the logstash-* indices that are older then 30 days"
+        description: "Clean up the logstash-* indices that are older then $AL_RETENTION_AGE days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -74,12 +74,12 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: 30
+          unit_count: $AL_RETENTION_AGE
         - filtertype: kibana
           exclude: True  
       3:
         action: delete_indices
-        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space 10GB"
+        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $APIL_RETENTION_SIZE GB"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -90,14 +90,14 @@ data:
           kind: regex
           value: 'kubecomponents-*'
         - filtertype: space
-          disk_space: 10
+          disk_space: $APIL_RETENTION_SIZE
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       4:
         action: delete_indices
-        description: "Clean up the kubecomponents-* indices that are older then 30 days"
+        description: "Clean up the kubecomponents-* indices that are older then $APIL_RETENTION_AGE days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -111,7 +111,7 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: 10
+          unit_count: $APIL_RETENTION_AGE
         - filtertype: kibana
           exclude: True
 

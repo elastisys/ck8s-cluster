@@ -154,7 +154,6 @@ releases:
   - values/prometheus-wc-federate-scraper.yaml.gotmpl
 
 #Elasticsearch-prometheus-exporter
-{{ if eq .Environment.Name "service_cluster" }}
 - name: elasticsearch-prometheus-exporter
   namespace: elastic-system
   labels:
@@ -162,9 +161,10 @@ releases:
   chart: stable/elasticsearch-exporter
   version: 2.1.1
   missingFileHandler: error
+  wait: true
   values: 
   - values/elasticsearch-prometheus-exporter.yaml.gotmpl
-{{ end }}
+
 
 # Harbor
 - name: harbor

@@ -197,7 +197,7 @@ prometheusOperator:
 
 defaultRules:
   labels:
-    role: alert-rules
+    role: operator
 
 prometheus:
   prometheusSpec:
@@ -215,4 +215,4 @@ prometheus:
       cluster: service_cluster
     ruleSelector:
       matchLabels:
-        role: alert-rules
+        role: operator
