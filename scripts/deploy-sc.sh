@@ -101,9 +101,9 @@ then
 fi
 
 # HELM and TILLER
-mkdir -p ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/service_cluster/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/service_cluster "helm"
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/service_cluster/kube-system/certs "helm"
+mkdir -p ${CONFIG_PATH}/certs/service_cluster/kube-system/certs
+${SCRIPTS_PATH}/initialize-cluster.sh ${CONFIG_PATH}/certs/service_cluster "helm"
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/service_cluster/kube-system/certs "helm"
 
 
 # CERT-MANAGER

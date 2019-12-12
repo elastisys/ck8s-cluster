@@ -65,9 +65,9 @@ then
 fi
 
 # HELM, TILLER
-mkdir -p ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster "helm"
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster/kube-system/certs "helm"
+mkdir -p ${CONFIG_PATH}/certs/workload_cluster/kube-system/certs
+${SCRIPTS_PATH}/initialize-cluster.sh ${CONFIG_PATH}/certs/workload_cluster "helm"
+source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/workload_cluster/kube-system/certs "helm"
 
 
 # CERT-MANAGER
@@ -242,7 +242,7 @@ kubectl config view --raw \
     -o jsonpath="{.clusters[0].cluster.certificate-authority-data}" \
     | base64 --decode > ${CUSTOMER_CERTIFICATE_AUTHORITY}
 
-CUSTOMER_KUBECONFIG=${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/customer/kubeconfig.yaml
+CUSTOMER_KUBECONFIG=${CONFIG_PATH}/customer/kubeconfig.yaml
 kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-cluster compliantk8s \
     --server=${CUSTOMER_SERVER} \
     --certificate-authority=${CUSTOMER_CERTIFICATE_AUTHORITY} --embed-certs=true
