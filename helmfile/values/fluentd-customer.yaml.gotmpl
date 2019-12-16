@@ -214,6 +214,100 @@ extraConfigMaps:
           overflow_action block
         </buffer>
       </match>
+    <match kubeaudit.**>
+        @id elasticsearch_kubeaudit
+        @type elasticsearch
+        @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+        include_tag_key true
+        type_name _doc
+        host "#{ENV['OUTPUT_HOST']}"
+        port "#{ENV['OUTPUT_PORT']}"
+        path "#{ENV['OUTPUT_PATH']}"
+        scheme "#{ENV['OUTPUT_SCHEME']}"
+        ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+        ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+        user "#{ENV['OUTPUT_USER']}"
+        password "#{ENV['OUTPUT_PASSWORD']}"
+        reconnect_on_error true
+        # Custom parameters --START--
+        # Rollover index configuration
+        include_timestamp true # defaults to false
+        index_name kubeaudit
+        rollover_index true
+        deflector_alias kubeaudit
+        index_prefix kubeaudit
+        index_date_pattern "now/d"
+        # Ilm configuration
+        enable_ilm true
+        # Policy is already created by init container so fluentd will skip it's creation
+        ilm_policy_id kubeaudit_policy
+        ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
+        # Template name is not used if ilm is in effect but it's mandatory parameter
+        template_name kubeaudit_template
+        template_file /etc/templates/kubeaudit_template
+        customize_template {"<<index_prefix>>": "kubeaudit"}
+        # Custom parameters --END--
+        <buffer>
+          @type file
+          path /var/log/fluentd-buffers/kubernetes.kubeaudit.system.buffer
+          flush_mode interval
+          retry_type exponential_backoff
+          flush_thread_count 2
+          flush_interval 5s
+          retry_forever
+          retry_max_interval 30
+          chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+          queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
+          overflow_action block
+        </buffer>
+      </match>
+    <match kubernetes.**>
+        @id elasticsearch_kubernetes
+        @type elasticsearch
+        @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+        include_tag_key true
+        type_name _doc
+        host "#{ENV['OUTPUT_HOST']}"
+        port "#{ENV['OUTPUT_PORT']}"
+        path "#{ENV['OUTPUT_PATH']}"
+        scheme "#{ENV['OUTPUT_SCHEME']}"
+        ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+        ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+        user "#{ENV['OUTPUT_USER']}"
+        password "#{ENV['OUTPUT_PASSWORD']}"
+        reconnect_on_error true
+        # Custom parameters --START--
+        # Rollover index configuration
+        include_timestamp true # defaults to false
+        index_name kubernetes
+        rollover_index true
+        deflector_alias kubernetes
+        index_prefix kubernetes
+        index_date_pattern "now/d"
+        # Ilm configuration
+        enable_ilm true
+        # Policy is already created by init container so fluentd will skip it's creation
+        ilm_policy_id kubernetes_policy
+        ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
+        # Template name is not used if ilm is in effect but it's mandatory parameter
+        template_name kubernetes_template
+        template_file /etc/templates/kubernetes_template
+        customize_template {"<<index_prefix>>": "kubernetes"}
+        # Custom parameters --END--
+        <buffer>
+          @type file
+          path /var/log/fluentd-buffers/kubernetes.kubernetes.system.buffer
+          flush_mode interval
+          retry_type exponential_backoff
+          flush_thread_count 2
+          flush_interval 5s
+          retry_forever
+          retry_max_interval 30
+          chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+          queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
+          overflow_action block
+        </buffer>
+      </match>
     <match **>
         @id elasticsearch
         @type elasticsearch
@@ -232,20 +326,20 @@ extraConfigMaps:
         # Custom parameters --START--
         # Rollover index configuration
         include_timestamp true # defaults to false
-        index_name logstash
+        index_name logs
         rollover_index true
-        deflector_alias logstash
-        index_prefix logstash
+        deflector_alias logs
+        index_prefix logs
         index_date_pattern "now/d"
         # Ilm configuration
         enable_ilm true
         # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id datastream_policy
+        ilm_policy_id logs_policy
         ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
         # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name logstash_template
-        template_file /etc/templates/logstash_template
-        customize_template {"<<index_prefix>>": "logstash"}
+        template_name logs_template
+        template_file /etc/templates/logs_template
+        customize_template {"<<index_prefix>>": "logs"}
         # Custom parameters --END--
         <buffer>
           @type file

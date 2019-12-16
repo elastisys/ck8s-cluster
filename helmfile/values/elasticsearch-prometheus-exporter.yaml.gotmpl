@@ -40,7 +40,6 @@ es:
   ##
   sslSkipVerify: true
 
-
 serviceMonitor:
   ## If true, a ServiceMonitor CRD is created for a prometheus operator
   ## https://github.com/coreos/prometheus-operator
@@ -64,16 +63,30 @@ prometheusRule:
     role: operator
   rules:
   - alert: CuratorFailedToRemoveAuditLogs
-    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"logstash-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "AL_RETENTION_SIZE" }}
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubeaudit-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "KUBEAUDIT_RETENTION_SIZE" }}
     for: 5m
     labels:
       severity: critical
     annotations:
-      description: Curator failed to remove logs 'logstash' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "AL_RETENTION_SIZE" }} GB 
+      description: Curator failed to remove logs 'kubeudit' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "KUBEAUDIT_RETENTION_SIZE" }} GB 
   - alert: CuratorFailedToRemoveAPIServerLogs
-    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"logstash-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "APIL_RETENTION_SIZE" }}
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubecomponents-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "KUBECOMPONENTS_RETENTION_SIZE" }}
     for: 5m
     labels:
       severity: critical
     annotations:
-      description: Curator failed to remove logs 'kubecomponents' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "APIL_RETENTION_SIZE" }} GB 
+      description: Curator failed to remove logs 'kubecomponents' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "KUBECOMPONENTS_RETENTION_SIZE" }} GB 
+  - alert: CuratorFailedToRemoveContainerLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubernetes-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "KUBERNETES_RETENTION_SIZE" }}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Curator failed to remove logs 'kubernetes' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "KUBERNETES_RETENTION_SIZE" }} GB 
+  - alert: CuratorFailedToRemoveDefaultLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"logs-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "LOGS_RETENTION_SIZE" }}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Curator failed to remove logs 'logs' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "LOGS_RETENTION_SIZE" }} GB 

@@ -42,7 +42,7 @@ data:
     actions:
       1:
         action: delete_indices
-        description: "Clean up the oldest logstash-* indices that exceeds total disk space $AL_RETENTION_SIZE GB "
+        description: "Clean up the oldest log-* indices that exceeds total disk space $LOGS_RETENTION_SIZE GB "
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -51,16 +51,16 @@ data:
         # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
         - filtertype: pattern
           kind: regex
-          value: 'logstash-*'
+          value: 'logs-*'
         - filtertype: space
-          disk_space: $AL_RETENTION_SIZE
+          disk_space: $LOGS_RETENTION_SIZE
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       2:
         action: delete_indices
-        description: "Clean up the logstash-* indices that are older then $AL_RETENTION_AGE days"
+        description: "Clean up the log-* indices that are older then $LOGS_RETENTION_AGE days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -69,17 +69,17 @@ data:
         # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
         - filtertype: pattern
           kind: regex
-          value: 'logstash-*'
+          value: 'logs-*'
         - filtertype: age
           source: creation_date
           direction: older
           unit: days
-          unit_count: $AL_RETENTION_AGE
+          unit_count: $LOGS_RETENTION_AGE
         - filtertype: kibana
           exclude: True  
       3:
         action: delete_indices
-        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $APIL_RETENTION_SIZE GB"
+        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $KUBECOMPONENTS_RETENTION_SIZE GB"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -90,14 +90,14 @@ data:
           kind: regex
           value: 'kubecomponents-*'
         - filtertype: space
-          disk_space: $APIL_RETENTION_SIZE
+          disk_space: $KUBECOMPONENTS_RETENTION_SIZE
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       4:
         action: delete_indices
-        description: "Clean up the kubecomponents-* indices that are older then $APIL_RETENTION_AGE days"
+        description: "Clean up the kubecomponents-* indices that are older then $KUBECOMPONENTS_RETENTION_AGE days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -111,7 +111,81 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: $APIL_RETENTION_AGE
+          unit_count: $KUBECOMPONENTS_RETENTION_AGE
+        - filtertype: kibana
+          exclude: True
+      5:
+        action: delete_indices
+        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $KUBEAUDIT_RETENTION_SIZE GB"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'kubeaudit-*'
+        - filtertype: space
+          disk_space: $KUBEAUDIT_RETENTION_SIZE
+          use_age: True
+          source: creation_date
+        - filtertype: kibana
+          exclude: True
+      6:
+        action: delete_indices
+        description: "Clean up the kubecomponents-* indices that are older then $KUBEAUDIT_RETENTION_AGE days"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'kubeaudit-*'
+        - filtertype: age
+          source: creation_date
+          direction: older
+          unit: days
+          unit_count: $KUBEAUDIT_RETENTION_AGE
+        - filtertype: kibana
+          exclude: True
+      7:
+        action: delete_indices
+        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $KUBERNETES_RETENTION_SIZE GB"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'kubernetes-*'
+        - filtertype: space
+          disk_space: $KUBERNETES_RETENTION_SIZE
+          use_age: True
+          source: creation_date
+        - filtertype: kibana
+          exclude: True
+      8:
+        action: delete_indices
+        description: "Clean up the kubecomponents-* indices that are older then $KUBERNETES_RETENTION_AGE days"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'kubernetes-*'
+        - filtertype: age
+          source: creation_date
+          direction: older
+          unit: days
+          unit_count: $KUBERNETES_RETENTION_AGE
         - filtertype: kibana
           exclude: True
 

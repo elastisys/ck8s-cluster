@@ -94,9 +94,13 @@ export ALERT_TO="slack" # default "slack", set to anything else to disable alert
 export SLACK_API_URL="https://..." # Default URL is for sending to the #ck8s-ops channel
 
 # Retention variables
-export AL_RETENTION_SIZE=100 #SIZE in GB when auditlogs should be removed for index 'logstash'
-export AL_RETENTION_AGE=30 #AGE in days when auditlogs should be removed for index 'logstash'
-export APIL_RETENTION_SIZE=1 #SIZE in GB when api-server logs should be removed for index  'kubecomponents'
-export APIL_RETENTION_AGE=10 #AGE in days when api-server logs should be removed for index  'kubecomponents'
+export KUBEAUDIT_RETENTION_SIZE=100 #SIZE in GB when auditlogs should be removed or 'kubeaudit'
+export KUBEAUDIT_RETENTION_AGE=30 #AGE in days when auditlogs should be removed or 'kubeaudit'
+export KUBECOMPONENTS_RETENTION_SIZE=1 #SIZE in GB when api-server logs should be removed or 'kubecomponents'
+export KUBECOMPONENTS_RETENTION_AGE=10 #AGE in days when api-server logs should be removed or 'kubecomponents'
+export KUBERNETES_RETENTION_SIZE=1 #SIZE in GB when kubernetes container logs should be removed or 'kubernetes'
+export KUBERNETES_RETENTION_AGE=10 #AGE in days when kubernetes container  logs should be removed or 'kubernetes'
+export LOGS_RETENTION_SIZE=1 #SIZE in GB when default logs should be removed or 'logs'
+export LOGS_RETENTION_AGE=10 #AGE in days when default logs should be removed or 'logs'
 export ROLLOVER_SIZE=1 #SIZE in GB when indices should perform rollover
 export ROLLOVER_AGE=1 #AGE in days when indices should perform rollover

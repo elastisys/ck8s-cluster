@@ -1,0 +1,1 @@
+{"index_patterns": ["kubeaudit-*"], "settings": {"index.refresh_interval" : "10s","index.lifecycle.name": "kubeaudit_policy", "index.lifecycle.rollover_alias": "kubeaudit"}}
