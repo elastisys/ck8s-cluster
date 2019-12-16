@@ -1,0 +1,79 @@
+es:
+  ## Address (host and port) of the Elasticsearch node we should connect to.
+  ## This could be a local node (localhost:9200, for instance), or the address
+  ## of a remote Elasticsearch server. When basic auth is needed,
+  ## specify as: <proto>://<user>:<password>@<host>:<port>. e.g., http://admin:pass@localhost:9200.
+  ##
+  uri: https://elastic:{{ requiredEnv "ES_PW" }}@elasticsearch-es-http:9200
+
+  ## If true, query stats for all nodes in the cluster, rather than just the
+  ## node we connect to.
+  ##
+  all: true
+
+  ## If true, query stats for all indices in the cluster.
+  ##
+  indices: true
+
+  ## If true, query settings stats for all indices in the cluster.
+  ##
+  indices_settings: true
+
+  ## If true, query stats for shards in the cluster.
+  ##
+  shards: true
+
+  ## If true, query stats for snapshots in the cluster.
+  ##
+  snapshots: true
+
+  ## If true, query stats for cluster settings.
+  ##
+  cluster_settings: false
+
+  ## Timeout for trying to get stats from Elasticsearch. (ex: 20s)
+  ##
+  timeout: 30s
+
+  ## Skip SSL verification when connecting to Elasticsearch
+  ## (only available if image.tag >= 1.0.4rc1)
+  ##
+  sslSkipVerify: true
+
+
+serviceMonitor:
+  ## If true, a ServiceMonitor CRD is created for a prometheus operator
+  ## https://github.com/coreos/prometheus-operator
+  ##
+  enabled: true
+  namespace: elastic-system
+  labels: 
+    release: prometheus-operator
+  interval: 10s
+  scrapeTimeout: 10s
+  scheme: http
+
+prometheusRule:
+  ## If true, a PrometheusRule CRD is created for a prometheus operator
+  ## https://github.com/coreos/prometheus-operator
+  ##
+  enabled: true
+  namespace: monitoring
+  labels: 
+    release: prometheus-operator
+    role: operator
+  rules:
+  - alert: CuratorFailedToRemoveAuditLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"logstash-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "AL_RETENTION_SIZE" }}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Curator failed to remove logs 'logstash' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "AL_RETENTION_SIZE" }} GB 
+  - alert: CuratorFailedToRemoveAPIServerLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"logstash-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "APIL_RETENTION_SIZE" }}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Curator failed to remove logs 'kubecomponents' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "APIL_RETENTION_SIZE" }} GB 
