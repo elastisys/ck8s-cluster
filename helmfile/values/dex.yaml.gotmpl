@@ -50,6 +50,7 @@ config:
       - http://localhost:8000
       - https://dashboard.{{ requiredEnv "ECK_OPS_DOMAIN" }}/oauth2/callback
       - https://dashboard.{{ requiredEnv "ECK_BASE_DOMAIN" }}/oauth2/callback
+      - https://ck8sdash.{{ requiredEnv "ECK_BASE_DOMAIN" }}/auth
     - id: grafana
       secret: {{ requiredEnv "GRAFANA_CLIENT_SECRET" }}
       name: 'Grafana'

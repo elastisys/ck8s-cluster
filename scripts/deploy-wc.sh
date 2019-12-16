@@ -47,7 +47,7 @@ fi
 INTERACTIVE=${2:-""}
 
 # NAMESPACES
-NAMESPACES="cert-manager falco monitoring fluentd"
+NAMESPACES="cert-manager falco monitoring fluentd ck8sdash"
 for namespace in ${NAMESPACES}
 do
     kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
@@ -99,7 +99,7 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
 
-issuer_namespaces='kube-system monitoring'
+issuer_namespaces='kube-system monitoring ck8sdash'
 for ns in $issuer_namespaces
 do
     export CERT_NAMESPACE=$ns
@@ -237,6 +237,11 @@ kubectl -n fluentd create secret generic elasticsearch \
 # Install fluentd
 helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply
 
+# ck8sdash
+envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/env-secret.yaml | kubectl apply -f -
+envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/ingress-wc.yaml | kubectl apply -f -
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/deployment.yaml
 
 #
 # Customer RBAC

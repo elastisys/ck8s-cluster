@@ -27,6 +27,7 @@ DEPLOYMENTS=(
     "monitoring prometheus-operator-grafana"
     "monitoring prometheus-operator-kube-state-metrics"
     "influxdb-prometheus influxdb"
+    "ck8sdash ck8sdash"
 )
 
 echo

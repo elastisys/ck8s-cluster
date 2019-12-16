@@ -16,6 +16,7 @@ DEPLOYMENTS=(
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
+    "ck8sdash ck8sdash"
 )
 
 echo

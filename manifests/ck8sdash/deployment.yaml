@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ck8sdash
+  namespace: ck8sdash
+spec:
+  selector:
+    matchLabels:
+      app: ck8sdash
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ck8sdash
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+      - name: ck8sdash
+        image: elastisys/ck8sdash:0.0.12
+        env:
+        - name: URL
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: url
+        - name: GRAFANA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: grafana-api-key
+        - name: HARBOR_BASIC_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: harbor-credentials
+        - name: KIBANA_BASIC_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: kibana-credentials
+        - name: OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: oidc-client-id
+        - name: OIDC_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: oidc-secret
+        - name: OIDC_URL
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: oidc-url
+        ports:
+        - containerPort: 4654

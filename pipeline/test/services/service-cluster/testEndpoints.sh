@@ -18,3 +18,5 @@ testEndpoint Kibana https://kibana.${ECK_BASE_DOMAIN}/ elastic:${PW}
 testEndpoint Harbor https://harbor.${ECK_BASE_DOMAIN}/api/users"" admin:${HARBOR_PWD}
 
 testEndpoint Grafana https://grafana.${ECK_BASE_DOMAIN}/ admin:${GRAFANA_PWD}
+
+testEndpoint ck8sdash https://ck8sdash.${ECK_BASE_DOMAIN}/

@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ck8sdash
+  namespace: ck8sdash
+spec:
+  ports:
+    - port: 4654
+      targetPort: 4654
+  selector:
+    app: ck8sdash

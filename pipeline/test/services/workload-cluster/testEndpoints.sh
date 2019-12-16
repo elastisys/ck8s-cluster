@@ -11,3 +11,4 @@ if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
     testEndpoint Prometheus-customer https://scrape.${ECK_BASE_DOMAIN}/ prometheus:${CUSTOMER_PROMETHEUS_CLIENT_SECRET}
 fi
+testEndpoint ck8sdash https://ck8sdash.${ECK_BASE_DOMAIN}/
