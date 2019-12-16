@@ -42,7 +42,7 @@ data:
     actions:
       1:
         action: delete_indices
-        description: "Clean up the oldest log-* indices that exceeds total disk space $LOGS_RETENTION_SIZE GB "
+        description: "Clean up the oldest log-* indices that exceeds total disk space $OTHER_RETENTION_SIZE GB "
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -51,16 +51,16 @@ data:
         # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
         - filtertype: pattern
           kind: regex
-          value: 'logs-*'
+          value: 'other-*'
         - filtertype: space
-          disk_space: $LOGS_RETENTION_SIZE
+          disk_space: $OTHER_RETENTION_SIZE
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       2:
         action: delete_indices
-        description: "Clean up the log-* indices that are older then $LOGS_RETENTION_AGE days"
+        description: "Clean up the log-* indices that are older then $OTHER_RETENTION_AGE days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -69,12 +69,12 @@ data:
         # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
         - filtertype: pattern
           kind: regex
-          value: 'logs-*'
+          value: 'other-*'
         - filtertype: age
           source: creation_date
           direction: older
           unit: days
-          unit_count: $LOGS_RETENTION_AGE
+          unit_count: $OTHER_RETENTION_AGE
         - filtertype: kibana
           exclude: True  
       3:

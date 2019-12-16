@@ -83,10 +83,10 @@ prometheusRule:
       severity: critical
     annotations:
       description: Curator failed to remove logs 'kubernetes' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "KUBERNETES_RETENTION_SIZE" }} GB 
-  - alert: CuratorFailedToRemoveDefaultLogs
-    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"logs-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "LOGS_RETENTION_SIZE" }}
+  - alert: CuratorFailedToRemoveOtherLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"other-(.+)"}))/(1024*1024*1024) > {{ requiredEnv "OTHER_RETENTION_SIZE" }}
     for: 5m
     labels:
       severity: critical
     annotations:
-      description: Curator failed to remove logs 'logs' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "LOGS_RETENTION_SIZE" }} GB 
+      description: Curator failed to remove logs 'other' {{ "{{" }}$value | printf "%.1f" {{ "}}" }} GB > {{ requiredEnv "OTHER_RETENTION_SIZE" }} GB 

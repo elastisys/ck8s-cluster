@@ -326,20 +326,20 @@ extraConfigMaps:
         # Custom parameters --START--
         # Rollover index configuration
         include_timestamp true # defaults to false
-        index_name logs
+        index_name other
         rollover_index true
-        deflector_alias logs
-        index_prefix logs
+        deflector_alias other
+        index_prefix other
         index_date_pattern "now/d"
         # Ilm configuration
         enable_ilm true
         # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id logs_policy
+        ilm_policy_id other_policy
         ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
         # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name logs_template
-        template_file /etc/templates/logs_template
-        customize_template {"<<index_prefix>>": "logs"}
+        template_name other_template
+        template_file /etc/templates/other_template
+        customize_template {"<<index_prefix>>": "other"}
         # Custom parameters --END--
         <buffer>
           @type file
