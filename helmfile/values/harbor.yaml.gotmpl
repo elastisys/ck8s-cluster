@@ -41,12 +41,40 @@ harborAdminPassword: {{ requiredEnv "HARBOR_PWD" }}
 core:
   secret: abcdefghijklmnop #TODO: Should be randomized
   secretName: harbor-core-cert
+  resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
 
 jobservice:
   secret: abcdefghijklmnop #TODO: Should be randomized
+  resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
 
 registry:
   secret: abcdefghijklmnop #TODO: Should be randomized
+  resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
 
 notary:
   secretName: harbor-notary-cert
+  resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
