@@ -35,7 +35,6 @@ infra="$1"
 : "${INFLUXDB_PWD:?Missing INFLUXDB_PWD}"
 : "${HARBOR_PWD:?Missing HARBOR_PWD}"
 : "${GRAFANA_PWD:?Missing GRAFANA_PWD}"
-: "${DASHBOARD_CLIENT_SECRET:?Missing DASHBOARD_CLIENT_SECRET}"
 : "${GRAFANA_CLIENT_SECRET:?Missing GRAFANA_CLIENT_SECRET}"
 : "${KUBELOGIN_CLIENT_SECRET:?Missing KUBELOGIN_CLIENT_SECRET}"
 : "${PROMETHEUS_CLIENT_SECRET:?Missing PROMETHEUS_CLIENT_SECRET}"
@@ -103,7 +102,6 @@ then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/tiller-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nfs-client-provisioner-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/cert-manager-psp.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/dashboard-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-restricted-psp.yaml
 
     # Deploy cluster spcific roles and rolebindings.
@@ -122,10 +120,6 @@ fi
 mkdir -p ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/service_cluster/kube-system/certs
 ${SCRIPTS_PATH}/initialize-cluster.sh ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/service_cluster "helm"
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${SCRIPTS_PATH}/../clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/service_cluster/kube-system/certs "helm"
-
-
-# DASHBOARD
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/dashboard.yaml
 
 
 # CERT-MANAGER

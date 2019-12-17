@@ -3,7 +3,6 @@ source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
 DEPLOYMENTS=(
     "dex dex"
-    "kube-system oauth2-oauth2-proxy"
     "cert-manager cert-manager"
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
@@ -18,8 +17,6 @@ DEPLOYMENTS=(
     "harbor harbor-harbor-registry"
     "kube-system coredns"
     "kube-system coredns-autoscaler"
-    "kube-system kubernetes-dashboard"
-    "kube-system kubernetes-metrics-scraper"
     "kube-system metrics-server"
     "kube-system nfs-client-provisioner"
     "nginx-ingress nginx-ingress-default-backend"

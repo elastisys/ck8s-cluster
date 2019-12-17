@@ -7,7 +7,6 @@ env_vars=(
     ["influxdb"]="INFLUXDB_PWD"
     ["kubelogin_client"]="KUBELOGIN_CLIENT_SECRET"
     ["grafana_client"]="GRAFANA_CLIENT_SECRET"
-    ["dashboard_client"]="DASHBOARD_CLIENT_SECRET"
     ["prometheus_client"]="PROMETHEUS_CLIENT_SECRET"
     ["customer_prometheus_client"]="CUSTOMER_PROMETHEUS_CLIENT_SECRET"
 )

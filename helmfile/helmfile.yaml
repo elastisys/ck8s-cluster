@@ -73,23 +73,6 @@ releases:
   - values/nfs-client-provisioner-wc.yaml.gotmpl
   {{ end }}
 
-# Oauth2
-- name: oauth2
-  namespace: kube-system
-  labels:
-    app: oauth2
-  chart: stable/oauth2-proxy
-  version: 0.12.3
-  missingFileHandler: error
-  values:
-  {{ if eq .Environment.Name "service_cluster" }}
-    - values/oauth2-sc.yaml.gotmpl
-  {{ end }}
-
-  {{ if eq .Environment.Name "workload_cluster" }}
-  - values/oauth2-wc.yaml.gotmpl
-  {{ end }}
-
 # Cert-manager
 - name: cert-manager
   namespace: cert-manager

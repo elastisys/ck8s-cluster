@@ -2,14 +2,11 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
 DEPLOYMENTS=(
-    "kube-system oauth2-oauth2-proxy"
     "cert-manager cert-manager"
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
     "kube-system coredns"
     "kube-system coredns-autoscaler"
-    "kube-system kubernetes-dashboard"
-    "kube-system kubernetes-metrics-scraper"
     "kube-system metrics-server"
     "nginx-ingress nginx-ingress-default-backend"
     "opa opa"

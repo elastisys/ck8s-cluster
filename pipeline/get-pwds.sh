@@ -16,9 +16,6 @@ export INFLUXDB_PWD=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE
 # Export kubelogin client secret for oauth
 export KUBELOGIN_CLIENT_SECRET=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/kubelogin_client" | jq -r '.data.data.password')
 
-# Export dashboard client secret for oauth
-export DASHBOARD_CLIENT_SECRET=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/dashboard_client" | jq -r '.data.data.password')
-
 # Export grafana client secret for oath
 export GRAFANA_CLIENT_SECRET=$(./scripts/vault-get.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$BASE_PATH/grafana_client" | jq -r '.data.data.password')
 
