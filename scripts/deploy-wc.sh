@@ -309,3 +309,17 @@ then
         2> /dev/null || echo "Example prometheus auth secret alredy in place. Ignoring."
     rm auth
 fi
+
+if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
+then
+    # Use `kubectl create` to avoid overwriting customer changes
+    kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-instance.yaml \
+        2> /dev/null || echo "Example alertmanager alredy in place. Ignoring."
+    # Create alertmanager config secret
+    # Note that the name must match alertmanager-{ALERTMANAGER_NAME}
+    # See https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/alerting.md
+    kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-alertmanager \
+        --from-file=${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager.yaml \
+        2> /dev/null || echo "Example alertmanager config secret alredy in place. Ignoring."
+    rm auth
+fi
