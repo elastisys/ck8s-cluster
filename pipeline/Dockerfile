@@ -35,6 +35,11 @@ RUN wget https://github.com/roboll/helmfile/releases/download/v0.81.0/helmfile_l
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile
 
+#Vault
+RUN wget https://releases.hashicorp.com/vault/1.2.2/vault_1.2.2_linux_amd64.zip
+RUN unzip vault_1.2.2_linux_amd64.zip && \
+    mv vault /usr/local/bin/vault
+
 #Pipenv
 RUN apt install python3-pip -y
 RUN python3 -m pip install pip

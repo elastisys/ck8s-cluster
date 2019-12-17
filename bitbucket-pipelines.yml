@@ -1,4 +1,4 @@
-image: elastisys/ck8s-bitbucket-pipeline:latest
+image: elastisys/ck8s-bitbucket-pipeline:1.0.2
 pipelines:
   pull-requests:
     '**':
@@ -14,7 +14,7 @@ pipelines:
             - export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
             - echo $VAULT_TOKEN > vault-token.txt
             # Generate and store passwords
-            - ./scripts/store-pwds.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$PWD_LENGTH" "$BASE_PATH" "grafana" "influxdb" "harbor" "kubelogin_client" "dashboard_client" "grafana_client" "prometheus_client"
+            - source scripts/get-gen-secrets.sh
             # Infrastructure
             - cd terraform/exoscale
             - echo '1' | TF_WORKSPACE=pipeline terraform init
@@ -60,7 +60,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - ./scripts/check-docker.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
                 - ./scripts/gen-rke-conf-wc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-wc.yaml
                 - rke up --config ./eck-wc.yaml
@@ -83,7 +83,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - ./scripts/deploy-sc.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - kubectl get pods --all-namespaces
@@ -102,7 +102,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - ./scripts/deploy-wc.sh "$BITBUCKET_CLONE_DIR/infra.json"
@@ -123,7 +123,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - source ./scripts/common.sh
                 # Tests
@@ -143,7 +143,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 # Services
                 - ./pipeline/test/services/test-wc.sh
               after-script:
@@ -183,7 +183,7 @@ pipelines:
             - export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
             - echo $VAULT_TOKEN > vault-token.txt
             # Generate and store passwords
-            - ./scripts/store-pwds.sh "$VAULT_ADDR" "$VAULT_TOKEN" "$PWD_LENGTH" "$BASE_PATH" "grafana" "influxdb" "harbor"
+            - source scripts/get-gen-secrets.sh
             # Infrastructure
             - cd terraform/safespring
             - echo '1' | TF_WORKSPACE=pipeline terraform init
@@ -237,7 +237,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords for services
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - ./scripts/check-docker.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
                 - ./scripts/gen-rke-conf-wc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-wc.yaml
                 - rke up --config ./eck-wc.yaml
@@ -260,7 +260,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords for services
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - ./scripts/deploy-sc.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - kubectl get pods --all-namespaces
@@ -278,7 +278,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - ./scripts/deploy-wc.sh "$BITBUCKET_CLONE_DIR/infra.json"
@@ -299,7 +299,7 @@ pipelines:
                 # Export vault token
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords for services
-                - source pipeline/get-pwds.sh
+                - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - source ./scripts/common.sh
                 # Tests

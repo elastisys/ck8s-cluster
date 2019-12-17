@@ -5,8 +5,6 @@
 set -e
 
 # Vault and passwords
-export CUSTOMER_ID="pipeline-${BITBUCKET_BUILD_NUMBER}"
+export ENVIRONMENT_NAME="pipeline-${BITBUCKET_BUILD_NUMBER}"
 export VAULT_ADDR=https://vault.eck.elastisys.se
-export PWD_LENGTH=16
-export BASE_PATH="eck/data/v1/${CUSTOMER_ID}/1"
-export BASE_PATH_META="eck/metadata/v1/${CUSTOMER_ID}/1"
+export BASE_PATH_META="eck/metadata/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}"
