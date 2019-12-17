@@ -8,11 +8,6 @@ RUN wget https://releases.hashicorp.com/terraform/0.12.6/terraform_0.12.6_linux_
 RUN unzip terraform_0.12.6_linux_amd64.zip && \
     mv terraform /usr/local/bin/terraform
 
-RUN mkdir -p ~/.terraform.d/plugins
-RUN wget https://github.com/exoscale/terraform-provider-exoscale/releases/download/v0.11.0/terraform-provider-exoscale_0.11.0_linux_amd64.tar.gz
-RUN tar -xvzf terraform-provider-exoscale* terraform-provider-exoscale_v0.11.0 && \
-    mv terraform-provider-exoscale_v0.11.0 ~/.terraform.d/plugins/
-
 #RKE
 RUN wget https://github.com/rancher/rke/releases/download/v0.2.8/rke_linux-amd64 && \
     chmod 755 rke_linux-amd64 && \

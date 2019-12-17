@@ -1,4 +1,4 @@
-image: elastisys/exoscale-pipeline:v2
+image: elastisys/ck8s-bitbucket-pipeline:latest
 pipelines:
   pull-requests:
     '**':
