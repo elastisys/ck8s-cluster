@@ -174,6 +174,16 @@ releases:
   values:
   - values/harbor.yaml.gotmpl
 
+- name: init-harbor
+  namespace: harbor
+  labels:
+    app: init-harbor
+  chart: ./charts/init-harbor
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/init-harbor.yaml.gotmpl
+
 # InfluxDB
 - name: influxdb
   namespace: influxdb-prometheus
