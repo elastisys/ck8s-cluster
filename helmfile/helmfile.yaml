@@ -177,7 +177,7 @@ releases:
 - name: init-harbor
   namespace: harbor
   labels:
-    app: init-harbor
+    app: harbor
   chart: ./charts/init-harbor
   version: 0.1.0
   missingFileHandler: error
