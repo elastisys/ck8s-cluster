@@ -231,50 +231,6 @@ envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/ingress-sc.yaml | kubectl apply
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/deployment.yaml
 
-if [[ $ENABLE_HARBOR == "true" ]]
-then
-    echo "Setting up initial harbor state"
-    HARBOR_URL="https://harbor.${ECK_BASE_DOMAIN}/api/projects/1"
-    # Check harbor rollout status.
-    # Should not be needed due to 'wait' when installing/upgrading harbor!
-    # Just keeping it for now but should be removed.
-    kubectl -n harbor rollout status deployment harbor-harbor-clair
-
-    # Set up initial state for harbor.
-    EXISTS=$(curl -k -X GET -u admin:Harbor12345 $HARBOR_URL | jq '.code') || {
-      echo "ERROR L.${LINENO} - Harbor url $HARBOR_URL cannot be reached."
-      exit 1
-    }
-    if [ "$EXISTS" != "404" ]
-    then
-        NAME=$(curl -k -X GET -u admin:Harbor12345 $HARBOR_URL | jq '.name')
-
-        if [ "$NAME" == "\"library\"" ]
-        then
-            # Deletes the default project "library"
-            echo Removing project library from harbor
-            # Curl will retrun status 500 even though it successfully removed the project.
-            curl -k -X DELETE -u admin:${HARBOR_PWD} $HARBOR_URL > /dev/null
-
-            # Creates new private project "default"
-            echo Creating new private project default
-            curl -k -X POST -u admin:${HARBOR_PWD} --header 'Content-Type: application/json' --header 'Accept: application/json' https://harbor.${ECK_BASE_DOMAIN}/api/projects --data '{
-                "project_name": "default",
-                "metadata": {
-                    "public": "0",
-                    "enable_content_trust": "false",
-                    "prevent_vul": "false",
-                    "severity": "low",
-                    "auto_scan": "true"
-                }
-            }'
-            echo "Harbor initialized"
-        fi
-    else
-        echo "Harbor was already initilized"
-    fi
-fi
-
 # Adding backup job and repository to elasticsearch
 while [[ $(kubectl get elasticsearches.elasticsearch.k8s.elastic.co -n elastic-system elasticsearch -o 'jsonpath={.status.health}') != "green" ]]
 do
