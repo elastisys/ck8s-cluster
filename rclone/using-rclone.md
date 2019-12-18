@@ -24,7 +24,7 @@ Currently the following buckets are synced **from** the safespring S3 endpoint `
 
 The buckets are synced at 5 AM UTC every day.
 
-A Kubernetes cronjob called `sync-buckets` is running in the service cluster. The job executes the `rsync clone` command for all above listed buckets.
+A Kubernetes cronjob called `sync-buckets` is running in the service cluster. The job executes the `rclone sync` command for all above listed buckets.
 
 ### How do i verify this?
 
@@ -51,7 +51,7 @@ You can look at the status of the pod that was created by the job. If successful
 
     ```
     envsubst < rclone.conf > rclone.conf.tmp && \
-        kubectl create secret generic rclone-config --from-file=rclone.conf=rclone.conf.tmp && \
+        kubectl create secret generic rclone-config --from-file=rclone.conf=rclone.conf.tmp -n kube-system && \
         rm rclone.conf.tmp
     ```
 
@@ -70,14 +70,14 @@ You can look at the status of the pod that was created by the job. If successful
     ...
     ```
 
-- `BUCKETS_TO_SYNC`: the names of the buckets that are to be synced.
-- `REMOTE_SRC`: the remote source. Specified in rclone.conf.
-- `REMOTE_DST`: the remote destination. Specified in rclone.conf.
-- `EXTRA_ARGS`: extra arguments supplied the Rclone.
+    - `BUCKETS_TO_SYNC`: the names of the buckets that are to be synced.
+    - `REMOTE_SRC`: the remote source. Specified in rclone.conf.
+    - `REMOTE_DST`: the remote destination. Specified in rclone.conf.
+    - `EXTRA_ARGS`: extra arguments supplied to Rclone.
 
 5. Deploy cronjob.
     ```
-    kubectl apply -f rclone-cron.yaml -n <target_namespace>
+    kubectl apply -f rclone-cron.yaml -n kube-system
     ```
 
 ## Kubernetes pod
