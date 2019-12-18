@@ -1,0 +1,5 @@
+ES:
+  endpoint: elasticsearch-es-http:9200
+  backupBucketName: {{ requiredEnv "S3_ES_BACKUP_BUCKET_NAME" }}
+kibana:
+  endpoint: kibana-kb-http:5601

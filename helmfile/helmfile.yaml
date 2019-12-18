@@ -234,6 +234,16 @@ releases:
   values:
   - values/fluentd-customer.yaml.gotmpl
 
+- name: configure-es
+  namespace: elastic-system
+  labels:
+    app: elasticsearch
+  chart: ./charts/configure-es
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/init-harbor.yaml.gotmpl
+
 # opa
 - name: opa
   namespace: opa
