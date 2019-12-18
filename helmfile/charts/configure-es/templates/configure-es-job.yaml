@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-job
+spec:
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: run
+          image: elastisys/curl-jq:latest
+          command: ['/bin/sh', '/scripts/configure-es.sh']
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+          env:
+            - name: ES_PW
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-es-elastic-user
+                  key: elastic
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ .Release.Name }}-cm
