@@ -63,6 +63,10 @@ if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
     STATEFULSETS+=("demo prometheus-prometheus")
 fi
+if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
+then
+    STATEFULSETS+=("demo alertmanager-alertmanager")
+fi
 
 echo
 echo

@@ -87,7 +87,7 @@ pipelines:
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - ./scripts/deploy-sc.sh 
+                - ./scripts/deploy-sc.sh
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
                 - kubectl describe nodes
@@ -108,7 +108,7 @@ pipelines:
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
-                - ./scripts/deploy-wc.sh 
+                - ./scripts/deploy-wc.sh
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
               after-script:
@@ -164,7 +164,7 @@ pipelines:
             # Export vault token
             - export VAULT_TOKEN=$(cat vault-token.txt)
             # Revoke vault token and remove secrets
-            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus_client customer_grafana
+            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus_client customer_grafana customer_alertmanager_client
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             - cd terraform/exoscale
             - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
@@ -270,7 +270,7 @@ pipelines:
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
-                - ./scripts/deploy-sc.sh 
+                - ./scripts/deploy-sc.sh
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
               after-script:
@@ -290,7 +290,7 @@ pipelines:
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
-                - ./scripts/deploy-wc.sh 
+                - ./scripts/deploy-wc.sh
                 - kubectl get pods --all-namespaces
                 - kubectl get nodes
               after-script:
@@ -343,7 +343,7 @@ pipelines:
             # Export vault token
             - export VAULT_TOKEN=$(cat vault-token.txt)
             # Revoke vault token and remove secrets
-            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus_client customer_grafana
+            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus_client customer_grafana customer_alertmanager_client
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             - cd terraform/safespring
             - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
