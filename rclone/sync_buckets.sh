@@ -14,5 +14,5 @@ remote_dst="$REMOTE_DST"
 buckets="$BUCKETS_TO_SYNC"
 
 for bucket in $buckets; do
-    rclone "${cmd}" --log-level DEBUG ${extra_args} "${remote_src}:${bucket}" "${remote_dst}:${bucket}"
+    rclone "${cmd}" "${remote_src}:${bucket}" "${remote_dst}:${bucket}" --log-level DEBUG ${extra_args}
 done
