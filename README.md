@@ -282,10 +282,10 @@ export ECK_SC_KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke
 source scripts/post-infra-common.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json
 
 export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/kube_config_eck-sc.yaml
-./scripts/deploy-sc.sh 
+./scripts/deploy-sc.sh
 
 export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/kube_config_eck-wc.yaml
-./scripts/deploy-wc.sh 
+./scripts/deploy-wc.sh
 ```
 
 The option `--interactive` mode can be used when running `deploy-wc/sc.sh` to decide whether or not you want to apply upgrades to helm charts.
@@ -339,9 +339,10 @@ influxdb
 kubelogin_client
 grafana_client
 dashboard_client
-prometheus_client
-customer_prometheus_client
+prometheus
+customer_prometheus
 customer_grafana
+customer_alertmanager
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
 certs/service_cluster/kube-system/certs/helm-key.pem

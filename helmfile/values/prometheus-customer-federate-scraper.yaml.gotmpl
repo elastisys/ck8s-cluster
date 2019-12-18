@@ -40,7 +40,7 @@ scrapeConfig:
       - '{job=~".+"}'
   basic_auth:
     username: prometheus
-    password: {{ requiredEnv "CUSTOMER_PROMETHEUS_CLIENT_SECRET"}}
+    password: {{ requiredEnv "CUSTOMER_PROMETHEUS_PWD"}}
 
   tls_config:
     # Using selfsigned issuer here

@@ -14,11 +14,11 @@ set -e
 : "${ENABLE_PSP:?Missing ENABLE_PSP}"
 : "${CUSTOMER_NAMESPACES:?Missing CUSTOMER_NAMESPACES}"
 : "${CUSTOMER_ADMIN_USERS:?Missing CUSTOMER_ADMIN_USERS}"
-: "${PROMETHEUS_CLIENT_SECRET:?Missing PROMETHEUS_CLIENT_SECRET}"
+: "${PROMETHEUS_PWD:?Missing PROMETHEUS_PWD}"
 : "${ENABLE_CUSTOMER_PROMETHEUS:?Missing ENABLE_CUSTOMER_PROMETHEUS}"
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
-    : "${CUSTOMER_PROMETHEUS_CLIENT_SECRET:?Missing CUSTOMER_PROMETHEUS_CLIENT_SECRET}"
+    : "${CUSTOMER_PROMETHEUS_PWD:?Missing CUSTOMER_PROMETHEUS_PWD}"
 fi
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
@@ -156,7 +156,7 @@ else
 fi
 
 # Create basic auth credentials for accessing workload cluster prometheus
-htpasswd -c -b auth prometheus ${PROMETHEUS_CLIENT_SECRET}
+htpasswd -c -b auth prometheus ${PROMETHEUS_PWD}
 kubectl -n monitoring create secret generic prometheus-auth --from-file=auth --dry-run -o yaml | kubectl apply -f -
 rm auth
 
@@ -305,7 +305,7 @@ then
         kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
         echo "Example prometheus alredy in place. Ignoring."
     # Create basic auth credentials for the customers prometheus instance
-    htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_CLIENT_SECRET}
+    htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_PWD}
     kubectl -n ${CONTEXT_NAMESPACE} create secret generic prometheus-auth --from-file=auth \
         2> /dev/null || echo "Example prometheus auth secret alredy in place. Ignoring."
     rm auth
@@ -328,7 +328,7 @@ then
         --from-file=alertmanager.yaml=${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-config.yaml \
         2> /dev/null || echo "Example alertmanager config secret alredy in place. Ignoring."
     # Create basic auth credentials for the customers alertmanager instance
-    htpasswd -c -b auth alertmanager ${CUSTOMER_ALERTMANAGER_CLIENT_SECRET}
+    htpasswd -c -b auth alertmanager ${CUSTOMER_ALERTMANAGER_PWD}
     kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-auth --from-file=auth \
         2> /dev/null || echo "Example alertmanager auth secret alredy in place. Ignoring."
     rm auth
