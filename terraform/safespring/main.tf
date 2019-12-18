@@ -58,18 +58,17 @@ module "service_cluster" {
   image_id = data.openstack_images_image_v2.ubuntu.id
   key_pair = openstack_compute_keypair_v2.sshkey_sc.id
 
-  #dns_name = "${var.dns_prefix}-sc"
-  dns_list  = [ 
-                "*.ops.${var.dns_prefix}",
-                "grafana.${var.dns_prefix}",
-                "harbor.${var.dns_prefix}",
-                "dex.${var.dns_prefix}",
-                "kibana.${var.dns_prefix}"
-              ]
+  dns_list = [
+    "*.ops.${var.dns_prefix}",
+    "grafana.${var.dns_prefix}",
+    "harbor.${var.dns_prefix}",
+    "dex.${var.dns_prefix}",
+    "kibana.${var.dns_prefix}"
+  ]
 
   master_flavor_id = data.openstack_compute_flavor_v2.b_medium.id
   worker_flavor_id = data.openstack_compute_flavor_v2.b_large.id
-  nfs_flavor_id = data.openstack_compute_flavor_v2.b_small.id
+  nfs_flavor_id    = data.openstack_compute_flavor_v2.b_small.id
   nfs_storage_size = 50
 }
 
@@ -84,11 +83,13 @@ module "workload_cluster" {
   image_id = data.openstack_images_image_v2.ubuntu.id
   key_pair = openstack_compute_keypair_v2.sshkey_wc.id
 
-  dns_list = ["*.${var.dns_prefix}"]
- # dns_name = "${var.dns_prefix}-wc"
+  dns_list = [
+    "*.${var.dns_prefix}",
+    "prometheus.ops.${var.dns_prefix}"
+  ]
 
   master_flavor_id = data.openstack_compute_flavor_v2.b_medium.id
   worker_flavor_id = data.openstack_compute_flavor_v2.b_large.id
-  nfs_flavor_id = data.openstack_compute_flavor_v2.b_small.id
+  nfs_flavor_id    = data.openstack_compute_flavor_v2.b_small.id
   nfs_storage_size = 50
 }

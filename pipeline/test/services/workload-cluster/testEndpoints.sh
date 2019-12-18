@@ -6,10 +6,10 @@ echo
 echo "Testing endpoints"
 echo "=================="
 
-testEndpoint Prometheus-wc https://prometheus.${ECK_BASE_DOMAIN}/ prometheus:${PROMETHEUS_PWD}
+testEndpoint Prometheus-wc https://prometheus.${ECK_OPS_DOMAIN}/ prometheus:${PROMETHEUS_PWD}
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
-    testEndpoint Prometheus-customer https://scrape.${ECK_BASE_DOMAIN}/ prometheus:${CUSTOMER_PROMETHEUS_PWD}
+    testEndpoint Prometheus-customer https://prometheus.${ECK_BASE_DOMAIN}/ prometheus:${CUSTOMER_PROMETHEUS_PWD}
 fi
 if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
 then

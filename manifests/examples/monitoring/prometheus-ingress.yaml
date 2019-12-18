@@ -14,7 +14,7 @@ metadata:
   name: prometheus
 spec:
   rules:
-  - host: scrape.${ECK_BASE_DOMAIN}
+  - host: prometheus.${ECK_BASE_DOMAIN}
     http:
       paths:
       - backend:
@@ -24,5 +24,5 @@ spec:
         path: /
   tls:
   - hosts:
-    - scrape.${ECK_BASE_DOMAIN}
+    - prometheus.${ECK_BASE_DOMAIN}
     secretName: prometheus-certs

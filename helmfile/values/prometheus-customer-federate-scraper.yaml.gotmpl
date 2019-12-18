@@ -50,4 +50,4 @@ scrapeConfig:
     - labels:
         cluster: workload_cluster
       targets:
-        - scrape.{{ requiredEnv "ECK_BASE_DOMAIN"}}
+        - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}

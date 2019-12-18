@@ -65,7 +65,7 @@ scrapeConfig:
     - labels:
         cluster: workload_cluster
       targets:
-      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
+      - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
 
 - job_name: 'federate-others'
   scrape_interval: 30s
@@ -96,4 +96,4 @@ scrapeConfig:
     - labels:
         cluster: workload_cluster
       targets:
-      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
+      - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
