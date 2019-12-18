@@ -1,3 +1,4 @@
+# https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheus
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
@@ -26,3 +27,10 @@ spec:
   # externalLabels:
   #   # Add labels you want to add to all metrics
   #   cluster: workload_cluster
+  alerting:
+    alertmanagers:
+    # https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#alertmanagerendpoints
+    - name: alertmanager-operated
+      namespace: ${CONTEXT_NAMESPACE}
+      pathPrefix: /
+      port: web
