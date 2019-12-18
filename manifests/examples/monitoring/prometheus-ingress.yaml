@@ -14,15 +14,15 @@ metadata:
   name: prometheus
 spec:
   rules:
-  - host: scrape.${ECK_WC_DOMAIN}
+  - host: scrape.${ECK_BASE_DOMAIN}
     http:
       paths:
       - backend:
           # This service is created automatically by the operator
           serviceName: prometheus-operated
-          servicePort: 9090
+          servicePort: web
         path: /
   tls:
   - hosts:
-    - scrape.${ECK_WC_DOMAIN}
+    - scrape.${ECK_BASE_DOMAIN}
     secretName: prometheus-certs

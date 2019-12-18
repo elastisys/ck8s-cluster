@@ -293,10 +293,10 @@ then
     # This Prometheus instance could be added just as we do with other prometheus
     # instances in the service cluster using helm, but then we risk overwriting
     # customer changes.
-    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/rbac.yaml | \
+    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus-rbac.yaml | \
         kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
         echo "Example prometheus RBAC alredy in place. Ignoring."
-    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/ingress.yaml | \
+    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus-ingress.yaml | \
         kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
         echo "Example ingress alredy in place. Ignoring."
     kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
@@ -314,13 +314,22 @@ fi
 if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
 then
     # Use `kubectl create` to avoid overwriting customer changes
+    kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
+        2> /dev/null || echo "Example issuer alredy in place. Ignoring."
     kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-instance.yaml \
         2> /dev/null || echo "Example alertmanager alredy in place. Ignoring."
+    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-ingress.yaml | \
+        kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
+        echo "Example ingress alredy in place. Ignoring."
     # Create alertmanager config secret
     # Note that the name must match alertmanager-{ALERTMANAGER_NAME}
     # See https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/alerting.md
     kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-alertmanager \
-        --from-file=${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager.yaml \
+        --from-file=alertmanager.yaml=${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-config.yaml \
         2> /dev/null || echo "Example alertmanager config secret alredy in place. Ignoring."
+    # Create basic auth credentials for the customers alertmanager instance
+    htpasswd -c -b auth alertmanager ${CUSTOMER_ALERTMANAGER_CLIENT_SECRET}
+    kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-auth --from-file=auth \
+        2> /dev/null || echo "Example alertmanager auth secret alredy in place. Ignoring."
     rm auth
 fi

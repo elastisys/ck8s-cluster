@@ -11,6 +11,7 @@ env_vars=(
     ["customer_prometheus_client"]="CUSTOMER_PROMETHEUS_CLIENT_SECRET"
     ["customer_grafana"]="CUSTOMER_GRAFANA_PWD"
     ["elasticsearch-es-elastic-user"]="ELASTIC_USER_SECRET"
+    ["customer_alertmanager_client"]="CUSTOMER_ALERTMANAGER_CLIENT_SECRET"
 )
 
 for key in ${!env_vars[@]}
