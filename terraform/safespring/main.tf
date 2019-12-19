@@ -69,7 +69,7 @@ module "service_cluster" {
   master_flavor_id = data.openstack_compute_flavor_v2.b_medium.id
   worker_flavor_id = data.openstack_compute_flavor_v2.b_large.id
   nfs_flavor_id    = data.openstack_compute_flavor_v2.b_small.id
-  nfs_storage_size = 50
+  nfs_storage_size = var.sc_nfs_storage_size
 }
 
 module "workload_cluster" {
@@ -91,5 +91,5 @@ module "workload_cluster" {
   master_flavor_id = data.openstack_compute_flavor_v2.b_medium.id
   worker_flavor_id = data.openstack_compute_flavor_v2.b_large.id
   nfs_flavor_id    = data.openstack_compute_flavor_v2.b_small.id
-  nfs_storage_size = 50
+  nfs_storage_size = var.wc_nfs_storage_size
 }

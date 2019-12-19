@@ -27,6 +27,12 @@ variable sc_worker_count {
   default     = 2
 }
 
+variable "sc_nfs_storage_size" {
+  description = "The size in GB of the NFS server block volume."
+  type        = number
+  default     = 50
+}
+
 variable wc_master_count {
   description = "The number of master nodes that should be created."
   type        = number
@@ -37,4 +43,10 @@ variable wc_worker_count {
   description = "The number of worker nodes that should be created."
   type        = number
   default     = 1
+}
+
+variable "wc_nfs_storage_size" {
+  description = "The size in GB of the NFS server block volume."
+  type        = number
+  default     = 50
 }
