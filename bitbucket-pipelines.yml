@@ -125,7 +125,7 @@ pipelines:
                 # Export passwords
                 - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - source ./scripts/common.sh
+                - source ./scripts/post-infra-common.sh infra.json
                 # Tests
                 - ./pipeline/test/services/test-sc.sh
               after-script:
@@ -137,7 +137,7 @@ pipelines:
                 - source pipeline/init-exoscale.sh
                 - source pipeline/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
-                - source ./scripts/common.sh
+                - source ./scripts/post-infra-common.sh infra.json
                 # Export vault variables
                 - source pipeline/vault-variables.sh
                 # Export vault token
@@ -301,7 +301,7 @@ pipelines:
                 # Export passwords for services
                 - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - source ./scripts/common.sh
+                - source ./scripts/post-infra-common.sh infra.json
                 # Tests
                 - ./pipeline/test/services/test-sc.sh
               after-script:
@@ -313,7 +313,7 @@ pipelines:
                 - source pipeline/init-safespring.sh
                 - source pipeline/variables.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
-                - source ./scripts/common.sh
+                - source ./scripts/post-infra-common.sh infra.json
                 # Services
                 - ./pipeline/test/services/test-wc.sh
               after-script:

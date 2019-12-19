@@ -3,16 +3,6 @@
 set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-source "${SCRIPTS_PATH}/common.sh"
-
-
-if [[ "$#" -lt 1 ]]
-then
-  >&2 echo "Usage: deploy-sc.sh path-to-infra-file <--interactive>"
-  exit 1
-fi
-
-infra="$1"
 
 # General aws S3 cli variables.
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
@@ -64,19 +54,10 @@ then
     : "${S3_ES_BACKUP_BUCKET_NAME:?Missing S3_ES_BACKUP_BUCKET_NAME}"
 fi
 
-if [ $CLOUD_PROVIDER == "exoscale" ]
-then
-export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_ip_address')
-elif [ $CLOUD_PROVIDER == "safespring" ]
-then
-export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_private_ip_address')
-fi
-
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
-INTERACTIVE=${2:-""}
-
+INTERACTIVE=${1:-""}
 
 # NAMESPACES
 NAMESPACES="cert-manager elastic-system dex nfs-provisioner influxdb-prometheus monitoring ck8sdash"

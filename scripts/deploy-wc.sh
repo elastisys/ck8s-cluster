@@ -23,28 +23,7 @@ fi
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
-source "${SCRIPTS_PATH}/common.sh"
-
-if [[ "$#" -lt 1 ]]
-then
-  >&2 echo "Usage: deploy-wc.sh path-to-infra-file <--interactive>"
-  exit 1
-fi
-
-infra="$1"
-
-if [ $CLOUD_PROVIDER == "exoscale" ]
-then
-export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_ip_address')
-elif [ $CLOUD_PROVIDER == "safespring" ]
-then
-export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_private_ip_address')
-fi
-
-# Arg for Helmfile to be interactive so that one can decide on which releases
-# to update if changes are found.
-# USE: --interactive, default is not interactive.
-INTERACTIVE=${2:-""}
+INTERACTIVE=${1:-""}
 
 # NAMESPACES
 NAMESPACES="cert-manager falco monitoring fluentd ck8sdash"
