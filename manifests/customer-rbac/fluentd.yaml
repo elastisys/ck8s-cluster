@@ -16,6 +16,7 @@ rules:
   - ""
   resourceNames:
   - fluentd-extra-config
+  - fluentd-extra-plugins
   resources:
   - configmaps
   verbs:
