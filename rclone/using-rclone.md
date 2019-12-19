@@ -24,11 +24,11 @@ Currently the following buckets are synced **from** the safespring S3 endpoint `
 
 The buckets are synced at 5 AM UTC every day.
 
-A Kubernetes cronjob called `sync-buckets` is running in the service cluster. The job executes the `rclone sync` command for all above listed buckets.
+A Kubernetes cronjob called `sync-buckets` is running in the service cluster in the namespace `kube-system`. The job executes the `rclone sync` command for all above listed buckets.
 
 ### How do i verify this?
 
-You can look at the status of the pod that was created by the job. If successful the status should say `completed`. You can also look at the output from Rclone by looking at the output from the pod using `kubectl logs ...`
+You can look at the status of the pod that was created by the job. If successful the status should say `completed`. You can also look at the output from Rclone by looking at the output from the pod using `kubectl -n kube-system logs sync-buckets-...`
 
 
 # Setup
@@ -56,6 +56,7 @@ You can look at the status of the pod that was created by the job. If successful
     ```
 
 4. Check that the fields in `rclone-cron.yaml` are correct, if not update them accordingly. Pay special attention to.
+
     ```
     ...
     env:
@@ -69,6 +70,7 @@ You can look at the status of the pod that was created by the job. If successful
       value: "--progress"
     ...
     ```
+
 
     - `BUCKETS_TO_SYNC`: the names of the buckets that are to be synced.
     - `REMOTE_SRC`: the remote source. Specified in rclone.conf.
@@ -91,4 +93,4 @@ Also consider using `--dry-run` to see what will be copied and deleted by adding
     - name: EXTRA_ARGS
       value: "--progress"
 ```
-in the pod manifest `rclone-pod`.
+in the pod manifest `rclone-pod.yaml`.
