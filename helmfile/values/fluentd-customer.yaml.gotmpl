@@ -365,12 +365,19 @@ extraVolumes:
     secret:
       defaultMode: 420
       secretName: template-secret
+  - name: fluentd-extra-plugins
+    configMap:
+      defaultMode: 420
+      name: fluentd-extra-plugins
 extraVolumeMounts:
   - name: extra-config
     mountPath: /etc/fluent/extra-config.d
     readOnly: true
   - name: template-secret
     mountPath: /etc/templates/
+    readOnly: true
+  - name: fluentd-extra-plugins
+    mountPath: /etc/fluent/plugin
     readOnly: true
 
 # Only run on worker nodes

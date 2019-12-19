@@ -311,6 +311,8 @@ done
 # customer may have done.
 kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml \
     2> /dev/null || echo "fluentd-extra-config configmap already in place. Ignoring."
+kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml \
+    2> /dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring."
 
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
