@@ -15,6 +15,11 @@ spec:
             app: sync-buckets
         spec:
           restartPolicy: Never
+          tolerations:
+          - key: "nodeType"
+            operator: "Equal"
+            value: "elastisys"
+            effect: "NoSchedule"
           volumes:
           - name: rclone-config
             secret:
