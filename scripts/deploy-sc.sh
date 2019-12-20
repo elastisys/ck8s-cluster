@@ -308,7 +308,7 @@ then
     exit 1
 fi
 
-curl -kL -X POST "kibana.${ECK_OPS_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
+curl -kL -X POST "kibana.${ECK_BASE_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
     --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ELASTIC_USER_SECRET}
 
 # Restore InfluxDB from backup
