@@ -24,18 +24,18 @@ Currently the following buckets are synced **from** the safespring S3 endpoint `
 
 The buckets are synced at 5 AM UTC every day.
 
-A Kubernetes cronjob called `sync-buckets` is running in the service cluster in the namespace `kube-system`. The job executes the `rclone sync` command for all above listed buckets.
+For each bucket there is a Kubernetes cronjob `sync-<name of bucket>` running in the service cluster in the namespace `kube-system`. The jobs executes the `rclone sync` command.
 
 ### How do i verify this?
 
-You can look at the status of the pod that was created by the job. If successful the status should say `completed`. You can also look at the output from Rclone by looking at the output from the pod using `kubectl -n kube-system logs sync-buckets-...`
+You can look at the status of the pods that was created by the jobs. If successful the status should say `completed`. You can also look at the output from Rclone by looking at the output from the pod using `kubectl -n kube-system logs sync-<name of bucket>-...`
 
 
 # Setup
 
 **A word of warning:** since syncing can cause unintentional data loss, make sure that the configuration is correct not just once but at the very least twice. Also consider adding the `--dry-run` flag when you first set things up!
 
-## Kubernetes cronjob
+## Kubernetes cronjobs
 
 1. Set the required environment variables to access `osl1` and `sto2` S3 region endpoints.
     ```
@@ -44,6 +44,7 @@ You can look at the status of the pod that was created by the job. If successful
     export STO2_ACCESS_KEY_ID=
     export STO2_SECRET_ACCESS_KEY_ID=
     ```
+    These are the only environment variable nessecary. The rest of the configuration has to be done manually!
 
 2. Verify rclone configuration specified in `rclone.conf`. For all possible fields see https://rclone.org/s3/
 
@@ -55,42 +56,25 @@ You can look at the status of the pod that was created by the job. If successful
         rm rclone.conf.tmp
     ```
 
-4. Check that the fields in `rclone-cron.yaml` are correct, if not update them accordingly. Pay special attention to.
+4. Modify the following fields in `setup-sync-cronjobs.sh`.
 
     ```
-    ...
-    env:
-    - name: BUCKETS_TO_SYNC
-      value: "test-clone1 test-clone2"
-    - name: REMOTE_SRC
-      value: "safespring-sto2"
-    - name: REMOTE_DST
-      value: "safespring-osl1"
-    - name: EXTRA_ARGS
-      value: "--progress"
-    ...
+    # When should the jobs run?
+    schedule='"0 5 * * *"'
+    # What is the remote source?
+    remote_src="safespring-sto2"
+    # What is the remote destination?
+    remote_dst="safespring-osl1"
+    # What buckets should be synced?
+    buckets="psql-tempus-safespring-ck8s influxdb-tempus-safespring-ck8s elasticsearch-tempus-safespring-ck8s velero-tempus-safespring-ck8s"
     ```
 
-
-    - `BUCKETS_TO_SYNC`: the names of the buckets that are to be synced.
-    - `REMOTE_SRC`: the remote source. Specified in rclone.conf.
-    - `REMOTE_DST`: the remote destination. Specified in rclone.conf.
-    - `EXTRA_ARGS`: extra arguments supplied to Rclone.
-
-5. Deploy cronjob.
+5. Deploy cronjobs.
     ```
-    kubectl apply -f rclone-cron.yaml -n kube-system
+    ./setup-sync-cronjobs.sh
     ```
 
 ## Kubernetes pod
 
-To quickly test to see if the configuration is correct or to force a sync you can start a kubernetes pod that will run immediatley. The steps are the same as that for the deployment of the cronjob but you have to make sure that the configuration is up-to date.
-
-Also consider using `--dry-run` to see what will be copied and deleted by adding the flag to 
-```
-  env:
-    ...
-    - name: EXTRA_ARGS
-      value: "--progress"
-```
-in the pod manifest `rclone-pod.yaml`.
+To quickly test to see if the configuration is correct or to force a sync you can start a kubernetes pod that will run immediatley. The steps are the same as that for the deployment of the cronjobs. Run the following to deploy pods `./setup-sync-cronjobs.sh pod`.
+Consider adding the flag `--dry-run` to see what will be copied and removed.

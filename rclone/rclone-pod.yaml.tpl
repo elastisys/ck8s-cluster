@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: sync-buckets
+  name: sync-$BUCKET_TO_SYNC
   labels:
-    app: sync-buckets
+    app: sync-$BUCKET_TO_SYNC
 spec:
   restartPolicy: Never     
   tolerations:
@@ -17,16 +17,9 @@ spec:
       secretName: rclone-config
   containers:
   - name: rclone
-    image: elastisys/rclone-sync:1.0.0
-    env:
-    - name: BUCKETS_TO_SYNC
-      value: "psql-tempus-safespring-ck8s influxdb-tempus-safespring-ck8s elasticsearch-tempus-safespring-ck8s velero-tempus-safespring-ck8s"
-    - name: REMOTE_SRC
-      value: "safespring-sto2"
-    - name: REMOTE_DST
-      value: "safespring-osl1"
-    - name: EXTRA_ARGS
-      value: "--progress"
+    image: elastisys/rclone-sync:1.1.0
+    command: ["rclone"]
+    args: $RCLONE_ARGS
     volumeMounts:
     - name: rclone-config
       mountPath: /root/.config/rclone/

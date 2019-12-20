@@ -12,6 +12,3 @@ RUN curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
     cp rclone /usr/bin/ && \
     chown root:root /usr/bin/rclone && \
     chmod 755 /usr/bin/rclone
-
-COPY sync_buckets.sh /
-CMD ["./sync_buckets.sh"]
