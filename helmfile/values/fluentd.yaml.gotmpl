@@ -7,10 +7,10 @@ elasticsearch:
     password: ""
   host: elastic.{{ requiredEnv "ECK_OPS_DOMAIN" }}
   sslVerify: {{ requiredEnv "TLS_VERIFY" }}
-  logLevel: "debug"
+  logLevel: "info"
 
 # Default args include "-q" which sets loglevel to warning.
-fluentdArgs: "--no-supervisor"
+fluentdArgs: "--no-supervisor -q"
 configMaps:
   useDefaults:
     systemConf: false

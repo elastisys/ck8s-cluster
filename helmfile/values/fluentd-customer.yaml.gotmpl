@@ -7,10 +7,8 @@ elasticsearch:
     password: ""
   host: elastic.{{ requiredEnv "ECK_OPS_DOMAIN" }}
   sslVerify: {{ requiredEnv "TLS_VERIFY" }}
-  logLevel: "debug"
+  logLevel: "info"
 
-# Default args include "-q" which sets loglevel to warning.
-fluentdArgs: "--no-supervisor"
 configMaps:
   useDefaults:
     systemConf: false
@@ -29,7 +27,7 @@ additionalPlugins:
   #New version due to https://github.com/fluent/fluent-plugin-prometheus/issues/119
   #default: gem 'fluent-plugin-prometheus', '~>1.4.0'
 - name: fluent-plugin-prometheus
-  version: 1.6.1 
+  version: 1.6.1
   #Required for ilm features
 - name: elasticsearch-xpack
   version: 7.4

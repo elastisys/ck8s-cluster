@@ -22,7 +22,9 @@ then
 fi
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-
+# Arg for Helmfile to be interactive so that one can decide on which releases
+# to update if changes are found.
+# USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
 # NAMESPACES
@@ -183,8 +185,12 @@ fi
 
 
 # FLUENTD
-kubectl -n kube-system create secret generic template-secret --from-file=../manifests/other_template  --from-file=../manifests/kubecomponents_template  --from-file=../manifests/kubeaudit_template  --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
-kubectl -n fluentd create secret generic template-secret --from-file=../manifests/other_template  --from-file=../manifests/kubecomponents_template  --from-file=../manifests/kubeaudit_template  --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
+kubectl -n kube-system create secret generic template-secret --from-file=../manifests/other_template \
+    --from-file=../manifests/kubecomponents_template --from-file=../manifests/kubeaudit_template \
+    --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
+kubectl -n fluentd create secret generic template-secret --from-file=../manifests/other_template \
+    --from-file=../manifests/kubecomponents_template --from-file=../manifests/kubeaudit_template \
+    --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
 
 while [[ $(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get elasticsearches.elasticsearch.k8s.elastic.co -n elastic-system elasticsearch -o 'jsonpath={.status.health}') != "green" ]]
 do
