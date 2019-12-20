@@ -61,6 +61,7 @@ export ENABLE_OPA="<true|false>" # default true
 export ENABLE_CUSTOMER_PROMETHEUS="<true|false>" # default false
 export ENABLE_CUSTOMER_GRAFANA="<true|false>" # default true
 export ENABLE_CUSTOMER_ALERTMANAGER="<true|false>" # default false
+export ENABLE_CUSTOMER_ALERTMANAGER_INGRESS="<true|false>" # default false
 
 # Identity providers
 export AAA_CLIENT_ID=1234

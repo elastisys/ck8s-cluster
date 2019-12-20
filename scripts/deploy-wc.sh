@@ -318,18 +318,22 @@ then
         2> /dev/null || echo "Example issuer alredy in place. Ignoring."
     kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-instance.yaml \
         2> /dev/null || echo "Example alertmanager alredy in place. Ignoring."
-    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-ingress.yaml | \
-        kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
-        echo "Example ingress alredy in place. Ignoring."
-    # Create alertmanager config secret
-    # Note that the name must match alertmanager-{ALERTMANAGER_NAME}
-    # See https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/alerting.md
-    kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-alertmanager \
-        --from-file=alertmanager.yaml=${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-config.yaml \
-        2> /dev/null || echo "Example alertmanager config secret alredy in place. Ignoring."
-    # Create basic auth credentials for the customers alertmanager instance
-    htpasswd -c -b auth alertmanager ${CUSTOMER_ALERTMANAGER_PWD}
-    kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-auth --from-file=auth \
-        2> /dev/null || echo "Example alertmanager auth secret alredy in place. Ignoring."
-    rm auth
+
+    if [ $ENABLE_CUSTOMER_ALERTMANAGER_INGRESS == "true" ]
+    then
+        envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-ingress.yaml | \
+            kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
+            echo "Example ingress alredy in place. Ignoring."
+        # Create alertmanager config secret
+        # Note that the name must match alertmanager-{ALERTMANAGER_NAME}
+        # See https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/alerting.md
+        kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-alertmanager \
+            --from-file=alertmanager.yaml=${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-config.yaml \
+            2> /dev/null || echo "Example alertmanager config secret alredy in place. Ignoring."
+        # Create basic auth credentials for the customers alertmanager instance
+        htpasswd -c -b auth alertmanager ${CUSTOMER_ALERTMANAGER_PWD}
+        kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-auth --from-file=auth \
+            2> /dev/null || echo "Example alertmanager auth secret alredy in place. Ignoring."
+        rm auth
+    fi
 fi
