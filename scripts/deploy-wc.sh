@@ -192,21 +192,11 @@ do
     sleep 2
 done
 
-# Get elastisearch password from service_cluster cluster
-ES_PW=$(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
-
-while [ -z "$ES_PW" ]
-do
-    echo "Waiting for elasticsearch password"
-    sleep 5
-    ES_PW=$(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
-done
-echo "Got elsticsearch password"
 
 kubectl -n kube-system create secret generic elasticsearch \
-    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
+    --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 kubectl -n fluentd create secret generic elasticsearch \
-    --from-literal=password="${ES_PW}" --dry-run -o yaml | kubectl apply -f -
+    --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 
 # Install fluentd
 helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply

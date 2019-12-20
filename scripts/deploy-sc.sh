@@ -283,16 +283,15 @@ done
 
 
 
-export ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 envsubst < ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch-curator.yaml | kubectl -n elastic-system apply -f -
 
 curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_snapshot/s3_backup_repository?pretty" \
     -H 'Content-Type: application/json' \
     -d' {"type": "s3", "settings":{ "bucket": "'"${S3_ES_BACKUP_BUCKET_NAME}"'", "client": "default"}}' \
-    -k -u elastic:${ES_PW}
+    -k -u elastic:${ELASTIC_USER_SECRET}
 curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_cluster/settings?pretty" \
     -H 'Content-Type: application/json' \
-    -k -u elastic:${ES_PW} \
+    -k -u elastic:${ELASTIC_USER_SECRET} \
     -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'\
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
@@ -309,7 +308,7 @@ then
 fi
 
 curl -kL -X POST "kibana.${ECK_OPS_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
-    --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ES_PW}
+    --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ELASTIC_USER_SECRET}
 
 # Restore InfluxDB from backup
 if [[ $ECK_RESTORE_CLUSTER != "false" ]]

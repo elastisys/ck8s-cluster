@@ -197,7 +197,7 @@ data:
       port: 9200
       use_ssl: True 
       ssl_no_validate: True
-      http_auth: elastic:$ES_PW
+      http_auth: elastic:$ELASTIC_USER_SECRET
       timeout: 30
       master_only: False
     logging:
