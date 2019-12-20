@@ -44,8 +44,7 @@ Log in to the services using the same identity provider you specified earlier as
   Log in using a temporary password that you can change later.
 - **Harbor** URL: https://harbor.CK8S_DOMAIN
 - **Grafana** URL: https://grafana.CK8S_DOMAIN
-- **Prometheus** URL: TODO
-- **Alertmanager** URL: TODO
+- **Prometheus** URL: https://prometheus.CK8S_DOMAIN
 
 ### Fluentd
 
@@ -89,7 +88,7 @@ You can use a Custom Resource called [ServiceMonitor](https://github.com/coreos/
 The API reference for ServiceMonitors is available [here](https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#servicemonitor).
 A simple example is provided here below:
 
-```
+```yaml
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -121,6 +120,38 @@ kubectl edit prometheuses prometheus
 Note that if you do not filter the ServiceMonitors in any way, you may end up scraping metrics from some system resources.
 To keep the number of metrics (and the storage capacity they require) down, we recommend that you keep the default `serviceMonitorSelector` setting.
 
+#### Prometheus alerts
+
+Prometheus can send out alerts based on the collected metrics.
+It can also combine or manipulate the raw data to get more useful, high level metrics.
+This is done by providing Prometheus with configuration in the form of CustomResources named [PrometheusRules](https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheusrule).
+There are two types of PrometheusRules: [recording rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/).
+Here is an example:
+
+```yaml
+# See https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#prometheusrule
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: example
+  labels:
+    app: prometheus
+spec:
+  groups:
+  - name: example
+    rules:
+    - alert: ExampleApplicationMemoryHigh
+      annotations:
+        message: The example application is using a lot of memory!
+      # Fire the alert when this expression evaluates to true.
+      expr: jvm_memory_bytes_used{area="heap",service="custom-jar-service"} > 20000000
+      for: 1m
+      labels:
+        severity: example
+```
+
+Note that Prometheus picks up these rules based on the `ruleSelector`, by default set to match the labels `app: prometheus`.
+
 #### Federation
 
 For redundancy, the metrics collected by this Prometheus instance are also federated to a separate Prometheus instance with a more durable storage backend.
@@ -131,6 +162,89 @@ If you remove or change this Ingress or the authentication credentials you risk 
 #### Grafana integration
 
 Grafana has access to the redundancy Prometheus and can be used to graph any metrics that are federated.
+
+### Alert using Alertmanager
+
+The Prometheus operator included in Compliant Kubernetes can also handle Alertmanager instances.
+A default instance is included as an example (see `kubectl get alertmanagers`).
+The [Alertmanager documentation](https://prometheus.io/docs/alerting/alertmanager/) and [Prometheus operator alerting documentation](https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/alerting.md) contains more details on how to configure and use Alertmanager.
+Note that alerts are configured through Prometheus, Alertmanager just aggregates and sends out notifications.
+
+You may change or delete the default Alertmanager instance or add a new if you wish.
+Here is an example:
+
+```yaml
+# See https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#alertmanager
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  name: alertmanager
+  labels:
+    app: alertmanager
+spec:
+  replicas: 1
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+```
+
+Alertmanager is configured using a [configuration file](https://prometheus.io/docs/alerting/configuration/).
+Here is an example configuration file for Alertmanager:
+
+```yaml
+# Note: Alertmanager instances require the secret resource naming to follow
+# the format alertmanager-{ALERTMANAGER_NAME}.
+# This config should be stored in a secret with a proper name to be picked
+# up by your alertmanager instance. The name of the file in the secret
+# must be `alertmanager.yaml`.
+#
+# See  the following URL for more details on how to configure alertmanager
+# https://prometheus.io/docs/alerting/configuration/
+global:
+  resolve_timeout: 5m
+route:
+  group_by: ['job']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  # Default receiver
+  receiver: slack
+  # Specify other receivers depending on match
+  routes:
+  - match:
+      # Send a specific alert to another receiver.
+      alertname: bad-alert
+    receiver: 'null'
+receivers:
+- name: 'null'
+- name: slack
+  slack_configs:
+  # Note: the channel here does not apply if the webhook URL is for a specific channel
+  - channel: notifications
+    # Webhook URL for slack, see https://api.slack.com/apps/
+    api_url: https://alertmanagerwebhook.example.com
+    # Do you want only alerts firing or also alerts resolved?
+    send_resolved: true
+    # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
+    text: "You have an alert! {{ .CommonAnnotations.summary }}"
+```
+
+To configure the Alertmanager instance, store the file as `alertmanager.yaml` and create a Secret from it named `alertmanager-{ALERTMANAGER_NAME}`, where `{ALERTMANAGER_NAME}` is the name of the Alertmanager instance.
+Use kubectl to create the secret like this: `kubectl create secret generic alertmanager-{ALERTMANAGER_NAME} --from-file=alertmanager.yaml`.
+Note that it is important that the file is named `alertmanager.yaml` and that the Secret is named according to the instructions for Alertmanager to pick it up.
+
+#### Alerts from Grafana
+
+Grafana can be configured to send alerts to Alertmanager.
+For this to work, the Alertmanager instance must be exposed for example using an Ingress.
+
+Configure Grafana by going to *Alerting > Notification channels* and adding a new channel.
+Pick *Prometheus Alertmanager* as Type and enter the URL of your exposed Alertmanager instance.
+
+*Hint:* You can configure the Alertmanager Ingress with basic authentication to protect it.
+If you do this, remember to add the username and password to the URL you configure in Grafana, like this: `https://username:password@alertmanager.example.com`.
+Note that the certificate used for TLS will need to be trusted by Grafana for this to work, so self-signed certificates will not work.
 
 ### Persistent storage
 
@@ -163,4 +277,3 @@ If you are having issues with your cluster or questions about how things work, r
 
 - Falco: Customers should be able to set up notifications and maybe also change/add rules to falco.
 - Fluentd/Elasticsearch/Kibana: Customers may need to parse application logs in specific ways.
-- Alertmanager: Customers may want to define their own alerts and configure where notifications go.

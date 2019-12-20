@@ -207,7 +207,7 @@ ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_wc
 You can now choose how you want to manage passwords and other credentials.
 Either generate them automatically and store them in Vault or create them manually and add to your `env.sh` file.
 
-If you don't want to use vault, you need to set passwords using these environment variables: `HARBOR_PWD`, `GRAFANA_PWD INFLUXDB_PWD`, `KUBELOGIN_CLIENT_SECRET`, `GRAFANA_CLIENT_SECRET`.
+If you don't want to use vault, you need to set passwords using these environment variables: `HARBOR_PWD`, `GRAFANA_PWD INFLUXDB_PWD`, `KUBELOGIN_CLIENT_SECRET`, `GRAFANA_CLIENT_SECRET`, `PROMETHEUS_PWD`, `CUSTOMER_PROMETHEUS_PWD`, `CUSTOMER_ALERTMANAGER_PWD`.
 Add them to your `env.sh` file and run `source env.sh` again to load them.
 
 If you want to use Vault, do this instead:

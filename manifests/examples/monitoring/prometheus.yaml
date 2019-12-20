@@ -16,6 +16,9 @@ spec:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
+  ruleSelector:
+    matchLabels:
+      app: prometheus
   serviceMonitorSelector:
     matchLabels:
       scrape: "true"
