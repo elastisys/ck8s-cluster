@@ -238,34 +238,12 @@ do
     sleep 2
 done
 
-
-
 envsubst < ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch-curator.yaml | kubectl -n elastic-system apply -f -
-
-curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_snapshot/s3_backup_repository?pretty" \
-    -H 'Content-Type: application/json' \
-    -d' {"type": "s3", "settings":{ "bucket": "'"${S3_ES_BACKUP_BUCKET_NAME}"'", "client": "default"}}' \
-    -k -u elastic:${ELASTIC_USER_SECRET}
-curl -X PUT "https://elastic.${ECK_OPS_DOMAIN}/_cluster/settings?pretty" \
-    -H 'Content-Type: application/json' \
-    -k -u elastic:${ELASTIC_USER_SECRET} \
-    -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'\
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
 
 #install elasticsearch-prometheus-exporter
 helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply
-
-# Adding dashboards to kibana
-echo "Waiting until kibana is ready"
-
-if ! kubectl rollout status -n elastic-system deployment kibana-kb --timeout=5m
-then
-    exit 1
-fi
-
-curl -kL -X POST "kibana.${ECK_BASE_DOMAIN}/api/saved_objects/_import" -H "kbn-xsrf: true" \
-    --form file=@${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana-dashboards.ndjson -u elastic:${ELASTIC_USER_SECRET}
 
 # Restore InfluxDB from backup
 if [[ $ECK_RESTORE_CLUSTER != "false" ]]
