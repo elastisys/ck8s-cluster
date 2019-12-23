@@ -1,3 +1,7 @@
+# Incidents
+
+This document describes incidents that we have encountered.
+The goal is to be able to learn, spread knowledge and avoid problems in the future.
 
 ## 2019-12-19 - Website workload cluster
 
@@ -7,7 +11,7 @@ The kubernetes master components was up and running. The kubelet on the worker n
 
 ### What was the likley cause for the cluster state
 
-All master components and the kublet on both the master and worker nodes were up and running. Looking at logs did not give any decisive answer but after a while we came to the conclusion that the reason for the connection timeout when the kubelet was trying to talk to the kube-apiserver was because of the network component `canal` being evicted from the master node. 
+All master components and the kublet on both the master and worker nodes were up and running. Looking at logs did not give any decisive answer but after a while we came to the conclusion that the reason for the connection timeout when the kubelet was trying to talk to the kube-apiserver was because of the network component `canal` being evicted from the master node.
 
 Our suspicions fell onto OPA that we thought might be the culprit denying requests to the apiserver. While fetching the available `validating admissionWebhooks` we saw that there was an error trying to get Cert-manager's webhook. We deleted both webhooks and the cluster returned to its normal state.
 
