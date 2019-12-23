@@ -104,3 +104,6 @@ export OTHER_RETENTION_SIZE=1 #SIZE in GB when other logs should be removed for 
 export OTHER_RETENTION_AGE=10 #AGE in days when other logs should be removed for index 'other'
 export ROLLOVER_SIZE=1 #SIZE in GB when indices should perform rollover
 export ROLLOVER_AGE=1 #AGE in days when indices should perform rollover
+
+export INFLUXDB_RETENTION_WC=7d # Retention policy for influxdb workload cluster database
+export INFLUXDB_RETENTION_SC=7d # Retention policy for influxdb service cluster database
