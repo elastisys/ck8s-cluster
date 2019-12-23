@@ -58,6 +58,12 @@ Soft (recommended) requirements:
 - [vault](https://www.vaultproject.io/downloads.html) (tested with v1.2.3)
 - [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)
 
+Installs Ansible and the requirements using the playbook get-requirements.yaml
+
+```
+sudo apt-get install ansible -y && ansible-playbook --connection=local --inventory=127.0.0.1 --limit 127.0.0.1 get-requirements.yaml
+```
+
 ## Get environment from Vault
 
 Configure the vault address: `export VAULT_ADDR=https://vault.eck.elastisys.se`
