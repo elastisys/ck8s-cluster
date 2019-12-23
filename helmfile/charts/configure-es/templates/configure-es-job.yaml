@@ -13,8 +13,7 @@ spec:
       containers:
         - name: run
           image: elastisys/curl-jq:latest
-          #command: ['/bin/sh', '/scripts/configure-es.sh']
-          command: ['/bin/sleep', '100000']
+          command: ['/bin/sh', '/scripts/configure-es.sh']
           volumeMounts:
             - name: scripts
               mountPath: /scripts

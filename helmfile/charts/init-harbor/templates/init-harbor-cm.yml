@@ -6,12 +6,19 @@ data:
   init-harbor.sh: |
     #!/bin/sh
     set -e
-    echo "Setting up initial harbor state"
-    HARBOR_URL="harbor-harbor-core:80/api/projects/1"
 
+    echo "testing curl address {{ .Values.endpoint }}"
     # Set up initial state for harbor.
-    EXISTS=$(curl -k -X GET -u admin:Harbor12345 {{ .Values.endpoint }}/projects/1 | jq '.code') 
-  
+    EXISTS=$(curl -k -u admin:Harbor12345 {{ .Values.endpoint }}/projects/1 | jq '.code') || {
+      echo "ERROR L.${LINENO} - Harbor url {{ .Values.endpoint }}/projects/1 cannot be reached."
+      exit 1
+    }
+    if [ -z "$EXISTS" ] 
+    then
+      echo "ERROR - Harbor url {{ .Values.endpoint }}/projects/1 did not return any code (probably canot be reached)"
+      exit 1
+    fi
+    echo "Setting up initial harbor state"
     if [ "$EXISTS" != "404" ]
     then
         NAME=$(curl -k -X GET -u admin:Harbor12345 {{ .Values.endpoint }}/projects/1 | jq '.name')

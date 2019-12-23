@@ -7,16 +7,16 @@ data:
     #!/bin/sh
     set -e 
     echo "configuring s3 backups"
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_snapshot/s3_backup_repository?pretty" \
+    curl -f -X PUT "https://{{ .Values.ES.endpoint }}/_snapshot/s3_backup_repository?pretty" \
       -H 'Content-Type: application/json' \
       -d' {"type": "s3", "settings":{ "bucket": "'"{{ .Values.ES.backupBucketName }}"'", "client": "default"}}' \
       -k -u elastic:${ES_PW}
     echo "changing poll interval"
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_cluster/settings?pretty" \
+    curl -f -X PUT "https://{{ .Values.ES.endpoint }}/_cluster/settings?pretty" \
       -H 'Content-Type: application/json' \
       -k -u elastic:${ES_PW} \
       -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'
     echo "setting up kibana dashboard"
-    curl -kL -X POST "https://{{ .Values.kibana.endpoint }}/api/saved_objects/_import" -H "kbn-xsrf: true" \
+    curl -f -kL -X POST "https://{{ .Values.kibana.endpoint }}/api/saved_objects/_import" -H "kbn-xsrf: true" \
       --form file=/scripts/kibana-dashboards.ndjson -u elastic:${ES_PW}
   kibana-dashboards.ndjson: {{ .Files.Get "dashboards/kibana-dashboards.ndjson" | quote -}}
