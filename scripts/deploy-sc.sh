@@ -238,6 +238,10 @@ do
     sleep 2
 done
 
+
+
+export ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
+
 envsubst < ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch-curator.yaml | kubectl -n elastic-system apply -f -
 
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
