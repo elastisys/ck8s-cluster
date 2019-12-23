@@ -83,12 +83,12 @@ variable wc_nfs_size {
 }
 
 # Common variables.
-variable "public_ingress_cidr_whitelist" {
+variable public_ingress_cidr_whitelist {
   type    = list(string)
   default = ["194.132.164.168/32", "194.132.164.169/32", "193.187.219.4/32"] # Elastisys office, A1 office
 }
 
-variable "dns_prefix" {
+variable dns_prefix {
   description = "Prefix name for dns"
   type        = string
 }
