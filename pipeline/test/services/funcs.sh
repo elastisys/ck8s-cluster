@@ -48,6 +48,17 @@ function testStatefulsetStatus {
 }
 
 #Args:
+#   1. namespace
+#   2. name of job
+function testJobStatus {
+    COMPLETED=$(kubectl get job -n $1 $2 -o jsonpath="{.status.succeeded}")
+    if [[ $COMPLETED > 0 ]]
+    then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+    else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+    fi
+}
+
+#Args:
 #   1. Name of endpoint to print
 #   2. url
 #   3. (optional) username and password, <username>:<password>

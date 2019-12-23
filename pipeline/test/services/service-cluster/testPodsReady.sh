@@ -92,6 +92,26 @@ do
     fi
 done
 
+JOBS=(
+  "harbor init-harbor"
+  "elastic-system configure-es"
+)
+
+echo
+echo
+echo "Testing jobs"
+echo "===================="
+
+for JOB in "${JOBS[@]}"
+do
+    arguments=($JOB)
+    echo -n -e "\n${arguments[1]}\t"
+    if testResourceExistence job $JOB
+    then
+        testJobStatus $JOB
+    fi
+done
+
 echo
 echo
 echo "Testing other services"
