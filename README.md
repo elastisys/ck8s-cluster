@@ -337,6 +337,7 @@ grafana_client
 dashboard_client
 prometheus_client
 customer_prometheus_client
+customer_grafana
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
 certs/service_cluster/kube-system/certs/helm-key.pem
