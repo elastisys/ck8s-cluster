@@ -77,6 +77,7 @@ do
 done
 
 FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
+rke/eck-sc.yaml rke/eck-wc.yaml rke/eck-sc.rkestate rke/eck-wc.rkestate
 rke/kube_config_eck-wc.yaml env/env.sh customer/kubeconfig.yaml infra/infra.json
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
@@ -94,6 +95,8 @@ for file in ${FILES}
 do
     vault kv get -field=base64-content eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file} | base64 --decode > clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file}
 done
+# Set suitable permissions for ssh-keys
+chmod u=rw,go= clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/ssh-keys/*
 ```
 
 Access Kubernetes API:
@@ -327,7 +330,8 @@ Delete secrets:
 export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|citycloud|exoscale}
 FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
-rke/kube_config_eck-wc.yaml env/env.sh infra/infra.json
+rke/kube_config_eck-wc.yaml rke/eck-sc.rkestate rke/eck-wc.rkestate
+env/env.sh infra/infra.json
 customer/kubeconfig.yaml
 grafana
 harbor
