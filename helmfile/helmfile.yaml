@@ -136,6 +136,19 @@ releases:
   values:
   - values/prometheus-wc-federate-scraper.yaml.gotmpl
 
+{{ if eq (env "ENABLE_CUSTOMER_GRAFANA") "true" }}
+# Grafana instance for customer
+- name: customer-grafana
+  namespace: monitoring
+  labels:
+    app: customer-grafana
+  chart: stable/grafana
+  version: 4.2.2
+  missingFileHandler: error
+  values:
+  - values/grafana-customer.yaml.gotmpl
+{{ end }}
+
 #Elasticsearch-prometheus-exporter
 {{ if eq .Environment.Name "service_cluster" }}
 - name: elasticsearch-prometheus-exporter
@@ -145,7 +158,7 @@ releases:
   chart: stable/elasticsearch-exporter
   version: 2.1.1
   missingFileHandler: error
-  values: 
+  values:
   - values/elasticsearch-prometheus-exporter.yaml.gotmpl
 {{ end }}
 

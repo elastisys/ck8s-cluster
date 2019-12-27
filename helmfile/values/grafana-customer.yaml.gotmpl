@@ -1,0 +1,72 @@
+adminPassword: {{ requiredEnv "CUSTOMER_GRAFANA_PWD" }}
+
+ingress:
+  enabled: true
+  annotations:
+    certmanager.k8s.io/issuer: letsencrypt-customer-monitoring-{{ requiredEnv "CERT_TYPE" }}
+  hosts:
+  - grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
+  tls:
+  - secretName: customer-grafana-tls
+    hosts:
+    - grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
+rbac:
+  pspUseAppArmor: false
+  pspEnabled: {{ requiredEnv "ENABLE_PSP" }}
+  namespaced: true
+
+persistence:
+  type: pvc
+  enabled: true
+  size: 10Gi
+  accessModes:
+    - ReadWriteOnce
+
+sidecar:
+  dashboards:
+    enabled: true
+    # This will pick up the prometheus-operator dashboards
+    label: grafana_dashboard
+  datasources:
+    enabled: false
+    defaultDatasourceEnabled: false
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: app-metrics
+      type: prometheus
+      url: http://customer-scraper-prometheus-instance.monitoring.svc.cluster.local:9090
+      access: proxy
+      isDefault: true
+      basicAuth: false
+      editable: false
+      isDefault: true
+      orgId: 1
+    - name: k8s-metrics
+      type: prometheus
+      access: proxy
+      url: http://wc-scraper-prometheus-instance.monitoring.svc.cluster.local:9090
+      basicAuth: false
+      editable: false
+      isDefault: false
+      orgId: 1
+      version: 1
+
+
+grafana.ini:
+  server:
+    root_url: https://grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
+  auth.generic_oauth:
+    name: dex
+    enabled: true
+    client_id: grafana
+    client_secret: {{ requiredEnv "GRAFANA_CLIENT_SECRET" }}
+    scopes: profile email openid
+    auth_url: https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}/auth
+    token_url: https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}/token
+    api_url: https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}/api
+    allowed_domains: {{ requiredEnv "OAUTH_ALLOWED_DOMAINS" }}
+    allow_sign_up: true
+    tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}

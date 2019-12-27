@@ -9,6 +9,7 @@ env_vars=(
     ["grafana_client"]="GRAFANA_CLIENT_SECRET"
     ["prometheus_client"]="PROMETHEUS_CLIENT_SECRET"
     ["customer_prometheus_client"]="CUSTOMER_PROMETHEUS_CLIENT_SECRET"
+    ["customer_grafana"]="CUSTOMER_GRAFANA_PWD"
     ["elasticsearch-es-elastic-user"]="ELASTIC_USER_SECRET"
 )
 
