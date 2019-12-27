@@ -101,13 +101,13 @@ grafana:
       ingress.kubernetes.io/rewrite-target: /
       certmanager.k8s.io/issuer: letsencrypt-monitoring-{{ requiredEnv "CERT_TYPE" }}
     hosts:
-    - grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
+    - grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     tls:
     - secretName: grafana-general-tls
       hosts:
-      - grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
+      - grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
   rbac:
     pspUseAppArmor: false
     pspEnabled: {{ requiredEnv "ENABLE_PSP" }}
@@ -178,7 +178,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: https://grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
+      root_url: https://grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
     auth.generic_oauth:
       name: dex
       enabled: true
