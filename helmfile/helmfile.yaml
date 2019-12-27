@@ -160,6 +160,17 @@ releases:
   missingFileHandler: error
   values:
   - values/elasticsearch-prometheus-exporter.yaml.gotmpl
+
+# configure elasticsearch
+- name: configure-es
+  namespace: elastic-system
+  labels:
+    app: config
+  chart: ./charts/configure-es
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/configure-es.yaml.gotmpl
 {{ end }}
 
 # Harbor
@@ -233,16 +244,6 @@ releases:
   missingFileHandler: error
   values:
   - values/fluentd-customer.yaml.gotmpl
-
-- name: configure-es
-  namespace: elastic-system
-  labels:
-    app: elasticsearch
-  chart: ./charts/configure-es
-  version: 0.1.0
-  missingFileHandler: error
-  values:
-  - values/configure-es.yaml.gotmpl
 
 # opa
 - name: opa
