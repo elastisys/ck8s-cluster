@@ -242,7 +242,7 @@ releases:
   version: 0.1.0
   missingFileHandler: error
   values:
-  - values/init-harbor.yaml.gotmpl
+  - values/configure-es.yaml.gotmpl
 
 # opa
 - name: opa
