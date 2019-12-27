@@ -3,7 +3,7 @@ imageTag: "v2.21.0"
 ingress:
   enabled: true
   annotations:
-    certmanager.k8s.io/issuer: letsencrypt-dex-{{ requiredEnv "CERT_TYPE" }}
+    certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
   tls:
   - secretName: dex-tls
     hosts:

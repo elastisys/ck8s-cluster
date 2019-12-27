@@ -78,9 +78,8 @@ kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true 
 issuer_namespaces='kube-system monitoring ck8sdash'
 for ns in $issuer_namespaces
 do
-    export CERT_NAMESPACE=$ns
-    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml | kubectl apply -f -
-    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml | kubectl apply -f -
+    kubectl -n ${ns} apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
+    kubectl -n ${ns} apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 done
 
 

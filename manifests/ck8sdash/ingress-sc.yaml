@@ -6,7 +6,7 @@ metadata:
   annotations:
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    certmanager.k8s.io/issuer: letsencrypt-ck8sdash-${CERT_TYPE}
+    certmanager.k8s.io/issuer: letsencrypt-${CERT_TYPE}
 spec:
   tls:
   - hosts:

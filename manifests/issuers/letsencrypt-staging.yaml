@@ -1,11 +1,10 @@
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Issuer
 metadata:
-  name: letsencrypt-${CERT_NAMESPACE}-staging
-  namespace: ${CERT_NAMESPACE}
+  name: letsencrypt-staging
 spec:
   acme:
-    email: techteam@elastisys.com 
+    email: techteam@elastisys.com
     privateKeySecretRef:
       name: letsencrypt-staging
     server: https://acme-staging-v02.api.letsencrypt.org/directory

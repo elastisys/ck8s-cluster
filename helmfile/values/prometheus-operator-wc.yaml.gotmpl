@@ -40,7 +40,7 @@ prometheus:
       nginx.ingress.kubernetes.io/auth-secret: prometheus-auth
       # message to display with an appropriate context why the authentication is required
       nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
-      certmanager.k8s.io/issuer: letsencrypt-monitoring-{{ requiredEnv "CERT_TYPE" }}
+      certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
     labels: {}
     hosts:
     - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}

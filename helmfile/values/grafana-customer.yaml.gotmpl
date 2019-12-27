@@ -3,7 +3,7 @@ adminPassword: {{ requiredEnv "CUSTOMER_GRAFANA_PWD" }}
 ingress:
   enabled: true
   annotations:
-    certmanager.k8s.io/issuer: letsencrypt-customer-monitoring-{{ requiredEnv "CERT_TYPE" }}
+    certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
   hosts:
   - grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
   tls:
