@@ -18,5 +18,5 @@ data:
       -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'
     echo "setting up kibana dashboard"
     curl -f -kL -X POST "https://{{ .Values.kibana.endpoint }}/api/saved_objects/_import" -H "kbn-xsrf: true" \
-      --form file=/scripts/kibana-dashboards.ndjson -u elastic:${ES_PW}
+      --form file=@/scripts/kibana-dashboards.ndjson -u elastic:${ES_PW}
   kibana-dashboards.ndjson: {{ .Files.Get "dashboards/kibana-dashboards.ndjson" | quote -}}
