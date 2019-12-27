@@ -148,15 +148,6 @@ grafana:
     default: {}
 
   additionalDataSources:
-  - name: prometheus-federated
-    access: proxy
-    basicAuth: false
-    editable: false
-    isDefault: true
-    orgId: 1
-    type: prometheus
-    url: http://customer-scraper-prometheus-instance:9090
-    version: 1
   - name: prometheus-wc-reader
     access: proxy
     basicAuth: false
