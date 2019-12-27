@@ -20,3 +20,8 @@ testEndpoint Harbor https://harbor.${ECK_BASE_DOMAIN}/api/users"" admin:${HARBOR
 testEndpoint Grafana https://grafana.${ECK_OPS_DOMAIN}/ admin:${GRAFANA_PWD}
 
 testEndpoint ck8sdash https://ck8sdash.${ECK_BASE_DOMAIN}/
+
+if [ $ENABLE_CUSTOMER_GRAFANA == "true" ]
+then
+    testEndpoint Grafana-customer https://grafana.${ECK_BASE_DOMAIN}/ admin:${CUSTOMER_GRAFANA_PWD}
+fi

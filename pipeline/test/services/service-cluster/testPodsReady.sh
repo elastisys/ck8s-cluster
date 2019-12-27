@@ -20,6 +20,7 @@ DEPLOYMENTS=(
     "kube-system metrics-server"
     "kube-system nfs-client-provisioner"
     "nginx-ingress nginx-ingress-default-backend"
+    "monitoring customer-grafana"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-grafana"
     "monitoring prometheus-operator-kube-state-metrics"
