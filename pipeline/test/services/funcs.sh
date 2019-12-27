@@ -50,11 +50,21 @@ function testStatefulsetStatus {
 #Args:
 #   1. namespace
 #   2. name of job
+#   3. Wait time for job to finish before marking failed
 function testJobStatus {
     COMPLETED=$(kubectl get job -n $1 $2 -o jsonpath="{.status.succeeded}")
-    if [[ $COMPLETED > 0 ]]
-    then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-    else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+    WAIT_TIME=300
+
+    while [[ $SECONDS -lt $WAIT_TIME ]]; do
+        SECONDS=$WAIT_TIME
+      fi
+      sleep 2
+    done
+    if [[ $COMPLETED > 0 ]]; then 
+      echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+    else
+      echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+      kubectl logs -n $1 $2
     fi
 }
 
