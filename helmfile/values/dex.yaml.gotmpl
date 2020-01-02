@@ -59,6 +59,7 @@ config:
       redirectURIs:
       - http://localhost:8000
       - https://ck8sdash.{{ requiredEnv "ECK_BASE_DOMAIN" }}/auth
+      - https://ck8sdash.{{ requiredEnv "ECK_OPS_DOMAIN" }}/auth
     - id: grafana
       secret: {{ requiredEnv "GRAFANA_CLIENT_SECRET" }}
       name: 'Grafana'

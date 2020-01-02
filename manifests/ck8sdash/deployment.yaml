@@ -18,6 +18,8 @@ spec:
       containers:
       - name: ck8sdash
         image: elastisys/ck8sdash:0.0.12
+        # Note that these values are not reloaded if the secret is changed
+        # The pod needs to be restarted to load new values
         env:
         - name: URL
           valueFrom:
