@@ -31,13 +31,17 @@ This could be seen in the logs from the elasticsearch master.
 - Evicted pods are not automatically cleaned up and replaced.
 - Elasticsearch may get stuck in yellow state when low on disk space.
 
-## 2019-12-19 - Website workload cluster
+## 2019-12-19 - Unable to delete or create pods
+
+**Cloud provider:** Safespring
+**Environment:** website
+**Cluster:** workload cluster
 
 ### In what state was the cluster
 
 The kubernetes master components was up and running. The kubelet on the worker node tried to register itself as a node but it could not perform the operation because it got `connection timout` while trying to talk to the kube-apiserver. The kube-apiserver was reachable outside of the cluster although normal operations such as scaling deployments and deleting pods did not have the desired behaviour. Essentialy pods could not be deleted or started.
 
-### What was the likley cause for the cluster state
+### What was the likely cause for the cluster state
 
 All master components and the kublet on both the master and worker nodes were up and running. Looking at logs did not give any decisive answer but after a while we came to the conclusion that the reason for the connection timeout when the kubelet was trying to talk to the kube-apiserver was because of the network component `canal` being evicted from the master node.
 
