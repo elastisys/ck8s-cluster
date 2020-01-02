@@ -17,6 +17,8 @@ env:
   value: {{ requiredEnv "INFLUXDB_PWD" }}
 
 config:
+  data:
+    index_version: tsi1
   http:
     auth_enabled: true
 
