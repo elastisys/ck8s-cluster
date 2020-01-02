@@ -3,6 +3,34 @@
 This document describes incidents that we have encountered.
 The goal is to be able to learn, spread knowledge and avoid problems in the future.
 
+## 2020-01-02 - Elasticsearch red health
+
+**Cloud provider:** Safespring
+**Environment:** tempus-testing
+**Cluster:** service cluster
+
+### In what state was the cluster
+
+One of the elasticsearch pods was `Evicted`, the other two running normally.
+The elasticsearch operator pod and kibana were both running normally and kibana was usable.
+Influxdb was in a crash loop, both the backup job and the database itself.
+
+After the evicted pod was deleted, a new pod was created.
+The elasticsearch cluster health became `yellow` instead, but got stuck there as some shards remained unassigned.
+
+### What was the likely cause for the cluster state
+
+Influxdb was crashing because it was `OOMKilled`.
+It is not clear why the elasticsearch pod was evicted but it may have been because influx was using up so much memory on the node.
+
+The reason why some shards remained unassigned was that all elasticsearch nodes (pods) were low on disk space.
+This could be seen in the logs from the elasticsearch master.
+
+### Lessons learned
+
+- Evicted pods are not automatically cleaned up and replaced.
+- Elasticsearch may get stuck in yellow state when low on disk space.
+
 ## 2019-12-19 - Website workload cluster
 
 ### In what state was the cluster
