@@ -3,66 +3,78 @@
     vars:
       install_path: /usr/local/bin
       install_user: "{{ lookup('env','USER') }}"
+      terraform_version: "0.12.6"
+      rancher_version: "0.2.8"
+      kubectl_version: "1.15.2"
+      helm_version: "2.14.3"
+      helmfile_version: "0.81.3"
+      helmdiff_version: "2.11.0+5"
+      jq_version: "1.5+dfsg-2"
+      apache2utils_version: "2.4.29-1ubuntu4.11"
+      vault_version: "1.2.3"
+      s3cmd_version: "2.0.1-2"
     connection: local
     become: yes
     become_user: root
     tasks:
     - name: "Get terraform"
       unarchive:
-        src: https://releases.hashicorp.com/terraform/0.12.6/terraform_0.12.6_linux_amd64.zip
+        src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip
         dest: "{{ install_path }}"
         remote_src: yes
     - name: "Get Rancher"
       get_url:
-        url: https://github.com/rancher/rke/releases/download/v0.2.8/rke_linux-amd64
+        url: https://github.com/rancher/rke/releases/download/v{{ rancher_version }}/rke_linux-amd64
         dest: "{{ install_path }}/rke"
         mode: 0775
     - name: "Get Kubectl"
       unarchive:
-        src: https://dl.k8s.io/v1.15.2/kubernetes-client-linux-amd64.tar.gz
+        src: https://dl.k8s.io/v{{ kubectl_version }}/kubernetes-client-linux-amd64.tar.gz
         dest: "{{ install_path }}"
         remote_src: yes
         extra_opts: [--strip-components=3]
     - name: "Get Helm"
       unarchive:
-        src: https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz
+        src: https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz
         dest: "{{ install_path }}"
         extra_opts: [--strip-components=1]
         mode: 0775
         remote_src: yes
     - name: "Get Helmfile"
       get_url:
-        url: https://github.com/roboll/helmfile/releases/download/v0.81.3/helmfile_linux_amd64
+        url: https://github.com/roboll/helmfile/releases/download/v{{ helmfile_version }}/helmfile_linux_amd64
         dest: "{{ install_path }}/helmfile"
         mode: 0775
+    - name: Check if helm home exists'
+      stat:
+        path: "/home/{{ install_user }}/.helm"
+      register: helm_home_exists
+    - name: "Init helm client side"
+      become: yes
+      become_user: "{{ install_user }}"
+      command: "helm init -c"
+      register: "output"
+      when: not helm_home_exists.stat.exists
     - name: Check if helm-diff plugin exists'
       stat:
         path: "/home/{{ install_user }}/.helm/plugins/helm-diff"
       register: helm_diff_exists
     - name: "Install helm plugin diff via helm"
-      become: yes
-      become_user: "{{ install_user }}"
-      command: "helm plugin install https://github.com/databus23/helm-diff --version v2.11.0+5"
+      command: "helm plugin install https://github.com/databus23/helm-diff --version v{{ helmdiff_version }} --home /home/{{ install_user }}/.helm"
       register: "output"
       when: not helm_diff_exists.stat.exists
     - name: "Get jq"
-      get_url:
-        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        dest: "{{ install_path }}/jq"
-        remote_src: yes
-        mode: 0775
+      apt:
+        name: jq={{ jq_version }}
     - name: "Install htpasswd by installing apache2-utils package"
       apt:
-      name: apache2-utils
+        name: apache2-utils={{ apache2utils_version }}
     - name: "Get Vault"
       unarchive:
-        src: https://releases.hashicorp.com/vault/1.2.3/vault_1.2.3_linux_amd64.zip
+        src: https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip
         dest: "{{ install_path }}"
         mode: 0775
         remote_src: yes
     - name: install s3cmd
-      become: yes
-      become_user: "{{ install_user }}"
-      pip:
-        name: s3cmd==2.0.1
-
+      apt:
+        name: s3cmd={{ s3cmd_version }}

@@ -59,9 +59,8 @@ Soft (recommended) requirements:
 - [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)
 
 Installs Ansible and the requirements using the playbook get-requirements.yaml
-
 ```
-sudo apt-get install ansible -y && ansible-playbook --connection=local --inventory=127.0.0.1 --limit 127.0.0.1 get-requirements.yaml
+sudo apt-get install ansible=2.5.1+dfsg-1ubuntu0.1 -y && ansible-playbook --connection=local --inventory=127.0.0.1 --limit 127.0.0.1 get-requirements.yaml
 ```
 
 ## Get environment from Vault
