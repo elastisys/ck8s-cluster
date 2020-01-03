@@ -5,15 +5,28 @@ persistence:
   size: 30Gi
 
 setDefaultUser:
+  # NOTE: the Job to create this user is actually disabled, this only creates
+  # the secret that we set env vars from below.
+  # In fact, it is not possible to create the user through the setDefaultUser
+  # Job when http auth is enabled.
+  enabled: true
   user:
     username: demo
     password: {{ requiredEnv "INFLUXDB_PWD" }}
 
 env:
+# Set credentials from Secret so that it is not possible to read them directly
+# with `kubectl get pod -o yaml`
 - name: INFLUXDB_ADMIN_USER
-  value: demo
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: influxdb-user
 - name: INFLUXDB_ADMIN_PASSWORD
-  value: {{ requiredEnv "INFLUXDB_PWD" }}
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: influxdb-password
 
 config:
   data:
