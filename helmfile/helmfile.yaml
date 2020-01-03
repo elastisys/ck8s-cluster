@@ -180,7 +180,7 @@ releases:
   labels:
     app: influxdb
   chart: stable/influxdb
-  version: 1.3.1
+  version: 3.1.0
   missingFileHandler: error
   wait: true
   values:

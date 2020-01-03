@@ -24,7 +24,6 @@ DEPLOYMENTS=(
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-grafana"
     "monitoring prometheus-operator-kube-state-metrics"
-    "influxdb-prometheus influxdb"
     "ck8sdash ck8sdash"
 )
 
@@ -71,6 +70,7 @@ STATEFULSETS=(
     "elastic-system elastic-operator"
     "harbor harbor-harbor-database"
     "harbor harbor-harbor-redis"
+    "influxdb-prometheus influxdb"
 )
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
