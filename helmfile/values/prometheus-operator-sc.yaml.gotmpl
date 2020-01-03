@@ -199,9 +199,9 @@ prometheus:
         memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
         cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
     remoteRead:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD" }}
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD" }}
     remoteWrite:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD" }}
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD" }}
     externalLabels:
       cluster: service_cluster
     ruleSelector:

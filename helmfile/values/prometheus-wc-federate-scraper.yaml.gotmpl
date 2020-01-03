@@ -19,9 +19,9 @@ prometheusSpec:
   logLevel: info
   remoteRead:
   - read_recent: true
-    url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD"}}
+    url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD"}}
   remoteWrite:
-  - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=workload_cluster&u=demo&p={{ requiredEnv "INFLUXDB_PWD"}}
+  - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=workload_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD"}}
   replicas: 1
   retention: 10d
   securityContext:
