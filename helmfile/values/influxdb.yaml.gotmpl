@@ -34,8 +34,6 @@ initScripts:
   enabled: true
   scripts:
     init.iql: |+
-      CREATE DATABASE "service_cluster";
-      CREATE DATABASE "workload_cluster";
-      CREATE RETENTION POLICY service_cluster_rp ON service_cluster DURATION {{ requiredEnv "INFLUXDB_RETENTION_SC" }} REPLICATION 1 DEFAULT; # default SHARD DURATION 1d
-      CREATE RETENTION POLICY workload_cluster_rp ON workload_cluster DURATION {{ requiredEnv "INFLUXDB_RETENTION_WC" }} REPLICATION 1 DEFAULT;
+      CREATE DATABASE "service_cluster" WITH DURATION {{ requiredEnv "INFLUXDB_RETENTION_SC" }} REPLICATION 1 NAME service_cluster_rp;
+      CREATE DATABASE "workload_cluster" WITH DURATION {{ requiredEnv "INFLUXDB_RETENTION_WC" }} REPLICATION 1 NAME workload_cluster_rp;
 {{ end }}
