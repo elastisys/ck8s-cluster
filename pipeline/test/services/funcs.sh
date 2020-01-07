@@ -52,11 +52,13 @@ function testStatefulsetStatus {
 #   2. name of job
 #   3. Wait time for job to finish before marking failed
 function testJobStatus {
-    COMPLETED=$(kubectl get job -n $1 $2 -o jsonpath="{.status.succeeded}")
     WAIT_TIME=$3
 
     while [[ $SECONDS -lt $WAIT_TIME ]]; do
-      SECONDS=$WAIT_TIME
+      COMPLETED=$(kubectl get job -n $1 $2 -o jsonpath="{.status.succeeded}")
+      if [[ $COMPLETED > 0 ]]; then
+        SECONDS=$WAIT_TIME
+      fi
       sleep 2
     done
     if [[ $COMPLETED > 0 ]]; then 
