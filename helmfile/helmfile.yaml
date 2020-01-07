@@ -26,14 +26,14 @@ helmDefaults:
 
   # TODO: Use env or Env.values instead of fixed paths for certs.
   {{ if eq .Environment.Name "service_cluster" }}
-  tlsCACert: "{{ env "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/ca.pem"
-  tlsCert: "{{ env "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/helm.pem"
-  tlsKey: "{{ env "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/helm-key.pem"
+  tlsCACert: "{{ requiredEnv "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/ca.pem"
+  tlsCert: "{{ requiredEnv "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/helm.pem"
+  tlsKey: "{{ requiredEnv "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/helm-key.pem"
   {{ end }}
   {{ if eq .Environment.Name "workload_cluster" }}
-  tlsCACert: "{{ env "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/ca.pem"
-  tlsCert: "{{ env "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/helm.pem"
-  tlsKey: "{{ env "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/helm-key.pem"
+  tlsCACert: "{{ requiredEnv "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/ca.pem"
+  tlsCert: "{{ requiredEnv "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/helm.pem"
+  tlsKey: "{{ requiredEnv "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/helm-key.pem"
   {{ end }}
 
 
