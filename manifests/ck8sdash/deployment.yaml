@@ -15,22 +15,46 @@ spec:
     spec:
       securityContext:
         runAsUser: 1000
+      serviceAccountName: ck8sdash
+      initContainers:
+      - name: create-grafana-api-key
+        image: elastisys/curl-jq
+        command: ['sh', '/scripts/init.sh']
+        env:
+        - name: GRAFANA_BASIC_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: grafana-credentials
+        - name: GRAFANA_URL
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: grafana-url
+        - name: GRAFANA_API_KEY_NAME
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: grafana-api-key-name
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
       containers:
       - name: ck8sdash
         image: elastisys/ck8sdash:0.0.12
         # Note that these values are not reloaded if the secret is changed
         # The pod needs to be restarted to load new values
         env:
+        - name: GRAFANA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-grafana-api-key
+              key: grafana-api-key
         - name: URL
           valueFrom:
             secretKeyRef:
               name: ck8sdash-env
-              key: url
-        - name: GRAFANA_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: ck8sdash-env
-              key: grafana-api-key
+              key: eck-base-domain
         - name: HARBOR_BASIC_CREDENTIALS
           valueFrom:
             secretKeyRef:
@@ -58,3 +82,7 @@ spec:
               key: oidc-url
         ports:
         - containerPort: 4654
+      volumes:
+      - name: scripts
+        configMap:
+          name: ck8sdash-init-script

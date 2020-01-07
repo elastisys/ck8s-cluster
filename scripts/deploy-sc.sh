@@ -254,31 +254,10 @@ then
     exit 1
 fi
 
-# ck8sdash
-if ! kubectl get secret -n ck8sdash ck8sdash-env > /dev/null 2>&1
-then
-    while [ $(curl -ksI -o /dev/null -X GET -w "%{http_code}" -u admin:${GRAFANA_PWD} https://grafana.${ECK_BASE_DOMAIN}) != "200" ]
-    do
-        echo "Waiting for grafana endpoint to be ready"
-        sleep 1
-    done
-
-    id=$(curl -sk -X GET https://grafana.${ECK_BASE_DOMAIN}/api/auth/keys -u "admin:${GRAFANA_PWD}" \
-        | jq '.[] | select(.name=="ck8sdash-sc") | .id')
-    echo $id
-    regex='^[0-9]+$'
-    if [[ $id =~ $regex ]]
-    then echo "Deleting old api key"
-        curl -sk -X DELETE https://grafana.${ECK_BASE_DOMAIN}/api/auth/keys/${id} -u "admin:${GRAFANA_PWD}"
-    fi
-    export GRAFANA_API_KEY=$(curl -s -X POST https://grafana.${ECK_BASE_DOMAIN}/api/auth/keys -u "admin:${GRAFANA_PWD}" \
-        -H "Content-Type: application/json" -d '{"name": "ck8sdash-sc", "role": "Viewer"}' \
-        | jq -j '.key')
-    echo
-    echo "Created new apikey: $GRAFANA_API_KEY"
-fi
-
-envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/env-secret.yaml | kubectl apply -f -
+# Install ck8sdash
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service-account.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/init-script-cm.yaml
+envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/env-secret-sc.yaml | kubectl apply -f -
 envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/ingress-sc.yaml | kubectl apply -f -
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/deployment.yaml
