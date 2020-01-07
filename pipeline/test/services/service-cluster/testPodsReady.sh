@@ -93,8 +93,8 @@ do
 done
 
 JOBS=(
-  "harbor init-harbor-job"
-  "elastic-system configure-es-job"
+  "harbor init-harbor-job 120"
+  "elastic-system configure-es-job 120"
 )
 
 echo
