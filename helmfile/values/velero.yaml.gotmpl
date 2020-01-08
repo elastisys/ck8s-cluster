@@ -6,7 +6,6 @@ resources:
     cpu: 100m
     memory: 100Mi
 
-
 configuration:
   # Cloud provider being used (e.g. aws, azure, gcp).
   provider: aws
@@ -57,6 +56,13 @@ restic:
 {{ else if (requiredEnv "CLOUD_PROVIDER") "safespring" }}
   podVolumePath: /var/lib/kubelet/pods
 {{ end }}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
 
 # Backup schedules to create.
 # Eg:
