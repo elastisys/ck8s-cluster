@@ -122,6 +122,17 @@ source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_
 source scripts/helm-env.sh kube-system clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/certs/workload_cluster/kube-system/certs "helm"
 ```
 
+Connect directly to the VMs:
+
+```
+# Check IP addresses
+cat clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/infra/infra.json
+# ssh to sc machines
+ssh -i clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_sc ubuntu@${IP_ADDRESS}
+# ssh to wc machines
+ssh -i clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_wc ubuntu@${IP_ADDRESS}
+```
+
 Set up the same environment variables that were used to deploy:
 
 ```

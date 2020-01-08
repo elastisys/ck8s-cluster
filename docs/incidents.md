@@ -3,6 +3,28 @@
 This document describes incidents that we have encountered.
 The goal is to be able to learn, spread knowledge and avoid problems in the future.
 
+## 2020-01-08 - Website API server not responding
+
+**Cloud provider:** Safespring
+**Environment:** website
+**Cluster:** workload cluster
+
+### In what state was the cluster
+
+The API server timed out most requests, although at least `kubectl get componentstatuses` worked (all in components had unknown status).
+
+The master had a disk usage of 100%.
+
+### What was the likely cause for the cluster state
+
+The master nodes disk had filled up completely with audit logs.
+
+### Lessons learned
+
+- Not much really.
+  We already know that we need to monitor disk usage and set retention policies.
+  This cluster was just not monitored that closely and not updated to include the retention config.
+
 ## 2020-01-02 - Elasticsearch red health
 
 **Cloud provider:** Safespring
