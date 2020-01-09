@@ -133,6 +133,14 @@ ssh -i clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_sc ubuntu@
 ssh -i clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_wc ubuntu@${IP_ADDRESS}
 ```
 
+Add ssh-keys to ssh-agent (for use with RKE and ansible for example):
+
+```
+# Add ssh-keys to agent:
+ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_sc
+ssh-add clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_wc
+```
+
 Set up the same environment variables that were used to deploy:
 
 ```
