@@ -275,10 +275,6 @@ If the base image used to create the virtual machines does not include docker, y
 This can be done with ansible like this:
 
 ```
-# Set up a python environment with ansible:
-pipenv install
-pipenv shell
-
 # Install docker on all nodes:
 ./scripts/generate-inventory.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json > ansible/hosts.ini
 ansible-playbook -i ansible/hosts.ini ansible/playbook.yml
@@ -509,4 +505,3 @@ ssh-add -D
 
 As of yet it is not possible to change the default password of the **elastic** user that the elasticsearch operator creates.
 See https://github.com/elastic/cloud-on-k8s/issues/967
-
