@@ -20,7 +20,9 @@ function testDeploymentStatus {
     kubectl rollout status deployment -n $1 $2 --timeout=1m > /dev/null
     if [ $? == 0 ]
     then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-    else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+    else
+        echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+        DEBUG_OUTPUT+=$(kubectl get deployment -n $1 $2 -o json)
     fi
 }
 
@@ -32,7 +34,9 @@ function testDaemonsetStatus {
     READY=$(kubectl get ds -n $1 $2 -o jsonpath="{.status.numberReady}")
     if [[ $DESIRED -eq $READY ]]
     then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-    else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+    else
+        echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+        DEBUG_OUTPUT+=$(kubectl get ds -n $1 $2 -o json)
     fi
 }
 
@@ -43,7 +47,9 @@ function testStatefulsetStatus {
     kubectl rollout status statefulset -n $1 $2 --timeout=1m > /dev/null
     if [ $? == 0 ]
     then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-    else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+    else
+        echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+        DEBUG_OUTPUT+=($(kubectl get statefulset -n $1 $2 -o json))
     fi
 }
 
@@ -52,20 +58,13 @@ function testStatefulsetStatus {
 #   2. name of job
 #   3. Wait time for job to finish before marking failed
 function testJobStatus {
-    WAIT_TIME=$3
-    SECONDS=0
-    while [[ $SECONDS -lt $WAIT_TIME ]]; do
-      COMPLETED=$(kubectl get job -n $1 $2 -o jsonpath="{.status.succeeded}")
-      if [[ $COMPLETED > 0 ]]; then
-        SECONDS=$WAIT_TIME
-      fi
-      sleep 2
-    done
-    if [[ $COMPLETED > 0 ]]; then 
-      echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+    kubectl wait --for=condition=complete --timeout=$3 -n $1 job/$2 > /dev/null
+    if [ $? == 0 ]; then
+      echo -n -e "\tcompleted ✔"; SUCCESSES=$((SUCCESSES+1))
     else
-      echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
-      kubectl logs -n $1 $2
+      echo -n -e "\tnot completed ❌"; FAILURES=$((FAILURES+1))
+      DEBUG_OUTPUT+=($(kubectl get -n $1 job $2 -o json))
+      DEBUG_LOGS+=($(kubectl logs -n $1 job/$2))
     fi
 }
 

@@ -92,9 +92,11 @@ do
     fi
 done
 
+# Format:
+# namespace job-name timeout
 JOBS=(
-  "harbor init-harbor-job 120"
-  "elastic-system configure-es-job 120"
+  "harbor init-harbor-job 120s"
+  "elastic-system configure-es-job 120s"
 )
 
 echo
