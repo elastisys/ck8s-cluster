@@ -28,18 +28,16 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 INTERACTIVE=${1:-""}
 
 # NAMESPACES
-NAMESPACES="cert-manager falco monitoring fluentd ck8sdash"
+NAMESPACES="cert-manager monitoring fluentd ck8sdash"
+
+[ "$ENABLE_FALCO" == "true" ] && NAMESPACES+=" falco"
+[ "$ENABLE_OPA" == "true" ] && NAMESPACES+=" opa"
+
 for namespace in ${NAMESPACES}
 do
     kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
     kubectl label --overwrite namespace ${namespace} owner=operator
 done
-
-if [[ $ENABLE_OPA == "true" ]]
-then
-    kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
-fi
-
 
 # PSP
 if [[ $ENABLE_PSP == "true" ]]
@@ -55,12 +53,16 @@ then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-restricted-psp.yaml
 
     # Deploy cluster spcific roles and rolebindings
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/falco-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/fluentd-psp.yaml
+
+    if [[ $ENABLE_FALCO == "true" ]]
+    then 
+        kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/falco-psp.yaml
+    fi
 
     if [[ $ENABLE_OPA == "true" ]]
     then
-        kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/
+        kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/opa-psp.yaml
     fi
 fi
 
@@ -146,14 +148,13 @@ then
         apiservice v1beta1.webhook.certmanager.k8s.io
 fi
 
-if [[ $ENABLE_OPA == "true" ]]
-then
-    # Install rest of the charts excluding fluentd and prometheus.
-    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=nginx-ingress $INTERACTIVE apply
-else
-    # Install rest of the charts excluding fluentd, prometheus, and opa.
-    helmfile -f helmfile.yaml -e workload_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=opa,app!=nginx-ingress $INTERACTIVE apply
-fi
+charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=nginx-ingress"
+
+[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=opa"
+[[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
+
+# Install rest of the charts excluding charts in charts_ignore_list.
+helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply
 
 # Create basic auth credentials for accessing workload cluster prometheus
 htpasswd -c -b auth prometheus ${PROMETHEUS_PWD}

@@ -24,6 +24,7 @@ export SLACK_API_URL=${SLACK_API_URL:-https://hooks.slack.com/services/T0P3RL01G
 
 # If unset -> true
 export ENABLE_PSP=${ENABLE_PSP:-true}
+export ENABLE_FALCO=${ENABLE_FALCO:-true}
 export ENABLE_HARBOR=${ENABLE_HARBOR:-true}
 export ENABLE_OPA=${ENABLE_OPA:-true}
 export ENABLE_CUSTOMER_PROMETHEUS=${ENABLE_CUSTOMER_PROMETHEUS:-false}

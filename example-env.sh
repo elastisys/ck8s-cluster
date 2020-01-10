@@ -56,6 +56,7 @@ export OS_PASSWORD=somelongsecret
 #
 
 export ENABLE_HARBOR="<true|false>" # default true
+export ENABLE_FALCO="<true|false>" # default true
 export ENABLE_PSP="<true|false>" # default true
 export ENABLE_OPA="<true|false>" # default true
 export ENABLE_CUSTOMER_PROMETHEUS="<true|false>" # default false
