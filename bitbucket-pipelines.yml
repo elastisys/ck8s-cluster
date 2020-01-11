@@ -1,4 +1,4 @@
-image: elastisys/ck8s-bitbucket-pipeline:1.0.2
+image: elastisys/ck8s-bitbucket-pipeline:1.0.3
 pipelines:
   pull-requests:
     '**':

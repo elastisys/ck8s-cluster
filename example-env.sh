@@ -52,6 +52,13 @@ export OS_USERNAME=user.name@elastisys.com
 export OS_PASSWORD=somelongsecret
 
 #
+# Kubernetes
+#
+
+# Rancher kubernetes image to use.
+export KUBERNETES_VERSION="<rancher image>" # default '"v1.15.6-rancher1-2"'
+
+#
 # Services
 #
 

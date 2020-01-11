@@ -7,6 +7,13 @@ export TF_VAR_ssh_pub_key_file_sc=${CONFIG_PATH}/ssh-keys/id_rsa_sc.pub
 export TF_VAR_ssh_pub_key_file_wc=${CONFIG_PATH}/ssh-keys/id_rsa_wc.pub
 
 #
+# Kubernetes
+#
+
+# Rancher kubernetes image to use.
+export KUBERNETES_VERSION=${KUBERNETES_VERSION:-'"v1.15.6-rancher1-2"'}
+
+#
 # Service settings
 #
 

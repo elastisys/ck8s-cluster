@@ -4,7 +4,7 @@
       install_path: /usr/local/bin
       install_user: "{{ lookup('env','USER') }}"
       terraform_version: "0.12.6"
-      rancher_version: "0.2.8"
+      rancher_version: "1.0.0"
       kubectl_version: "1.15.2"
       helm_version: "2.14.3"
       helmfile_version: "0.81.3"

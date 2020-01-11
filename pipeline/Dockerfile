@@ -9,7 +9,7 @@ RUN unzip terraform_0.12.6_linux_amd64.zip && \
     mv terraform /usr/local/bin/terraform
 
 #RKE
-RUN wget https://github.com/rancher/rke/releases/download/v0.2.8/rke_linux-amd64 && \
+RUN wget https://github.com/rancher/rke/releases/download/v1.0.0/rke_linux-amd64 && \
     chmod 755 rke_linux-amd64 && \
     mv rke_linux-amd64 /usr/local/bin/rke
 

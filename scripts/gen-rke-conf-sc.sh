@@ -39,6 +39,8 @@ cluster_name: eck-service_cluster
 
 ssh_agent_auth: true
 
+kubernetes_version: $KUBERNETES_VERSION
+
 nodes:
 EOF
 
