@@ -24,6 +24,7 @@ DEPLOYMENTS=(
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-grafana"
     "monitoring prometheus-operator-kube-state-metrics"
+    "monitoring blackbox-prometheus-blackbox-exporter"
     "ck8sdash ck8sdash"
 )
 
