@@ -44,7 +44,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 
 ## Requirements
 
-- [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.6)
+- [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.19)
 - [RKE](https://github.com/rancher/rke/releases) (tested with 1.0.0)
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
 - [helm](https://github.com/helm/helm/releases) (tested with 2.14.3)
