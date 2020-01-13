@@ -20,6 +20,8 @@ then
     export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_private_ip_address')
 fi
 
+export MASTER_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.master_ip_addresses[0]')
+
 # Domains
 : "${ECK_OPS_DOMAIN:?Missing ECK_OPS_DOMAIN}"
 : "${ECK_BASE_DOMAIN:?Missing ECK_BASE_DOMAIN}"
@@ -41,7 +43,7 @@ kubectl  -n  elastic-system create namespace elastic-system --kubeconfig="${ECK_
 kubectl  -n  elastic-system create secret generic elasticsearch-es-elastic-user \
     --from-literal=elastic=$ELASTIC_USER_SECRET --kubeconfig="${ECK_SC_KUBECONFIG}" \
     --dry-run -o yaml | kubectl apply -f - --kubeconfig="${ECK_SC_KUBECONFIG}"
- 
+
 # Export whether to skip tls verify or not.
 if [[ "$CERT_TYPE" == "prod" ]];
 then export TLS_VERIFY="true"
@@ -49,7 +51,7 @@ then export TLS_VERIFY="true"
 elif [[ "$CERT_TYPE" == "staging" ]];
 then export TLS_VERIFY="false"
     export TLS_SKIP_VERIFY="true"
-else 
+else
     echo "CERT_TYPE should be set to either 'prod' or 'staging'"
     exit 1
 fi

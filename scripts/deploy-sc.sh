@@ -36,6 +36,9 @@ then
     : "${CUSTOMER_PROMETHEUS_PWD:?Missing CUSTOMER_PROMETHEUS_PWD}"
 fi
 
+# For health checking
+: "${MASTER_WC_SERVER_IP:?Missing MASTER_WC_SERVER_IP}"
+
 # If unset -> false
 ECK_RESTORE_CLUSTER=${ECK_RESTORE_CLUSTER:-false}
 

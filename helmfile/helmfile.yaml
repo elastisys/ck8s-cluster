@@ -150,7 +150,6 @@ releases:
 {{ end }}
 
 #Elasticsearch-prometheus-exporter
-{{ if eq .Environment.Name "service_cluster" }}
 - name: elasticsearch-prometheus-exporter
   namespace: elastic-system
   labels:
@@ -171,7 +170,6 @@ releases:
   missingFileHandler: error
   values:
   - values/configure-es.yaml.gotmpl
-{{ end }}
 
 # Harbor
 - name: harbor
@@ -206,6 +204,16 @@ releases:
   wait: true
   values:
   - values/influxdb.yaml.gotmpl
+
+- name: blackbox
+  namespace: monitoring
+  labels:
+    app: blackbox
+  chart: ./charts/blackbox
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/blackbox.yaml.gotmpl
 
 # End of system services releases
 {{ end }}
