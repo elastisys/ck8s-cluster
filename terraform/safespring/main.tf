@@ -63,7 +63,8 @@ module "service_cluster" {
     "grafana.${var.dns_prefix}",
     "harbor.${var.dns_prefix}",
     "dex.${var.dns_prefix}",
-    "kibana.${var.dns_prefix}"
+    "kibana.${var.dns_prefix}",
+    "notary.harbor.${var.dns_prefix}"
   ]
 
   master_flavor_id = data.openstack_compute_flavor_v2.b_medium.id

@@ -38,7 +38,8 @@ module "service_cluster" {
     "grafana.${var.dns_prefix}",
     "harbor.${var.dns_prefix}",
     "kibana.${var.dns_prefix}",
-    "dex.${var.dns_prefix}"
+    "dex.${var.dns_prefix}",
+    "notary.harbor.${var.dns_prefix}"
   ]
 
   master_security_group_name = "${terraform.workspace}-sc-master-sg"
