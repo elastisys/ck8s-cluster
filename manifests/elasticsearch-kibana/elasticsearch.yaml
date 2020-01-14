@@ -14,6 +14,7 @@ spec:
       plugin.mandatory: repository-s3
       s3.client.default.endpoint: ${S3_REGION_ENDPOINT}
       s3.client.default.protocol: https
+      xpack.security.authc.realms.native.native1.order: 0
     podTemplate:
       spec:
         initContainers:
