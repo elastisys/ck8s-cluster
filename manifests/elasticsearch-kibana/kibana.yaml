@@ -1,10 +1,10 @@
-apiVersion: kibana.k8s.elastic.co/v1alpha1
+apiVersion: kibana.k8s.elastic.co/v1beta1
 kind: Kibana
 metadata:
   name: kibana
   namespace: elastic-system
 spec:
-  version: 7.3.1
-  nodeCount: 1
+  version: 7.4.2
+  count: 1
   elasticsearchRef:
     name: elasticsearch
