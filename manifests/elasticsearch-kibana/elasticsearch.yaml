@@ -1,19 +1,23 @@
-apiVersion: elasticsearch.k8s.elastic.co/v1alpha1
+apiVersion: elasticsearch.k8s.elastic.co/v1beta1
 kind: Elasticsearch
 metadata:
   name: elasticsearch
   namespace: elastic-system
 spec:
-  version: 7.3.1
-  nodes:
-  - nodeCount: 3
+  version: 7.4.2
+  nodeSets:
+  - count: 3
+    name: nodes
     config:
       node.master: true
       node.data: true
       node.ingest: true
+      node.ml: false
+      node.store.allow_mmap: false
       plugin.mandatory: repository-s3
       s3.client.default.endpoint: ${S3_REGION_ENDPOINT}
       s3.client.default.protocol: https
+      s3.client.default.path_style_access: true
       xpack.security.authc.realms.native.native1.order: 0
     podTemplate:
       spec:
@@ -57,4 +61,4 @@ spec:
             storage: 40Gi
         storageClassName: ${STORAGE_CLASS}
   secureSettings:
-    secretName: s3-credentials
+  - secretName: s3-credentials
