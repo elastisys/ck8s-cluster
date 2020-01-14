@@ -29,6 +29,26 @@ It is important to let the customer know what to expect during this time: How lo
 
 In this step we (Elastisys) create infrastructure, configuration, credentials, etc. and install Kubernetes as well as the managed services.
 
+### Manual steps
+
+#### Kibana
+
+Create index patterns:
+
+1. Log in to Kibana as the elastic user
+2. Go to *Management > Index patterns*
+3. Create the following index patterns: `kubernetes-*`, `kubeaudit-*`, `kubecomponents-*` and `other-*`. Make sure you set the Time Field to `@timestamp`.
+4. Set the `kubernetes-*` index pattern as default.
+
+Give customer access to Kibana:
+
+1. Log in to Kibana as the elastic user
+2. Go to *Management > Roles*
+3. Create a role called `kubernetes-log-reader` with read privilege for indices `kubernetes-*` and `kubeaudit-*`.
+4. Go to *Management > Users*
+5. Create a user for the customer with roles `kibana_user` and `kubernetes-log-reader`.
+6. Give credentials to the customer (and encourage them to change the password).
+
 ## Step 3 - Handover
 
 *Note:* This step will be completely manual at first, including a hands-on walk through of the system and services.
