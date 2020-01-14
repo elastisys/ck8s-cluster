@@ -164,7 +164,7 @@ pipelines:
             # Export vault token
             - export VAULT_TOKEN=$(cat vault-token.txt)
             # Revoke vault token and remove secrets
-            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager
+            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             - cd terraform/exoscale
             - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
@@ -343,7 +343,7 @@ pipelines:
             # Export vault token
             - export VAULT_TOKEN=$(cat vault-token.txt)
             # Revoke vault token and remove secrets
-            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager
+            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user
             - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
             - cd terraform/safespring
             - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
