@@ -100,6 +100,14 @@ alertmanager:
           {{ end }}
           {{ end }}`}}
       {{ end }}
+    - name: opsgenie
+      {{ if eq (env "ALERT_TO") "opsgenie" }}
+      opsgenie_configs:
+        # See https://prometheus.io/docs/alerting/configuration/#opsgenie_config
+        - api_key: {{ requiredEnv "OPSGENIE_API_KEY" }}
+          source: grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
+      {{ end }}
+
 
 # TODO: These do not work out of the box with RKE
 # If we switch to kubeadm they should be fine, otherwise we should look into
