@@ -2,8 +2,6 @@
 
 set -e
 
-: "${ECK_SC_KUBECONFIG:?Missing ECK_SC_KUBECONFIG}"
-
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
 : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
 : "${S3_REGION:?Missing S3_REGION}"
@@ -15,6 +13,7 @@ set -e
 : "${CUSTOMER_NAMESPACES:?Missing CUSTOMER_NAMESPACES}"
 : "${CUSTOMER_ADMIN_USERS:?Missing CUSTOMER_ADMIN_USERS}"
 : "${PROMETHEUS_PWD:?Missing PROMETHEUS_PWD}"
+: "${ELASTIC_USER_SECRET:?Missing ELASTIC_USER_SECRET}"
 : "${ENABLE_CUSTOMER_PROMETHEUS:?Missing ENABLE_CUSTOMER_PROMETHEUS}"
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
@@ -56,7 +55,7 @@ then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/fluentd-psp.yaml
 
     if [[ $ENABLE_FALCO == "true" ]]
-    then 
+    then
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/falco-psp.yaml
     fi
 
@@ -192,13 +191,7 @@ kubectl -n fluentd create secret generic template-secret --from-file=../manifest
     --from-file=../manifests/kubecomponents_template --from-file=../manifests/kubeaudit_template \
     --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
 
-while [[ $(kubectl --kubeconfig="${ECK_SC_KUBECONFIG}" get elasticsearches.elasticsearch.k8s.elastic.co -n elastic-system elasticsearch -o 'jsonpath={.status.health}') != "green" ]]
-do
-    echo "Waiting until elasticsearch is ready"
-    sleep 2
-done
-
-
+# Password for accessing elasticsearch
 kubectl -n kube-system create secret generic elasticsearch \
     --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 kubectl -n fluentd create secret generic elasticsearch \

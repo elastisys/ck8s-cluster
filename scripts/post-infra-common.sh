@@ -8,6 +8,8 @@ fi
 infra="$1"
 
 
+# Cloud provider
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 
 # Common environment variables needed for deploy-*.sh
 if [ $CLOUD_PROVIDER == "exoscale" ]
@@ -29,21 +31,6 @@ export MASTER_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.master_ip_add
 # Cert type
 : "${CERT_TYPE:?Missing CERT_TYPE}"
 
-# Cloud provider
-: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
-
-# elasticsearch user secret
-: "${ELASTIC_USER_SECRET:?Missing ELASTIC_USER_SECRET}"
-
-# KUBEconf for service cluster
-: "${ECK_SC_KUBECONFIG:?Missing ECK_SC_KUBECONFIG}"
-
-kubectl  -n  elastic-system create namespace elastic-system --kubeconfig="${ECK_SC_KUBECONFIG}" \
-    --dry-run -o yaml | kubectl apply -f - --kubeconfig="${ECK_SC_KUBECONFIG}"
-kubectl  -n  elastic-system create secret generic elasticsearch-es-elastic-user \
-    --from-literal=elastic=$ELASTIC_USER_SECRET --kubeconfig="${ECK_SC_KUBECONFIG}" \
-    --dry-run -o yaml | kubectl apply -f - --kubeconfig="${ECK_SC_KUBECONFIG}"
-
 # Export whether to skip tls verify or not.
 if [[ "$CERT_TYPE" == "prod" ]];
 then export TLS_VERIFY="true"
@@ -53,5 +40,4 @@ then export TLS_VERIFY="false"
     export TLS_SKIP_VERIFY="true"
 else
     echo "CERT_TYPE should be set to either 'prod' or 'staging'"
-    exit 1
 fi

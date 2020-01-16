@@ -28,6 +28,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 : "${GRAFANA_PWD:?Missing GRAFANA_PWD}"
 : "${GRAFANA_CLIENT_SECRET:?Missing GRAFANA_CLIENT_SECRET}"
 : "${KUBELOGIN_CLIENT_SECRET:?Missing KUBELOGIN_CLIENT_SECRET}"
+: "${ELASTIC_USER_SECRET:?Missing ELASTIC_USER_SECRET}"
 
 : "${PROMETHEUS_PWD:?Missing PROMETHEUS_PWD}"
 : "${CUSTOMER_GRAFANA_PWD:?Missing CUSTOMER_GRAFANA_PWD}"
@@ -133,6 +134,10 @@ then
 fi
 
 # Elasticsearch and kibana.
+kubectl  -n  elastic-system create secret generic elasticsearch-es-elastic-user \
+    --from-literal=elastic=$ELASTIC_USER_SECRET \
+    --dry-run -o yaml | kubectl apply -f -
+
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
 kubectl create secret generic s3-credentials -n elastic-system \
     --from-literal=s3.client.default.access_key=${S3_ACCESS_KEY} \

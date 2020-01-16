@@ -298,7 +298,6 @@ rke up --config clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/eck-wc.yaml
 Install services using the deploy scripts:
 
 ```
-export ECK_SC_KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/kube_config_eck-sc.yaml
 source scripts/post-infra-common.sh clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/infra/infra.json
 
 export KUBECONFIG=$(pwd)/clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/rke/kube_config_eck-sc.yaml
