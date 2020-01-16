@@ -33,13 +33,6 @@ In this step we (Elastisys) create infrastructure, configuration, credentials, e
 
 #### Kibana
 
-Create index patterns:
-
-1. Log in to Kibana as the elastic user
-2. Go to *Management > Index patterns*
-3. Create the following index patterns: `kubernetes-*`, `kubeaudit-*`, `kubecomponents-*` and `other-*`. Make sure you set the Time Field to `@timestamp`.
-4. Set the `kubernetes-*` index pattern as default.
-
 Give customer access to Kibana and Elasticsearch:
 
 1. Log in to Kibana as the elastic user
