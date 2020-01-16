@@ -1,33 +1,4 @@
-apiVersion: batch/v1beta1
-kind: CronJob
-metadata:
-  name: curator
-  namespace: elastic-system
-spec:
-  # Run every 5 minutes
-  schedule: "*/5 * * * *"
-  concurrencyPolicy: Forbid
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - name: elasticsearch-curator
-            # https://hub.docker.com/r/bobrik/curator/tags/
-            image: bobrik/curator:5.7.6
-            imagePullPolicy: IfNotPresent
-            args: 
-            - --config
-            - /etc/config/config.yml
-            - /etc/config/action_file.yml
-            volumeMounts:
-              - name: config-volume
-                mountPath: /etc/config
-          volumes:
-            - name: config-volume
-              configMap:
-                name: curator-config
-          restartPolicy: Never
+cat <<EOF
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -188,6 +159,50 @@ data:
           unit_count: $KUBERNETES_RETENTION_AGE
         - filtertype: kibana
           exclude: True
+EOF
+
+if [ "$ENABLE_POSTGRESQL" == "true" ]; then
+cat <<EOF
+      9:
+        action: delete_indices
+        description: "Clean up the oldest postgresql-* indices that exceeds total disk space $POSTGRESQL_RETENTION_SIZE GB"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'postgresql-*'
+        - filtertype: space
+          disk_space: $POSTGRESQL_RETENTION_SIZE
+          use_age: True
+          source: creation_date
+        - filtertype: kibana
+          exclude: True
+      10:
+        action: delete_indices
+        description: "Clean up the postgresql-* indices that are older then $POSTGRESQL_RETENTION_AGE days"
+        options:
+          continue_if_exception: False
+          ignore_empty_list: True
+          allow_ilm_indices: True
+        filters:
+        # https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filters.html
+        - filtertype: pattern
+          kind: regex
+          value: 'postgresql-*'
+        - filtertype: age
+          source: creation_date
+          direction: older
+          unit: days
+          unit_count: $POSTGRESQL_RETENTION_AGE
+        - filtertype: kibana
+          exclude: True
+EOF
+fi
+cat <<EOF
 
   config.yml: |-
     ---
@@ -205,3 +220,4 @@ data:
       logformat: default
       # This is the default blacklist
       blacklist: ['elasticsearch', 'urllib3']
+EOF

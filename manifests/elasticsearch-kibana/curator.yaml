@@ -1,0 +1,30 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: curator
+  namespace: elastic-system
+spec:
+  # Run every 5 minutes
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: elasticsearch-curator
+            # https://hub.docker.com/r/bobrik/curator/tags/
+            image: bobrik/curator:5.7.6
+            imagePullPolicy: IfNotPresent
+            args: 
+            - --config
+            - /etc/config/config.yml
+            - /etc/config/action_file.yml
+            volumeMounts:
+              - name: config-volume
+                mountPath: /etc/config
+          volumes:
+            - name: config-volume
+              configMap:
+                name: curator-config
+          restartPolicy: Never
