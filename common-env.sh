@@ -25,7 +25,7 @@ export INFLUX_BACKUP_SCHEDULE="0 0 * * *"
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-example.com}"
 
 # Alerting variables
-export ALERT_TO=${ALERT_TO:-none}
+export ALERT_TO=${ALERT_TO:-null}
 # Default URL is for sending to the #ck8s-ops channel
 export SLACK_API_URL=${SLACK_API_URL:-https://hooks.slack.com/services/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}
 
