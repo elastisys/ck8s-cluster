@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ck8sdash-info-text
+  namespace: ck8sdash
+data:
+  info.json: |
+    {
+      "elastisys": {
+        "header": "Welcome",
+        "body": "Welcome to CK8SDash.",
+        "button": {
+          "title": "Elastisys",
+          "url": "https://elastisys.com"
+        }
+      },
+      "support": {
+        "header": "Service ",
+        "body": "If you need help with the cluster, please go here.",
+        "button": {
+          "title": "Service Desk",
+          "url": "https://servicedesk.com"
+        }
+      }
+    }

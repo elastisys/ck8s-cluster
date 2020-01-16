@@ -13,6 +13,8 @@ set -e
 : "${CUSTOMER_NAMESPACES:?Missing CUSTOMER_NAMESPACES}"
 : "${CUSTOMER_ADMIN_USERS:?Missing CUSTOMER_ADMIN_USERS}"
 : "${PROMETHEUS_PWD:?Missing PROMETHEUS_PWD}"
+: "${HARBOR_PWD:?Missing HARBOR_PWD}"
+: "${CUSTOMER_GRAFANA_PWD:?Missing CUSTOMER_GRAFANA_PWD}"
 : "${ELASTIC_USER_SECRET:?Missing ELASTIC_USER_SECRET}"
 : "${ENABLE_CUSTOMER_PROMETHEUS:?Missing ENABLE_CUSTOMER_PROMETHEUS}"
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
@@ -20,7 +22,7 @@ then
     : "${CUSTOMER_PROMETHEUS_PWD:?Missing CUSTOMER_PROMETHEUS_PWD}"
 fi
 : "${ENABLE_CUSTOMER_ALERTMANAGER:?Missing ENABLE_CUSTOMER_ALERTMANAGER}"
-if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
+if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
 then
     : "${ENABLE_CUSTOMER_ALERTMANAGER_INGRESS:?Missing ENABLE_CUSTOMER_ALERTMANAGER_INGRESS}"
     if [ $ENABLE_CUSTOMER_ALERTMANAGER_INGRESS == "true" ]
@@ -212,6 +214,7 @@ helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply
 # Install ck8sdash
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service-account.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/init-script-cm.yaml
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/info-text-cm.yaml
 envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/env-secret-wc.yaml | kubectl apply -f -
 envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/ingress-wc.yaml | kubectl apply -f -
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service.yaml

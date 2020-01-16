@@ -5,7 +5,7 @@ metadata:
   namespace: ck8sdash
 spec:
   ports:
-    - port: 4654
-      targetPort: 4654
+    - port: 8080
+      targetPort: 8080
   selector:
     app: ck8sdash

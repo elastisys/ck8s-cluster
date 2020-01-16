@@ -13,19 +13,22 @@ spec:
       labels:
         app: ck8sdash
     spec:
-      securityContext:
-        runAsUser: 1000
       serviceAccountName: ck8sdash
       initContainers:
       - name: create-grafana-api-key
         image: elastisys/curl-jq
         command: ['sh', '/scripts/init.sh']
         env:
-        - name: GRAFANA_BASIC_CREDENTIALS
+        - name: GRAFANA_USERNAME
           valueFrom:
             secretKeyRef:
               name: ck8sdash-env
-              key: grafana-credentials
+              key: grafana-username
+        - name: GRAFANA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: grafana-password
         - name: GRAFANA_URL
           valueFrom:
             secretKeyRef:
@@ -40,31 +43,95 @@ spec:
         - name: scripts
           mountPath: /scripts
       containers:
-      - name: ck8sdash
-        image: elastisys/ck8sdash:0.0.12
+      - name: ck8sdash-nginx
+        image: elastisys/ck8sdash-nginx:0.1.0
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 50m
+          limits:
+            memory: 128Mi
+            cpu: 100m
         # Note that these values are not reloaded if the secret is changed
         # The pod needs to be restarted to load new values
         env:
+        - name: API_SERVER #ck8sdash-server port
+          value: localhost:9090
+        - name: PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080
+      - name: ck8sdash-server
+        image: elastisys/ck8sdash-server:0.1.0
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 50m
+          limits:
+            memory: 128Mi
+            cpu: 100m
+        volumeMounts:
+        - name: info-text
+          mountPath: /info-text
+        # Note that these values are not reloaded if the secret is changed
+        # The pod needs to be restarted to load new values
+        env:
+        - name: PORT
+          value: "9090"
+        - name: INFO_PATH
+          value: /info-text/info.json
         - name: GRAFANA_API_KEY
           valueFrom:
             secretKeyRef:
               name: ck8sdash-grafana-api-key
               key: grafana-api-key
-        - name: URL
+        - name: GRAFANA_URL
           valueFrom:
             secretKeyRef:
               name: ck8sdash-env
-              key: eck-base-domain
-        - name: HARBOR_BASIC_CREDENTIALS
+              key: grafana-url
+        - name: HARBOR_URL
           valueFrom:
             secretKeyRef:
               name: ck8sdash-env
-              key: harbor-credentials
-        - name: KIBANA_BASIC_CREDENTIALS
+              key: harbor-url
+        - name: KIBANA_URL
           valueFrom:
             secretKeyRef:
               name: ck8sdash-env
-              key: kibana-credentials
+              key: kibana-url
+        - name: ELASTIC_URL
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: elastic-url
+        - name: OIDC_URL
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: oidc-url
+        - name: HARBOR_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: harbor-username
+        - name: HARBOR_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: harbor-password
+        - name: ELASTIC_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: elastic-username
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: elastic-password
         - name: OIDC_CLIENT_ID
           valueFrom:
             secretKeyRef:
@@ -75,14 +142,37 @@ spec:
             secretKeyRef:
               name: ck8sdash-env
               key: oidc-secret
-        - name: OIDC_URL
+        - name: ENABLE_OPA
           valueFrom:
             secretKeyRef:
               name: ck8sdash-env
-              key: oidc-url
+              key: enable-opa
+        - name: ENABLE_FALCO
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: enable-falco
+        - name: ELASTIC_KUBERNETES_INDEX_PREFIX
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: elastic-kubernetes-index-prefix
+        - name: ELASTIC_COMPONENTS_INDEX_PREFIX
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: elastic-components-index-prefix
+        - name: GRAFANA_DATASOURCE
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-env
+              key: grafana-datasource
         ports:
-        - containerPort: 4654
+        - containerPort: 9090
       volumes:
       - name: scripts
         configMap:
           name: ck8sdash-init-script
+      - name: info-text
+        configMap:
+          name: ck8sdash-info-text

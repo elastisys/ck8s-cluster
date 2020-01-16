@@ -19,4 +19,4 @@ spec:
         - path: /
           backend:
             serviceName: ck8sdash
-            servicePort: 4654
+            servicePort: 8080

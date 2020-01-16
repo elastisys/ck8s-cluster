@@ -19,22 +19,22 @@ data:
         ${APISERVER}/api/v1/namespaces/ck8sdash/secrets/ck8sdash-grafana-api-key) ]
     then
         echo "Secret does not exist. Must create new api key."
-        while [ "200" != $(curl -ksI -o /dev/null -X GET -w "%{http_code}" -u ${GRAFANA_BASIC_CREDENTIALS} \
-            https://${GRAFANA_URL}) ]
+        while [ "200" != $(curl -ksI -o /dev/null -X GET -w "%{http_code}" -u ${GRAFANA_USERNAME}:${GRAFANA_PASSWORD} \
+            ${GRAFANA_URL}) ]
         do
             echo "Waiting for grafana endpoint to be ready"
             sleep 1
         done
 
-        id=$(curl -sk -X GET https://${GRAFANA_URL}/api/auth/keys -u ${GRAFANA_BASIC_CREDENTIALS} \
+        id=$(curl -sk -X GET ${GRAFANA_URL}/api/auth/keys -u ${GRAFANA_USERNAME}:${GRAFANA_PASSWORD} \
             | jq '.[] | select(.name=="'${GRAFANA_API_KEY_NAME}'") | .id')
         regex='^[0-9][0-9]*$'
         if echo -n $id | grep -q $regex
         then 
             echo "Deleting old api key"
-            curl -sk -X DELETE https://${GRAFANA_URL}/api/auth/keys/${id} -u ${GRAFANA_BASIC_CREDENTIALS}
+            curl -sk -X DELETE ${GRAFANA_URL}/api/auth/keys/${id} -u ${GRAFANA_USERNAME}:${GRAFANA_PASSWORD}
         fi
-        export GRAFANA_API_KEY=$(curl -s -X POST https://${GRAFANA_URL}/api/auth/keys -u ${GRAFANA_BASIC_CREDENTIALS} \
+        export GRAFANA_API_KEY=$(curl -s -X POST ${GRAFANA_URL}/api/auth/keys -u ${GRAFANA_USERNAME}:${GRAFANA_PASSWORD} \
             -H "Content-Type: application/json" -d '{"name": "'${GRAFANA_API_KEY_NAME}'", "role": "Admin"}' \
             | jq -j '.key')
         echo
