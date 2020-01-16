@@ -15,20 +15,56 @@ The script will do the following:
 4. Create a git commit with message `release version vx.x.x`
 5. Create a tag named `vx.x.x`
 
+OBS! the release must be done from someone with write access to the master branch.
+
 ## While developing
 
 When a feature or change is developed on a branch fill out some human readable
 bullet points in the `WIP-CHANGELOG.md` this will make it easier to track the changes.
-Once the release is done this will be appended to the main changelog. Add the bullet points
-in some subsections for example:
+Once the release is done this will be appended to the main changelog. 
+
+## Structure
+
+The structure follow the guidelines of [keepachangelog](https://keepachangelog.com/en/1.0.0/).
+
+Changelogs are for humans, not machines. Keep messages in human readable form rather
+than commits or code. Commits or pull requests can off course be linked. Add messages
+as bullet points under one of theese categories:
 
 * Added
+* Changed
+* Deprecated
 * Removed
-* Changes
-* Fixes
+* Fixed
+* Security
+
+When creating a major (and perhaps minor) release a section of `Release highlights` can be added at the top with a summary of all the patch notes.
 
 You can link comments to related pull requests with `PR#pr-number`. Commit ids can be linked
 by just writing that commits short hash or full hash.
 
+# Example changelog
 
-Exact format of CHANGELOG is yet to be determined.
+## v0.1.2 - 2020-01-14  (OBS! this line is automatically added by script)
+
+### Added
+
+* Option to add prometheus scrape endpoints
+* Retetion for elasticsearch
+
+### Changed
+
+* Updated grafana version to 6.7.0
+* Changed manifests for deploying ck8sdash into a helm chart PR#120
+
+### Deprecated
+
+* Option to disable OPA with `ENABLE_OPA` variable. Now always true
+
+### Removed
+
+* Curator has been removed. Now retention is configured with ILM.
+
+### Fixed
+
+* bugfix deploying elasticsearch operator 2310e74

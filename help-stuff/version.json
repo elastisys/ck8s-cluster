@@ -1,0 +1,15 @@
+{
+  "ck8s": "0.1.0",
+  "k8s": "1.16.3",
+  "services": {
+    "grafana": "6.5.2",
+    "prometheus": "v2.13.1",
+    "elasticsearch": "7.4.2",
+    "kibana": "7.4.2",
+    "nginx-ingress-controller": "0.26.1",
+    "harbor-core": "v1.10.0",
+    "falco": "0.17.1",
+    "velero": "v1.1.0",
+    "fluentd": "v2.8.0"
+  }
+}

@@ -70,9 +70,9 @@ rm temp*
 # Clearing WIP-CHANGELOG.md
 > WIP-CHANGELOG.md
 
-#git add VERSION.md CHANGELOG.md WIP-CHANGELOG.md
-#git commit -m "Releasing v${new_version}"
-#git tag -a "v${new_version}" -m "releasing version ${new_version}"
+git add VERSION.md CHANGELOG.md WIP-CHANGELOG.md
+git commit -m "Releasing v${new_version}"
+git tag -a "v${new_version}" -m "releasing version ${new_version}"
 
 echo ""
 echo "finish release with:"
