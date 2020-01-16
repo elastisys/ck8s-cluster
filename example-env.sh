@@ -70,6 +70,7 @@ export ENABLE_CUSTOMER_PROMETHEUS="<true|false>" # default false
 export ENABLE_CUSTOMER_GRAFANA="<true|false>" # default true
 export ENABLE_CUSTOMER_ALERTMANAGER="<true|false>" # default false
 export ENABLE_CUSTOMER_ALERTMANAGER_INGRESS="<true|false>" # default false
+export ENABLE_POSTGRESQL="<true|false>" # default false
 
 # Identity providers
 export AAA_CLIENT_ID=1234
@@ -116,6 +117,8 @@ export KUBERNETES_RETENTION_SIZE=1 #SIZE in GB when kubernetes container logs sh
 export KUBERNETES_RETENTION_AGE=10 #AGE in days when kubernetes container  logs should be removed for index 'kubernetes'
 export OTHER_RETENTION_SIZE=1 #SIZE in GB when other logs should be removed for index 'other'
 export OTHER_RETENTION_AGE=10 #AGE in days when other logs should be removed for index 'other'
+export POSTGRESQL_RETENTION_SIZE=30 #SIZE in GB when other logs should be removed for index 'postgresql'
+export POSTGRESQL_RETENTION_AGE=30 #AGE in days when other logs should be removed for index 'postgresql'
 export ROLLOVER_SIZE=1 #SIZE in GB when indices should perform rollover
 export ROLLOVER_AGE=1 #AGE in days when indices should perform rollover
 
