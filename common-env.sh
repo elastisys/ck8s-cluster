@@ -28,6 +28,8 @@ export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-example.com}"
 export ALERT_TO=${ALERT_TO:-null}
 # Default URL is for sending to the #ck8s-ops channel
 export SLACK_API_URL=${SLACK_API_URL:-https://hooks.slack.com/services/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}
+export ENABLE_HEARTBEAT=${ENABLE_HEARTBEAT:-false}
+export OPSGENIE_API_KEY=${OPSGENIE_API_KEY:-0c10e49c-e3fc-4e22-8703-b7ef9d4ba598}
 
 # If unset -> true
 export ENABLE_PSP=${ENABLE_PSP:-true}

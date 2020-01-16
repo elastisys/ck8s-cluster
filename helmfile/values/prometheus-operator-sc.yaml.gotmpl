@@ -22,9 +22,16 @@ alertmanager:
       receiver: '{{ requiredEnv "ALERT_TO" }}'
       routes:
       - match:
-          # The watchdog alert is always active, send it to null.
+          # The watchdog alert is always active to show that things are working
           alertname: Watchdog
+        # Repeat often to integreate with opsgenies heartbeat feture.
+        # If this goes silent, opsgenie will send out alerts.
+        repeat_interval: 1m
+        {{ if eq (env "ENABLE_HEARTBEAT") "true" }}
+        receiver: heartbeat
+        {{ else }}
         receiver: 'null'
+        {{ end }}
       - match:
           # TODO: it would be nice to do this some other way.
           # The workload_cluster does not have an alertmanager, send to null.
@@ -52,6 +59,17 @@ alertmanager:
         receiver: 'null'
     receivers:
     - name: 'null'
+    - name: heartbeat
+      {{ if eq (env "ENABLE_HEARTBEAT") "true" }}
+      webhook_configs:
+        - url: https://api.eu.opsgenie.com/v2/heartbeats/{{ requiredEnv "OPSGENIE_HEARTBEAT_NAME" }}/ping
+          send_resolved: false
+          http_config:
+            basic_auth:
+              # https://docs.opsgenie.com/docs/authentication
+              # username: no username
+              password: {{ requiredEnv "OPSGENIE_API_KEY" }}
+      {{ end }}
     - name: slack
       {{ if eq (env "ALERT_TO") "slack" }}
       slack_configs:

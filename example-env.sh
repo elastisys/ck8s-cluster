@@ -114,6 +114,10 @@ export ELASTIC_USER_SECRET=z4lcf527wqv2np8n2wcqtqxs #default randomly generated 
 # Alerting variables
 export ALERT_TO="slack" # default "null", one of slack or null
 export SLACK_API_URL="https://..." # Default URL is for sending to the #ck8s-ops channel
+export ENABLE_HEARTBEAT="<true|false>" # default false, use opsgenie heartbeat feature
+# See https://elastisys.app.eu.opsgenie.com/settings/integration/configured-integrations
+export OPSGENIE_API_KEY=api-key-here # defaults to API key for prometheus/alertmanager integration
+export OPSGENIE_HEARTBEAT_NAME=name-of-heartbeat # required if heartbeat enabled, no default
 
 # Retention variables
 export KUBEAUDIT_RETENTION_SIZE=100 #SIZE in GB when auditlogs should be removed for index 'kubeaudit'

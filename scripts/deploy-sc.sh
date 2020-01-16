@@ -22,6 +22,14 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 : "${SLACK_API_URL:?Missing SLACK_API_URL}"
 : "${OAUTH_ALLOWED_DOMAINS:?Missing OAUTH_ALLOWED_DOMAINS}"
 
+# Alerting
+: "${ENABLE_HEARTBEAT:?Missing ENABLE_HEARTBEAT}"
+: "${OPSGENIE_API_KEY:?Missing OPSGENIE_API_KEY}"
+if [ $ENABLE_HEARTBEAT == "true" ]
+then
+    : "${OPSGENIE_HEARTBEAT_NAME:?Missing OPSGENIE_HEARTBEAT_NAME}"
+fi
+
 # Check that passwords are set
 : "${INFLUXDB_PWD:?Missing INFLUXDB_PWD}"
 : "${HARBOR_PWD:?Missing HARBOR_PWD}"
