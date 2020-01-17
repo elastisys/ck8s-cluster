@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb-du-monitoring-deployment
+  namespace: influxdb-prometheus
+  labels:
+    app: influxdb-du-monitoring
+    release: prometheus-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb-du-monitoring
+  template:
+    metadata:
+      name: influxdb-du-monitoring-pod
+      labels:
+        app: influxdb-du-monitoring
+        release: prometheus-operator
+    spec:  
+      volumes:
+        - name: influxdb-pv
+          persistentVolumeClaim:
+            claimName: influxdb-data-influxdb-0 # we assume that this name does not change (since it is a StatefulSet with a single replica)
+        - name: textfile-collector-dir
+          emptyDir: {}
+        - name: scripts
+          configMap:
+            name: influxdb-du-monitoring-script
+        - name: cronfiles
+          configMap:
+            name: influxdb-du-monitoring-cronjob
+      initContainers:
+        # influxdb is running as root, so in order to be able to execute du on database directory we need to add read and execute rights 
+        - name: change-data-dir-rights
+          image: alpine:3.11
+          command:
+          - chmod
+          - -R
+          - a+rx
+          - /var/lib/influxdb/data/{{ .Values.influxdb.databaseName }}
+          volumeMounts:
+          - mountPath: /var/lib/influxdb
+            name: influxdb-pv
+      containers:
+        - name: influxdb-du-monitoring-node-exporter
+          image: prom/node-exporter:v0.18.1
+          args: ["--collector.textfile.directory=/textfile-collector", "--no-collector.arp", "--no-collector.bcache", "--no-collector.bonding", "--no-collector.conntrack", "--no-collector.cpu", "--no-collector.cpufreq", "--no-collector.diskstats", "--no-collector.edac", "--no-collector.entropy", "--no-collector.filefd", "--no-collector.filesystem", "--no-collector.hwmon", "--no-collector.infiniband", "--no-collector.ipvs", "--no-collector.loadavg", "--no-collector.mdadm", "--no-collector.meminfo", "--no-collector.netclass", "--no-collector.netdev", "--no-collector.nfs", "--no-collector.nfsd", "--no-collector.netstat", "--no-collector.pressure", "--no-collector.stat", "--no-collector.sockstat", "--no-collector.timex", "--no-collector.vmstat", "--no-collector.xfs", "--no-collector.zfs"]
+            # enabled collectors: textfile, time, uname
+          ports:
+          - containerPort: 9100
+            name: web
+          volumeMounts:
+            - name: textfile-collector-dir
+              mountPath: /textfile-collector
+        - name: influxdb-du-monitoring-cronjob
+          image: bambash/docker-cron
+          volumeMounts:
+            - name: influxdb-pv
+              mountPath: /var/lib/influxdb
+            - name: textfile-collector-dir
+              mountPath: /textfile-collector
+            - name: scripts
+              mountPath: /scripts
+            - name: cronfiles
+              mountPath: /etc/cron.d/
