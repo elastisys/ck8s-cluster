@@ -18,7 +18,7 @@ variable ssh_pub_key_file_wc {
   type = string
 }
 
-variable "dns_prefix" {
+variable dns_prefix {
   description = "Prefix name for dns"
   type        = string
 }
@@ -35,7 +35,7 @@ variable sc_worker_count {
   default     = 2
 }
 
-variable "sc_nfs_storage_size" {
+variable sc_nfs_storage_size {
   description = "The size in GB of the NFS server block volume."
   type        = number
   default     = 50
@@ -53,7 +53,7 @@ variable wc_worker_count {
   default     = 1
 }
 
-variable "wc_nfs_storage_size" {
+variable wc_nfs_storage_size {
   description = "The size in GB of the NFS server block volume."
   type        = number
   default     = 50
