@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-metrics-retention-script
+  namespace: influxdb-prometheus
+data:
+  influxdb-size-based-metrics-retention.py: |
+{{ .Files.Get "influxdb-size-based-metrics-retention.py" | indent 4}}

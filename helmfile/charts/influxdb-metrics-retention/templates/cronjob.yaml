@@ -1,0 +1,64 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: influxdb-metrics-retention-cronjob
+  labels:
+    app: influxdb-metrics-retention
+spec:
+  schedule: "{{ .Values.retention.cronSchedule }}"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: influxdb-metrics-retention
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+            - name: python-script
+              configMap:
+                name: influxdb-metrics-retention-script
+          containers:
+            - name: influxdb-metrics-retention
+              image: elastisys/influx-metric-retention:latest
+              command: ["python3", "/app/influxdb-size-based-metrics-retention.py"]
+              env:
+              - name: INFLUXDB_HOST
+                value: influxdb
+              - name: INFLUXDB_PORT
+                value: "8086"
+              - name: INFLUXDB_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: influxdb-metrics-retention-env
+                    key: influxdb-username
+              - name: INFLUXDB_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: influxdb-metrics-retention-env
+                    key: influxdb-password
+              - name: INFLUXDB_DATABASE
+                value: "{{ .Values.influxdb.databaseName }}"
+              - name: INFLUXDB_MIN_SHARDS
+                value: "{{ .Values.retention.minShards }}"
+              - name: INFLUXDB_DATABASE_SIZE_LIMIT
+                value: "{{ .Values.retention.databaseSizeLimit }}"
+              - name: PROMETHEUS_HOST
+                value: prometheus-operator-prometheus.monitoring
+              - name: PROMETHEUS_PORT
+                value: "9090"
+              - name: PROMETHEUS_INFLUXDB_METRIC
+                value: influxdb_{{ .Values.influxdb.databaseName }}_size
+              - name: LOGLEVEL
+                value: "{{ .Values.retention.logLevel }}"
+              volumeMounts:
+                - name: python-script
+                  mountPath: /app
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 100Mi
+                limits:
+                  cpu: 250m
+                  memory: 500Mi            
