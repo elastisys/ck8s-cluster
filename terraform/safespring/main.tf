@@ -10,9 +10,9 @@ terraform {
 }
 
 provider "openstack" {
-  project_domain_name = "elastisys.se"
-  user_domain_name    = "elastisys.se"
-  tenant_name         = "infra.elastisys.se"
+  project_domain_name = var.domain_name
+  user_domain_name    = var.domain_name
+  tenant_name         = var.tenant_name
   auth_url            = "https://keystone.api.cloud.ipnett.se/v3"
   region              = "se-east-1"
 }
