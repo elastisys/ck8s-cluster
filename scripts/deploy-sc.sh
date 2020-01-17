@@ -19,15 +19,28 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 : "${ENABLE_HARBOR:?Missing ENABLE_HARBOR}"
 : "${ENABLE_CUSTOMER_PROMETHEUS:?Missing ENABLE_CUSTOMER_PROMETHEUS}"
 : "${ENABLE_CUSTOMER_GRAFANA:?Missing ENABLE_CUSTOMER_GRAFANA}"
-: "${SLACK_API_URL:?Missing SLACK_API_URL}"
 : "${OAUTH_ALLOWED_DOMAINS:?Missing OAUTH_ALLOWED_DOMAINS}"
 
 # Alerting
+: "${ALERT_TO:?Missing ALERT_TO}"
 : "${ENABLE_HEARTBEAT:?Missing ENABLE_HEARTBEAT}"
-: "${OPSGENIE_API_KEY:?Missing OPSGENIE_API_KEY}"
 if [ $ENABLE_HEARTBEAT == "true" ]
 then
     : "${OPSGENIE_HEARTBEAT_NAME:?Missing OPSGENIE_HEARTBEAT_NAME}"
+    : "${OPSGENIE_API_KEY:?Missing OPSGENIE_API_KEY}"
+fi
+if [ $ALERT_TO == "opsgenie" ]
+then
+    : "${OPSGENIE_API_KEY:?Missing OPSGENIE_API_KEY}"
+elif [ $ALERT_TO == "slack" ]
+then
+    : "${SLACK_API_URL:?Missing SLACK_API_URL}"
+elif [ $ALERT_TO == "null" ]
+then
+    :; # This is OK, do nothing
+else
+    echo "ERROR: ALERT_TO must be set to one of slack, opsgenie or null."
+    exit 1
 fi
 
 # Check that passwords are set

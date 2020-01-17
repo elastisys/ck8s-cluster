@@ -20,7 +20,7 @@ export S3_ES_BACKUP_BUCKET_NAME=es-backup
 export S3_INFLUX_BUCKET_URL=s3://influxdb-backups
 
 # Disable alerts
-export ALERT_TO=none
+export ALERT_TO=null
 # In case we want alerts at some point
 export SLACK_API_URL=https://hooks.slack.com/services/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
 
