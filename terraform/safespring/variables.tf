@@ -1,11 +1,3 @@
-variable domain_name {
-  default = "elastisys.se"
-}
-
-variable tenant_name {
-  default = "infra.elastisys.se"
-}
-
 variable ssh_pub_key_file_sc {
   description = "Path to public SSH key file which is injected into the VMs."
 

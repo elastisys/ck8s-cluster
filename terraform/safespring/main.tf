@@ -9,12 +9,8 @@ terraform {
   }
 }
 
+# This information is set with Environment variables
 provider "openstack" {
-  project_domain_name = var.domain_name
-  user_domain_name    = var.domain_name
-  tenant_name         = var.tenant_name
-  auth_url            = "https://keystone.api.cloud.ipnett.se/v3"
-  region              = "se-east-1"
 }
 
 data "openstack_compute_flavor_v2" "b_small" {
