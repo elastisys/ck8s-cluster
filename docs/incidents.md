@@ -3,6 +3,42 @@
 This document describes incidents that we have encountered.
 The goal is to be able to learn, spread knowledge and avoid problems in the future.
 
+## 2020-01-20 - Elasticsearch health unknown, pods initializing
+
+**Cloud provider:** Safespring
+**Environment:** Tempus
+**Cluster:** service cluster
+
+### In what state was the cluster
+
+Two of three elasticsearch pods were stuck initializing, the third was running.
+The elasticsearch cluster health showed "unknown".
+
+The two pods that were stuck initializing did not manage to mount the data volume.
+Logs (see below) from the kubelet indicated that the node status did not show the volume as mounted after trying to mount it.
+In Safespring's web GUI, the volumes showed as attached to the correct VMs.
+It is unknown what this looked like from the VM itself (did the volume show up in the filesystem or not?).
+
+```
+I0120 06:07:56.686034    4962 reconciler.go:203] operationExecutor.VerifyControllerAttachedVolume started for volume "pvc-fc31cdd6-bace-498b-8aa4-bede891e38c4" (UniqueName: "kubernetes.io/cinder/1ffb10df-eac1-4923-8bde-017955eed96a") pod "elasticsearch-es-nodes-0" (UID: "716f3cf9-1c65-41d5-ac6d-046b8a9ab93c")
+E0120 06:07:56.690633    4962 nestedpendingoperations.go:270] Operation for "\"kubernetes.io/cinder/1ffb10df-eac1-4923-8bde-017955eed96a\"" failed. No retries permitted until 2020-01-20 06:09:58.690574423 +0000 UTC m=+591079.290842552 (durationBeforeRetry 2m2s). Error: "Volume not attached according to node status for volume \"pvc-fc31cdd6-bace-498b-8aa4-bede891e38c4\" (UniqueName: \"kubernetes.io/cinder/1ffb10df-eac1-4923-8bde-017955eed96a\") pod \"elasticsearch-es-nodes-0\" (UID: \"716f3cf9-1c65-41d5-ac6d-046b8a9ab93c\") "
+```
+
+### Solution
+
+Detach the affected volumes through Safespring's API or web GUI.
+The volumes were then attached by Kubernetes as normal and the pods could initialize successfully.
+
+### What was the likely cause for the cluster state
+
+Safespring had multiple problems (API issues and loss of network) during the weekend which may have caused the volumes and nodes to end up in this situation.
+Unfortunately, we cannot be sure what exactly caused it.
+
+### Lessons learned
+
+- Inconsistencies between what the cloud provider and Kubernetes APIs can prevent self healing inside the cluster.
+- Resetting the state (turn off and on again, detach and attach again, etc.) can help in many situations.
+
 ## 2020-01-08 - Website API server not responding
 
 **Cloud provider:** Safespring
