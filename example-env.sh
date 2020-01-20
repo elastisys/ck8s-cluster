@@ -51,6 +51,13 @@ export CLOUD_PROVIDER=safespring
 export OS_USERNAME=user.name@elastisys.com
 export OS_PASSWORD=somelongsecret
 
+# Optional. if left unchecked these will be set to default values in safespring-common-env
+export OS_PROJECT_DOMAIN_NAME=elastisys.se
+export OS_USER_DOMAIN_NAME=elastisys.se
+export OS_PROJECT_NAME=infra.elastisys.se
+export OS_PROJECT_ID=9f91e56185fb4f929c36430ac4bcbe6e
+export S3_REGION_ENDPOINT=https://s3.sto1.safedc.net
+
 #
 # Kubernetes
 #
