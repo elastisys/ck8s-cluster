@@ -64,3 +64,20 @@ prometheus:
       limits:
         memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
         cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+    {{ if eq (env "ENABLE_POSTGRESQL") "true"  }}
+    additionalScrapeConfigs:
+    - job_name: 'postgresql_metrics'
+      scrape_interval: 30s
+      metrics_path: /metrics
+      static_configs:
+      - targets:
+        - 'postgres.tempus.elastisys.se:9187'
+
+    - job_name: 'postgresql_node_metrics'
+      scrape_interval: 30s
+      metrics_path: /metrics
+      scheme: http
+      static_configs:
+      - targets:
+        - 'postgres.tempus.elastisys.se:9100'
+    {{ end }}
