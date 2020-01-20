@@ -81,3 +81,20 @@ kubectl top pods --all-namespaces
 
 In Grafana, start from the cluster level and "drill down".
 The dashboards "Kubernetes / Compute Resources / Cluster" and "Kubernetes / USE Method / Cluster" show cluster level metrics.
+
+## Kubernetes component logs
+
+Check logs for the kubelet, API server or other Kubernetes components by ssh-ing to the relevant node.
+The username is `rancher` for all Exoscale clusters and `ubuntu` on other cloud providers.
+List the running docker containers with `docker ps` and view the logs with `docker logs <name-of-container>`.
+
+Example:
+
+```
+# check IP address
+kubectl get nodes -o wide
+# ssh to node
+ssh -i clusters/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/ssh-keys/id_rsa_sc ${USERNAME}@${IP_ADDRESS}
+# get logs from the kubelet container
+docker logs kubelet
+```
