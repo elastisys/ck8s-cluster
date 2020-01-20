@@ -8,7 +8,8 @@ import urllib.parse
 def create_logger():
     global logger
     logger = logging.getLogger('influxdb_size_based_metrics_retention')
-    LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+    # LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+    LOGLEVEL = os.environ.get('LOGLEVEL', 'DEBUG').upper()
     logger.setLevel(LOGLEVEL)
     ch = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s \n%(message)s')
@@ -41,7 +42,8 @@ def get_config():
         PROMETHEUS_INFLUXDB_METRIC = os.environ['PROMETHEUS_INFLUXDB_METRIC']
     except KeyError as err:
         logger.error("Environment variable [%s] is not set!", str(err))
-        quit()
+        raise err
+        # quit()
 
 def parse_numeric_config():
     global INFLUXDB_DATABASE_SIZE_LIMIT
@@ -52,21 +54,18 @@ def parse_numeric_config():
         INFLUXDB_MIN_SHARDS = int(INFLUXDB_MIN_SHARDS_STRING)
     except ValueError as err:
         logger.error("Environment variable [%s] could not be parsed to integer!", str(err))
-        quit()
+        raise err
+        # quit()
 
 def get_db_size():
-    # create request url to query Prometheus regarding the InfluxDB database size
-    PROMETHEUS_GET_URL = "http://" + PROMETHEUS_HOST + ":" + PROMETHEUS_PORT + "/api/v1/query?query=" + PROMETHEUS_INFLUXDB_METRIC
-
-    # send the request to Prometheus
     try:
+        # create request url to query Prometheus regarding the InfluxDB database size
+        PROMETHEUS_GET_URL = "http://" + PROMETHEUS_HOST + ":" + PROMETHEUS_PORT + "/api/v1/query?query=" + PROMETHEUS_INFLUXDB_METRIC
+
+        # send the request to Prometheus
         prometheus_response = requests.get(url = PROMETHEUS_GET_URL)
-    except:
-        logger.error("Connection to [%s] failed", PROMETHEUS_GET_URL)
-        quit()
 
-    # parse the response from Prometheus
-    try:
+        # parse the response from Prometheus
         prometheus_query_response_data = prometheus_response.json()
         prometheus_query_response_data_normalized = json_normalize(data=prometheus_query_response_data['data']['result'], errors='ignore')
         prometheus_query_response_data_filtered = prometheus_query_response_data_normalized[prometheus_query_response_data_normalized['metric.__name__']==PROMETHEUS_INFLUXDB_METRIC]
@@ -74,10 +73,15 @@ def get_db_size():
         prometheus_metric_value = prometheus_metric_row['value'][1]
         db_size = int(prometheus_metric_value)
         return db_size
-    except:
+    except (IndexError, ValueError):
         logger.error("Could not get the current size of [%s] database.", INFLUXDB_DATABASE)
         logger.debug("Response=[%s]", prometheus_response.content)
-        quit()
+        raise ValueError
+    except:
+        logger.error("Connection to [%s] failed", PROMETHEUS_GET_URL)
+        raise ConnectionError        
+
+        # quit()
 
 def get_oldest_shard():
     # create request url to query InfluxDB regarding the shards
@@ -141,7 +145,8 @@ def get_oldest_shard():
     except:
         logger.error("Could not get the oldes shard of [%s] database.", INFLUXDB_DATABASE)
         logger.debug("Response=[%s]", str(influxdb_get_response.content))
-        quit()
+        raise RuntimeError
+        # quit()
 
 def drop_shard(shard_id):
     query = "DROP SHARD " + str(shard_id)
@@ -154,26 +159,30 @@ def drop_shard(shard_id):
     #     influxdb_drop_response = requests.post(url = INFLUXDB_DROP_URL)
     # except:
     #     logger.error("Connection to [%s] failed", INFLUXDB_DROP_URL)
+    #     raise ConnectionError
     #     quit()
     
     # logger.debug(influxdb_drop_response)
     logger.info("Shard with id [%d] dropped successfully.", shard_id)
 
 def main():
-    create_logger()
-    get_config()
-    parse_numeric_config()
+    try:
+        create_logger()
+        get_config()
+        parse_numeric_config()
 
-    db_size = get_db_size()
+        db_size = get_db_size()
 
-    if db_size <= INFLUXDB_DATABASE_SIZE_LIMIT:
-        logger.info("Current size of [%s] database [%d] is within the limit [%d]. No action needed.", INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
-        quit()
+        if db_size <= INFLUXDB_DATABASE_SIZE_LIMIT:
+            logger.info("Current size of [%s] database [%d] is within the limit [%d]. No action needed.", INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
+            quit()
 
-    logger.warning("Current size of [%s] database [%d] is over the limit [%d]! Removing the oldest shard.", INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
+        logger.warning("Current size of [%s] database [%d] is over the limit [%d]! Removing the oldest shard.", INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
 
-    oldest_shard_id = get_oldest_shard()
-    drop_shard(oldest_shard_id)
+        oldest_shard_id = get_oldest_shard()
+        drop_shard(oldest_shard_id)
+    except:
+        logger.error("Runtime error. Script excecution interrupted!")
 
 if __name__ == "__main__":
     main()
