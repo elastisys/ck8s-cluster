@@ -238,6 +238,26 @@ releases:
   missingFileHandler: error
   values:
   - values/blackbox.yaml.gotmpl
+  
+- name: influxdb-du-monitoring
+  namespace: influxdb-prometheus
+  labels:
+    app: influxdb-du-monitoring
+  chart: ./charts/influxdb-du-monitoring
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/influxdb-du-monitoring.yaml.gotmpl
+
+- name: influxdb-metrics-retention
+  namespace: influxdb-prometheus
+  labels:
+    app: influxdb-metrics-retention
+  chart: ./charts/influxdb-metrics-retention
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/influxdb-metrics-retention.yaml.gotmpl
 
 # Fluentd
 - name: fluentd
