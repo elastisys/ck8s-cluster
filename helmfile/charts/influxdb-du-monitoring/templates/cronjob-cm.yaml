@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: influxdb-du-monitoring-cronjob
+  name: {{ .Release.Name }}-cronjob
   namespace: influxdb-prometheus
 data:
   cronjob: |

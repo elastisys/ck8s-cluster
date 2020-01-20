@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-    name: influxdb-du-monitoring-service-monitor
+    name: {{ .Release.Name }}-service-monitor
     namespace: monitoring
     labels:
         app: prometheus-operator-influxdb-du-monitoring

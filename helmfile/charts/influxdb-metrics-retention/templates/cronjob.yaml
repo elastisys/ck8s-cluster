@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: influxdb-metrics-retention-cronjob
+  name: {{ .Release.Name }}-cronjob
   labels:
     app: influxdb-metrics-retention
 spec:
@@ -18,10 +18,10 @@ spec:
           volumes:
             - name: python-script
               configMap:
-                name: influxdb-metrics-retention-script
+                name: {{ .Release.Name }}-script
           containers:
             - name: influxdb-metrics-retention
-              image: elastisys/influx-metric-retention:latest
+              image: elastisys/influxdb-metrics-retention:latest
               command: ["python3", "/app/influxdb-size-based-metrics-retention.py"]
               env:
               - name: INFLUXDB_HOST

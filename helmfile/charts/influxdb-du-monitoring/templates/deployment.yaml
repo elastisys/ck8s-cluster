@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: influxdb-du-monitoring-deployment
+  name: {{ .Release.Name }}-deployment
   namespace: influxdb-prometheus
   labels:
     app: influxdb-du-monitoring
@@ -13,7 +13,7 @@ spec:
       app: influxdb-du-monitoring
   template:
     metadata:
-      name: influxdb-du-monitoring-pod
+      name: {{ .Release.Name }}-pod
       labels:
         app: influxdb-du-monitoring
         release: prometheus-operator
@@ -26,10 +26,10 @@ spec:
           emptyDir: {}
         - name: scripts
           configMap:
-            name: influxdb-du-monitoring-script
+            name: {{ .Release.Name }}-script
         - name: cronfiles
           configMap:
-            name: influxdb-du-monitoring-cronjob
+            name: {{ .Release.Name }}-cronjob
       initContainers:
         # influxdb is running as root, so in order to be able to execute du on database directory we need to add read and execute rights 
         - name: change-data-dir-rights
@@ -43,7 +43,7 @@ spec:
           - mountPath: /var/lib/influxdb
             name: influxdb-pv
       containers:
-        - name: influxdb-du-monitoring-node-exporter
+        - name: {{ .Release.Name }}-node-exporter
           image: prom/node-exporter:v0.18.1
           args: ["--collector.textfile.directory=/textfile-collector", "--no-collector.arp", "--no-collector.bcache", "--no-collector.bonding", "--no-collector.conntrack", "--no-collector.cpu", "--no-collector.cpufreq", "--no-collector.diskstats", "--no-collector.edac", "--no-collector.entropy", "--no-collector.filefd", "--no-collector.filesystem", "--no-collector.hwmon", "--no-collector.infiniband", "--no-collector.ipvs", "--no-collector.loadavg", "--no-collector.mdadm", "--no-collector.meminfo", "--no-collector.netclass", "--no-collector.netdev", "--no-collector.nfs", "--no-collector.nfsd", "--no-collector.netstat", "--no-collector.pressure", "--no-collector.stat", "--no-collector.sockstat", "--no-collector.timex", "--no-collector.vmstat", "--no-collector.xfs", "--no-collector.zfs"]
             # enabled collectors: textfile, time, uname
@@ -53,7 +53,7 @@ spec:
           volumeMounts:
             - name: textfile-collector-dir
               mountPath: /textfile-collector
-        - name: influxdb-du-monitoring-cronjob
+        - name: {{ .Release.Name }}-cronjob
           image: bambash/docker-cron
           volumeMounts:
             - name: influxdb-pv

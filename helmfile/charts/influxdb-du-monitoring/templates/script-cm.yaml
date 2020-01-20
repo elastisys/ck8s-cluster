@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: influxdb-du-monitoring-script
+  name: {{ .Release.Name }}-script
   namespace: influxdb-prometheus
 data:
   export-influxdb-database-size.sh: |
