@@ -3,18 +3,34 @@ import requests
 import json
 from pandas.io.json import json_normalize
 import os
+import sys
 import urllib.parse
+
+INFLUXDB_HOST = None
+INFLUXDB_PORT = None
+INFLUXDB_USER = None
+INFLUXDB_PASSWORD = None
+INFLUXDB_DATABASE = None
+INFLUXDB_DATABASE_SIZE_LIMIT_STRING = None
+INFLUXDB_MIN_SHARDS_STRING = None
+PROMETHEUS_HOST = None
+PROMETHEUS_PORT = None
+PROMETHEUS_INFLUXDB_METRIC = None
+INFLUXDB_DATABASE_SIZE_LIMIT = 0
+INFLUXDB_MIN_SHARDS = 1
+
 
 def create_logger():
     global logger
     logger = logging.getLogger('influxdb_size_based_metrics_retention')
-    # LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
-    LOGLEVEL = os.environ.get('LOGLEVEL', 'DEBUG').upper()
+    LOGLEVEL = os.environ.get('LOGLEVEL', 'INFO').upper()
     logger.setLevel(LOGLEVEL)
     ch = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s \n%(message)s')
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s \n%(message)s')
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+
 
 def get_config():
     global INFLUXDB_HOST
@@ -43,7 +59,7 @@ def get_config():
     except KeyError as err:
         logger.error("Environment variable [%s] is not set!", str(err))
         raise err
-        # quit()
+
 
 def parse_numeric_config():
     global INFLUXDB_DATABASE_SIZE_LIMIT
@@ -53,74 +69,91 @@ def parse_numeric_config():
         INFLUXDB_DATABASE_SIZE_LIMIT = int(INFLUXDB_DATABASE_SIZE_LIMIT_STRING)
         INFLUXDB_MIN_SHARDS = int(INFLUXDB_MIN_SHARDS_STRING)
     except ValueError as err:
-        logger.error("Environment variable [%s] could not be parsed to integer!", str(err))
+        logger.error(
+            "Environment variable [%s] could not be parsed to integer!", str(err))
         raise err
-        # quit()
+
 
 def get_db_size():
     try:
         # create request url to query Prometheus regarding the InfluxDB database size
-        PROMETHEUS_GET_URL = "http://" + PROMETHEUS_HOST + ":" + PROMETHEUS_PORT + "/api/v1/query?query=" + PROMETHEUS_INFLUXDB_METRIC
+        PROMETHEUS_GET_URL = "http://" + PROMETHEUS_HOST + ":" + \
+            PROMETHEUS_PORT + "/api/v1/query?query=" + PROMETHEUS_INFLUXDB_METRIC
 
         # send the request to Prometheus
-        prometheus_response = requests.get(url = PROMETHEUS_GET_URL)
+        prometheus_response = requests.get(url=PROMETHEUS_GET_URL)
+        prometheus_response.raise_for_status()
 
         # parse the response from Prometheus
         prometheus_query_response_data = prometheus_response.json()
-        prometheus_query_response_data_normalized = json_normalize(data=prometheus_query_response_data['data']['result'], errors='ignore')
-        prometheus_query_response_data_filtered = prometheus_query_response_data_normalized[prometheus_query_response_data_normalized['metric.__name__']==PROMETHEUS_INFLUXDB_METRIC]
+        prometheus_query_response_data_normalized = json_normalize(
+            data=prometheus_query_response_data['data']['result'], errors='ignore')
+        prometheus_query_response_data_filtered = prometheus_query_response_data_normalized[
+            prometheus_query_response_data_normalized['metric.__name__'] == PROMETHEUS_INFLUXDB_METRIC]
         prometheus_metric_row = prometheus_query_response_data_filtered.iloc[0]
         prometheus_metric_value = prometheus_metric_row['value'][1]
         db_size = int(prometheus_metric_value)
         return db_size
     except (IndexError, ValueError):
-        logger.error("Could not get the current size of [%s] database.", INFLUXDB_DATABASE)
+        logger.error(
+            "Could not get the current size of [%s] database.", INFLUXDB_DATABASE)
         logger.debug("Response=[%s]", prometheus_response.content)
         raise ValueError
     except:
         logger.error("Connection to [%s] failed", PROMETHEUS_GET_URL)
-        raise ConnectionError        
+        raise ConnectionError
 
-        # quit()
 
-def get_oldest_shard():
-    # create request url to query InfluxDB regarding the shards
-    INFLUXDB_GET_URL = "http://" + INFLUXDB_HOST + ":" + INFLUXDB_PORT + "/query?u=" + INFLUXDB_USER + "&p=" + INFLUXDB_PASSWORD + "&q=SHOW SHARDS"
-        
+def get_shards():
     try:
-        influxdb_get_response = requests.get(url = INFLUXDB_GET_URL)
-    except:
-        logger.error("Connection to [%s] failed", INFLUXDB_GET_URL)
-        quit()
+        # create request url to query InfluxDB regarding the shards
+        INFLUXDB_GET_URL = "http://" + INFLUXDB_HOST + ":" + INFLUXDB_PORT + \
+            "/query?u=" + INFLUXDB_USER + "&p=" + INFLUXDB_PASSWORD + "&q=SHOW SHARDS"
 
-    try:
+        # send the request to InfluxDB
+        influxdb_get_response = requests.get(url=INFLUXDB_GET_URL)
+        influxdb_get_response.raise_for_status()
+
+        # parse the response from InfluxDB
         data = influxdb_get_response.json()
-        # normalized = json_normalize(data=data['results'][0]['series'], record_path='values', meta=data['results'][0]['series'][0]['columns'], errors='ignore')
 
-        normalized = json_normalize(data=data['results'][0]['series'], record_path='values', errors='ignore')
-        normalized.columns = ['id', 'database', 'retention_policy', 'shard_group', 'start_time', 'end_time', 'expiry_time', 'owners'] 
+        # get values
+        normalized = json_normalize(
+            data=data['results'][0]['series'], record_path='values', errors='ignore')
 
-        #TODO: get column names from the JSON file instead the hardcoded list above
-        #colnames = json_normalize(data=data['results'][0]['series'][0], record_path='columns')
-        # normalized.columns = colnames.values
+        # get column names
+        colnames = json_normalize(
+            data=data['results'][0]['series'][0], record_path='columns')
+        columns = []
+
+        for i in range(0, len(colnames.values)):
+            columns.append(colnames.values[i, 0])
+
+        normalized.columns = columns
 
         logger.debug("\nNORMALIZED")
         logger.debug(normalized)
 
-        fitered_data = normalized[normalized['database']==INFLUXDB_DATABASE]
+        # filter rows for specified database
+        fitered_data = normalized[normalized['database'] == INFLUXDB_DATABASE]
 
         logger.debug("\nFILTERED")
         logger.debug(fitered_data)
 
-        filtered_rows_count = fitered_data.shape[0]
+        return fitered_data
+    except (KeyError, TypeError, IndexError, ValueError):
+        logger.error(
+            "Could not get shards of [%s] database.", INFLUXDB_DATABASE)
+        logger.debug("Response=[%s]", str(influxdb_get_response.content))
+        raise RuntimeError
+    except:
+        logger.error("Connection to [%s] failed", INFLUXDB_GET_URL)
+        raise ConnectionError
 
-        logger.debug("\nFILTERED ROWS COUNT: %d", filtered_rows_count)
 
-        if (filtered_rows_count <= INFLUXDB_MIN_SHARDS):
-            logger.warning("[%s] database consists only of [%d] shards. Removing oldest shard aborted!", INFLUXDB_DATABASE, INFLUXDB_MIN_SHARDS)
-            quit()
-
-        sorted_data = fitered_data.sort_values(by=['expiry_time'])
+def get_oldest_shard(shards):
+    try:
+        sorted_data = shards.sort_values(by=['expiry_time'])
 
         logger.debug("\nSORTED")
         logger.debug(sorted_data)
@@ -138,32 +171,35 @@ def get_oldest_shard():
         logger.debug("\nVALUES")
         logger.debug("oldest_expiry_shard_id: %s", str(oldest_expiry_shard_id))
         logger.debug("oldest_expiry_database: %s", str(oldest_expiry_database))
-        logger.debug("oldest_expiry_retention_policy: %s", str(oldest_expiry_retention_policy))
+        logger.debug("oldest_expiry_retention_policy: %s",
+                     str(oldest_expiry_retention_policy))
         logger.debug("oldest_expiry_time: %s", str(oldest_expiry_time))
 
         return oldest_expiry_shard_id
-    except:
-        logger.error("Could not get the oldes shard of [%s] database.", INFLUXDB_DATABASE)
-        logger.debug("Response=[%s]", str(influxdb_get_response.content))
+    except (KeyError, TypeError, IndexError, ValueError):
+        logger.error(
+            "Could not get the oldes shard of [%s] database.", INFLUXDB_DATABASE)
         raise RuntimeError
-        # quit()
+
 
 def drop_shard(shard_id):
     query = "DROP SHARD " + str(shard_id)
     INFLUXDB_QUERY = urllib.parse.quote(query)
 
-    INFLUXDB_DROP_URL = "http://" + INFLUXDB_HOST + ":" + INFLUXDB_PORT + "/query?u=" + INFLUXDB_USER + "&p=" + INFLUXDB_PASSWORD + "&q=" + INFLUXDB_QUERY
+    INFLUXDB_DROP_URL = "http://" + INFLUXDB_HOST + ":" + INFLUXDB_PORT + \
+        "/query?u=" + INFLUXDB_USER + "&p=" + INFLUXDB_PASSWORD + "&q=" + INFLUXDB_QUERY
     logger.debug("\nPOST URL: " + INFLUXDB_DROP_URL)
 
-    # try:
-    #     influxdb_drop_response = requests.post(url = INFLUXDB_DROP_URL)
-    # except:
-    #     logger.error("Connection to [%s] failed", INFLUXDB_DROP_URL)
-    #     raise ConnectionError
-    #     quit()
-    
-    # logger.debug(influxdb_drop_response)
+    try:
+        influxdb_drop_response = requests.post(url=INFLUXDB_DROP_URL)
+        influxdb_drop_response.raise_for_status()
+    except:
+        logger.error("Connection to [%s] failed", INFLUXDB_DROP_URL)
+        logger.debug("Response=[%s]", str(influxdb_drop_response.content))
+        raise ConnectionError
+
     logger.info("Shard with id [%d] dropped successfully.", shard_id)
+
 
 def main():
     try:
@@ -174,15 +210,30 @@ def main():
         db_size = get_db_size()
 
         if db_size <= INFLUXDB_DATABASE_SIZE_LIMIT:
-            logger.info("Current size of [%s] database [%d] is within the limit [%d]. No action needed.", INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
+            logger.info("Current size of [%s] database [%d] is within the limit [%d]. No action needed.",
+                        INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
             quit()
 
-        logger.warning("Current size of [%s] database [%d] is over the limit [%d]! Removing the oldest shard.", INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
+        logger.warning("Current size of [%s] database [%d] is over the limit [%d]! Removing the oldest shard.",
+                       INFLUXDB_DATABASE, db_size, INFLUXDB_DATABASE_SIZE_LIMIT)
 
-        oldest_shard_id = get_oldest_shard()
+        shards = get_shards()
+        shards_number = shards.shape[0]
+        logger.debug("[%s] database consists of [%d] shards.",
+                     INFLUXDB_DATABASE, shards_number)
+
+        if (shards_number <= INFLUXDB_MIN_SHARDS):
+            logger.warning(
+                "Number of shards of [%s] database is not above the minimum number of [%d] shards. Removing the oldest shard aborted!", INFLUXDB_DATABASE, INFLUXDB_MIN_SHARDS)
+            quit()
+
+        oldest_shard_id = get_oldest_shard(shards)
         drop_shard(oldest_shard_id)
+    except SystemExit as e:
+        sys.exit(e)
     except:
         logger.error("Runtime error. Script excecution interrupted!")
+
 
 if __name__ == "__main__":
     main()
