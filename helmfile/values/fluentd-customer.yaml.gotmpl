@@ -181,6 +181,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubecomponents
@@ -228,6 +230,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubeaudit
@@ -275,6 +279,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubernetes
@@ -322,6 +328,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name other

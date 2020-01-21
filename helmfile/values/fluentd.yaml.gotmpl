@@ -37,11 +37,11 @@ additionalPlugins:
   #New version due to https://github.com/fluent/fluent-plugin-prometheus/issues/119
   #default: gem 'fluent-plugin-prometheus', '~>1.4.0'
 - name: fluent-plugin-prometheus
-  version: 1.6.1 
+  version: 1.6.1
   #Required for ilm features
 - name: elasticsearch-xpack
   version: 7.4
-  
+
 extraConfigMaps:
   system.conf: |-
     <system>
@@ -188,6 +188,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubecomponents
@@ -235,6 +237,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubeaudit
@@ -282,6 +286,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubernetes
@@ -329,6 +335,8 @@ extraConfigMaps:
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
         # Custom parameters --START--
+        reload_on_failure true
+        reload_connections false
         # Rollover index configuration
         include_timestamp true # defaults to false
         index_name other
