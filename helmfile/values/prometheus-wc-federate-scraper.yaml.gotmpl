@@ -86,6 +86,8 @@ scrapeConfig:
       - '{job="apiserver"}'
       - '{job="prometheus-operator-prometheus"}'
       - '{job="prometheus-operator-operator"}'
+      - '{job="postgresql_metrics"}'
+      - '{job="postgresql_node_metrics"}'
       - '{__name__=~"job:.*"}'
       - '{__name__=~"namespace(_|:).*"}'
   basic_auth:
