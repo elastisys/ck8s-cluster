@@ -225,17 +225,18 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/deployment.yaml
 #
 
 # Create namespace(s) and RBAC
-for namespace in ${CUSTOMER_NAMESPACES}
+kubectl auth reconcile -f ${SCRIPTS_PATH}/../manifests/customer-rbac/customer-admin-role.yaml
+for NAMESPACE in ${CUSTOMER_NAMESPACES}
 do
-    kubectl create namespace "${namespace}" \
+    export NAMESPACE=$NAMESPACE
+    kubectl create namespace "${NAMESPACE}" \
         --dry-run -o yaml | kubectl apply -f -
-    for user in ${CUSTOMER_ADMIN_USERS}
+    for CUSTOMER_USER in ${CUSTOMER_ADMIN_USERS}
     do
+        export CUSTOMER_USER=$CUSTOMER_USER
         # By using "auth reconcile" instead of "apply" we can add one
         # user at a time.
-        kubectl -n "${namespace}" create rolebinding workload-admins \
-            --clusterrole=admin --user="${user}" \
-            --dry-run -o yaml | kubectl auth reconcile -f -
+        envsubst < ${SCRIPTS_PATH}/../manifests/customer-rbac/customer-admin-rolebinding.yaml | kubectl auth reconcile -f -
     done
 done
 
