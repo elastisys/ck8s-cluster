@@ -1,7 +1,7 @@
 variable "prefix" {}
 variable "image_id" {}
 variable "key_pair" {}
-
+variable public_v4_network {}
 ## DNS
 
 #variable "dns_name" {}

@@ -15,6 +15,11 @@ variable "dns_prefix" {
   type        = string
 }
 
+variable public_v4_network {
+  description = "the id of the public-v4 network"
+  default     = "71b10496-2617-47ae-abbc-36239f0863bb"
+}
+
 
 # For workers
 variable "worker_name_flavor_map_sc" {
