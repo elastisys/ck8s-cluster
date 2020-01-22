@@ -17,6 +17,7 @@ DEPLOYMENTS=(
     "harbor harbor-harbor-notary-signer"
     "harbor harbor-harbor-portal"
     "harbor harbor-harbor-registry"
+    "influxdb-prometheus influxdb-du-monitoring-deployment"
     "kube-system coredns"
     "kube-system coredns-autoscaler"
     "kube-system metrics-server"
