@@ -2,6 +2,7 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}-cronjob
+  namespace: {{ .Release.Namespace }}
   labels:
     app: influxdb-metrics-retention
 spec:

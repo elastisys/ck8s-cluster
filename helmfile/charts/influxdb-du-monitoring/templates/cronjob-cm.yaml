@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-cronjob
-  namespace: influxdb-prometheus
+  namespace: {{ .Release.Namespace }}
 data:
   cronjob: |
     ### cron file for running the export script
