@@ -5,7 +5,7 @@ set -e
 : "${ECK_OPS_DOMAIN:?Missing ECK_OPS_DOMAIN}"
 : "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 
-if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
+if [ $CLOUD_PROVIDER != "safespring" ]
 then
 : "${OS_USERNAME:?Missing OS_USERNAME}"
 : "${OS_PASSWORD:?Missing OS_PASSWORD}"
@@ -20,22 +20,14 @@ then
   exit 1
 fi
 
-infra="$1"
+infra=$(cat "$1")
 
 # If unset -> true
 ENABLE_PSP=${ENABLE_PSP:-true}
 
-# Use default harbor password if not set.
-HARBOR_PWD=${HARBOR_PWD:-"Harbor12345"}
-
-master_ip_addresses=($(cat $infra | jq -r '.workload_cluster.master_ip_addresses[]'))
-worker_ip_addresses=($(cat $infra | jq -r '.workload_cluster.worker_ip_addresses[]'))
-
-if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
-then
-  master_private_ip_addresses=($(cat $infra | jq -r '.workload_cluster.master_private_ip_addresses[]'))
-  worker_private_ip_addresses=($(cat $infra | jq -r '.workload_cluster.worker_private_ip_addresses[]'))
-fi
+# Get list of master and worker instance names.
+masters=$(echo $infra | jq -r '.workload_cluster.master_ip_addresses | keys[]')
+workers=$(echo $infra | jq -r '.workload_cluster.worker_ip_addresses | keys[]')
 
 cat <<EOF
 cluster_name: eck-workload_cluster
@@ -47,42 +39,44 @@ kubernetes_version: $KUBERNETES_VERSION
 nodes:
 EOF
 
-for i in $(seq 0 $((${#master_ip_addresses[@]} - 1)))
-do
+# Add master nodes.
+for instance in ${masters[@]}; do
 cat <<EOF
-  - address: ${master_ip_addresses[${i}]}
+  - address: $(echo $infra | jq -r '.workload_cluster.master_ip_addresses."'"${instance}"'".public_ip')
     role: [controlplane,etcd]
+    hostname_override: $instance
 EOF
+
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
 cat <<EOF
     user: rancher
 EOF
-elif [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
-then
+else
 cat <<EOF
     user: ubuntu
-    internal_address: ${master_private_ip_addresses[${i}]}
+    internal_address: $(echo $infra | jq -r '.workload_cluster.master_ip_addresses."'"${instance}"'".private_ip')
 EOF
 fi
 done
 
-for i in $(seq 0 $((${#worker_ip_addresses[@]} - 1)))
-do
+# Add worker nodes.
+for instance in ${workers[@]}; do
 cat <<EOF
-  - address: ${worker_ip_addresses[${i}]}
+  - address: $(echo $infra | jq -r '.workload_cluster.worker_ip_addresses."'"${instance}"'".public_ip')
     role: [worker]
+    hostname_override: $instance
 EOF
+
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
 cat <<EOF
     user: rancher
 EOF
-elif [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
-then
+else
 cat <<EOF
     user: ubuntu
-    internal_address: ${worker_private_ip_addresses[${i}]}
+    internal_address: $(echo $infra | jq -r '.workload_cluster.worker_ip_addresses."'"${instance}"'".private_ip')
 EOF
 fi
 done
@@ -90,6 +84,18 @@ done
 cat <<EOF
 
 services:
+EOF
+
+if (( $(echo $infra | jq -r '.workload_cluster.worker_device_path | length') > 0 ))
+then
+cat <<EOF
+  kubelet:
+    extra_binds:
+      - /mnt/disks:/mnt/disks
+EOF
+fi
+
+cat <<EOF
   kube-api:
 EOF
 
@@ -150,16 +156,23 @@ cat <<EOF
 
 ingress:
     provider: none
+EOF
+
+if [ "$ENABLE_HARBOR" == "true" ];
+then
+cat <<EOF
 
 private_registries:
     - url: harbor.${ECK_BASE_DOMAIN}
       user: admin
       password: ${HARBOR_PWD}
 EOF
+fi
 
-if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
+if [ $CLOUD_PROVIDER != "exoscale" ]
 then
 cat <<EOF
+
 cloud_provider:
   name: openstack
   openstackCloudProvider:

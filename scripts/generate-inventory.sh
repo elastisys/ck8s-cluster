@@ -10,55 +10,51 @@ then
   exit 1
 fi
 
-infra="$1"
+infra=$(cat "$1")
 
-sc_master_ip_addresses=($(cat $infra | jq -r '.service_cluster.master_ip_addresses[]'))
-sc_worker_ip_addresses=($(cat $infra | jq -r '.service_cluster.worker_ip_addresses[]'))
-sc_nfs_ip_address=$(cat $infra | jq -r '.service_cluster.nfs_ip_address')
-wc_master_ip_addresses=($(cat $infra | jq -r '.workload_cluster.master_ip_addresses[]'))
-wc_worker_ip_addresses=($(cat $infra | jq -r '.workload_cluster.worker_ip_addresses[]'))
-wc_nfs_ip_address=$(cat $infra | jq -r '.workload_cluster.nfs_ip_address')
+sc_workers_extra_volume=$(echo $infra | jq -r '.service_cluster.worker_device_path | keys[]')
+sc_masters=$(echo $infra | jq -r '.service_cluster.master_ip_addresses | keys[]')
+sc_workers=$(echo $infra | jq -r '.service_cluster.worker_ip_addresses | keys[]')
 
-# TODO: Cheating by assuming same device path on both clusters for now
-nfs_device_path=$(cat $infra | jq -r '.service_cluster.nfs_device_path')
+wc_workers_extra_volume=$(echo $infra | jq -r '.workload_cluster.worker_device_path | keys[]')
+wc_masters=$(echo $infra | jq -r '.workload_cluster.master_ip_addresses | keys[]')
+wc_workers=$(echo $infra | jq -r '.workload_cluster.worker_ip_addresses | keys[]')
 
-for i in $(seq 0 $((${#sc_master_ip_addresses[@]} - 1))); do
+function print_ansible_hosts {
+  type="$1"
+  cluster="$2"
+  shift;shift
+  instances="$@"
+
+  for instance in ${instances[@]}; do
+
+cat <<EOF
+$instance ansible_host=$(echo $infra | jq -r '.'"${cluster}"'.'"${type}"'_ip_addresses."'"${instance}"'".public_ip')
+EOF
+
+  done
+}
+
 cat <<EOF
 [all]
-sc_master${i} ansible_host=${sc_master_ip_addresses[${i}]}
 EOF
-done
 
-for i in $(seq 0 $((${#sc_worker_ip_addresses[@]} - 1))); do
-cat <<EOF
-sc_worker${i} ansible_host=${sc_worker_ip_addresses[${i}]}
-EOF
-done
+print_ansible_hosts master service_cluster ${sc_masters[@]}
+print_ansible_hosts worker service_cluster ${sc_workers[@]}
 
-for i in $(seq 0 $((${#wc_master_ip_addresses[@]} - 1))); do
 cat <<EOF
 [all]
-wc_master${i} ansible_host=${wc_master_ip_addresses[${i}]}
 EOF
-done
 
-for i in $(seq 0 $((${#wc_worker_ip_addresses[@]} - 1))); do
+print_ansible_hosts master workload_cluster ${wc_masters[@]}
+print_ansible_hosts worker workload_cluster ${wc_workers[@]}
+
 cat <<EOF
-wc_worker${i} ansible_host=${wc_worker_ip_addresses[${i}]}
+[extra_volume]
 EOF
-done
 
-if [ $CLOUD_PROVIDER != "citycloud" ]
-then
-  cat <<EOF
-[nfs]
-sc_nfs ansible_host=${sc_nfs_ip_address}
-wc_nfs ansible_host=${wc_nfs_ip_address}
-[nfs:vars]
-internal_cidr_prefix=172.16.0.0/24
-nfs_device_path=${nfs_device_path}
-EOF
-fi
+print_ansible_hosts worker service_cluster ${sc_workers_extra_volume[@]}
+print_ansible_hosts worker workload_cluster ${wc_workers_extra_volume[@]}
 
 cat <<EOF
 [all:vars]

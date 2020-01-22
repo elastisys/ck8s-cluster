@@ -10,43 +10,76 @@ variable ssh_pub_key_file_wc {
   type = string
 }
 
-variable dns_prefix {
+variable "dns_prefix" {
   description = "Prefix name for dns"
   type        = string
 }
 
-variable sc_master_count {
-  description = "The number of master nodes that should be created."
-  type        = number
-  default     = 1
+
+# For workers
+variable "worker_name_flavor_map_sc" {
+  description = "Map of instance name to openstack flavor."
+  type        = map
 }
 
-variable sc_worker_count {
-  description = "The number of worker nodes that should be created."
-  type        = number
-  default     = 2
+variable "worker_names_sc" {
+  description = "List of names for worker instances to create." 
+  type        = list(string)
 }
 
-variable sc_nfs_storage_size {
-  description = "The size in GB of the NFS server block volume."
-  type        = number
-  default     = 50
+variable "worker_name_flavor_map_wc" {
+  description = "Map of instance name to openstack flavor."
+  type        = map
 }
 
-variable wc_master_count {
-  description = "The number of master nodes that should be created."
-  type        = number
-  default     = 1
+variable "worker_names_wc" {
+  type = list(string)
 }
 
-variable wc_worker_count {
-  description = "The number of worker nodes that should be created."
-  type        = number
-  default     = 1
+
+# For masters
+variable "master_name_flavor_map_sc" {
+  description = "Map of instance name to openstack flavor."
+  type        = map
 }
 
-variable wc_nfs_storage_size {
-  description = "The size in GB of the NFS server block volume."
-  type        = number
-  default     = 50
+variable "master_names_sc" {
+  description = "List of names for master instances to create."
+  type = list(string)
+}
+
+variable "master_name_flavor_map_wc" {
+  description = "Map of instance name to openstack flavor."
+  type        = map
+}
+
+variable "master_names_wc" {
+  description = "List of names for master instances to create."
+  type        = list(string)
+}
+
+
+# Worker instances that should have an extra volume mounted.
+variable "worker_extra_volume_sc" {
+  description = "List of worker instance names that should mount an extra volume"
+  type        = list(string)
+  default     = []
+}
+
+variable "worker_extra_volume_wc" {
+  description = "List of worker instance names that should mount an extra volume"
+  type        = list(string)
+  default     = []
+}
+
+variable "worker_extra_volume_size_sc" {
+  description = "Mapping from instance name to volume size for the extra volume." 
+  type        = map
+  default     = {}  
+}
+
+variable "worker_extra_volume_size_wc" {
+  description = "Mapping from instance name to volume size for the extra volume."
+  type        = map
+  default     = {}  
 }

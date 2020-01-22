@@ -116,15 +116,14 @@ resource "openstack_compute_secgroup_v2" "master_sg" {
 module "master" {
   source = "../vm"
 
-  instance_name  = "${var.prefix}-master"
-  instance_count = var.master_count
-
-  image_id  = var.image_id
-  flavor_id = var.master_flavor_id
-  key_pair  = var.key_pair
+  names           = var.master_names
+  name_flavor_map = var.master_name_flavor_map
+  image_id        = var.image_id
+  key_pair        = var.key_pair
 
   network_id = openstack_networking_network_v2.network.id
   subnet_id  = openstack_networking_subnet_v2.subnet.id
+
   security_group_ids = [
     openstack_compute_secgroup_v2.cluster_sg.id,
     openstack_compute_secgroup_v2.master_sg.id,
@@ -163,43 +162,29 @@ resource "openstack_compute_secgroup_v2" "worker_sg" {
 module "worker" {
   source = "../vm"
 
-  instance_name  = "${var.prefix}-worker"
-  instance_count = var.worker_count
-
-  image_id  = var.image_id
-  flavor_id = var.worker_flavor_id
-  key_pair  = var.key_pair
+  names           = var.worker_names
+  name_flavor_map = var.worker_name_flavor_map
+  image_id        = var.image_id
+  key_pair        = var.key_pair
 
   network_id = openstack_networking_network_v2.network.id
   subnet_id  = openstack_networking_subnet_v2.subnet.id
+  
   security_group_ids = [
     openstack_compute_secgroup_v2.cluster_sg.id,
     openstack_compute_secgroup_v2.worker_sg.id,
   ]
 }
 
-module "nfs" {
-  source = "../vm"
-
-  instance_name = "${var.prefix}-nfs"
-
-  image_id  = var.image_id
-  flavor_id = var.nfs_flavor_id
-  key_pair  = var.key_pair
-
-  network_id = openstack_networking_network_v2.network.id
-  subnet_id  = openstack_networking_subnet_v2.subnet.id
-  security_group_ids = [
-    openstack_compute_secgroup_v2.cluster_sg.id,
-  ]
+resource "openstack_blockstorage_volume_v2" "worker_volume" {
+  # Cannot use simply use the default value '[""]' in the variable directly for some reason.
+  for_each = var.worker_extra_volume == [] ? toset([""]) : toset(var.worker_extra_volume)
+  name     = each.value
+  size     = var.worker_extra_volume_size[each.value]
 }
 
-resource "openstack_blockstorage_volume_v2" "nfs_volume" {
-  name = "${var.prefix}-nfs-volume"
-  size = var.nfs_storage_size
-}
-
-resource "openstack_compute_volume_attach_v2" "nfs_va" {
-  instance_id = module.nfs.instance_ids[0]
-  volume_id   = openstack_blockstorage_volume_v2.nfs_volume.id
+resource "openstack_compute_volume_attach_v2" "worker_va" {
+  for_each    = var.worker_extra_volume == [] ? toset([""]) : toset(var.worker_extra_volume)
+  instance_id = module.worker.instance_ids[each.value]
+  volume_id   = openstack_blockstorage_volume_v2.worker_volume[each.value].id
 }

@@ -1,8 +1,7 @@
 resource "openstack_networking_port_v2" "port" {
-  count = var.instance_count
-
-  name = "${var.instance_name}-port-${count.index}"
-
+  for_each = toset(var.names)
+  
+  name       = "${each.value}-port"
   network_id = var.network_id
 
   fixed_ip {
@@ -10,40 +9,32 @@ resource "openstack_networking_port_v2" "port" {
   }
 
   security_group_ids = var.security_group_ids
-
-  admin_state_up = "true"
+  admin_state_up     = "true"
 }
 
 resource "openstack_compute_instance_v2" "instance" {
-  count = var.instance_count
+  for_each = toset(var.names)
 
-  name = "${var.instance_name}-${count.index}"
+  name = each.value
 
   image_id  = var.image_id
-  flavor_id = var.flavor_id
+  flavor_id = var.name_flavor_map[each.value]
   key_pair  = var.key_pair
 
   network {
-    port = element(openstack_networking_port_v2.port.*.id, count.index)
+    port = openstack_networking_port_v2.port[each.value].id
   }
 }
 
 resource "openstack_compute_floatingip_v2" "fip" {
-  count = var.instance_count
+  for_each = toset(var.names)
 
   pool = "public-v4"
 }
 
 resource "openstack_compute_floatingip_associate_v2" "fip_assoc" {
-  count = var.instance_count
+  for_each = toset(var.names)
 
-  floating_ip = element(
-    openstack_compute_floatingip_v2.fip.*.address,
-    count.index
-  )
-
-  instance_id = element(
-    openstack_compute_instance_v2.instance.*.id,
-    count.index
-  )
+  floating_ip = openstack_compute_floatingip_v2.fip[each.value].address
+  instance_id = openstack_compute_instance_v2.instance[each.value].id
 }

@@ -14,29 +14,21 @@
         groups: docker
         append: yes
 
-- hosts: nfs
+- hosts: extra_volume
   become: yes
   become_user: root
   tasks:
 
-    - name: Create NFS share directory
-      file: path=/nfs state=directory owner=root group=root mode=0777
+    - name: Create mount directory
+      file: path=/mnt/disks state=directory owner=root group=root mode=0777
 
     - name: Create filesystem
-      filesystem: dev={{ nfs_device_path }} fstype=ext4
+      filesystem: dev={{ device_path }} fstype=ext4
 
-    - name: Configure NFS share mount point
-      mount: name=/nfs src={{ nfs_device_path }} fstype=ext4 state=mounted
+    - name: Configure mount point 
+      mount: name=/mnt/disks/disk1 src={{ device_path }} fstype=ext4 state=mounted
 
-    - name: Configure NFS exports
-      copy: content="/nfs    {{ internal_cidr_prefix }}(rw,sync,no_root_squash,no_subtree_check)\n" dest=/etc/exports
-
-    - name: Install NFS server
-      apt:
-        name: nfs-kernel-server
-        update_cache: yes
-
-- hosts: "wc_master*,sc_master*"
+- hosts: "wc-master*,sc-master*"
   become: yes
   become_user: root
   tasks:

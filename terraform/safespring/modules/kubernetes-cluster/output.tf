@@ -1,31 +1,3 @@
-output "master_floating_ip" {
-  value = module.master.floating_ips
-}
-
-output "master_fixed_ip" {
-  value = module.master.fixed_ips
-}
-
-output "worker_floating_ips" {
-  value = module.worker.floating_ips
-}
-
-output "worker_fixed_ips" {
-  value = module.worker.fixed_ips
-}
-
-output "nfs_floating_ip" {
-  value = module.nfs.floating_ips[0]
-}
-
-output "nfs_fixed_ip" {
-  value = module.nfs.fixed_ips[0]
-}
-
-output "nfs_device_path" {
-  value = openstack_compute_volume_attach_v2.nfs_va.device
-}
-
 output "dns_record_name" {
   value = [ 
     for dns in aws_route53_record.dns: dns.name
@@ -34,4 +6,26 @@ output "dns_record_name" {
 
 output "dns_suffix" {
   value = trimsuffix(data.aws_route53_zone.zone.name, ".")
+}
+
+# List of worker floating ips. Used for creating dns records!
+output "worker_floating_ips" {
+  value = module.worker.floating_ips
+}
+
+# Ip address instance mapping. Contains both floating and fixed ips.
+output "master_ips" {
+  value = module.master.instance_ips
+}
+
+output "worker_ips" {
+  value = module.worker.instance_ips
+}
+
+# For device paths
+output "worker_device_path" {
+  value = {
+    for instance in var.worker_extra_volume:
+    instance => openstack_compute_volume_attach_v2.worker_va[instance].device
+  }
 }

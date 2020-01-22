@@ -9,23 +9,12 @@ terraform {
   }
 }
 
-# This information is set with Environment variables
 provider "openstack" {
-}
-
-data "openstack_compute_flavor_v2" "b_small" {
-  vcpus = 1
-  ram   = 2048
-}
-
-data "openstack_compute_flavor_v2" "b_medium" {
-  vcpus = 2
-  ram   = 4096
-}
-
-data "openstack_compute_flavor_v2" "b_large" {
-  vcpus = 4
-  ram   = 8192
+  project_domain_name = "elastisys.se"
+  user_domain_name    = "elastisys.se"
+  tenant_name         = "infra.elastisys.se"
+  auth_url            = "https://keystone.api.cloud.ipnett.se/v3"
+  region              = "se-east-1"
 }
 
 data "openstack_images_image_v2" "ubuntu" {
@@ -48,8 +37,13 @@ module "service_cluster" {
 
   prefix = "${terraform.workspace}-service-cluster"
 
-  master_count = var.sc_master_count
-  worker_count = var.sc_worker_count
+  worker_names = var.worker_names_sc
+  worker_name_flavor_map   = var.worker_name_flavor_map_sc
+  worker_extra_volume      = var.worker_extra_volume_sc
+  worker_extra_volume_size = var.worker_extra_volume_size_sc
+
+  master_names           = var.master_names_sc
+  master_name_flavor_map = var.master_name_flavor_map_sc
 
   image_id = data.openstack_images_image_v2.ubuntu.id
   key_pair = openstack_compute_keypair_v2.sshkey_sc.id
@@ -63,19 +57,18 @@ module "service_cluster" {
     "notary.harbor.${var.dns_prefix}"
   ]
 
-  master_flavor_id = data.openstack_compute_flavor_v2.b_medium.id
-  worker_flavor_id = data.openstack_compute_flavor_v2.b_large.id
-  nfs_flavor_id    = data.openstack_compute_flavor_v2.b_small.id
-  nfs_storage_size = var.sc_nfs_storage_size
 }
+
 
 module "workload_cluster" {
   source = "./modules/kubernetes-cluster"
 
   prefix = "${terraform.workspace}-workload-cluster"
 
-  master_count = var.wc_master_count
-  worker_count = var.wc_worker_count
+  worker_names             = var.worker_names_wc
+  worker_name_flavor_map   = var.worker_name_flavor_map_wc
+  worker_extra_volume      = var.worker_extra_volume_wc
+  worker_extra_volume_size = var.worker_extra_volume_size_wc
 
   image_id = data.openstack_images_image_v2.ubuntu.id
   key_pair = openstack_compute_keypair_v2.sshkey_wc.id
@@ -85,8 +78,6 @@ module "workload_cluster" {
     "prometheus.ops.${var.dns_prefix}"
   ]
 
-  master_flavor_id = data.openstack_compute_flavor_v2.b_medium.id
-  worker_flavor_id = data.openstack_compute_flavor_v2.b_large.id
-  nfs_flavor_id    = data.openstack_compute_flavor_v2.b_small.id
-  nfs_storage_size = var.wc_nfs_storage_size
+  master_names           = var.master_names_wc
+  master_name_flavor_map = var.master_name_flavor_map_wc
 }

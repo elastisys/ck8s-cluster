@@ -1,11 +1,26 @@
 output "instance_ids" {
-  value = openstack_compute_instance_v2.instance.*.id
+  description = "Instance to id mapping."
+
+  value = {
+    for instance in openstack_compute_instance_v2.instance:
+    instance.name => instance.id
+  }
 }
 
 output "floating_ips" {
-  value = openstack_compute_floatingip_v2.fip.*.address
+  description = "List of floating ips."
+
+  value = values(openstack_compute_floatingip_v2.fip)[*].address
 }
 
-output "fixed_ips" {
-  value = openstack_networking_port_v2.port.*.all_fixed_ips.0
+output "instance_ips" {
+  description = "The private (fixed) and floating (public) ip addresses per instance."
+
+  value = {
+    for instance in openstack_compute_instance_v2.instance:
+    instance.name => {
+      "private_ip" = openstack_networking_port_v2.port[instance.name].all_fixed_ips.0,
+      "public_ip" = openstack_compute_floatingip_v2.fip[instance.name].address
+    }
+  }
 }
