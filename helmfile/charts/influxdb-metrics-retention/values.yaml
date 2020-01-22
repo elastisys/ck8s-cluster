@@ -1,4 +1,6 @@
 influxdb:
+  username: admin
+  password:
   databaseName: service_cluster
 retention:
   cronSchedule: "* * * * *"
