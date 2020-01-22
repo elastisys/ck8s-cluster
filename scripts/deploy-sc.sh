@@ -143,14 +143,8 @@ do
     kubectl -n ${ns} apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
     kubectl -n ${ns} apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 done
-
-
 if [[ $ENABLE_HARBOR == "true" ]]
 then
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/issuers/selfsigning-issuer-harbor.yaml
-    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-core-cert.yaml | kubectl apply -f -
-    envsubst < ${SCRIPTS_PATH}/../manifests/issuers/harbor-notary-cert.yaml | kubectl apply -f -
-
     kubectl -n harbor apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
     kubectl -n harbor apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 fi

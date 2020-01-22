@@ -172,6 +172,16 @@ releases:
   - values/configure-es.yaml.gotmpl
 
 # Harbor
+- name: harbor-certs
+  namespace: harbor
+  labels:
+    app: harbor
+  chart: ./charts/harbor-certs
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/harbor-certs.yaml.gotmpl
+
 - name: harbor
   namespace: harbor
   labels:
