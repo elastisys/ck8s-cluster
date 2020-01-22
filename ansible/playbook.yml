@@ -33,7 +33,7 @@
     - name: Configure mount point 
       mount: name=/mnt/disks/disk1 src={{ device_path }} fstype=ext4 state=mounted
 
-- hosts: "wc-master*,sc-master*"
+- hosts: "*master*"
   become: yes
   become_user: root
   tasks:

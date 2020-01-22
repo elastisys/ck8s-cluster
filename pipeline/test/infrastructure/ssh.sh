@@ -27,6 +27,11 @@ function check_hosts () {
         elif [ "$CLOUD_PROVIDER" == "safespring" ]
         then user="ubuntu"
         fi
+    elif [ "$type" == "nfs" ]
+    then 
+        nr_hosts=1
+        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_address[]" ))
+        user="ubuntu"
     fi
 
     # Check that the list of host ip addresses is equal to the number of desired workers.
@@ -63,3 +68,4 @@ function check_hosts () {
 
 check_hosts master
 check_hosts worker
+check_hosts nfs

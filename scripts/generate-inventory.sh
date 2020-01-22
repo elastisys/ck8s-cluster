@@ -31,7 +31,7 @@ function print_ansible_hosts {
 cat <<EOF
 $instance ansible_host=$(echo $infra | jq -r '.'"${cluster}"'.'"${type}"'_ip_addresses."'"${instance}"'".public_ip')
 EOF
-
+  
   done
 }
 

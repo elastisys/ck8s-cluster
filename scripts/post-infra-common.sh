@@ -16,13 +16,9 @@ if [ $CLOUD_PROVIDER == "exoscale" ]
 then
     export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_ip_address')
     export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_ip_address')
-elif [ $CLOUD_PROVIDER == "safespring" ]
-then
-    export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_private_ip_address')
-    export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_private_ip_address')
 fi
 
-export MASTER_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.master_ip_addresses[0]')
+export MASTER_WC_SERVER_IP=$(cat $infra | jq -r 'first(.workload_cluster.master_ip_addresses[].public_ip)')
 
 # Domains
 : "${ECK_OPS_DOMAIN:?Missing ECK_OPS_DOMAIN}"
