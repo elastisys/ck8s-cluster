@@ -198,10 +198,10 @@ cd ${SCRIPTS_PATH}/../helmfile
 if [ $CLOUD_PROVIDER != "exoscale" ]
 then
     # Install cert-manager.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply
+    helmfile -f helmfile.yaml -q -e service_cluster -l app=cert-manager $INTERACTIVE apply
 else
     # Install cert-manager and nfs-client-provisioner.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+    helmfile -f helmfile.yaml -q -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 fi
 
 # Get status of the cert-manager webhook api.
@@ -216,7 +216,7 @@ then
 fi
 
 # Install dex.
-helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
+helmfile -f helmfile.yaml -q -e service_cluster -l app=dex $INTERACTIVE apply
 
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
 
@@ -230,13 +230,13 @@ success=false
 
 for i in $(seq 1 $tries)
 do
-    if helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE apply
+    if helmfile -f helmfile.yaml -q -e service_cluster -l app=prometheus-operator $INTERACTIVE apply
     then
         success=true
         break
     else
         echo failed to deploy prometheus operator on try $i
-        helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE destroy
+        helmfile -f helmfile.yaml -q -e service_cluster -l app=prometheus-operator $INTERACTIVE destroy
     fi
 done
 
@@ -275,7 +275,7 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/curator.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
 
 #install elasticsearch-prometheus-exporter
-helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply
+helmfile -f helmfile.yaml -q -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply
 
 # Restore InfluxDB from backup
 if [[ $ECK_RESTORE_CLUSTER != "false" ]]

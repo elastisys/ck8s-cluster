@@ -1,13 +1,10 @@
 #!/bin/bash
 
-SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
-pushd "${SCRIPTS_PATH}/../" > /dev/null
-
 export ECK_BASE_DOMAIN=$(cat infra.json | jq -r '.service_cluster.domain_name')
 export ECK_OPS_DOMAIN=$(cat infra.json | jq -r '.service_cluster.domain_name' | sed 's/^/ops./')
-source common-env.sh
+export CERT_TYPE=staging
 
-popd > /dev/null
+source common-env.sh
 
 export S3_ACCESS_KEY=$EXOSCALE_API_KEY
 export S3_SECRET_KEY=$EXOSCALE_SECRET_KEY
@@ -25,3 +22,6 @@ export ALERT_TO=null
 export SLACK_API_URL=https://hooks.slack.com/services/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
 
 export OAUTH_ALLOWED_DOMAINS="example.com"
+
+#This is the home folder when the container is built, but not when it is executed in github actions
+export HELM_HOME=/root/.helm

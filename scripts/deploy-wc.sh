@@ -161,7 +161,7 @@ charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-s
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
 
 # Install rest of the charts excluding charts in charts_ignore_list.
-helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply
+helmfile -f helmfile.yaml -q -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply
 
 # Create basic auth credentials for accessing workload cluster prometheus
 htpasswd -c -b auth prometheus ${PROMETHEUS_PWD}
@@ -174,13 +174,13 @@ success=false
 
 for i in $(seq 1 $tries)
 do
-    if helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE apply
+    if helmfile -f helmfile.yaml -q -e workload_cluster -l app=prometheus-operator $INTERACTIVE apply
     then
         success=true
         break
     else
         echo failed to deploy prometheus operator on try $i
-        helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE destroy
+        helmfile -f helmfile.yaml -q -e workload_cluster -l app=prometheus-operator $INTERACTIVE destroy
     fi
 done
 
@@ -206,7 +206,7 @@ kubectl -n fluentd create secret generic elasticsearch \
     --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 
 # Install fluentd
-helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply
+helmfile -f helmfile.yaml -q -e workload_cluster -l app=fluentd $INTERACTIVE apply
 
 # Install ck8sdash
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service-account.yaml
