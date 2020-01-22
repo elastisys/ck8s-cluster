@@ -127,6 +127,7 @@ resource "openstack_compute_secgroup_v2" "master_sg" {
 module "master" {
   source = "../vm"
 
+  prefix          = var.prefix
   names           = var.master_names
   name_flavor_map = var.master_name_flavor_map
   image_id        = var.image_id
@@ -173,6 +174,7 @@ resource "openstack_compute_secgroup_v2" "worker_sg" {
 module "worker" {
   source = "../vm"
 
+  prefix          = var.prefix
   names           = var.worker_names
   name_flavor_map = var.worker_name_flavor_map
   image_id        = var.image_id

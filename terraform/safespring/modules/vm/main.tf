@@ -15,7 +15,7 @@ resource "openstack_networking_port_v2" "port" {
 resource "openstack_compute_instance_v2" "instance" {
   for_each = toset(var.names)
 
-  name = each.value
+  name = "${var.prefix}-${each.value}"
 
   image_id  = var.image_id
   flavor_id = var.name_flavor_map[each.value]

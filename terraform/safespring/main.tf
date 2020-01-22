@@ -34,10 +34,10 @@ resource "openstack_compute_keypair_v2" "sshkey_wc" {
 
 module "service_cluster" {
   source = "./modules/kubernetes-cluster"
-
   prefix = "${terraform.workspace}-service-cluster"
-
-  worker_names = var.worker_names_sc
+  
+  public_v4_network        = var.public_v4_network
+  worker_names             = var.worker_names_sc
   worker_name_flavor_map   = var.worker_name_flavor_map_sc
   worker_extra_volume      = var.worker_extra_volume_sc
   worker_extra_volume_size = var.worker_extra_volume_size_sc
@@ -65,6 +65,7 @@ module "workload_cluster" {
 
   prefix = "${terraform.workspace}-workload-cluster"
 
+  public_v4_network        = var.public_v4_network
   worker_names             = var.worker_names_wc
   worker_name_flavor_map   = var.worker_name_flavor_map_wc
   worker_extra_volume      = var.worker_extra_volume_wc

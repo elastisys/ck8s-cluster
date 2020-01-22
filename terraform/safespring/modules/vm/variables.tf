@@ -3,6 +3,8 @@ variable "image_id" {}
 variable "key_pair" {}
 variable "network_id" {}
 variable "subnet_id" {}
+variable "prefix" {}
+
 variable "security_group_ids" {
   type = list(string)
 }
