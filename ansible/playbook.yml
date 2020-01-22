@@ -13,6 +13,11 @@
         name: ubuntu
         groups: docker
         append: yes
+    
+    - name: enable docker
+      service:
+        name: docker
+        enabled: yes
 
 - hosts: extra_volume
   become: yes

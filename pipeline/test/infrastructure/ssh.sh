@@ -21,17 +21,12 @@ function check_hosts () {
     if [ "$type" == "worker" ] || [ "$type" == "master" ]
     then
         nr_hosts=$(cat $infra | jq -r ".${prefix}.${type}_count" )
-        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[]" ))
+        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[].public_ip" ))
         if [ "$CLOUD_PROVIDER" == "exoscale" ]
         then user="rancher"
         elif [ "$CLOUD_PROVIDER" == "safespring" ]
         then user="ubuntu"
         fi
-    elif [ "$type" == "nfs" ]
-    then 
-        nr_hosts=1
-        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_address" ))
-        user="ubuntu"
     fi
 
     # Check that the list of host ip addresses is equal to the number of desired workers.
@@ -68,4 +63,3 @@ function check_hosts () {
 
 check_hosts master
 check_hosts worker
-check_hosts nfs
