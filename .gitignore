@@ -14,3 +14,6 @@ certs
 env.sh
 hosts.ini
 clusters
+**/*.coverage
+**/__pycache__
+.vscode
