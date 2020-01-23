@@ -9,5 +9,4 @@ runcmd:
 
   # Falco requires kernel headers to dynamically build and insert its kernel
   # module on pod start.
-  - sudo ros service enable kernel-headers
-  - sudo ros service up kernel-headers
+  - apt-get -y install linux-headers-$(uname -r)

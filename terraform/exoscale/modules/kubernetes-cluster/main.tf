@@ -25,11 +25,6 @@ locals {
   set = setproduct(var.dns_list, local.workers_ip)
 }
 
-data "exoscale_compute_template" "rancher" {
-  zone = var.zone
-  name = "Linux RancherOS 1.5.5 64-bit"
-}
-
 data "exoscale_compute_template" "ubuntu" {
   zone = var.zone
   name = "Linux Ubuntu 18.04 LTS 64-bit"
@@ -45,11 +40,18 @@ resource "exoscale_network" "net" {
   netmask  = cidrnetmask(local.internal_cidr_prefix)
 }
 
+data "exoscale_compute_template" "os_image" {
+  zone   = var.zone
+  name   = var.compute_instance_image
+  # TODO: remove this when the image is publicly published
+  filter = "mine"
+}
+
 resource "exoscale_compute" "master" {
   for_each = toset(var.master_names)
 
   display_name    = "${var.prefix}-${each.value}"
-  template_id     = data.exoscale_compute_template.rancher.id
+  template_id     = data.exoscale_compute_template.os_image.id
   size            = var.master_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
@@ -83,7 +85,7 @@ resource "exoscale_compute" "worker" {
   for_each = toset(var.worker_names)
 
   display_name    = "${var.prefix}-${each.value}"
-  template_id     = data.exoscale_compute_template.rancher.id
+  template_id     = data.exoscale_compute_template.os_image.id
   size            = var.worker_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
