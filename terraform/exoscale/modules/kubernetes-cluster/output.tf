@@ -1,9 +1,19 @@
 output "master_ip_addresses" {
-  value = "${exoscale_compute.master.*.ip_address}"
+  value = {
+    for key, instance in exoscale_compute.master:
+    instance.hostname => {
+      "public_ip" = exoscale_compute.master[key].ip_address
+    }
+  }
 }
 
 output "worker_ip_addresses" {
-  value = exoscale_compute.worker[*].ip_address
+  value = {
+    for key, instance in exoscale_compute.worker:
+    instance.hostname => {
+      "public_ip" = exoscale_compute.worker[key].ip_address
+    }
+  }
 }
 
 output "nfs_ip_address" {

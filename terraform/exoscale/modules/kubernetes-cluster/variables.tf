@@ -6,31 +6,25 @@ variable "zone" {
   default = "ch-gva-2"
 }
 
+variable "prefix" {}
+
+variable "worker_names" {
+  type = list(string)
+}
+
+variable "worker_name_size_map" {
+  type = map
+}
+
+variable "master_names" {
+  type = list(string)
+}
+
+variable "master_name_size_map" {
+  type = map
+}
+
 variable "nfs_size" {}
-
-variable "network_name" {}
-
-variable "master_name" {}
-
-variable "master_count" {}
-
-variable "master_size" {}
-
-variable "worker_name" {}
-
-variable "worker_count" {}
-
-variable "worker_size" {}
-
-variable "nfs_name" {}
-
-variable "master_security_group_name" {}
-
-variable "worker_security_group_name" {}
-
-variable "nfs_security_group_name" {}
-
-variable "ssh_key_name" {}
 
 variable "ssh_pub_key_file" {}
 
@@ -52,4 +46,3 @@ variable "aws_dns_zone_id" {
 variable "role_arn" {
   default = "arn:aws:iam::248119176842:role/a1-pipeline"
 }
-

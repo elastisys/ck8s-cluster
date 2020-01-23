@@ -24,8 +24,8 @@ locals {
 
 resource "exoscale_network" "net" {
   zone             = var.zone
-  name             = var.network_name
-  network_offering = "PrivNet"
+  name             = "${var.prefix}-network"
+  #network_offering = "PrivNet"
 
   start_ip = cidrhost(local.internal_cidr_prefix, 1)
   end_ip   = cidrhost(local.internal_cidr_prefix, local.internal_network_size)
@@ -33,11 +33,11 @@ resource "exoscale_network" "net" {
 }
 
 resource "exoscale_compute" "master" {
-  count = var.master_count
+  for_each = toset(var.master_names)
 
-  display_name    = "${var.master_name}-${count.index}"
+  display_name    = "${var.prefix}-${each.value}"
   template        = "Linux RancherOS 1.5.1 64-bit"
-  size            = var.master_size
+  size            = var.master_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
@@ -66,11 +66,11 @@ resource "exoscale_compute" "master" {
 #}
 
 resource "exoscale_compute" "worker" {
-  count = var.worker_count
+  for_each = toset(var.worker_names)
 
-  display_name    = "${var.worker_name}-${count.index}"
+  display_name    = "${var.prefix}-${each.value}"
   template        = "Linux RancherOS 1.5.1 64-bit"
-  size            = var.worker_size
+  size            = var.worker_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
@@ -100,7 +100,7 @@ resource "exoscale_compute" "worker" {
 #}
 
 resource "exoscale_compute" "nfs" {
-  display_name    = var.nfs_name
+  display_name    = "${var.prefix}-nfs"
   template        = "Linux Ubuntu 18.04 LTS 64-bit"
   size            = var.nfs_size
   disk_size       = 200
@@ -130,7 +130,7 @@ resource "exoscale_compute" "nfs" {
 #}
 
 resource "exoscale_security_group" "master_sg" {
-  name        = var.master_security_group_name
+  name        = "${var.prefix}-master-sg"
   description = "Security group for Kubernetes masters"
 }
 
@@ -174,7 +174,7 @@ resource "exoscale_security_group_rules" "master_sg_rules" {
 }
 
 resource "exoscale_security_group" "worker_sg" {
-  name        = var.worker_security_group_name
+  name        = "${var.prefix}-worker-sg"
   description = "security group for kubernetes worker nodes"
 }
 
@@ -218,7 +218,7 @@ resource "exoscale_security_group_rules" "worker_sg_rules" {
 }
 
 resource "exoscale_security_group" "nfs_sg" {
-  name        = var.nfs_security_group_name
+  name        = "${var.prefix}-nfs-sg"
   description = "Security group for NFS node"
 }
 
@@ -273,7 +273,7 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
 #}
 
 resource "exoscale_ssh_keypair" "ssh_key" {
-  name       = var.ssh_key_name
+  name       = "${var.prefix}-ssh-key"
   public_key = trimspace(file(pathexpand(var.ssh_pub_key_file)))
 }
 

@@ -9,80 +9,88 @@ variable exoscale_secret_key {
   type        = string
 }
 
-# Service cluster variables.
+# For workers
+
+variable worker_names_sc {
+  description = "List of names for worker instances to create." 
+  type        = list(string)
+
+  default     = ["worker-0","worker-1"]
+}
+
+variable worker_name_size_map_sc {
+  description = "Map of instance name to openstack size."
+  type        = map
+
+  default     = {
+    "worker-0" : "Large",
+    "worker-1" : "Large"  
+  }
+}
+
+variable worker_names_wc {
+  description = "List of names for worker instances to create." 
+  type        = list(string)
+
+  default     = ["worker-0","worker-1"]
+}
+
+variable worker_name_size_map_wc {
+  description = "Map of instance name to openstack size."
+  type        = map
+
+  default     = {
+    "worker-0" : "Large",
+    "worker-1" : "Large"  
+  }
+}
+
+# For masters
+variable master_names_sc {
+  description = "List of names for master instances to create."
+  type = list(string)
+  default     = ["master-0"]
+}
+
+variable master_name_size_map_sc {
+  description = "Map of instance name to openstack size."
+  type        = map
+  default     = {
+    "master-0" : "Small"
+  }
+}
+
+variable master_names_wc {
+  description = "List of names for master instances to create."
+  type        = list(string)
+  default     = ["master-0"]
+}
+
+variable master_name_size_map_wc {
+  description = "Map of instance name to openstack size."
+  type        = map
+  default     = {
+    "master-0" : "Small"
+  }
+}
+
+variable nfs_size {
+  description = "The size of the nfs machine"
+  type        = string
+  default     = "Small"
+}
+
+
 variable ssh_pub_key_file_sc {
   description = "Path to public SSH key file which is injected into the VMs."
   type        = string
 }
 
-variable sc_master_count {
-  description = "The number of master nodes that should be created."
-  type        = number
-  default     = 1
-}
-
-variable sc_master_size {
-  description = "The size of the master VMs"
-  type        = string
-  default     = "Small"
-}
-
-variable sc_worker_count {
-  description = "The number of worker nodes that should be created."
-  type        = number
-  default     = 1
-}
-
-variable sc_worker_size {
-  description = "The size of the worker VMs."
-  type        = string
-  default     = "Huge"
-}
-
-variable sc_nfs_size {
-  description = "The size of the nfs machine"
-  type        = string
-  default     = "Small"
-}
-
-
-# Workload cluster variables.
 variable ssh_pub_key_file_wc {
   description = "Path to public SSH key file which is injected into the VMs."
   type        = string
 }
 
-variable wc_master_count {
-  description = "The number of master nodes that should be created."
-  type        = number
-  default     = 1
-}
-
-variable wc_master_size {
-  description = "The size of the master VMs."
-  type        = string
-  default     = "Small"
-}
-
-variable wc_worker_count {
-  description = "The number of worker nodes that should be created."
-  type        = number
-  default     = 1
-}
-
-variable wc_worker_size {
-  description = "The size of the worker VMs."
-  type        = string
-  default     = "Large"
-}
-
-variable wc_nfs_size {
-  description = "The size of the nfs machine"
-  type        = string
-  default     = "Small"
-}
-
-# Common variables.
 variable public_ingress_cidr_whitelist {
   type    = list(string)
   default = ["194.132.164.168/32", "194.132.164.169/32", "193.187.219.4/32"] # Elastisys office, A1 office
