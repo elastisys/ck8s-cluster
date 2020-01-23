@@ -82,11 +82,6 @@ then
     : "${S3_ES_BACKUP_BUCKET_NAME:?Missing S3_ES_BACKUP_BUCKET_NAME}"
 fi
 
-if [[ $CLOUD_PROVIDER == "exoscale" ]]
-then
-    export NFS_SC_SERVER_IP=$(cat ${CONFIG_PATH}/infra/infra.json | jq -r '.service_cluster.nfs_ip_addresses')
-fi
-
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
@@ -100,9 +95,6 @@ do
     kubectl label --overwrite namespace ${namespace} owner=operator
 done
 
-# Path cordens deployment
-#kubectl patch deployment -n kube-system coredns --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
-#kubectl patch deployment -n kube-system coredns-autoscaler --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then
@@ -212,10 +204,10 @@ cd ${SCRIPTS_PATH}/../helmfile
 if [ $CLOUD_PROVIDER != "exoscale" ]
 then
     # Install cert-manager.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nginx-ingress $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply
 else
     # Install cert-manager and nfs-client-provisioner.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner -l app=nginx-ingress $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 fi
 
 # Get status of the cert-manager webhook api.
@@ -232,14 +224,11 @@ fi
 # Install dex.
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
 
-if [[ $ENABLE_HARBOR == "true" ]]
-then
-    # Install the rest of the charts, excluding prometheus-operator.
-    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter $INTERACTIVE apply
-else
-    # Install the rest of the charts, excluding prometheus-operator.
-    helmfile -f helmfile.yaml -e service_cluster -l app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter,app!=harbor $INTERACTIVE apply
-fi
+charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
+
+[[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"
+
+helmfile -f helmfile.yaml -e service_cluster -l "$charts_ignore_list" $INTERACTIVE apply
 
 # Install prometheus-operator. Retry three times.
 tries=3

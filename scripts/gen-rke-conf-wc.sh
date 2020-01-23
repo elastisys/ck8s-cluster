@@ -5,7 +5,7 @@ set -e
 : "${ECK_OPS_DOMAIN:?Missing ECK_OPS_DOMAIN}"
 : "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 
-if [ $CLOUD_PROVIDER != "safespring" ]
+if [ $CLOUD_PROVIDER != "exoscale" ]
 then
 : "${OS_USERNAME:?Missing OS_USERNAME}"
 : "${OS_PASSWORD:?Missing OS_PASSWORD}"

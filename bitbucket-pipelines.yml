@@ -82,7 +82,7 @@ pipelines:
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
                 - source scripts/get-gen-secrets.sh
-                - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - ./scripts/deploy-sc.sh
                 - kubectl get pods --all-namespaces
@@ -102,7 +102,7 @@ pipelines:
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
                 - source scripts/get-gen-secrets.sh
-                - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
                 - ./scripts/deploy-wc.sh
                 - kubectl get pods --all-namespaces
@@ -125,7 +125,7 @@ pipelines:
                 - source scripts/get-gen-secrets.sh
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
                 # Tests
                 - ./pipeline/test/services/test-sc.sh
               after-script:
@@ -144,7 +144,7 @@ pipelines:
                 # Export passwords
                 - source scripts/get-gen-secrets.sh
                 - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - source ./scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
 
                 # Services
                 - ./pipeline/test/services/test-wc.sh

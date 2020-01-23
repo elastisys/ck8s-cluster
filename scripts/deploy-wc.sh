@@ -37,10 +37,10 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
-if [[ $CLOUD_PROVIDER == "exoscale" ]]
-then
-    export NFS_WC_SERVER_IP=$(cat ${CONFIG_PATH}/infra/infra.json | jq -r '.workload_cluster.nfs_ip_addresses')
-fi
+#if [[ $CLOUD_PROVIDER == "exoscale" ]]
+#then
+#    export NFS_WC_SERVER_IP=$(cat ${CONFIG_PATH}/infra/infra.json | jq -r '.workload_cluster.nfs_ip_addresses')
+#fi
 
 # NAMESPACES
 NAMESPACES="cert-manager monitoring fluentd ck8sdash"
@@ -53,14 +53,6 @@ do
     kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
     kubectl label --overwrite namespace ${namespace} owner=operator
 done
-
-#kubectl patch deployment -n kube-system coredns --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
-#kubectl patch deployment -n kube-system coredns-autoscaler --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
-
-if [[ $ENABLE_OPA == "true" ]]
-then
-    kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
-fi
 
 # PSP
 if [[ $ENABLE_PSP == "true" ]]
@@ -150,10 +142,10 @@ cd ${SCRIPTS_PATH}/../helmfile
 if [[ $CLOUD_PROVIDER != "exoscale" ]]
 then
     # Install cert-manager.
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nginx-ingress $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply
 else
     # Install cert-manager and nfs-client-provisioner.
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner -l app=nginx-ingress $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
 fi
 
 
