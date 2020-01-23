@@ -1,13 +1,13 @@
 # Service cluster outputs
-output "sc_master_ip_addresses" {
+output "sc_master_ips" {
   value = "${module.service_cluster.master_ip_addresses}"
 }
 
-output "sc_worker_ip_addresses" {
+output "sc_worker_ips" {
   value = "${module.service_cluster.worker_ip_addresses}"
 }
 
-output "sc_nfs_ip_address" {
+output "sc_nfs_ips" {
   value = "${module.service_cluster.nfs_ip_address}"
 }
 
@@ -18,15 +18,15 @@ output "sc_dns_name" {
 
 # Workload cluster cluster outputs
 
-output "wc_master_ip_addresses" {
+output "wc_master_ips" {
   value = "${module.workload_cluster.master_ip_addresses}"
 }
 
-output "wc_worker_ip_addresses" {
+output "wc_worker_ips" {
   value = "${module.workload_cluster.worker_ip_addresses}"
 }
 
-output "wc_nfs_ip_address" {
+output "wc_nfs_ips" {
   value = "${module.workload_cluster.nfs_ip_address}"
 }
 

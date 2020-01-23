@@ -19,7 +19,10 @@ locals {
     local.nfs_internal_host_num
   )
 
-  set = setproduct(var.dns_list, exoscale_compute.worker[*].ip_address)
+  workers_ip = [
+    for k,v in exoscale_compute.worker: exoscale_compute.worker[k].ip_address
+  ]
+  set = setproduct(var.dns_list, local.workers_ip)
 }
 
 resource "exoscale_network" "net" {
@@ -112,7 +115,8 @@ resource "exoscale_compute" "nfs" {
   user_data = templatefile(
     "${path.module}/templates/nfs-cloud-init.tmpl",
     {
-      worker_ips = exoscale_compute.worker.*.ip_address
+      #worker_ips = exoscale_compute.worker[*].ip_address
+      worker_ips = local.workers_ip
       # internal_cidr_prefix = local.internal_cidr_prefix
 
       # TODO: Remove when managed virtual router/DHCP is working properly.

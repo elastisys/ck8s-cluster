@@ -30,7 +30,7 @@ function check_hosts () {
     elif [ "$type" == "nfs" ]
     then 
         nr_hosts=1
-        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_address[]" ))
+        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ips" ))
         user="ubuntu"
     fi
 
