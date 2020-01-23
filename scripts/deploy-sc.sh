@@ -69,7 +69,7 @@ then
     : "${INFLUX_BACKUP_NAME:?Missing INFLUX_BACKUP_NAME}"
 fi
 
-if [ $CLOUD_PROVIDER == "citycloud" ]
+if [[ $CLOUD_PROVIDER != "exoscale" ]]
 then
     export STORAGE_CLASS=cinder-storage
 else
@@ -82,18 +82,27 @@ then
     : "${S3_ES_BACKUP_BUCKET_NAME:?Missing S3_ES_BACKUP_BUCKET_NAME}"
 fi
 
+if [[ $CLOUD_PROVIDER == "exoscale" ]]
+then
+    export NFS_SC_SERVER_IP=$(cat ${CONFIG_PATH}/infra/infra.json | jq -r '.service_cluster.nfs_ip_addresses')
+fi
+
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
 # NAMESPACES
-NAMESPACES="cert-manager elastic-system dex nfs-provisioner influxdb-prometheus monitoring ck8sdash"
+NAMESPACES="cert-manager elastic-system dex influxdb-prometheus monitoring ck8sdash"
 for namespace in ${NAMESPACES}
 do
     kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
     kubectl label --overwrite namespace ${namespace} owner=operator
 done
+
+# Path cordens deployment
+#kubectl patch deployment -n kube-system coredns --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
+#kubectl patch deployment -n kube-system coredns-autoscaler --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then
@@ -185,10 +194,10 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
 
 
-if [ $CLOUD_PROVIDER == "citycloud" ]
+if [ $CLOUD_PROVIDER != "exoscale" ]
 then
-    storage=$(kubectl get storageclasses.storage.k8s.io cinder-storage)
-    if [ $storage != "cinder-storage" ]
+    storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "cinder-storage") | .name')
+    if [ -z "$storage" ]
     then
         # Install cinder StorageClass.
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
@@ -200,13 +209,13 @@ echo -e "\nContinuing with Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
 
-if [ $CLOUD_PROVIDER == "citycloud" ]
+if [ $CLOUD_PROVIDER != "exoscale" ]
 then
     # Install cert-manager.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nginx-ingress $INTERACTIVE apply
 else
     # Install cert-manager and nfs-client-provisioner.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner -l app=nginx-ingress $INTERACTIVE apply
 fi
 
 # Get status of the cert-manager webhook api.

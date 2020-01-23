@@ -37,6 +37,11 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
+if [[ $CLOUD_PROVIDER == "exoscale" ]]
+then
+    export NFS_WC_SERVER_IP=$(cat ${CONFIG_PATH}/infra/infra.json | jq -r '.workload_cluster.nfs_ip_addresses')
+fi
+
 # NAMESPACES
 NAMESPACES="cert-manager monitoring fluentd ck8sdash"
 
@@ -48,6 +53,14 @@ do
     kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
     kubectl label --overwrite namespace ${namespace} owner=operator
 done
+
+#kubectl patch deployment -n kube-system coredns --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
+#kubectl patch deployment -n kube-system coredns-autoscaler --patch "$(cat ${SCRIPTS_PATH}/../manifests/toleration-affinity-patch.yaml)"
+
+if [[ $ENABLE_OPA == "true" ]]
+then
+    kubectl create namespace opa --dry-run -o yaml | kubectl apply -f -
+fi
 
 # PSP
 if [[ $ENABLE_PSP == "true" ]]
@@ -122,22 +135,19 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
 
 
-if [ $CLOUD_PROVIDER == "citycloud" ]
-then
-    storage=$(kubectl get storageclasses.storage.k8s.io cinder-storage)
-    if [ $storage != "cinder-storage" ]
-    then
-        # Install cinder StorageClass.
-        kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
-    fi
+
+# Install cinder storageclass if it is not installed.
+if [[ $CLOUD_PROVIDER != "exoscale" ]]; then
+    [ $(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[] | select(.metadata.name == "cinder-storage") | length') > 0 ] || kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
 fi
+
 
 
 echo -e "\nContinuing with Helmfile\n"
 cd ${SCRIPTS_PATH}/../helmfile
 
 
-if [ $CLOUD_PROVIDER == "citycloud" ]
+if [[ $CLOUD_PROVIDER != "exoscale" ]]
 then
     # Install cert-manager.
     helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nginx-ingress $INTERACTIVE apply

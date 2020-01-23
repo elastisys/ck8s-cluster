@@ -31,6 +31,10 @@ function check_hosts () {
     then 
         nr_hosts=1
         host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses" ))
+        if [ "$host_addresses" == "null" ]; then 
+            echo "no nfs used"
+            exit 0
+        fi
         user="ubuntu"
     fi
 
