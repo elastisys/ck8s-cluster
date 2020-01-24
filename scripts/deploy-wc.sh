@@ -37,11 +37,6 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
-#if [[ $CLOUD_PROVIDER == "exoscale" ]]
-#then
-#    export NFS_WC_SERVER_IP=$(cat ${CONFIG_PATH}/infra/infra.json | jq -r '.workload_cluster.nfs_ip_addresses')
-#fi
-
 # NAMESPACES
 NAMESPACES="cert-manager monitoring fluentd ck8sdash"
 
@@ -160,7 +155,7 @@ then
         apiservice v1beta1.webhook.certmanager.k8s.io
 fi
 
-charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=nginx-ingress"
+charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator"
 
 [[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=opa"
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"

@@ -40,6 +40,7 @@ pipelines:
               script:
                 - source pipeline/init-exoscale.sh
                 - source pipeline/variables.sh
+                - ./scripts/check-docker.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
                 - ./scripts/gen-rke-conf-sc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-sc.yaml
                 - rke up --config ./eck-sc.yaml
                 - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
@@ -60,6 +61,7 @@ pipelines:
                 - export VAULT_TOKEN=$(cat vault-token.txt)
                 # Export passwords
                 - source scripts/get-gen-secrets.sh
+                - ./scripts/check-docker.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
                 - ./scripts/gen-rke-conf-wc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-wc.yaml
                 - rke up --config ./eck-wc.yaml
                 - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
