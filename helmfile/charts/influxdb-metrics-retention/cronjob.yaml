@@ -1,12 +1,11 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ .Release.Name }}-cronjob
-  namespace: {{ .Release.Namespace }}
+  name: influxdb-metrics-retention-cronjob
   labels:
     app: influxdb-metrics-retention
 spec:
-  schedule: "{{ .Values.retention.cronSchedule }}"
+  schedule: "* * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -19,11 +18,11 @@ spec:
           volumes:
             - name: python-script
               configMap:
-                name: {{ .Release.Name }}-script
+                name: influxdb-metrics-retention-script
           containers:
             - name: influxdb-metrics-retention
               image: elastisys/influxdb-metrics-retention:latest
-              command: ["python3", "/app/influxdb-size-based-metrics-retention.py"]
+              command: ["python3", "/app/influxdb_size_based_metrics_retention.py"]
               env:
               - name: INFLUXDB_HOST
                 value: influxdb
@@ -40,19 +39,19 @@ spec:
                     name: influxdb-metrics-retention-env
                     key: influxdb-password
               - name: INFLUXDB_DATABASE
-                value: "{{ .Values.influxdb.databaseName }}"
+                value: service_cluster
               - name: INFLUXDB_MIN_SHARDS
-                value: "{{ .Values.retention.minShards }}"
+                value: "1"
               - name: INFLUXDB_DATABASE_SIZE_LIMIT
-                value: "{{ .Values.retention.databaseSizeLimit }}"
+                value: "5000000"
               - name: PROMETHEUS_HOST
                 value: prometheus-operator-prometheus.monitoring
               - name: PROMETHEUS_PORT
                 value: "9090"
               - name: PROMETHEUS_INFLUXDB_METRIC
-                value: influxdb_{{ .Values.influxdb.databaseName }}_size
+                value: influxdb_service_cluster_size
               - name: LOGLEVEL
-                value: "{{ .Values.retention.logLevel }}"
+                value: "INFO"
               volumeMounts:
                 - name: python-script
                   mountPath: /app

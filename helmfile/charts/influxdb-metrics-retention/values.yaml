@@ -1,9 +1,0 @@
-influxdb:
-  username: admin
-  password:
-  databaseName: service_cluster
-retention:
-  cronSchedule: "* * * * *"
-  minShards: "1"
-  databaseSizeLimit: "5000000"
-  logLevel: INFO

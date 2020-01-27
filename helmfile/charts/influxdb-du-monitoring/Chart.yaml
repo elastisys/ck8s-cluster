@@ -1,3 +1,0 @@
-apiVersion: v1
-name: influxdb-du-monitoring
-version: 0.1.0

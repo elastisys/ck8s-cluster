@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-du-monitoring-script
+data:
+  export-influxdb-database-size.sh: |
+    #!/bin/sh
+    
+    echo influxdb_service_cluster_size $(du -s /var/lib/influxdb/data/service_cluster | cut -f 1) > /textfile-collector/influxdb_service_cluster_size.prom.$$
+    mv /textfile-collector/influxdb_service_cluster_size.prom.$$ /textfile-collector/influxdb_service_cluster_size.prom

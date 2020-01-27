@@ -1,0 +1,3 @@
+resources:
+  - charts/influxdb
+  - charts/influxdb-metrics-retention
