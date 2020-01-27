@@ -10,6 +10,10 @@ resource "openstack_networking_subnet_v2" "subnet" {
 
   cidr       = "172.16.0.0/24"
   ip_version = 4
+  dns_nameservers = [
+    "8.8.8.8",
+    "8.8.4.4"
+  ]
 }
 
 resource "openstack_compute_secgroup_v2" "cluster_sg" {
@@ -112,7 +116,7 @@ resource "openstack_compute_secgroup_v2" "master_sg" {
 module "master" {
   source = "../vm"
 
-  instance_name = "${var.prefix}-master"
+  instance_name  = "${var.prefix}-master"
   instance_count = var.master_count
 
   image_id  = var.image_id
