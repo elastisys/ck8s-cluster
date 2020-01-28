@@ -5,7 +5,6 @@ env_vars=(
     ["harbor"]="HARBOR_PWD"
     ["grafana"]="GRAFANA_PWD"
     ["influxdb"]="INFLUXDB_PWD"
-    ["grafana_customer"]="GRAFANA_PWD_CUSTOMER"
     ["kubelogin_client"]="KUBELOGIN_CLIENT_SECRET"
     ["grafana_client"]="GRAFANA_CLIENT_SECRET"
     ["prometheus"]="PROMETHEUS_PWD"
