@@ -76,3 +76,24 @@ then
 else
     openssl x509 -req -CA ${CERT_DIR}/ca.pem -CAkey ${CERT_DIR}/ca-key.pem -CAcreateserial -in ${CERT_DIR}/tiller-csr.pem -out ${CERT_DIR}/tiller.pem -days 365
 fi
+
+# Clean up files that are not needed anymore
+
+echo "Cleaning up certificate signing requests and serial files"
+
+if [ -e ${CERT_DIR}/ca.srl ]
+then
+    rm ${CERT_DIR}/ca.srl
+fi
+if [ -e ${CERT_DIR}/tiller-csr.pem ]
+then
+    rm ${CERT_DIR}/tiller-csr.pem
+fi
+
+for client in ${CLIENT_LIST}
+do
+    if [ -e ${CERT_DIR}/${client}-csr.pem ]
+    then
+        rm ${CERT_DIR}/${client}-csr.pem
+    fi
+done
