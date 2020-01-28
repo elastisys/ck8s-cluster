@@ -81,9 +81,13 @@ do
     mkdir -p clusters/$CLOUD_PROVIDER/${ENVIRONMENT_NAME}/${folder}
 done
 
-FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
-rke/eck-sc.yaml rke/eck-wc.yaml rke/eck-sc.rkestate rke/eck-wc.rkestate
-rke/kube_config_eck-wc.yaml env/env.sh customer/kubeconfig.yaml infra/infra.json
+FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_sc.pub
+ssh-keys/id_rsa_wc ssh-keys/id_rsa_wc.pub
+rke/kube_config_eck-sc.yaml rke/kube_config_eck-wc.yaml
+rke/eck-sc.rkestate rke/eck-wc.rkestate
+rke/eck-sc.yaml rke/eck-wc.yaml
+env/env.sh infra/infra.json
+customer/kubeconfig.yaml
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
 certs/service_cluster/kube-system/certs/helm-key.pem
@@ -348,8 +352,11 @@ Delete secrets:
 ```
 export ENVIRONMENT_NAME=test
 export CLOUD_PROVIDER={safespring|citycloud|exoscale}
-FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_wc rke/kube_config_eck-sc.yaml
-rke/kube_config_eck-wc.yaml rke/eck-sc.rkestate rke/eck-wc.rkestate
+FILES="ssh-keys/id_rsa_sc ssh-keys/id_rsa_sc.pub
+ssh-keys/id_rsa_wc ssh-keys/id_rsa_wc.pub
+rke/kube_config_eck-sc.yaml rke/kube_config_eck-wc.yaml
+rke/eck-sc.rkestate rke/eck-wc.rkestate
+rke/eck-sc.yaml rke/eck-wc.yaml
 env/env.sh infra/infra.json
 customer/kubeconfig.yaml
 grafana
@@ -362,6 +369,7 @@ prometheus
 customer_prometheus
 customer_grafana
 customer_alertmanager
+elasticsearch-es-elastic-user
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
 certs/service_cluster/kube-system/certs/helm-key.pem
