@@ -248,14 +248,13 @@ Note that the certificate used for TLS will need to be trusted by Grafana for th
 
 ### Persistent storage
 
-PersistentVolumes are supported with a default StorageClass `nfs-client`.
-As the name suggests, this storage is backed by an NFS server.
+PersistentVolumes are supported with a default StorageClass, either `nfs-client` or `cinder-storage`, depending on cloud provider.
+As the names suggests, this storage is backed by an NFS server or the OpenStack Cinder provider.
 In cases where this is not enough, contact Elastisys for other options, including high performance Node local storage.
 
 ### Other services
 
-Falco, Fluentd and Dex are currently not configurable directly.
-Access to Alertmanager and Prometheus is not yet available.
+Falco and Dex are currently not configurable directly.
 If you require changes/access to these services, please contact us.
 
 ## Known issues and limitations
@@ -276,4 +275,3 @@ If you are having issues with your cluster or questions about how things work, r
 ## TODO
 
 - Falco: Customers should be able to set up notifications and maybe also change/add rules to falco.
-- Fluentd/Elasticsearch/Kibana: Customers may need to parse application logs in specific ways.
