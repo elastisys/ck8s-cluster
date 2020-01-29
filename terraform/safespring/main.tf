@@ -17,8 +17,8 @@ provider "openstack" {
   region              = "se-east-1"
 }
 
-data "openstack_images_image_v2" "ubuntu" {
-  name        = "ubuntu-18.04-server-cloudimg-amd64-20190212.1"
+data "openstack_images_image_v2" "os_image" {
+  name        = var.compute_instance_image
   most_recent = true
 }
 
@@ -46,7 +46,7 @@ module "service_cluster" {
   master_names           = var.master_names_sc
   master_name_flavor_map = var.master_name_flavor_map_sc
 
-  image_id = data.openstack_images_image_v2.ubuntu.id
+  image_id = data.openstack_images_image_v2.os_image.id
   key_pair = openstack_compute_keypair_v2.sshkey_sc.id
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
@@ -77,7 +77,7 @@ module "workload_cluster" {
   worker_extra_volume      = var.worker_extra_volume_wc
   worker_extra_volume_size = var.worker_extra_volume_size_wc
 
-  image_id = data.openstack_images_image_v2.ubuntu.id
+  image_id = data.openstack_images_image_v2.os_image.id
   key_pair = openstack_compute_keypair_v2.sshkey_wc.id
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist

@@ -36,4 +36,4 @@
 - Exoscale EIP is reintroduced as loadbalancer for the nginx ingress
   controller. This also means that the DNS records now points to the EIP IP
   address instead of every worker.
-- Using BaseOS as VM image instead of plain ubuntu for all k8s nodes on Exoscale.
+- Using BaseOS as VM image instead of plain ubuntu for all k8s nodes on Exoscale and Safespring.
