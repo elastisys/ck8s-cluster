@@ -40,14 +40,15 @@ Create index patterns:
 3. Create the following index patterns: `kubernetes-*`, `kubeaudit-*`, `kubecomponents-*` and `other-*`. Make sure you set the Time Field to `@timestamp`.
 4. Set the `kubernetes-*` index pattern as default.
 
-Give customer access to Kibana:
+Give customer access to Kibana and Elasticsearch:
 
 1. Log in to Kibana as the elastic user
 2. Go to *Management > Roles*
-3. Create a role called `kubernetes-log-reader` with read privilege for indices `kubernetes-*` and `kubeaudit-*`.
-4. Go to *Management > Users*
-5. Create a user for the customer with roles `kibana_user` and `kubernetes-log-reader`.
-6. Give credentials to the customer (and encourage them to change the password).
+3. Create a role called `kubernetes-log-reader` with `read` privilege for indices `kubernetes-*` and `kubeaudit-*`.
+4. Create a role called `backup-exporter` with cluster privileges `cluster:monitor/state` and `cluster:monitor/health`; index privileges `monitor` for `*` and `read` for `kubernetes-*` and `kubeaudit-*`.
+5. Go to *Management > Users*
+6. Create a user for the customer with roles `kibana_user`, `kubernetes-log-reader` and `backup-exporter`.
+7. Give credentials to the customer (and encourage them to change the password).
 
 ## Step 3 - Handover
 
