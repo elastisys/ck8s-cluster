@@ -147,7 +147,8 @@ def get_shards():
         logger.debug("Response=[%s]", str(influxdb_get_response.content))
         raise RuntimeError
     except:
-        logger.error("Connection to [%s] failed", INFLUXDB_GET_URL)
+        logger.error("Connection to InfluxDB failed")
+        logger.debug("Response=[%s]", str(influxdb_get_response.content))
         raise ConnectionError
 
 
@@ -194,7 +195,7 @@ def drop_shard(shard_id):
         influxdb_drop_response = requests.post(url=INFLUXDB_DROP_URL)
         influxdb_drop_response.raise_for_status()
     except:
-        logger.error("Connection to [%s] failed", INFLUXDB_DROP_URL)
+        logger.error("Connection to InfluxDB failed")
         logger.debug("Response=[%s]", str(influxdb_drop_response.content))
         raise ConnectionError
 

@@ -1,0 +1,9 @@
+configMapGenerator:
+- name: common-env-vars-cm
+  envs:
+  - common.env
+
+resources:
+  - influxdb
+  - influxdb-metrics-retention
+  - influxdb-backup

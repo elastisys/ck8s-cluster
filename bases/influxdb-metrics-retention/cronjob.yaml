@@ -31,15 +31,18 @@ spec:
               - name: INFLUXDB_USER
                 valueFrom:
                   secretKeyRef:
-                    name: influxdb-metrics-retention-env
-                    key: influxdb-username
+                    name: influxdb-auth
+                    key: influxdb-user
               - name: INFLUXDB_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: influxdb-metrics-retention-env
+                    name: influxdb-auth
                     key: influxdb-password
               - name: INFLUXDB_DATABASE
-                value: service_cluster
+                valueFrom:
+                  configMapKeyRef:
+                    name: common-env-vars-cm
+                    key: influxdb-retention-database
               - name: INFLUXDB_MIN_SHARDS
                 value: "1"
               - name: INFLUXDB_DATABASE_SIZE_LIMIT
@@ -49,7 +52,10 @@ spec:
               - name: PROMETHEUS_PORT
                 value: "9090"
               - name: PROMETHEUS_INFLUXDB_METRIC
-                value: influxdb_service_cluster_size
+                valueFrom:
+                  configMapKeyRef:
+                    name: common-env-vars-cm
+                    key: prometheus-influxdb-retention-metric-name
               - name: LOGLEVEL
                 value: "INFO"
               volumeMounts:

@@ -1,0 +1,67 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: influxdb-backup
+  labels:
+    app: influxdb-backup
+spec:
+  schedule: "0 0 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: influxdb-backup
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+          - name: backups
+            emptyDir: {}
+          initContainers:
+          - name: influxdb-backup
+            image: influxdb:1.7.6-alpine
+            volumeMounts:
+            - name: backups
+              mountPath: /backups
+            command:
+            - /bin/sh
+            args:
+            - '-c'
+            - |
+              influxd backup -host $(INFLUX_ADDR) -portable /backups/backup_$(date +%Y%m%d_%H%M%S)
+            resources:
+              requests:
+                cpu: 50m
+                memory: 100Mi
+              limits:
+                cpu: 250m
+                memory: 500Mi
+          containers:
+          - name: aws-cli-util
+            image: atlassian/pipelines-awscli:1.16.185
+            command:
+            - /bin/sh
+            args:
+            - '-c'
+            - |
+              printenv
+              aws s3 --endpoint-url $(S3_REGION_ENDPOINT) sync /backups $(S3_INFLUX_BUCKET_URL) --acl "private"
+            env:
+            # Aws s3 cli variables.
+            - name: AWS_DEFAULT_REGION
+              value: $(S3_REGION)
+            - name: AWS_SECRET_ACCESS_KEY
+              value: $(S3_SECRET_KEY)
+            - name: AWS_ACCESS_KEY_ID
+              value: $(S3_ACCESS_KEY)
+            volumeMounts:
+            - name: backups
+              mountPath: /backups
+            resources:
+              requests:
+                cpu: 50m
+                memory: 100Mi
+              limits:
+                cpu: 250m
+                memory: 300Mi

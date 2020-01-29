@@ -1,0 +1,58 @@
+configMapGenerator:
+- name: influx-env-cm
+  envs:
+  - influx.env
+
+vars:
+- name: INFLUX_ADDR
+  objref:
+    kind: ConfigMap
+    name: influx-env-cm
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.INFLUX_ADDR
+# - name: INFLUX_BACKUP_SCHEDULE
+#   objref:
+#     kind: ConfigMap
+#     name: influx-env-cm
+#     apiVersion: v1
+#   fieldref:
+#     fieldpath: data.INFLUX_BACKUP_SCHEDULE
+- name: S3_REGION
+  objref:
+    kind: ConfigMap
+    name: influx-env-cm
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.S3_REGION
+- name: S3_REGION_ENDPOINT
+  objref:
+    kind: ConfigMap
+    name: influx-env-cm
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.S3_REGION_ENDPOINT
+- name: S3_INFLUX_BUCKET_URL
+  objref:
+    kind: ConfigMap
+    name: influx-env-cm
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.S3_INFLUX_BUCKET_URL
+- name: S3_ACCESS_KEY
+  objref:
+    kind: ConfigMap
+    name: influx-env-cm
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.S3_ACCESS_KEY
+- name: S3_SECRET_KEY
+  objref:
+    kind: ConfigMap
+    name: influx-env-cm
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.S3_SECRET_KEY
+
+resources:
+  - backup-influx-cronjob.yaml  

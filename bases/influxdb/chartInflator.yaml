@@ -5,4 +5,4 @@ metadata:
 chartName: influxdb
 chartVersion: 3.1.0
 releaseName: influxdb
-values: /home/jakub/workspace/ck8s/influxdb.yaml
+values: helmValues.yaml
