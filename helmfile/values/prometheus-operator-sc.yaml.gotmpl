@@ -27,6 +27,7 @@ alertmanager:
         # Repeat often to integreate with opsgenies heartbeat feture.
         # If this goes silent, opsgenie will send out alerts.
         repeat_interval: 1m
+        group_interval: 1m
         {{ if eq (env "ENABLE_HEARTBEAT") "true" }}
         receiver: heartbeat
         {{ else }}
