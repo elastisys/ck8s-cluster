@@ -42,6 +42,8 @@ Log in to the services using the same identity provider you specified earlier as
 - **Kubernetes Dashboard** URL: https://dashboard.CK8S_DOMAIN
 - **Kibana** URL: https://kibana.CK8S_DOMAIN
   Log in using a temporary password that you can change later.
+- **Elasticsearch** URL: https://elastic.ops.CK8S_DOMAIN
+  Same credentials as for Kibana.
 - **Harbor** URL: https://harbor.CK8S_DOMAIN
 - **Grafana** URL: https://grafana.CK8S_DOMAIN
 - **Prometheus** URL: https://prometheus.CK8S_DOMAIN
@@ -248,14 +250,38 @@ Note that the certificate used for TLS will need to be trusted by Grafana for th
 
 ### Persistent storage
 
-PersistentVolumes are supported with a default StorageClass `nfs-client`.
-As the name suggests, this storage is backed by an NFS server.
+PersistentVolumes are supported with a default StorageClass, either `nfs-client` or `cinder-storage`, depending on cloud provider.
+As the names suggests, this storage is backed by an NFS server or the OpenStack Cinder provider.
 In cases where this is not enough, contact Elastisys for other options, including high performance Node local storage.
+
+### Export logs from Elasticsearch
+
+For exporting, moving or making backups of the logs in Elasticsearch, we recommend [elasticsearch-dump](https://github.com/taskrabbit/elasticsearch-dump).
+You can use the same username and password for both Elasticsearch and Kibana.
+The URL for Elasticsearch is https://elastic.ops.CK8S_DOMAIN.
+To authenticate, put the username and password in the URL, like this: `https://username:password@elastic.ops.CK8S_DOMAIN`.
+
+**Example:**
+
+List indices:
+```
+# List all indices
+curl https://username:password@elastic.ops.CK8S_DOMAIN/_cat/indices
+# List indices that match kubernetes-*
+curl https://username:password@elastic.ops.CK8S_DOMAIN/_cat/indices/kubernetes-*
+```
+
+Export logs from `my_index` to a file:
+```
+elasticdump \
+  --input=https://username:password@elastic.ops.CK8S_DOMAIN/my_index \
+  --output=/data/my_index.json \
+  --type=data
+```
 
 ### Other services
 
-Falco, Fluentd and Dex are currently not configurable directly.
-Access to Alertmanager and Prometheus is not yet available.
+Falco and Dex are currently not configurable directly.
 If you require changes/access to these services, please contact us.
 
 ## Known issues and limitations
@@ -276,4 +302,3 @@ If you are having issues with your cluster or questions about how things work, r
 ## TODO
 
 - Falco: Customers should be able to set up notifications and maybe also change/add rules to falco.
-- Fluentd/Elasticsearch/Kibana: Customers may need to parse application logs in specific ways.
