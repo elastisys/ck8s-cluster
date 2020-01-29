@@ -105,6 +105,7 @@ alertmanager:
       opsgenie_configs:
         # See https://prometheus.io/docs/alerting/configuration/#opsgenie_config
         - api_key: {{ requiredEnv "OPSGENIE_API_KEY" }}
+          api_url: https://api.eu.opsgenie.com/
           source: grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
       {{ end }}
 
