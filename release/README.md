@@ -1,6 +1,8 @@
 # Release process
 
 The releases will follow semantic versioning and be handled with git tags.
+
+When ready to cut a new major release create a release branch `Release-x`. 
 When all the desired changes for a certain release is done run: 
 ```./release.sh [patch|minor|major|-v verion]```
 
