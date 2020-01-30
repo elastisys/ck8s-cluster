@@ -158,21 +158,6 @@ kubectl create secret generic s3-credentials -n fluentd \
     --from-literal=s3_secret_key=${S3_SECRET_KEY} \
     --dry-run -o yaml | kubectl apply -f -
 
-echo "Deploying Elastic search and Kibana" >&2
-kubectl  -n  elastic-system create secret generic elasticsearch-es-elastic-user \
-    --from-literal=elastic=$ELASTIC_USER_SECRET \
-    --dry-run -o yaml | kubectl apply -f -
-
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/operator.yaml
-kubectl create secret generic s3-credentials -n elastic-system \
-    --from-literal=s3.client.default.access_key=${S3_ACCESS_KEY} \
-    --from-literal=s3.client.default.secret_key=${S3_SECRET_KEY} \
-    --dry-run -o yaml | kubectl apply -f -
-cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/elasticsearch.yaml | envsubst | kubectl apply -f -
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
-cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | kubectl apply -f -
-
-
 echo "Installing Harbor" >&2
 if [[ $ENABLE_PSP == "true" && $ENABLE_HARBOR == "true" ]]
 then
@@ -194,7 +179,7 @@ then
     storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "cinder-storage") | .name')
     if [ -z "$storage" ]
     then
-        echo "Install cinder storage class" >&2 
+        echo "Install cinder storage class" >&2
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
     fi
 fi
@@ -210,7 +195,7 @@ then
     helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 else
     echo "Install cert-manager and nfs-client-provisioner" >&2
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff 
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff
 fi
 
 # Get status of the cert-manager webhook api.
@@ -263,20 +248,6 @@ then
     echo "Error: Prometheus failed to install three times" >&2
     exit 1
 fi
-
-# Adding backup job and repository to elasticsearch
-while [[ $(kubectl get elasticsearches.elasticsearch.k8s.elastic.co -n elastic-system elasticsearch -o 'jsonpath={.status.health}') != "green" ]]
-do
-    echo "Waiting until elasticsearch is ready" >&2
-    sleep 2
-done
-
-export ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
-
-echo "Start curator cronjob" >&2
-${SCRIPTS_PATH}/gen-curator-conf.sh | kubectl apply -f -
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/curator.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
 
 echo "Install elasticsearch prometheus exporter" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply --suppress-diff

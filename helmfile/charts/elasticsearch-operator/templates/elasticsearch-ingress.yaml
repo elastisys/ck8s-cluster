@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: elasticsearch
+  namespace: elastic-system
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    certmanager.k8s.io/issuer: {{ .Values.elasticsearch.ingress.issuer }}
+    # TODO: Set an appropriate size, probably in synergy with fluentd buffer
+    #       and elasticsearch size limits
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.elasticsearch.ingress.host }}
+    secretName: elastic-cert
+  rules:
+  - host: {{ .Values.elasticsearch.ingress.host }}
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: elasticsearch-es-http
+            servicePort: 9200

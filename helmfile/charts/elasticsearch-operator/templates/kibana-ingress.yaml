@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kibana
+  namespace: elastic-system
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    certmanager.k8s.io/issuer: {{ .Values.kibana.ingress.issuer }}
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.kibana.ingress.host }}
+    secretName: kibana-cert
+  rules:
+  - host: {{ .Values.kibana.ingress.host }}
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: kibana-kb-http
+            servicePort: 5601

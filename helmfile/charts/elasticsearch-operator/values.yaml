@@ -1,0 +1,41 @@
+# Default values for elasticsearch-operator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+kibana:
+  ingress:
+    host: kibana.example.com
+    issuer: letsencrypt-staging
+elasticsearch:
+  password: replace-me
+  ingress:
+    host: elastic.example.com
+    issuer: letsencrypt-staging
+  s3:
+    endpoint: https://s3.example.com
+    access_key: replace-me
+    secret_key: replace-me
+  storageClassName: nfs-client
+  storageSize: 40Gi
+  resources: {}
+    # requests:
+    #   memory: 2Gi
+    #   cpu: 0.3
+    # limits:
+    #   memory: 3Gi
+    #   cpu: 1
+
+curator:
+  retention:
+    other_gb: 1
+    other_days: 10
+    kubecomponents_gb: 1
+    kubecomponents_days: 10
+    kubernetes_gb: 1
+    kubernetes_days: 10
+    kubeaudit_gb: 100
+    kubeaudit_days: 30
+    postgresql_gb: 30
+    postgresql_days: 30
+  # Should curator clean up the postgresql indices?
+  postgres: false

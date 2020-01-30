@@ -163,6 +163,17 @@ releases:
   - values/grafana-customer.yaml.gotmpl
 {{ end }}
 
+# Elasticsearch-operator
+- name: elasticsearch-operator
+  namespace: elastic-system
+  labels:
+    app: elasticsearch-operator
+  chart: ./charts/elasticsearch-operator
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/elasticsearch-operator.yaml.gotmpl
+
 #Elasticsearch-prometheus-exporter
 - name: elasticsearch-prometheus-exporter
   namespace: elastic-system

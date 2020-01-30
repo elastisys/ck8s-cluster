@@ -16,7 +16,7 @@ spec:
             # https://hub.docker.com/r/bobrik/curator/tags/
             image: bobrik/curator:5.7.6
             imagePullPolicy: IfNotPresent
-            args: 
+            args:
             - --config
             - /etc/config/config.yml
             - /etc/config/action_file.yml

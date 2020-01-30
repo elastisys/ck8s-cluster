@@ -1,5 +1,3 @@
-cat <<EOF
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,11 +7,11 @@ metadata:
     app: curator
 data:
   action_file.yml: |-
-    ---    
+    ---
     actions:
       1:
         action: delete_indices
-        description: "Clean up the oldest log-* indices that exceeds total disk space $OTHER_RETENTION_SIZE GB "
+        description: "Clean up the oldest other-* indices that exceeds total disk space {{ .Values.curator.retention.other_gb }} GB "
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -24,14 +22,14 @@ data:
           kind: regex
           value: 'other-*'
         - filtertype: space
-          disk_space: $OTHER_RETENTION_SIZE
+          disk_space: {{ .Values.curator.retention.other_gb }}
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       2:
         action: delete_indices
-        description: "Clean up the log-* indices that are older then $OTHER_RETENTION_AGE days"
+        description: "Clean up the other-* indices that are older then {{ .Values.curator.retention.other_days }} days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -45,12 +43,12 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: $OTHER_RETENTION_AGE
+          unit_count: {{ .Values.curator.retention.other_days }}
         - filtertype: kibana
-          exclude: True  
+          exclude: True
       3:
         action: delete_indices
-        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $KUBECOMPONENTS_RETENTION_SIZE GB"
+        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space {{ .Values.curator.retention.kubecomponents_gb }} GB"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -61,14 +59,14 @@ data:
           kind: regex
           value: 'kubecomponents-*'
         - filtertype: space
-          disk_space: $KUBECOMPONENTS_RETENTION_SIZE
+          disk_space: {{ .Values.curator.retention.kubecomponents_gb }}
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       4:
         action: delete_indices
-        description: "Clean up the kubecomponents-* indices that are older then $KUBECOMPONENTS_RETENTION_AGE days"
+        description: "Clean up the kubecomponents-* indices that are older then {{ .Values.curator.retention.kubecomponents_days }} days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -82,12 +80,12 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: $KUBECOMPONENTS_RETENTION_AGE
+          unit_count: {{ .Values.curator.retention.kubecomponents_days }}
         - filtertype: kibana
           exclude: True
       5:
         action: delete_indices
-        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $KUBEAUDIT_RETENTION_SIZE GB"
+        description: "Clean up the oldest kubeaudit-* indices that exceeds total disk space {{ .Values.curator.retention.kubeaudit_gb }} GB"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -98,14 +96,14 @@ data:
           kind: regex
           value: 'kubeaudit-*'
         - filtertype: space
-          disk_space: $KUBEAUDIT_RETENTION_SIZE
+          disk_space: {{ .Values.curator.retention.kubeaudit_gb }}
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       6:
         action: delete_indices
-        description: "Clean up the kubecomponents-* indices that are older then $KUBEAUDIT_RETENTION_AGE days"
+        description: "Clean up the kubeaudit-* indices that are older then {{ .Values.curator.retention.kubeaudit_days }} days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -119,12 +117,12 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: $KUBEAUDIT_RETENTION_AGE
+          unit_count: {{ .Values.curator.retention.kubeaudit_days }}
         - filtertype: kibana
           exclude: True
       7:
         action: delete_indices
-        description: "Clean up the oldest kubecomponents-* indices that exceeds total disk space $KUBERNETES_RETENTION_SIZE GB"
+        description: "Clean up the oldest kubernetes-* indices that exceeds total disk space {{ .Values.curator.retention.kubernetes_gb }} GB"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -135,14 +133,14 @@ data:
           kind: regex
           value: 'kubernetes-*'
         - filtertype: space
-          disk_space: $KUBERNETES_RETENTION_SIZE
+          disk_space: {{ .Values.curator.retention.kubernetes_gb }}
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       8:
         action: delete_indices
-        description: "Clean up the kubecomponents-* indices that are older then $KUBERNETES_RETENTION_AGE days"
+        description: "Clean up the kubernetes-* indices that are older then {{ .Values.curator.retention.kubernetes_days }} days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -156,16 +154,14 @@ data:
           source: creation_date
           direction: older
           unit: days
-          unit_count: $KUBERNETES_RETENTION_AGE
+          unit_count: {{ .Values.curator.retention.kubernetes_days }}
         - filtertype: kibana
           exclude: True
-EOF
 
-if [ "$ENABLE_POSTGRESQL" == "true" ]; then
-cat <<EOF
+{{- if .Values.curator.postgresql }}
       9:
         action: delete_indices
-        description: "Clean up the oldest postgresql-* indices that exceeds total disk space $POSTGRESQL_RETENTION_SIZE GB"
+        description: "Clean up the oldest postgresql-* indices that exceeds total disk space {{ .Values.curator.retention.postgresql_gb }} GB"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -176,14 +172,14 @@ cat <<EOF
           kind: regex
           value: 'postgresql-*'
         - filtertype: space
-          disk_space: $POSTGRESQL_RETENTION_SIZE
+          disk_space: {{ .Values.curator.retention.postgresql_gb }}
           use_age: True
           source: creation_date
         - filtertype: kibana
           exclude: True
       10:
         action: delete_indices
-        description: "Clean up the postgresql-* indices that are older then $POSTGRESQL_RETENTION_AGE days"
+        description: "Clean up the postgresql-* indices that are older then {{ .Values.curator.retention.postgresql_days }} days"
         options:
           continue_if_exception: False
           ignore_empty_list: True
@@ -197,12 +193,10 @@ cat <<EOF
           source: creation_date
           direction: older
           unit: days
-          unit_count: $POSTGRESQL_RETENTION_AGE
+          unit_count: {{ .Values.curator.retention.postgresql_days }}
         - filtertype: kibana
           exclude: True
-EOF
-fi
-cat <<EOF
+{{- end }}
 
   config.yml: |-
     ---
@@ -210,9 +204,9 @@ cat <<EOF
       hosts:
         - elasticsearch-es-http
       port: 9200
-      use_ssl: True 
+      use_ssl: True
       ssl_no_validate: True
-      http_auth: elastic:$ELASTIC_USER_SECRET
+      http_auth: elastic:{{ .Values.elasticsearch.password }}
       timeout: 30
       master_only: False
     logging:

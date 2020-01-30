@@ -15,7 +15,7 @@ spec:
       node.ml: false
       node.store.allow_mmap: false
       plugin.mandatory: repository-s3
-      s3.client.default.endpoint: ${S3_REGION_ENDPOINT}
+      s3.client.default.endpoint: {{ .Values.elasticsearch.s3.endpoint }}
       s3.client.default.protocol: https
       s3.client.default.path_style_access: true
       xpack.security.authc.realms.native.native1.order: 0
@@ -29,14 +29,9 @@ spec:
           - |
             bin/elasticsearch-plugin install --batch repository-s3
         containers:
-        - name: elasticsearch 
+        - name: elasticsearch
           resources:
-            requests:
-              memory: 2Gi
-              cpu: 0.3
-            limits:
-              memory: 3Gi
-              cpu: 1
+{{ toYaml .Values.elasticsearch.resources | indent 12 }}
         affinity:
           podAntiAffinity:
             preferredDuringSchedulingIgnoredDuringExecution:
@@ -58,7 +53,7 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 40Gi
-        storageClassName: ${STORAGE_CLASS}
+            storage: {{ .Values.elasticsearch.storageSize }}
+        storageClassName: {{ .Values.elasticsearch.storageClassName }}
   secureSettings:
   - secretName: s3-credentials
