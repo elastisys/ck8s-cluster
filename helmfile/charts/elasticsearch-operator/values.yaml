@@ -38,4 +38,4 @@ curator:
     postgresql_gb: 30
     postgresql_days: 30
   # Should curator clean up the postgresql indices?
-  postgres: false
+  postgresql: false
