@@ -2,9 +2,9 @@
   "ck8s": "0.1.0",
   "k8s": "v1.15.6",
   "services": {
-    "elasticsearch": "7.4.2",
     "kibana": "7.4.2",
     "harbor-core": "v1.10.0",
+    "elasticsearch": "7.4.2",
     "grafana": "6.5.2",
     "nginx-ingress-controller": "0.26.1"
   }

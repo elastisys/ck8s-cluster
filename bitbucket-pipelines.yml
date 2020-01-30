@@ -1,176 +1,221 @@
 image: elastisys/ck8s-bitbucket-pipeline:1.0.3
+definitions:
+  steps:
+    - step: &infra
+        name: Infrastructure
+        script:
+          # Variables
+          - source pipeline/init-exoscale.sh
+          - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
+          # Export vault variables
+          - source pipeline/vault-variables.sh
+          # Export vault token and save it to disk
+          - export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
+          - echo $VAULT_TOKEN > vault-token.txt
+          # Generate and store passwords
+          - source scripts/get-gen-secrets.sh
+          # Infrastructure
+          - cd terraform/exoscale
+          - echo '1' | TF_WORKSPACE=pipeline terraform init
+          - terraform workspace new pipeline-$BITBUCKET_BUILD_NUMBER
+          - terraform init
+          - ./set-execution-mode.sh
+          - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
+          - terraform apply -input=false tfplan
+          # Generate infra.json
+          - cd ../..
+          - ./scripts/gen-infra.sh > infra.json
+          - ./pipeline/test/infrastructure/ssh.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+          - ./pipeline/test/infrastructure/ssh.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+        artifacts:
+          - infra.json
+          - vault-token.txt
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+    
+    - step: &rke-sc
+        name: Service cluster rke
+        script:
+          - source pipeline/init-exoscale.sh
+          - source pipeline/variables.sh
+          - ./scripts/check-docker.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+          - ./scripts/gen-rke-conf-sc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-sc.yaml
+          - rke up --config ./eck-sc.yaml
+          - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+          - cd pipeline/test/k8s
+          - ./check-nodes.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+        artifacts:
+          - kube_config_eck-sc.yaml
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+
+    - step: &rke-wc
+        name: Workload cluster rke
+        script:
+          - source pipeline/init-exoscale.sh
+          - source pipeline/variables.sh
+          # Export vault variables
+          - source pipeline/vault-variables.sh
+          # Export vault token
+          - export VAULT_TOKEN=$(cat vault-token.txt)
+          # Export passwords
+          - source scripts/get-gen-secrets.sh
+          - ./scripts/check-docker.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+          - ./scripts/gen-rke-conf-wc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-wc.yaml
+          - rke up --config ./eck-wc.yaml
+          - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
+          - cd pipeline/test/k8s
+          - ./check-nodes.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
+        artifacts:
+          - kube_config_eck-wc.yaml
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+    - step: &deploy-sc
+        name: Service cluster deploy
+        script:
+          - source pipeline/init-exoscale.sh
+          - source pipeline/variables.sh
+          # Export vault variables
+          - source pipeline/vault-variables.sh
+          # Export vault token
+          - export VAULT_TOKEN=$(cat vault-token.txt)
+          # Export passwords
+          - source scripts/get-gen-secrets.sh
+          - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+          - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+          - ./scripts/deploy-sc.sh
+          - kubectl get pods --all-namespaces
+          - kubectl get nodes
+          - kubectl describe nodes
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+
+    - step: &deploy-wc
+        name: Workload cluster deploy
+        script:
+          - apt-get -y install apache2-utils
+          - source pipeline/init-exoscale.sh
+          - source pipeline/variables.sh
+          # Export vault variables
+          - source pipeline/vault-variables.sh
+          # Export vault token
+          - export VAULT_TOKEN=$(cat vault-token.txt)
+          # Export passwords
+          - source scripts/get-gen-secrets.sh
+          - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+          - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
+          - ./scripts/deploy-wc.sh
+          - kubectl get pods --all-namespaces
+          - kubectl get nodes
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+    - step: &test-sc
+        name: Service cluster test
+        script:
+          # Variables
+          - source pipeline/init-exoscale.sh
+          - source pipeline/variables.sh
+          # Export vault variables
+          - source pipeline/vault-variables.sh
+          # Export vault token
+          - export VAULT_TOKEN=$(cat vault-token.txt)
+          # Export passwords
+          - source scripts/get-gen-secrets.sh
+          - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+          - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+          - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+          # Tests
+          - ./pipeline/test/services/test-sc.sh
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+    - step: &test-wc
+        name: Workload cluster test
+        script:
+          # Variables
+          - source pipeline/init-exoscale.sh
+          - source pipeline/variables.sh
+          - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
+          # Export vault variables
+          - source pipeline/vault-variables.sh
+          # Export vault token
+          - export VAULT_TOKEN=$(cat vault-token.txt)
+          # Export passwords
+          - source scripts/get-gen-secrets.sh
+          - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+          - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
+
+          # Services
+          - ./pipeline/test/services/test-wc.sh
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+
+    - step: &versions
+        name: get running versions
+        script:
+          # Variables
+          - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
+          # Export vault variables
+          - ./release/get-versions.sh
+          - export ECK_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
+          - ./release/get-versions.sh
+          - cp release/version.json ./version.json
+    
+        after-script:
+          - ./pipeline/after-script.sh pipeline/init-exoscale.sh
+        artifacts:
+          - version.json
+
+    - step: &cleanup
+        name: Clean up
+        script:
+          - source pipeline/init-exoscale.sh
+          # Export vault variables
+          - source pipeline/vault-variables.sh
+          # Export vault token
+          - export VAULT_TOKEN=$(cat vault-token.txt)
+          # Revoke vault token and remove secrets
+          - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user
+          - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
+          - cd terraform/exoscale
+          - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
+          - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
+          - terraform destroy -auto-approve
+          - terraform workspace select pipeline
+          - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
+
 pipelines:
   pull-requests:
     '**':
-      - step:
-          name: Infrastructure
-          script:
-            # Variables
-            - source pipeline/init-exoscale.sh
-            - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
-            # Export vault variables
-            - source pipeline/vault-variables.sh
-            # Export vault token and save it to disk
-            - export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
-            - echo $VAULT_TOKEN > vault-token.txt
-            # Generate and store passwords
-            - source scripts/get-gen-secrets.sh
-            # Infrastructure
-            - cd terraform/exoscale
-            - echo '1' | TF_WORKSPACE=pipeline terraform init
-            - terraform workspace new pipeline-$BITBUCKET_BUILD_NUMBER
-            - terraform init
-            - ./set-execution-mode.sh
-            - terraform plan -var 'public_ingress_cidr_whitelist=["0.0.0.0/0"]' -out=tfplan -input=false
-            - terraform apply -input=false tfplan
-            # Generate infra.json
-            - cd ../..
-            - ./scripts/gen-infra.sh > infra.json
-            - ./pipeline/test/infrastructure/ssh.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
-            - ./pipeline/test/infrastructure/ssh.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
-          artifacts:
-            - infra.json
-            - vault-token.txt
-          after-script:
-            - ./pipeline/after-script.sh pipeline/init-exoscale.sh
-
+      - step: *infra
       - parallel:
-          - step:
-              name: Service cluster rke
-              script:
-                - source pipeline/init-exoscale.sh
-                - source pipeline/variables.sh
-                - ./scripts/check-docker.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
-                - ./scripts/gen-rke-conf-sc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-sc.yaml
-                - rke up --config ./eck-sc.yaml
-                - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - cd pipeline/test/k8s
-                - ./check-nodes.sh service_cluster "$BITBUCKET_CLONE_DIR/infra.json"
-              artifacts:
-                - kube_config_eck-sc.yaml
-              after-script:
-                - ./pipeline/after-script.sh pipeline/init-exoscale.sh
-          - step:
-              name: Workload cluster rke
-              script:
-                - source pipeline/init-exoscale.sh
-                - source pipeline/variables.sh
-                # Export vault variables
-                - source pipeline/vault-variables.sh
-                # Export vault token
-                - export VAULT_TOKEN=$(cat vault-token.txt)
-                # Export passwords
-                - source scripts/get-gen-secrets.sh
-                - ./scripts/check-docker.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
-                - ./scripts/gen-rke-conf-wc.sh "$BITBUCKET_CLONE_DIR/infra.json" > ./eck-wc.yaml
-                - rke up --config ./eck-wc.yaml
-                - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
-                - cd pipeline/test/k8s
-                - ./check-nodes.sh workload_cluster "$BITBUCKET_CLONE_DIR/infra.json"
-              artifacts:
-                - kube_config_eck-wc.yaml
-              after-script:
-                - ./pipeline/after-script.sh pipeline/init-exoscale.sh
-
+          - step: *rke-sc
+          - step: *rke-wc
+  
       - parallel:
-          - step:
-              name: Service cluster deploy
-              script:
-                - source pipeline/init-exoscale.sh
-                - source pipeline/variables.sh
-                # Export vault variables
-                - source pipeline/vault-variables.sh
-                # Export vault token
-                - export VAULT_TOKEN=$(cat vault-token.txt)
-                # Export passwords
-                - source scripts/get-gen-secrets.sh
-                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
-                - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - ./scripts/deploy-sc.sh
-                - kubectl get pods --all-namespaces
-                - kubectl get nodes
-                - kubectl describe nodes
-              after-script:
-                - ./pipeline/after-script.sh pipeline/init-exoscale.sh
-          - step:
-              name: Workload cluster deploy
-              script:
-                - apt-get -y install apache2-utils
-                - source pipeline/init-exoscale.sh
-                - source pipeline/variables.sh
-                # Export vault variables
-                - source pipeline/vault-variables.sh
-                # Export vault token
-                - export VAULT_TOKEN=$(cat vault-token.txt)
-                # Export passwords
-                - source scripts/get-gen-secrets.sh
-                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
-                - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
-                - ./scripts/deploy-wc.sh
-                - kubectl get pods --all-namespaces
-                - kubectl get nodes
-              after-script:
-                - ./pipeline/after-script.sh pipeline/init-exoscale.sh
-
+          - step: *deploy-sc
+          - step: *deploy-wc
+          
       - parallel:
-          - step:
-              name: Service cluster test
-              script:
-                # Variables
-                - source pipeline/init-exoscale.sh
-                - source pipeline/variables.sh
-                # Export vault variables
-                - source pipeline/vault-variables.sh
-                # Export vault token
-                - export VAULT_TOKEN=$(cat vault-token.txt)
-                # Export passwords
-                - source scripts/get-gen-secrets.sh
-                - export KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
-                # Tests
-                - ./pipeline/test/services/test-sc.sh
-              after-script:
-                - ./pipeline/after-script.sh pipeline/init-exoscale.sh
-          - step:
-              name: Workload cluster test
-              script:
-                # Variables
-                - source pipeline/init-exoscale.sh
-                - source pipeline/variables.sh
-                - export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
-                # Export vault variables
-                - source pipeline/vault-variables.sh
-                # Export vault token
-                - export VAULT_TOKEN=$(cat vault-token.txt)
-                # Export passwords
-                - source scripts/get-gen-secrets.sh
-                - export ECK_SC_KUBECONFIG=$(pwd)/kube_config_eck-sc.yaml
-                - source scripts/post-infra-common.sh "$BITBUCKET_CLONE_DIR/infra.json"
-
-                # Services
-                - ./pipeline/test/services/test-wc.sh
-              after-script:
-               - ./pipeline/after-script.sh pipeline/init-exoscale.sh
-
-      - step:
-          name: Clean up
-          script:
-            - source pipeline/init-exoscale.sh
-            # Export vault variables
-            - source pipeline/vault-variables.sh
-            # Export vault token
-            - export VAULT_TOKEN=$(cat vault-token.txt)
-            # Revoke vault token and remove secrets
-            - ./pipeline/vault-cleanup.sh harbor grafana influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user
-            - export TF_VAR_dns_prefix=pipeline-$BITBUCKET_BUILD_NUMBER
-            - cd terraform/exoscale
-            - echo '1' | TF_WORKSPACE=pipeline-$BITBUCKET_BUILD_NUMBER terraform init
-            - terraform workspace select pipeline-$BITBUCKET_BUILD_NUMBER
-            - terraform destroy -auto-approve
-            - terraform workspace select pipeline
-            - terraform workspace delete pipeline-$BITBUCKET_BUILD_NUMBER
-
+          - step: *test-sc
+          - step: *test-wc
+      - step: *versions       
+      - step: *cleanup
+  branches:
+    Release-*:
+      - step: *infra
+      - parallel:
+          - step: *rke-sc
+          - step: *rke-wc
+  
+      - parallel:
+          - step: *deploy-sc
+          - step: *deploy-wc
+          
+      - parallel:
+          - step: *test-sc
+          - step: *test-wc
+      - step: *versions       
+      - step: *cleanup
 
   custom:
     #Run this manualy if you want to test on safespring

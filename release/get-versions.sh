@@ -1,6 +1,6 @@
 #!/bin/bash
-
-file=version.json
+SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+file=${SCRIPTS_PATH}/version.json
 
 # Get k8s version
 tmp=$(mktemp)
