@@ -30,11 +30,11 @@ curator:
     kubernetes_days: {{ requiredEnv "KUBERNETES_RETENTION_AGE" }}
     kubeaudit_gb: {{ requiredEnv "KUBEAUDIT_RETENTION_SIZE" }}
     kubeaudit_days: {{ requiredEnv "KUBEAUDIT_RETENTION_AGE" }}
-    postgresql_gb: {{ env "POSTGRESQL_RETENTION_SIZE" }}
-    postgresql_days: {{ env "POSTGRESQL_RETENTION_AGE" }}
+{{- if eq (env "ENABLE_POSTGRESQL") "true" }}
+    postgresql_gb: {{ requiredEnv "POSTGRESQL_RETENTION_SIZE" }}
+    postgresql_days: {{ requiredEnv "POSTGRESQL_RETENTION_AGE" }}
   # Should curator clean up the postgresql indices?
-  {{ if eq (env "ENABLE_POSTGRESQL") "true" }}
   postgres: true
-  {{ else }}
+{{- else }}
   postgres: false
-  {{ end }}
+{{- end }}

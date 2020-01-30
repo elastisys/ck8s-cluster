@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curator-env
+  namespace: elastic-system
+  labels:
+    app: curator
+data:
+  KUBEAUDIT_RETENTION_SIZE: {{ .Values.curator.retention.kubeaudit_gb | quote }}
+  KUBEAUDIT_RETENTION_AGE: {{ .Values.curator.retention.kubeaudit_days | quote }}
+  KUBECOMPONENTS_RETENTION_SIZE: {{ .Values.curator.retention.kubecomponents_gb | quote }}
+  KUBECOMPONENTS_RETENTION_AGE: {{ .Values.curator.retention.kubecomponents_days | quote }}
+  KUBERNETES_RETENTION_SIZE: {{ .Values.curator.retention.kubernetes_gb | quote }}
+  KUBERNETES_RETENTION_AGE: {{ .Values.curator.retention.kubernetes_days | quote }}
+  OTHER_RETENTION_SIZE: {{ .Values.curator.retention.other_gb | quote }}
+  OTHER_RETENTION_AGE: {{ .Values.curator.retention.other_days | quote }}
+  POSTGRESQL_RETENTION_SIZE: {{ .Values.curator.retention.postgresql_gb | quote }}
+  POSTGRESQL_RETENTION_AGE: {{ .Values.curator.retention.postgresql_days | quote }}

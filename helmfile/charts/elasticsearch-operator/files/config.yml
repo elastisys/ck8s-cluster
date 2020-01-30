@@ -1,0 +1,17 @@
+---
+# https://www.elastic.co/guide/en/elasticsearch/client/curator/current/configfile.html
+client:
+  hosts:
+    - elasticsearch-es-http
+  port: 9200
+  use_ssl: True
+  ssl_no_validate: True
+  {{- /* Note: the elasticsearch password is taken from the env var at runtime */ -}}
+  http_auth: elastic:${ELASTICSEARCH_PWD}
+  timeout: 30
+  master_only: False
+logging:
+  loglevel: DEBUG
+  logformat: default
+  # This is the default blacklist
+  blacklist: ['elasticsearch', 'urllib3']

@@ -20,6 +20,15 @@ spec:
             - --config
             - /etc/config/config.yml
             - /etc/config/action_file.yml
+            envFrom:
+            - configMapRef:
+                name: curator-env
+            env:
+              - name: ELASTICSEARCH_PWD
+                valueFrom:
+                  secretKeyRef:
+                    name: elasticsearch-es-elastic-user
+                    key: elastic
             volumeMounts:
               - name: config-volume
                 mountPath: /etc/config
