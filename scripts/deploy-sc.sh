@@ -228,6 +228,12 @@ fi
 echo "Installing Dex" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff
 
+# Set environment variable for the directory containing the kustomize plugin directory
+export XDG_CONFIG_HOME=$(pwd)
+
+# Build InfluxDB helm chart based on the stable chart and last mile modifications using kustomize
+./helmify.sh build influxdb service_cluster
+
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
 
 [[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"

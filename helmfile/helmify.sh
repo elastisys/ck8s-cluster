@@ -5,19 +5,20 @@ chart=$2
 env=$3
 dir=${chart}-kustomize
 
-chart=charts/${chart/.\//}
+chart=${chart/.\//}
+chart_dir=charts/$chart
 
 build() {
   if [ ! -d "$dir" ]; then
-    echo "directory \"$dir\" does not exist. make a kustomize project there in order to generate a local helm chart at $chart/ from it!" 1>&2
+    echo "directory \"$dir\" does not exist. make a kustomize project there in order to generate a local helm chart at $chart_dir/ from it!" 1>&2
     exit 1
   fi
 
-  mkdir -p $chart/templates
+  mkdir -p $chart_dir/templates
 
-  echo "generating $chart/Chart.yaml" 1>&2
+  echo "generating $chart_dir/Chart.yaml" 1>&2
 
-  cat <<EOF > $chart/Chart.yaml
+  cat <<EOF > $chart_dir/Chart.yaml
 apiVersion: v1
 appVersion: "1.0"
 description: A Helm chart for Kubernetes
@@ -25,9 +26,9 @@ name: $chart
 version: 0.1.0
 EOF
 
-  echo "generating $chart/templates/NOTES.txt" 1>&2
+  echo "generating $chart_dir/templates/NOTES.txt" 1>&2
 
-  cat <<EOF > $chart/templates/NOTES.txt
+  cat <<EOF > $chart_dir/templates/NOTES.txt
 $chart has been installed as release {{ .Release.Name }}.
 
 Run \`helm status {{ .Release.Name }}\` for more information.
@@ -36,21 +37,20 @@ EOF
 
   echo "running kustomize" 1>&2
 
-  (cd $dir; kustomize build --enable_alpha_plugins overlays/$env) > $chart/templates/all.yaml
+  (cd $dir; kustomize build --enable_alpha_plugins overlays/$env) > $chart_dir/templates/all.yaml
 
   echo "running helm lint" 1>&2
 
-  helm lint $chart
+  helm lint $chart_dir
 
   echo "generated following files:"
 
-  tree $chart
+  tree $chart_dir
 }
 
 clean() {
-  rm -r $chart
-  #rm $chart/Chart.yaml
-  #rm $chart/templates/*.yaml
+  rm $chart_dir/Chart.yaml
+  rm $chart_dir/templates/*.yaml
 }
 
 case "$cmd" in

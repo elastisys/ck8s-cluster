@@ -219,7 +219,7 @@ releases:
   - values/init-harbor.yaml.gotmpl
 
 # InfluxDB with disk usage monitoring and metrics retention
-# Generated with helmify script bef
+# Generated with helmify script before running helmfile
 - name: influxdb
   namespace: influxdb-prometheus
   labels:
