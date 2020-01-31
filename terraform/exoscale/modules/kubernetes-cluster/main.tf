@@ -39,7 +39,7 @@ resource "exoscale_compute" "master" {
   for_each = toset(var.master_names)
 
   display_name    = "${var.prefix}-${each.value}"
-  template        = "Linux RancherOS 1.5.1 64-bit"
+  template        = "Linux RancherOS 1.5.5 64-bit"
   size            = var.master_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
@@ -72,7 +72,7 @@ resource "exoscale_compute" "worker" {
   for_each = toset(var.worker_names)
 
   display_name    = "${var.prefix}-${each.value}"
-  template        = "Linux RancherOS 1.5.1 64-bit"
+  template        = "Linux RancherOS 1.5.5 64-bit"
   size            = var.worker_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
