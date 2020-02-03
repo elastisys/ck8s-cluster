@@ -44,7 +44,19 @@ variable "worker_extra_volume" {
 
 variable "worker_extra_volume_size" {
   type = map
-  default = {}  
+  default = {}
+}
+
+variable "loadbalancer_names" {
+  description = "List of names for loadbalancer instances to create."
+  type        = list(string)
+  default     = []
+}
+
+variable "loadbalancer_name_flavor_map" {
+  description = "Map of instance name to openstack flavor."
+  type        = map
+  default     = {}
 }
 
 variable public_ingress_cidr_whitelist {

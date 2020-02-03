@@ -38,7 +38,7 @@ variable prefix_wc {
 # m.medium : 2c1708d1-3974-4ab8-97cc-cbf58aa27ad9
 # b.xlarge : fce2b54d-c0ef-4ad4-aa81-bcdcaa54f7cb
 variable worker_names_sc {
-  description = "List of names for worker instances to create." 
+  description = "List of names for worker instances to create."
   type        = list(string)
 
   default     = ["worker-0","worker-1"]
@@ -55,7 +55,7 @@ variable worker_name_flavor_map_sc {
 }
 
 variable worker_names_wc {
-  description = "List of names for worker instances to create." 
+  description = "List of names for worker instances to create."
   type        = list(string)
 
   default     = ["worker-0","worker-1"]
@@ -67,7 +67,7 @@ variable worker_name_flavor_map_wc {
 
   default     = {
     "worker-0" : "16d11558-62fe-4bce-b8de-f49a077dc881",
-    "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"  
+    "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"
   }
 }
 
@@ -114,15 +114,44 @@ variable worker_extra_volume_wc {
 }
 
 variable worker_extra_volume_size_sc {
-  description = "Mapping from instance name to volume size for the extra volume." 
+  description = "Mapping from instance name to volume size for the extra volume."
   type        = map
-  default     = {}  
+  default     = {}
 }
 
 variable worker_extra_volume_size_wc {
   description = "Mapping from instance name to volume size for the extra volume."
   type        = map
-  default     = {}  
+  default     = {}
+}
+
+variable loadbalancer_names_sc {
+  description = "List of names for loadbalancer instances to create."
+  type        = list(string)
+  default     = ["sc-lb-0"]
+}
+
+variable loadbalancer_name_flavor_map_sc {
+  description = "Map of instance name to openstack flavor."
+  type        = map
+  default     = {
+    "sc-lb-0" : "1493be98-d150-4f69-8154-4d59ea49681c"
+  }
+}
+
+
+variable loadbalancer_names_wc {
+  description = "List of names for loadbalancer instances to create."
+  type        = list(string)
+  default     = ["wc-lb-0"]
+}
+
+variable loadbalancer_name_flavor_map_wc {
+  description = "Map of instance name to openstack flavor."
+  type        = map
+  default     = {
+    "wc-lb-0" : "1493be98-d150-4f69-8154-4d59ea49681c"
+  }
 }
 
 variable public_ingress_cidr_whitelist {

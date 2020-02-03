@@ -182,7 +182,7 @@ module "worker" {
 
   network_id = openstack_networking_network_v2.network.id
   subnet_id  = openstack_networking_subnet_v2.subnet.id
-  
+
   security_group_ids = [
     openstack_compute_secgroup_v2.cluster_sg.id,
     openstack_compute_secgroup_v2.worker_sg.id,
@@ -200,4 +200,22 @@ resource "openstack_compute_volume_attach_v2" "worker_va" {
   for_each    = var.worker_extra_volume == [] ? toset([""]) : toset(var.worker_extra_volume)
   instance_id = module.worker.instance_ids[each.value]
   volume_id   = openstack_blockstorage_volume_v2.worker_volume[each.value].id
+}
+
+module "loadbalancer" {
+  source = "../vm"
+
+  prefix          = var.prefix
+  names           = var.loadbalancer_names
+  name_flavor_map = var.loadbalancer_name_flavor_map
+  image_id        = var.image_id
+  key_pair        = var.key_pair
+
+  network_id = openstack_networking_network_v2.network.id
+  subnet_id  = openstack_networking_subnet_v2.subnet.id
+
+  security_group_ids = [
+    openstack_compute_secgroup_v2.cluster_sg.id,
+    openstack_compute_secgroup_v2.worker_sg.id,
+  ]
 }

@@ -60,6 +60,9 @@ module "service_cluster" {
     "notary.harbor.${var.dns_prefix}"
   ]
 
+  loadbalancer_names           = var.loadbalancer_names_sc
+  loadbalancer_name_flavor_map = var.loadbalancer_name_flavor_map_sc
+
 }
 
 
@@ -86,4 +89,7 @@ module "workload_cluster" {
 
   master_names           = var.master_names_wc
   master_name_flavor_map = var.master_name_flavor_map_wc
+
+  loadbalancer_names           = var.loadbalancer_names_wc
+  loadbalancer_name_flavor_map = var.loadbalancer_name_flavor_map_wc
 }
