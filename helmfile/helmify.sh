@@ -43,9 +43,6 @@ EOF
 
   helm lint $chart_dir
 
-  echo "generated following files:"
-
-  tree $chart_dir
 }
 
 clean() {
