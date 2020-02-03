@@ -1,4 +1,4 @@
-name: CI
+name: Exoscale-pipeline
 
 on: [push]
 
@@ -9,6 +9,10 @@ jobs:
       image: elastisys/ck8s-bitbucket-pipeline:1.0.6
     steps:
     - uses: actions/checkout@v1
+    - run: echo $GITHUB_RUN_ID
+      shell: bash
+    - run: env
+      shell: bash
     - run: ./pipeline/infra.sh
       shell: bash
       env:
@@ -118,6 +122,11 @@ jobs:
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+    - name: Upload deploy output
+      uses: actions/upload-artifact@v1
+      with:
+        name: deploy-sc-output
+        path: deploy-sc-output
 
   deploy-wc:
     needs: [rke-sc,rke-wc]
@@ -143,6 +152,11 @@ jobs:
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+    - name: Upload deploy output
+      uses: actions/upload-artifact@v1
+      with:
+        name: deploy-wc-output
+        path: deploy-wc-output
   
   test-sc:
     needs: [deploy-wc, deploy-sc]
@@ -195,7 +209,7 @@ jobs:
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
 
   clean-up:
-    needs: [deploy-sc,deploy-wc]
+    needs: [test-sc,test-wc]
     if: always()
     runs-on: ubuntu-latest
     container: 

@@ -8,7 +8,7 @@ echo "getting vault passwords"
 source pipeline/vault-variables.sh
 export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
 #Generate and store passwords
-source scripts/get-gen-secrets.sh
+source scripts/get-gen-secrets.sh > /dev/null
 source pipeline/variables.sh
 
 source ./scripts/post-infra-common.sh infra.json

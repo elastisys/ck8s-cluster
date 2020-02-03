@@ -1,6 +1,0 @@
-name: 'Test docker action'
-description: 'Testing and action with docker'
-runs: 
-  using: 'docker'
-  image: 'docker://elastisys/ck8s-bitbucket-pipeline:1.0.3'
-  entrypoint: ["/bin/sh", "./.github/actions/test-action/script.sh"]

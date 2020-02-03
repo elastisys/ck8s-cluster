@@ -1,5 +1,4 @@
 set -e
-
 echo "Sourcing variables"
 export CLOUD_PROVIDER=exoscale
 export ENVIRONMENT_NAME="pipeline-$GITHUB_RUN_ID"
@@ -12,7 +11,7 @@ source pipeline/vault-variables.sh
 #Export vault token and save it to disk
 export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
 #Generate and store passwords
-source scripts/get-gen-secrets.sh
+source scripts/get-gen-secrets.sh > /dev/null
 #Infrastructure
 echo -e "\nTerraform"
 cd terraform/exoscale

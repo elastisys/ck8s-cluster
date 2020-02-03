@@ -11,7 +11,7 @@ echo "getting vault passwords"
 source pipeline/vault-variables.sh
 export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
 #Generate and store passwords
-source scripts/get-gen-secrets.sh
+source scripts/get-gen-secrets.sh > /dev/null
 source pipeline/variables.sh
 
 echo "Testing docker on nodes"
@@ -29,3 +29,5 @@ chmod o+r kube_config_eck-sc.yaml
 
 # Revoke vault token.
 curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST "${VAULT_ADDR}/v1/auth/token/revoke-self"
+
+echo "rke-sc completed!"
