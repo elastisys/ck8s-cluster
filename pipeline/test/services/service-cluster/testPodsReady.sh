@@ -17,7 +17,6 @@ DEPLOYMENTS=(
     "harbor harbor-harbor-notary-signer"
     "harbor harbor-harbor-portal"
     "harbor harbor-harbor-registry"
-    "influxdb-prometheus influxdb-du-monitoring-deployment"
     "kube-system coredns"
     "kube-system coredns-autoscaler"
     "kube-system metrics-server"
@@ -123,6 +122,25 @@ do
     then
         testJobStatus $JOB
     fi
+done
+
+# Format:
+# namespace cronjob-name timeout
+CRONJOBS=(
+  "influxdb-prometheus influxdb-metrics-retention-cronjob"
+  "influxdb-prometheus influxdb-backup"
+)
+
+echo
+echo
+echo "Testing cronjobs"
+echo "===================="
+
+for CRONJOB in "${CRONJOBS[@]}"
+do
+    arguments=($CRONJOB)
+    echo -n -e "\n${arguments[1]}\t"
+    testResourceExistence cronjob $CRONJOB
 done
 
 echo
