@@ -2,22 +2,34 @@
 
 The releases will follow semantic versioning and be handled with git tags.
 
-When ready to cut a new major release create a release branch `Release-x`. 
-When all the desired changes for a certain release is done run: 
+## Major releases
+When ready to cut a new major release create a release branch `Release-x`.
+This will when pushed trigger the pipeline to create and test a new cluster. 
+Run all tests necessary and if everything passes get the artifact version.json from
+the pipeline and update the local version.json. 
+When everything else is done run: 
 ```./release.sh [patch|minor|major|-v verion]```
 
-`patch, minor or major` will bump the current version found in `VERSION.md` while
+`patch, minor or major` will bump the current version found in `version.json` while
 using `-v version` will set a specific version.
 
 The script will do the following:
 
-1. Increase the version in `VERSION.md`
+1. Increase the CK8S version in `version.json`
 2. Append what ever is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
 3. Clear `WIP-CHANGELOG.md`
 4. Create a git commit with message `release version vx.x.x`
 5. Create a tag named `vx.x.x`
 
-OBS! the release must be done from someone with write access to the master branch.
+The last step is running `git push; git push --tags` manually then opening a pull request
+back to master.
+
+## Minor and Patch releases
+For minor and patch releases pull in the desired changes to the existing release branch.
+Minor changes can be pulled from feature branches and add new features while a patch 
+should only include hotfixes that does not require any downtime to be pulled in.
+
+The rest follows the workflow from a major release.
 
 ## While developing
 
@@ -40,7 +52,8 @@ as bullet points under one of theese categories:
 * Fixed
 * Security
 
-When creating a major (and perhaps minor) release a section of `Release highlights` can be added at the top with a summary of all the patch notes.
+When creating a major release a section of `Release highlights` should be added
+on top of the WIP-changelog with a summary of the most important changes.
 
 You can link comments to related pull requests with `PR#pr-number`. Commit ids can be linked
 by just writing that commits short hash or full hash.
