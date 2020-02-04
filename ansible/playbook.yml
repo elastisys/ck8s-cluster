@@ -76,3 +76,19 @@
         owner: root
         group: root
         mode: '0644'
+
+- hosts: wc_loadbalancers
+  become: yes
+  become_user: root
+  vars:
+    server_group: wc_workers
+  roles:
+    - haproxy
+
+- hosts: sc_loadbalancers
+  become: yes
+  become_user: root
+  vars:
+    server_group: sc_workers
+  roles:
+    - haproxy
