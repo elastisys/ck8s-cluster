@@ -17,5 +17,5 @@ resource "aws_route53_record" "dns" {
   type    = "A"
   ttl     = "300"
   # TODO change records to eip once working
-  records = module.worker.floating_ips
+  records = module.loadbalancer.floating_ips
 }
