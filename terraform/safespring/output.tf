@@ -11,11 +11,19 @@ output "sc_master_ips" {
   value = module.service_cluster.master_ips
 }
 
+output "sc_loadbalancer_ips" {
+  value = module.service_cluster.loadbalancer_ips
+}
+
 output "wc_worker_ips" {
   value = module.workload_cluster.worker_ips
 }
 output "wc_master_ips" {
   value = module.workload_cluster.master_ips
+}
+
+output "wc_loadbalancer_ips" {
+  value = module.workload_cluster.loadbalancer_ips
 }
 
 output "wc_dns_name" {

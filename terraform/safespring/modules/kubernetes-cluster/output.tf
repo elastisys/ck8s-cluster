@@ -1,5 +1,5 @@
 output "dns_record_name" {
-  value = [ 
+  value = [
     for dns in aws_route53_record.dns: dns.name
   ]
 }
@@ -20,6 +20,10 @@ output "master_ips" {
 
 output "worker_ips" {
   value = module.worker.instance_ips
+}
+
+output "loadbalancer_ips" {
+  value = module.loadbalancer.instance_ips
 }
 
 # For device paths
