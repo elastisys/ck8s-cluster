@@ -5,5 +5,5 @@ metadata:
 data:
   cronjob: |
     ### cron file for running the export script
-    * * * * * root sh /scripts/export-influxdb-database-size.sh ## run the export script
+    0/5 * * * * root sh /scripts/export-influxdb-database-size.sh ## run the export script at every 5th minute from 0 through 59
     # An empty line is required at the end of this file for a valid cron file.
