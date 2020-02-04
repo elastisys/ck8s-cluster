@@ -17,6 +17,7 @@ popd > /dev/null
 service=$(echo $tf_out | jq '{
     "worker_ip_addresses": .sc_worker_ips.value,
     "master_ip_addresses": .sc_master_ips.value,
+    "loadbalancer_ip_addresses": .sc_loadbalancer_ips.value,
     "nfs_ip_addresses": .sc_nfs_ips.value,
     "nfs_device_path": .sc_nfs_device_paths.value,
     "worker_device_path": .sc_worker_device_paths.value,
@@ -29,6 +30,7 @@ service=$(echo $tf_out | jq '{
 workload=$(echo $tf_out | jq '{
     "worker_ip_addresses": .wc_worker_ips.value,
     "master_ip_addresses": .wc_master_ips.value,
+    "loadbalancer_ip_addresses": .wc_loadbalancer_ips.value,
     "nfs_ip_addresses": .wc_nfs_ips.value,
     "nfs_device_path": .wc_nfs_device_paths.value,
     "worker_device_path": .wc_worker_device_paths.value,
