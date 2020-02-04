@@ -12,7 +12,7 @@ function write_env_vars_to_file() { # arguments: file, env_vars
     done
 }
 
-env_vars=("INFLUX_ADDR" "INFLUX_BACKUP_SCHEDULE" "S3_REGION" "S3_REGION_ENDPOINT" "S3_INFLUX_BUCKET_URL")
+env_vars=("INFLUX_ADDR" "S3_REGION" "S3_REGION_ENDPOINT" "S3_INFLUX_BUCKET_URL")
 file=./kustomize/influxdb/base/influxdb-backup/backup-influx.env
 write_env_vars_to_file $file "${env_vars[@]}"
 

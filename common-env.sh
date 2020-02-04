@@ -19,7 +19,6 @@ export KUBERNETES_VERSION=${KUBERNETES_VERSION:-'"v1.15.6-rancher1-2"'}
 
 # Influx cronjob backup variables.
 export INFLUX_ADDR=influxdb.influxdb-prometheus.svc:8088
-export INFLUX_BACKUP_SCHEDULE="0 0 * * *"
 
 # Domains that should be allowed to log in using OAuth
 export OAUTH_ALLOWED_DOMAINS="${OAUTH_ALLOWED_DOMAINS:-example.com}"
