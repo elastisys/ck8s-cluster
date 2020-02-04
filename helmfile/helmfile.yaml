@@ -219,23 +219,18 @@ releases:
   - values/init-harbor.yaml.gotmpl
 
 # InfluxDB with disk usage monitoring and metrics retention
-# Generated with helmify script before running helmfile
+# Generated with helmify script using kustomize
 - name: influxdb
   namespace: influxdb-prometheus
   labels:
     app: influxdb
-  chart: ./charts/influxdb
+  chart: ./charts/influxdb # Specifies the target directory of Helm Chart generated using kustomize based on the stable/influxdb (as specified in kustomize/ifluxdb/base/influxdb/chartInflator.yaml file)
   version: 0.1.0
-
-# - name: kustomize
-#   namespace: influxdb-prometheus
-#   labels:
-#     app: influxdb
-#   chart: influxdb
-#   hooks:
-#   - events: ["prepare", "cleanup"]
-#     command: "./helmify.sh"
-#     args: ["{{`{{if eq .Event.Name \"prepare\"}}build{{else}}clean{{end}}`}}", "{{`{{.Release.Chart}}`}}", "{{`{{.Environment.Name}}`}}"]
+  hooks:
+  - events: ["prepare", "cleanup"]
+  # - events: ["prepare"]  
+    command: "./helmify.sh"
+    args: ["{{`{{if eq .Event.Name \"prepare\"}}build{{else}}clean{{end}}`}}", "{{`{{.Release.Chart}}`}}", "{{`{{.Environment.Name}}`}}"]
 
 - name: blackbox
   namespace: monitoring
