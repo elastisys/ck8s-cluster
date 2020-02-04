@@ -11,7 +11,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 if [[ -z "$GITHUB_RUN_ID" ]]; then
     if [[ -n "$1" ]]; then
-        MANUAL=true
+        export MANUAL=true
         GITHUB_RUN_ID=$1
     else 
         echo "ERROR: GITHUB_RUN_ID is empty and no arg1 is set. One is required"
