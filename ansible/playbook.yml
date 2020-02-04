@@ -84,6 +84,8 @@
     server_group: wc_workers
   roles:
     - haproxy
+  tags:
+    - loadbalancer
 
 - hosts: sc_loadbalancers
   become: yes
@@ -92,3 +94,5 @@
     server_group: sc_workers
   roles:
     - haproxy
+  tags:
+    - loadbalancer
