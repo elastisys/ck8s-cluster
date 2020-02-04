@@ -48,6 +48,7 @@ EOF
 clean() {
   rm $chart_dir/Chart.yaml
   rm $chart_dir/templates/*.yaml
+  rm $chart_dir/templates/NOTES.txt
 }
 
 case "$cmd" in
