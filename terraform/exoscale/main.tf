@@ -19,8 +19,9 @@ provider "exoscale" {
 
 module "service_cluster" {
   source = "./modules/kubernetes-cluster"
-  prefix = "${terraform.workspace}-service-cluster"
-
+  
+  prefix = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+  
   worker_names          = var.worker_names_sc
   worker_name_size_map  = var.worker_name_size_map_sc
   master_names          = var.master_names_sc
@@ -48,7 +49,8 @@ module "service_cluster" {
 
 module "workload_cluster" {
   source = "./modules/kubernetes-cluster"
-  prefix = "${terraform.workspace}-workload-cluster"
+
+  prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
 
   worker_names          = var.worker_names_sc
   worker_name_size_map  = var.worker_name_size_map_wc
