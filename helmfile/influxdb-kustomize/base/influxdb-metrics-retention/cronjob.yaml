@@ -32,12 +32,12 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: influxdb-auth
-                    key: influxdb-user
+                    key: INFLUXDB_USER
               - name: INFLUXDB_PASSWORD
                 valueFrom:
                   secretKeyRef:
                     name: influxdb-auth
-                    key: influxdb-password
+                    key: INFLUXDB_PWD
               - name: INFLUXDB_DATABASE
                 valueFrom:
                   configMapKeyRef:

@@ -22,12 +22,12 @@ env:
   valueFrom:
     secretKeyRef:
       name: influxdb-auth
-      key: influxdb-user
+      key: INFLUXDB_USER
 - name: INFLUXDB_ADMIN_PASSWORD
   valueFrom:
     secretKeyRef:
       name: influxdb-auth
-      key: influxdb-password
+      key: INFLUXDB_PWD
 
 config:
   data:

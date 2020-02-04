@@ -4,7 +4,12 @@ resources:
 configMapGenerator:
 - name: influx-env-cm
   envs:
-  - influx.env
+  - backup-influx.env
+
+secretGenerator:
+- name: influx-backup-secret
+  envs:
+  - secret.env
 
 vars:
 - name: INFLUX_ADDR
@@ -37,15 +42,15 @@ vars:
     fieldpath: data.S3_INFLUX_BUCKET_URL
 - name: S3_ACCESS_KEY
   objref:
-    kind: ConfigMap
-    name: influx-env-cm
+    kind: Secret
+    name: influx-backup-secret
     apiVersion: v1
   fieldref:
     fieldpath: data.S3_ACCESS_KEY
 - name: S3_SECRET_KEY
   objref:
-    kind: ConfigMap
-    name: influx-env-cm
+    kind: Secret
+    name: influx-backup-secret
     apiVersion: v1
   fieldref:
     fieldpath: data.S3_SECRET_KEY

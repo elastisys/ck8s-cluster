@@ -3,6 +3,11 @@ configMapGenerator:
   envs:
   - common.env
 
+secretGenerator:
+- name: influxdb-auth
+  envs:
+  - secret.env
+
 resources:
   - influxdb
   - influxdb-metrics-retention
