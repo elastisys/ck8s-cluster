@@ -95,6 +95,22 @@ releases:
   - values/prometheus-operator-wc.yaml.gotmpl
 {{ end }}
 
+- name: ck8sdash
+  namespace: ck8sdash
+  labels:
+    app: ck8sdash
+  chart: ./charts/ck8sdash
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/ck8sdash-common.yaml.gotmpl
+{{ if eq .Environment.Name "service_cluster" }}
+  - values/ck8sdash-sc.yaml.gotmpl
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+  - values/ck8sdash-wc.yaml.gotmpl
+{{ end }}
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex

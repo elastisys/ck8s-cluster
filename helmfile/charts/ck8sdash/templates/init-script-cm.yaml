@@ -1,8 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ck8sdash-init-script
-  namespace: ck8sdash
+  name: {{ include "ck8sdash.fullname" . }}-init-script
+  labels:
+{{ include "ck8sdash.labels" . | indent 4 }}
 data:
   init.sh: |
     #!/bin/sh
@@ -54,7 +55,7 @@ data:
           }, 
           "metadata": {
             "name": "ck8sdash-grafana-api-key",
-            "namespace": "ck8sdash"
+            "namespace": "'$NAMESPACE'"
           },
           "type": "Opaque"
         }'
