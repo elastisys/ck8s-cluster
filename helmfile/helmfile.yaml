@@ -319,4 +319,14 @@ releases:
   values:
   - values/velero.yaml.gotmpl
 
+# Customer RBAC
+- name: customer-rbac
+  namespace: kube-system
+  labels:
+    app: customer-rbac
+  chart: ./charts/customer-rbac
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/customer-rbac.yaml.gotmpl
 {{ end }}

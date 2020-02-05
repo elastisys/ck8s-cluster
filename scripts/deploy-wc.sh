@@ -31,6 +31,9 @@ then
     fi
 fi
 
+export CUSTOMER_NAMESPACES_COMMASEPARATED=$(echo "$CUSTOMER_NAMESPACES" | tr ' ' ,)
+export CUSTOMER_ADMIN_USERS_COMMASEPARATED=$(echo "$CUSTOMER_ADMIN_USERS" | tr ' ' ,)
+
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
@@ -209,26 +212,6 @@ kubectl -n fluentd create secret generic elasticsearch \
 helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply
 
 
-#
-# Customer RBAC
-#
-
-# Create namespace(s) and RBAC
-kubectl auth reconcile -f ${SCRIPTS_PATH}/../manifests/customer-rbac/customer-admin-role.yaml
-for NAMESPACE in ${CUSTOMER_NAMESPACES}
-do
-    export NAMESPACE=$NAMESPACE
-    kubectl create namespace "${NAMESPACE}" \
-        --dry-run -o yaml | kubectl apply -f -
-    for CUSTOMER_USER in ${CUSTOMER_ADMIN_USERS}
-    do
-        export CUSTOMER_USER=$CUSTOMER_USER
-        # By using "auth reconcile" instead of "apply" we can add one
-        # user at a time.
-        envsubst < ${SCRIPTS_PATH}/../manifests/customer-rbac/customer-admin-rolebinding.yaml | kubectl auth reconcile -f -
-    done
-done
-
 
 # Create kubeconfig for the customer
 
@@ -267,16 +250,6 @@ kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config use-context \
     user@compliantk8s
 
 rm ${CUSTOMER_CERTIFICATE_AUTHORITY}
-
-# Allow customer admins to configure fluentd
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/customer-rbac/fluentd.yaml
-
-for user in ${CUSTOMER_ADMIN_USERS}
-do
-    kubectl -n fluentd create rolebinding fluentd-configurer \
-        --role=fluentd-configurer --user="${user}" \
-        --dry-run -o yaml | kubectl auth reconcile -f -
-done
 
 # Add example resources.
 # We use `create` here instead of `apply` to avoid overwriting any changes the
