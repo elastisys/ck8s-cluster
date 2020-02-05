@@ -6,7 +6,7 @@ jobs:
   infra:
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.7
     steps:
     - uses: actions/checkout@v1
     - run: echo $GITHUB_RUN_ID
