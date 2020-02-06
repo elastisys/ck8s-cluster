@@ -2,7 +2,9 @@
 # Usage ./release.sh patch|minor|major
 
 set -e
+SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 file=version.json
+CHANGELOG=${SCRIPTS_PATH}/../CHANGELOG.md
 if [[ ! -f "$file" ]]; then
   echo "ERROR:  $file does not exist"
   exit 1
@@ -52,29 +54,29 @@ DATE=$(date +'%Y-%m-%d')
 echo "replacing previous version: $prev_version with new version: $new_version"
 tmp=$(mktemp)
 jq --arg version $new_version '.ck8s = $version' "$file" > "$tmp" && mv "$tmp" "$file"
-# sed -i "1!b;s/${prev_version}/${new_version}/" VERSION.md
 
-# ### Generating new changelog by combining CHANGELOG.md and WIP-CHANGELOG.md ###
-# echo "generating new changelog"
+### Generating new changelog by combining CHANGELOG.md and WIP-CHANGELOG.md ###
+echo "generating new changelog"
 
-# # Split Changelog and Table of contents(TOC) into seperate files
-# sed -n '/^<!-- BEGIN TOC -->/,/^<!-- END TOC -->/!p' CHANGELOG.md > temp-cl.md
-# sed -n '/<!-- BEGIN TOC -->/,/<!-- END TOC -->/{ /<!--/d; p }' CHANGELOG.md > temp-toc.md
+# Split Changelog and Table of contents(TOC) into seperate files
+sed -n '/<!-- BEGIN TOC -->/,/<!-- END TOC -->/{ /<!--/d; p }' ${CHANGELOG} > temp-toc.md
+sed '1,/^<!-- END TOC -->$/d' ${CHANGELOG} > temp-cl.md
 
-# # Adding version to changelog
-# echo -e "# v${new_version} - ${DATE}\n" | cat - WIP-CHANGELOG.md temp-cl.md > temp-cl2.md
-# # Adding link to TOC
-# echo -e "- [v${new_version}](#v${short_version})" | cat - temp-toc.md > temp-toc2.md
-# echo -e "<!-- END TOC -->" >> temp-toc2.md
-# echo -e "<!-- BEGIN TOC -->" | cat - temp-toc2.md > temp-toc.md
-# echo -e "\n-------------------------------------------------" >> temp-toc.md
-# # Creating new changelog
-# cat temp-toc.md temp-cl2.md > CHANGELOG.md
-# rm temp*
-# # Clearing WIP-CHANGELOG.md
-# > WIP-CHANGELOG.md
+# Adding version to changelog
+echo -e "## v${new_version} - ${DATE} <a name=\"v${short_version}\"></a>\n" | cat - WIP-CHANGELOG.md temp-cl.md > temp-cl2.md
+# Adding link to TOC
+echo -e "- [v${new_version}](#v${short_version})" | cat - temp-toc.md > temp-toc2.md
+echo -e "<!-- END TOC -->" >> temp-toc2.md
+echo -e "<!-- BEGIN TOC -->" | cat - temp-toc2.md > temp-toc.md
+echo -e "\n-------------------------------------------------" >> temp-toc.md
+# Creating new changelog
+echo -e "# Compliant Kubernetes Changelog" > ${CHANGELOG}
+cat temp-toc.md temp-cl2.md >> ${CHANGELOG}
+rm temp*
+# Clearing WIP-CHANGELOG.md
+> WIP-CHANGELOG.md
 
-# git add VERSION.md CHANGELOG.md WIP-CHANGELOG.md
+# git add version.json ${CHANGELOG} WIP-CHANGELOG.md
 # git commit -m "Releasing v${new_version}"
 # git tag -a "v${new_version}" -m "releasing version ${new_version}"
 

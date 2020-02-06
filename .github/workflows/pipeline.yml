@@ -1,6 +1,12 @@
 name: Exoscale-pipeline
 
-on: [pull_request]
+on: 
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - 'Release-*'
 
 jobs:
   infra:
@@ -207,6 +213,31 @@ jobs:
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+  
+  get-versions:
+    needs: [deploy-wc, deploy-sc]
+    runs-on: ubuntu-latest
+    container: 
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download kube_config
+      uses: actions/download-artifact@v1
+      with:
+        name: kube_config_eck-wc.yaml
+        path: .
+    - name: Download kube_config
+      uses: actions/download-artifact@v1
+      with:
+        name: kube_config_eck-sc.yaml
+        path: .
+    - run: ./pipeline/versions.sh
+      shell: bash
+    - name: Upload version.json
+      uses: actions/upload-artifact@v1
+      with:
+        name: version.json
+        path: version.json
 
   clean-up:
     needs: [test-sc,test-wc]

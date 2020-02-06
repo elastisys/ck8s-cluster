@@ -1,4 +1,7 @@
 #!/bin/bash
+# Script to get versions from current kubeconfig and post to json file.
+# OBS! add/remove items from APPS var to specify which apps to include.
+
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 file=${SCRIPTS_PATH}/version.json
 
