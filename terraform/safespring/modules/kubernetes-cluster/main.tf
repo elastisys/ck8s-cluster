@@ -63,7 +63,7 @@ resource "openstack_compute_secgroup_v2" "cluster_sg" {
     from_port   = 22
     to_port     = 22
     ip_protocol = "tcp"
-    cidr        = "194.132.164.168/32"
+    cidr        = var.public_ingress_cidr_whitelist
   }
 }
 

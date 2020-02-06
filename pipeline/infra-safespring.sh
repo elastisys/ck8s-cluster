@@ -24,7 +24,7 @@ terraform init
 echo "Setting local executiong mode"
 ./set-execution-mode.sh
 echo "Running terraform plan"
-terraform plan -out=tfplan -input=false > "${GITHUB_WORKSPACE}/tfoutput"
+terraform plan -var 'public_ingress_cidr_whitelist=0.0.0.0/0' -out=tfplan -input=false > "${GITHUB_WORKSPACE}/tfoutput"
 echo "Running terraform apply"
 terraform apply -input=false tfplan >> "${GITHUB_WORKSPACE}/tfoutput"
 echo "Terraform successful"

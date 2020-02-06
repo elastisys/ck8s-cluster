@@ -46,3 +46,7 @@ variable "worker_extra_volume_size" {
   type = map
   default = {}  
 }
+
+variable public_ingress_cidr_whitelist {
+  type    = string
+}

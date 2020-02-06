@@ -123,3 +123,8 @@ variable worker_extra_volume_size_wc {
   type        = map
   default     = {}  
 }
+
+variable public_ingress_cidr_whitelist {
+  type    = string
+  default = "194.132.164.168/32" # Elastisys office
+}

@@ -49,6 +49,8 @@ module "service_cluster" {
   image_id = data.openstack_images_image_v2.ubuntu.id
   key_pair = openstack_compute_keypair_v2.sshkey_sc.id
 
+  public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
+
   dns_list = [
     "*.ops.${var.dns_prefix}",
     "grafana.${var.dns_prefix}",
@@ -74,6 +76,8 @@ module "workload_cluster" {
 
   image_id = data.openstack_images_image_v2.ubuntu.id
   key_pair = openstack_compute_keypair_v2.sshkey_wc.id
+
+  public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
   dns_list = [
     "*.${var.dns_prefix}",
