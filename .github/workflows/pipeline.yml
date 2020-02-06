@@ -237,7 +237,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: version.json
-        path: release/version.json
+        path: version.json
 
   clean-up:
     needs: [test-sc,test-wc]
