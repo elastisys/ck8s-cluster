@@ -5,7 +5,6 @@
     "kibana": "7.4.2",
     "harbor-core": "v1.10.0",
     "elasticsearch": "7.4.2",
-    "grafana": "6.5.2",
-    "nginx-ingress-controller": "0.26.1"
+    "grafana": "6.5.2"
   }
 }
