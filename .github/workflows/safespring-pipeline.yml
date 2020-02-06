@@ -6,7 +6,7 @@ jobs:
   infra:
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.7
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.8
     steps:
     - uses: actions/checkout@v1
     - run: echo $GITHUB_RUN_ID
@@ -44,7 +44,7 @@ jobs:
   #   needs: infra
   #   runs-on: ubuntu-latest
   #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.8
   #   steps:
   #   - uses: actions/checkout@v1
   #   - name: Download infra.json
@@ -76,7 +76,7 @@ jobs:
   #   needs: infra
   #   runs-on: ubuntu-latest
   #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.8
   #   steps:
   #   - uses: actions/checkout@v1
   #   - name: Download infra.json
@@ -108,7 +108,7 @@ jobs:
   #   needs: [rke-sc,rke-wc]
   #   runs-on: ubuntu-latest
   #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.8
   #   steps:
   #   - uses: actions/checkout@v1
   #   - name: Download infra.json
@@ -138,7 +138,7 @@ jobs:
   #   needs: [rke-sc,rke-wc]
   #   runs-on: ubuntu-latest
   #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.8
   #   steps:
   #   - uses: actions/checkout@v1
   #   - name: Download infra.json
@@ -168,7 +168,7 @@ jobs:
   #   needs: [deploy-wc, deploy-sc]
   #   runs-on: ubuntu-latest
   #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.8
   #   steps:
   #   - uses: actions/checkout@v1
   #   - name: Download infra.json
@@ -193,7 +193,7 @@ jobs:
   #   needs: [deploy-wc, deploy-sc]
   #   runs-on: ubuntu-latest
   #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.8
   #   steps:
   #   - uses: actions/checkout@v1
   #   - name: Download infra.json
@@ -219,7 +219,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.6
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.8
     steps:
     - uses: actions/checkout@v1
     - run: ./pipeline/cleanup-safespring.sh

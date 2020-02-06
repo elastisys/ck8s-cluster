@@ -4,8 +4,8 @@ RUN  apt-get update \
   && apt-get install -y wget unzip ssh gettext-base jq curl python3.7 apache2-utils
 
 #Terraform
-RUN wget https://releases.hashicorp.com/terraform/0.12.6/terraform_0.12.6_linux_amd64.zip
-RUN unzip terraform_0.12.6_linux_amd64.zip && \
+RUN wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
+RUN unzip terraform_0.12.19_linux_amd64.zip && \
     mv terraform /usr/local/bin/terraform
 
 #RKE
