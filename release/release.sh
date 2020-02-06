@@ -3,8 +3,9 @@
 
 set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-file=version.json
+file=${SCRIPTS_PATH}/version.json
 CHANGELOG=${SCRIPTS_PATH}/../CHANGELOG.md
+WIP=${SCRIPTS_PATH}/WIP-CHANGELOG.md
 if [[ ! -f "$file" ]]; then
   echo "ERROR:  $file does not exist"
   exit 1
@@ -30,10 +31,13 @@ if [[ "$1" == "patch" ]]; then
 elif [[ "$1" == "minor" ]]; then
     echo "bumping minor version"
     ((++a[1]))
+    a[2]=0
     new_version="${a[0]}.${a[1]}.${a[2]}"
 elif [[ "$1" == "major" ]]; then
     echo "bumping major version"
     ((++a[0]))
+    a[1]=0
+    a[2]=0
     new_version="${a[0]}.${a[1]}.${a[2]}"
 elif [[ "$1" == "-v" ]]; then
     if [[ "$2" =~ ${semver_regex} ]]; then
@@ -63,9 +67,9 @@ sed -n '/<!-- BEGIN TOC -->/,/<!-- END TOC -->/{ /<!--/d; p }' ${CHANGELOG} > te
 sed '1,/^<!-- END TOC -->$/d' ${CHANGELOG} > temp-cl.md
 
 # Adding version to changelog
-echo -e "## v${new_version} - ${DATE} <a name=\"v${short_version}\"></a>\n" | cat - WIP-CHANGELOG.md temp-cl.md > temp-cl2.md
+echo -e "## v${new_version} - ${DATE}\n" | cat - ${WIP} temp-cl.md > temp-cl2.md
 # Adding link to TOC
-echo -e "- [v${new_version}](#v${short_version})" | cat - temp-toc.md > temp-toc2.md
+echo -e "- [v${new_version}](#v${short_version}---${DATE})" | cat - temp-toc.md > temp-toc2.md
 echo -e "<!-- END TOC -->" >> temp-toc2.md
 echo -e "<!-- BEGIN TOC -->" | cat - temp-toc2.md > temp-toc.md
 echo -e "\n-------------------------------------------------" >> temp-toc.md
@@ -74,9 +78,9 @@ echo -e "# Compliant Kubernetes Changelog" > ${CHANGELOG}
 cat temp-toc.md temp-cl2.md >> ${CHANGELOG}
 rm temp*
 # Clearing WIP-CHANGELOG.md
-> WIP-CHANGELOG.md
+> ${WIP}
 
-# git add version.json ${CHANGELOG} WIP-CHANGELOG.md
+# git add version.json ${CHANGELOG} ${WIP}
 # git commit -m "Releasing v${new_version}"
 # git tag -a "v${new_version}" -m "releasing version ${new_version}"
 
