@@ -46,6 +46,7 @@ Note: These are required for explicit use with `helmfile`. All might not be requ
 * `S3_REGION_ENDPOINT`
 * `S3_HARBOR_BUCKET_NAME`
 * `S3_VELERO_BUCKET_NAME`
+* `S3_SC_FLUENTD_BUCKET_NAME`
 
 If any environment variable is not set helmfile will throw an error and the release will not be installed. 
 

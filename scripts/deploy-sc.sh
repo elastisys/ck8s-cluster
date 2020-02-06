@@ -15,6 +15,9 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 : "${S3_INFLUX_BUCKET_URL:?Missing S3_INFLUX_BUCKET_URL}"
 : "${INFLUX_BACKUP_SCHEDULE:?Missing INFLUX_BACKUP_SCHEDULE}"
 
+# Fluentd aggregator S3 output variables.
+: "${S3_SC_FLUENTD_BUCKET_NAME:?Missing S3_SC_FLUENTD_BUCKET_NAME}"
+
 : "${ENABLE_PSP:?Missing ENABLE_PSP}"
 : "${ENABLE_HARBOR:?Missing ENABLE_HARBOR}"
 : "${ENABLE_CUSTOMER_PROMETHEUS:?Missing ENABLE_CUSTOMER_PROMETHEUS}"
@@ -88,7 +91,7 @@ fi
 INTERACTIVE=${1:-""}
 
 # NAMESPACES
-NAMESPACES="cert-manager elastic-system dex influxdb-prometheus monitoring ck8sdash"
+NAMESPACES="cert-manager elastic-system dex influxdb-prometheus monitoring ck8sdash fluentd"
 for namespace in ${NAMESPACES}
 do
     kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
@@ -118,6 +121,7 @@ then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/dex-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/elastic-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/influxdb-psp.yaml
+    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/fluentd-psp.yaml
 
     if [[ $ENABLE_HARBOR == "true" ]]
     then
@@ -148,6 +152,13 @@ then
     kubectl -n harbor apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
     kubectl -n harbor apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 fi
+
+# Fluentd and Fluentd aggregator.
+
+kubectl create secret generic s3-credentials -n fluentd \
+    --from-literal=s3_access_key=${S3_ACCESS_KEY} \
+    --from-literal=s3_secret_key=${S3_SECRET_KEY} \
+    --dry-run -o yaml | kubectl apply -f -
 
 # Elasticsearch and kibana.
 kubectl  -n  elastic-system create secret generic elasticsearch-es-elastic-user \

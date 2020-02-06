@@ -26,6 +26,7 @@ DEPLOYMENTS=(
     "monitoring prometheus-operator-kube-state-metrics"
     "monitoring blackbox-prometheus-blackbox-exporter"
     "ck8sdash ck8sdash"
+    "fluentd fluentd-aggregator"
 )
 
 echo
@@ -47,6 +48,7 @@ DAEMONSETS=(
     "kube-system canal"
     "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
+    "fluentd fluentd"
 )
 
 echo

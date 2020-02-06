@@ -13,6 +13,7 @@ export S3_REGION_ENDPOINT=https://sos-ch-gva-2.exo.io
 export S3_HARBOR_BUCKET_NAME=harbor
 export S3_VELERO_BUCKET_NAME=velero
 export S3_ES_BACKUP_BUCKET_NAME=es-backup
+export S3_SC_FLUENTD_BUCKET_NAME=sc-logs
 # Influx backup variables
 export S3_INFLUX_BUCKET_URL=s3://influxdb-backups
 

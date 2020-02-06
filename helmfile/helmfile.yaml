@@ -4,17 +4,13 @@ repositories:
   url: https://kubernetes-charts.storage.googleapis.com
 - name: jetstack
   url: https://charts.jetstack.io
+- name: kiwigrid
+  url: https://kiwigrid.github.io
 
 # service_cluster specific repositories
 {{ if eq .Environment.Name "service_cluster" }}
 - name: harbor
   url: https://helm.goharbor.io
-{{ end }}
-
-# Workload cluster specific repositories
-{{ if eq .Environment.Name "workload_cluster" }}
-- name: kiwigrid
-  url: https://kiwigrid.github.io
 {{ end }}
 
 # Defults settings to use with helm and tiller.
@@ -225,6 +221,28 @@ releases:
   values:
   - values/blackbox.yaml.gotmpl
 
+# Fluentd
+- name: fluentd
+  namespace: fluentd
+  labels:
+    app: fluentd
+  chart: kiwigrid/fluentd-elasticsearch
+  version: 5.1.1
+  missingFileHandler: error
+  values:
+  - values/fluentd-sc.yaml.gotmpl
+
+# Fluentd aggregator
+- name: fluentd-aggregator
+  namespace: fluentd
+  labels:
+    app: fluentd-aggregator
+  chart: stable/fluentd
+  version: 2.3.2
+  missingFileHandler: error
+  values:
+  - values/fluentd-aggregator.yaml.gotmpl
+
 # End of system services releases
 {{ end }}
 
@@ -250,7 +268,7 @@ releases:
   version: 5.1.1
   missingFileHandler: error
   values:
-  - values/fluentd.yaml.gotmpl
+  - values/fluentd-wc.yaml.gotmpl
 
 # Fluentd configurable by the customer
 - name: fluentd
