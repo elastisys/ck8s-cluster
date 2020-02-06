@@ -1,5 +1,7 @@
 #!/bin/bash
 # Usage ./release.sh patch|minor|major
+# This script will bump then patch, minor or major version in version.json and
+# add the WIP-CHANGELOG ontop of the existing CHANGELOG.md
 
 set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
@@ -80,9 +82,9 @@ rm temp*
 # Clearing WIP-CHANGELOG.md
 > ${WIP}
 
-# git add version.json ${CHANGELOG} ${WIP}
-# git commit -m "Releasing v${new_version}"
-# git tag -a "v${new_version}" -m "releasing version ${new_version}"
+git add version.json ${CHANGELOG} ${WIP}
+git commit -m "Releasing v${new_version}"
+git tag -a "v${new_version}" -m "releasing version ${new_version}"
 
 # echo ""
 # echo "finish release with:"
