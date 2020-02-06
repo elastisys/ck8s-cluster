@@ -208,14 +208,6 @@ kubectl -n fluentd create secret generic elasticsearch \
 # Install fluentd
 helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply
 
-# Install ck8sdash
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service-account.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/init-script-cm.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/info-text-cm.yaml
-envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/env-secret-wc.yaml | kubectl apply -f -
-envsubst < ${SCRIPTS_PATH}/../manifests/ck8sdash/ingress-wc.yaml | kubectl apply -f -
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/service.yaml
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/ck8sdash/deployment.yaml
 
 #
 # Customer RBAC
