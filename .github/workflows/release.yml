@@ -1,0 +1,22 @@
+name: Release
+
+on: 
+  push:
+    tags:
+    - 'v*'
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            See [CHANGELOG.md](https://github.com/elastisys/ck8s/blob/${{ github.ref }}/CHANGELOG.md) for details.
