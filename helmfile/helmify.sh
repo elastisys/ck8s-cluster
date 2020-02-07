@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 cmd=$1
 chart=$2
 env=$3
@@ -23,6 +25,7 @@ build() {
   echo "running helm lint" 1>&2
 
   helm lint $chart
+
 
 }
 
