@@ -1,7 +1,7 @@
 FROM ubuntu:18.10
 
 RUN  apt-get update \
-  && apt-get install -y wget unzip ssh gettext-base jq curl python3.7 apache2-utils
+  && apt-get install -y wget unzip ssh gettext-base jq curl python3.7 apache2-utils ansible=2.6.5+dfsg-1
 
 #Terraform
 RUN wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
