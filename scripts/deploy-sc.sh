@@ -281,15 +281,12 @@ echo "Install elasticsearch prometheus exporter" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply --suppress-diff
 
 # Restore InfluxDB from backup
+# Requires dropping existing databases first
 if [[ $ECK_RESTORE_CLUSTER != "false" ]]
 then
     echo "Restoring InfluxDB" >&2
     envsubst < ${SCRIPTS_PATH}/../manifests/restore/restore-influx.yaml | kubectl -n influxdb-prometheus apply -f -
 fi
-
-## Maybe this can become problematic if cluster is being restored?
-echo "Install InfluxDB backup cron-job" >&2
-envsubst < ${SCRIPTS_PATH}/../manifests/influx/backup-influx-cronjob.yaml | kubectl -n influxdb-prometheus apply -f -
 
 if [ "${RESTORE_VELERO}" = "true" ]
 then
