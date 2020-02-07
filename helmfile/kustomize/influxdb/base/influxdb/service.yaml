@@ -7,7 +7,6 @@ metadata:
     release: prometheus-operator
 spec:
   selector:
-    # app: influxdb-du-monitoring
     app: influxdb
   ports:
     - name: web
