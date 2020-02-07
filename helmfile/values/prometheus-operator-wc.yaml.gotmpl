@@ -52,6 +52,13 @@ prometheus:
       - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
 
   prometheusSpec:
+    externalLabels:
+      cluster: workload_cluster
+
+    # Dont add prometheus labels.
+    prometheusExternalLabelNameClear: true
+    replicaExternalLabelNameClear: true
+    
     serviceMonitorNamespaceSelector:
       # We don't want to pick up all (customer) ServiceMonitors that may exist
       # in the cluster. Just select namespaces we own.

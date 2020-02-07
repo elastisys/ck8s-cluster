@@ -22,8 +22,13 @@ prometheusSpec:
   serviceMonitorSelector:
     matchLabels:
       target: none  # so that operator wont generate new config
+
   externalLabels:
-    cluster: workload_cluster
+    scraper: customer-federate
+  
+  # Don't add prometheus labels.
+  prometheusExternalLabelName: ""
+  replicaExternalLabelName: ""
 
 scrapeConfig:
 - job_name: 'federate'
@@ -47,7 +52,5 @@ scrapeConfig:
     insecure_skip_verify: true
 
   static_configs:
-    - labels:
-        cluster: workload_cluster
-      targets:
+    - targets:
         - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}

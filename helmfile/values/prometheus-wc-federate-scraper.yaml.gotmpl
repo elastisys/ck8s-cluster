@@ -37,8 +37,13 @@ prometheusSpec:
     matchLabels:
       app: prometheus-operator
       release: prometheus-operator
+  
   externalLabels:
-    cluster: workload_cluster
+    scraper: wc-federate
+
+  # Don't add prometheus info.
+  prometheusExternalLabelName: ""
+  replicaExternalLabelName: ""
 
 scrapeConfig:
 #The idea with splitting the federation in two is to (hopefully) reduce the resources needed for prometheus.
@@ -65,9 +70,7 @@ scrapeConfig:
     insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}
 
   static_configs:
-    - labels:
-        cluster: workload_cluster
-      targets:
+    - targets:
       - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
 
 - job_name: 'federate-others'
@@ -98,7 +101,5 @@ scrapeConfig:
     insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}
 
   static_configs:
-    - labels:
-        cluster: workload_cluster
-      targets:
+    - targets:
       - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}

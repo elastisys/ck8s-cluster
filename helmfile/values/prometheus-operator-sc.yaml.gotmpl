@@ -231,8 +231,14 @@ prometheus:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD" }}
     remoteWrite:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD" }}
+    
     externalLabels:
       cluster: service_cluster
+
+    # Don't add prometheus info.
+    prometheusExternalLabelNameClear: true
+    replicaExternalLabelNameClear: true
+
     ruleSelector:
       matchLabels:
         role: operator

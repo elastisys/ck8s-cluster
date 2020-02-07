@@ -34,8 +34,6 @@ prometheusSpec:
   serviceMonitorSelector:
     matchLabels:
       target: none
-  externalLabels:
-    cluster: workload_cluster
 
 ingress:
   enabled: false
