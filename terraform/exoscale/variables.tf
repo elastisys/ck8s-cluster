@@ -33,7 +33,7 @@ variable worker_name_size_map_sc {
   type        = map
 
   default     = {
-    "worker-0" : "Large",
+    "worker-0" : "Extra-large",
     "worker-1" : "Large"  
   }
 }
