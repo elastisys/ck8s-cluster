@@ -106,65 +106,65 @@ jobs:
         name: rke-wc-output
         path: rke-wc-output
 
-  # deploy-sc:
-  #   needs: [rke-sc,rke-wc]
-  #   runs-on: ubuntu-latest
-  #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.9
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Download infra.json
-  #     uses: actions/download-artifact@v1
-  #     with:
-  #       name: infra.json
-  #       path: .
-  #   - name: Download kube_config
-  #     uses: actions/download-artifact@v1
-  #     with:
-  #       name: kube_config_eck-sc.yaml
-  #       path: .
-  #   - run: ./pipeline/deploy-sc.sh
-  #     shell: bash
-  #     env:
-  #       EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-  #       EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-  #       VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-  #       VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-  #   - name: Upload deploy output
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: deploy-sc-output
-  #       path: deploy-sc-output
+  deploy-sc:
+    needs: [rke-sc,rke-wc]
+    runs-on: ubuntu-latest
+    container: 
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download infra.json
+      uses: actions/download-artifact@v1
+      with:
+        name: infra.json
+        path: .
+    - name: Download kube_config
+      uses: actions/download-artifact@v1
+      with:
+        name: kube_config_eck-sc.yaml
+        path: .
+    - run: ./pipeline/deploy-sc-safespring.sh
+      shell: bash
+      env:
+        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
+        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+        S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
+        S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
+    - name: Upload deploy output
+      uses: actions/upload-artifact@v1
+      with:
+        name: deploy-sc-output
+        path: deploy-sc-output
 
-  # deploy-wc:
-  #   needs: [rke-sc,rke-wc]
-  #   runs-on: ubuntu-latest
-  #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.9
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Download infra.json
-  #     uses: actions/download-artifact@v1
-  #     with:
-  #       name: infra.json
-  #       path: .
-  #   - name: Download kube_config
-  #     uses: actions/download-artifact@v1
-  #     with:
-  #       name: kube_config_eck-wc.yaml
-  #       path: .
-  #   - run: ./pipeline/deploy-wc.sh
-  #     shell: bash
-  #     env:
-  #       EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-  #       EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-  #       VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-  #       VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-  #   - name: Upload deploy output
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: deploy-wc-output
-  #       path: deploy-wc-output
+  deploy-wc:
+    needs: [rke-sc,rke-wc]
+    runs-on: ubuntu-latest
+    container: 
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download infra.json
+      uses: actions/download-artifact@v1
+      with:
+        name: infra.json
+        path: .
+    - name: Download kube_config
+      uses: actions/download-artifact@v1
+      with:
+        name: kube_config_eck-wc.yaml
+        path: .
+    - run: ./pipeline/deploy-wc-safespring.sh
+      shell: bash
+      env:
+        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
+        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+        S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
+        S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
+    - name: Upload deploy output
+      uses: actions/upload-artifact@v1
+      with:
+        name: deploy-wc-output
+        path: deploy-wc-output
   
   # test-sc:
   #   needs: [deploy-wc, deploy-sc]
@@ -217,7 +217,7 @@ jobs:
   #       VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
 
   clean-up:
-    needs: [rke-sc,rke-wc]
+    needs: [deploy-sc,deploy-wc]
     if: always()
     runs-on: ubuntu-latest
     container: 
