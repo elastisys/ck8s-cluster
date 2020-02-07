@@ -228,7 +228,6 @@ releases:
   version: 0.1.0
   hooks:
   - events: ["prepare", "cleanup"]
-  # - events: ["prepare"]  
     command: "./helmify.sh"
     args: ["{{`{{if eq .Event.Name \"prepare\"}}build{{else}}clean{{end}}`}}", "{{`{{.Release.Chart}}`}}", "{{`{{.Environment.Name}}`}}"]
 
