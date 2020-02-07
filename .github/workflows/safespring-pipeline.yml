@@ -40,69 +40,71 @@ jobs:
         name: tfoutput        
         path: tfoutput
 
-  # rke-sc:
-  #   needs: infra
-  #   runs-on: ubuntu-latest
-  #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.9
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Download infra.json
-  #     uses: actions/download-artifact@v1
-  #     with:
-  #       name: infra.json
-  #       path: .
-  #   - run: ./pipeline/rke-sc.sh
-  #     shell: bash
-  #     env:
-  #       SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-  #       SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-  #       EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-  #       EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-  #       VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-  #       VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-  #   - name: Upload kube_config
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: kube_config_eck-sc.yaml
-  #       path: kube_config_eck-sc.yaml
-  #   - name: Upload rke output
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: rke-sc-output
-  #       path: rke-sc-output
+  rke-sc:
+    needs: infra
+    runs-on: ubuntu-latest
+    container: 
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download infra.json
+      uses: actions/download-artifact@v1
+      with:
+        name: infra.json
+        path: .
+    - run: ./pipeline/rke-sc-safespring.sh
+      shell: bash
+      env:
+        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
+        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
+        OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
+        OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
+        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
+        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+    - name: Upload kube_config
+      uses: actions/upload-artifact@v1
+      with:
+        name: kube_config_eck-sc.yaml
+        path: kube_config_eck-sc.yaml
+    - name: Upload rke output
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: rke-sc-output
+        path: rke-sc-output
 
-  # rke-wc:
-  #   needs: infra
-  #   runs-on: ubuntu-latest
-  #   container: 
-  #     image: elastisys/ck8s-bitbucket-pipeline:1.0.9
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Download infra.json
-  #     uses: actions/download-artifact@v1
-  #     with:
-  #       name: infra.json
-  #       path: .
-  #   - run: ./pipeline/rke-wc.sh
-  #     shell: bash
-  #     env:
-  #       SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-  #       SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-  #       EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-  #       EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-  #       VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-  #       VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-  #   - name: Upload kube_config
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: kube_config_eck-wc.yaml
-  #       path: kube_config_eck-wc.yaml
-  #   - name: Upload rke output
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: rke-wc-output
-  #       path: rke-wc-output
+  rke-wc:
+    needs: infra
+    runs-on: ubuntu-latest
+    container: 
+      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download infra.json
+      uses: actions/download-artifact@v1
+      with:
+        name: infra.json
+        path: .
+    - run: ./pipeline/rke-wc-safespring.sh
+      shell: bash
+      env:
+        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
+        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
+        OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
+        OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
+        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
+        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+    - name: Upload kube_config
+      uses: actions/upload-artifact@v1
+      with:
+        name: kube_config_eck-wc.yaml
+        path: kube_config_eck-wc.yaml
+    - name: Upload rke output
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: rke-wc-output
+        path: rke-wc-output
 
   # deploy-sc:
   #   needs: [rke-sc,rke-wc]
@@ -215,7 +217,7 @@ jobs:
   #       VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
 
   clean-up:
-    needs: [infra]
+    needs: [rke-sc,rke-wc]
     if: always()
     runs-on: ubuntu-latest
     container: 
