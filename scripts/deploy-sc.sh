@@ -228,7 +228,7 @@ echo "Installing Dex" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff
 
 # Generate environment variable files used by kustomize to create modified InfluxDB Helm Chart
-../scripts/gen-kustomize-env-files.sh
+${SCRIPTS_PATH}/gen-kustomize-env-files.sh
 
 # Set environment variable for the directory containing the kustomize plugin directory
 export XDG_CONFIG_HOME=$(pwd)
