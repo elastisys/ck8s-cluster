@@ -10,10 +10,6 @@ setDefaultUser:
   # In fact, it is not possible to create the user through the setDefaultUser
   # Job when http auth is enabled.
   enabled: false
-  # enabled: true
-  # user:
-  #   username: admin
-  #   password: ${INFLUXDB_PWD}
 
 env:
 # Set credentials from Secret so that it is not possible to read them directly
@@ -43,11 +39,9 @@ resources:
     memory: 4Gi
     cpu: 2
 
-#{{ if or (not (env "ECK_RESTORE_CLUSTER")) (not (eq (env "ECK_RESTORE_CLUSTER") "true")) }}
 initScripts:
   enabled: true
   scripts:
     init.iql: |+
       CREATE DATABASE "service_cluster" WITH DURATION 3d REPLICATION 1 NAME service_cluster_rp;
       CREATE DATABASE "workload_cluster" WITH DURATION 7d REPLICATION 1 NAME workload_cluster_rp;
-#{{ end }}
