@@ -24,5 +24,9 @@ export SLACK_API_URL=https://hooks.slack.com/services/T0P3RL01G/BPQRK3UP3/Z8ZC4z
 
 export OAUTH_ALLOWED_DOMAINS="example.com"
 
+# Customer access
+export CUSTOMER_NAMESPACES="demo1 demo2 demo3"
+export CUSTOMER_ADMIN_USERS="admin1@example.com admin2@example.com"
+
 #This is the home folder when the container is built, but not when it is executed in github actions
 export HELM_HOME=/root/.helm
