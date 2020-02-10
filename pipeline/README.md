@@ -14,3 +14,12 @@ for debugging or working with the cluster.
 
 In `Dockerfile.dev` these tools can be added to provide an image better suited for developers.
 This image will also be built on every release under the name `elastisys/ck8s-ops:<version>-dev`
+This image can also be built locally with:
+```
+docker build -t local-ck8s-ops -f Dockerfile.dev .
+```
+
+To run the dockerfile and mounting the local ck8s repo run:
+```
+docker run -it -v <path-to-repo>:ck8s elastisys/ck8s-ops:<version>-dev
+```

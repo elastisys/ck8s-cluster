@@ -269,3 +269,5 @@ jobs:
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+        DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
