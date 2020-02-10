@@ -1,3 +1,5 @@
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
+
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
@@ -15,6 +17,10 @@ DEPLOYMENTS=(
     "velero velero"
     "ck8sdash ck8sdash"
 )
+if [ $CLOUD_PROVIDER == "exoscale" ]
+then
+    DEPLOYMENTS+=("kube-system nfs-client-provisioner")
+fi
 
 echo
 echo

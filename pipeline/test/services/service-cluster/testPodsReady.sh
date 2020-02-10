@@ -1,3 +1,5 @@
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
+
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
@@ -18,7 +20,6 @@ DEPLOYMENTS=(
     "kube-system coredns"
     "kube-system coredns-autoscaler"
     "kube-system metrics-server"
-    "kube-system nfs-client-provisioner"
     "nginx-ingress nginx-ingress-default-backend"
     "monitoring customer-grafana"
     "monitoring prometheus-operator-operator"
@@ -29,6 +30,10 @@ DEPLOYMENTS=(
     "fluentd fluentd-aggregator"
     "velero velero"
 )
+if [ $CLOUD_PROVIDER == "exoscale" ]
+then
+    DEPLOYMENTS+=("kube-system nfs-client-provisioner")
+fi
 
 echo
 echo
