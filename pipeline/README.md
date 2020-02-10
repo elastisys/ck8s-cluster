@@ -1,26 +1,16 @@
 ## Pipeline
 The pipeline is now using a ubuntu based docker image now located at dockerhub on
-`vanneback/exoscale-pipeline`. 
+[elastisys/ck8s-ops](https://hub.docker.com/r/elastisys/ck8s-ops). Each run of the
+pipeline will generate its own image using the commit hash. Once a release is made
+it will also tag a image with the same tag. 
 
-The pipeline first executes an init script `init.sh`. This scripts sets all the variables
-needed. The script should not need to be altered and all the variables can be changed from
-bitbucket https://bitbucket.org/elastisys/a1-demo/admin/addon/admin/pipelines/repository-variables.
+The pipeline will run on pull requests to master and on push to branches named 
+`Release-x`. The pipeline workflow is in `.github/workflows` and the scripts used are located in the `pipeline` directory.
 
-The rest of the pipeline can be altered from the file `bitbucket-pipelines.yml`. the line `pull-requests`
-defines when the pipeline should run. Now it is configured to run when something is merged to the master branch.
-This definition can be replaced to allow the pipeline to run on other condintions. See https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html.
+## Ops image
+The image built from the `Dockerfile` will have all the requirements to set up a new
+cluster from scratch. This image might not have all the tools a developer might have
+for debugging or working with the cluster. 
 
-## Dockerfile
-The docker image now has the following dependecies.
-
-* Terraform (with the exoscale plugin)
-* RKE cli
-* Kubectl cli
-* helm (with the helm diff plugin)
-* helmfile
-
-If any other dependencies are inserted in the project they will need to be added to the Dockerfile
-and the image will need to be rebuilt.
-
-## TODO
-* Perhaps move this dir to own repo with CI for pushing image.
+In `Dockerfile.dev` these tools can be added to provide an image better suited for developers.
+This image will also be built on every release under the name `elastisys/ck8s-ops:<version>-dev`

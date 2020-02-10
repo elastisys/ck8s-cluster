@@ -1,0 +1,5 @@
+FROM elastisys/ck8s-ops:latest
+
+# Add utilities not needed for the pipeline but nice to have when using manually.
+RUN  apt-get update \
+  && apt-get install -y git vim
