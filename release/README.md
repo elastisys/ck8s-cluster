@@ -1,9 +1,10 @@
 # Release process
 
 The releases will follow semantic versioning and be handled with git tags.
+https://semver.org/
 
 ## Major releases
-When ready to cut a new major release create a release branch `Release-x`.
+When ready to cut a new major release create a release branch `release-x`.
 This will when pushed trigger the pipeline to create and test a new cluster. 
 Run all tests necessary and if everything passes get the artifact version.json from
 the pipeline and update the local version.json. 
