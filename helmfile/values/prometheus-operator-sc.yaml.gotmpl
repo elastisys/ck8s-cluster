@@ -13,6 +13,10 @@ kubeApiServer:
         sourceLabels: [__name__]
         regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|)'
 
+  relabelings:
+  - targetLabel: cluster
+    replacement: service_cluster
+
 alertmanager:
   config:
     # See https://prometheus.io/docs/alerting/configuration/
@@ -110,6 +114,10 @@ alertmanager:
           source: grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
       {{ end }}
 
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
 
 # TODO: These do not work out of the box with RKE
 # If we switch to kubeadm they should be fine, otherwise we should look into
@@ -210,9 +218,19 @@ grafana:
       allowed_domains: {{ requiredEnv "OAUTH_ALLOWED_DOMAINS" }}
       allow_sign_up: true
       tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}
+  
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
 
 prometheusOperator:
   createCustomResource: false
+
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
 
 defaultRules:
   labels:
@@ -231,9 +249,6 @@ prometheus:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD" }}
     remoteWrite:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD" }}
-    
-    externalLabels:
-      cluster: service_cluster
 
     # Don't add prometheus info.
     prometheusExternalLabelNameClear: true
@@ -242,3 +257,39 @@ prometheus:
     ruleSelector:
       matchLabels:
         role: operator
+
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+kubelet:
+  enabled: true
+  namespace: kube-system
+
+  serviceMonitor:
+    cAdvisorRelabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+    
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+nodeExporter:
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+kubeStateMetrics:
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+coreDns:
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
