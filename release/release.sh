@@ -13,18 +13,18 @@ if [[ ! -f "$file" ]]; then
   exit 1
 fi
 
-# Regex supporting Major.Minor.Patch and optional - pre-release info - metadata
-# https://gist.github.com/jhorsman/62eeea161a13b80e39f5249281e17c39#gistcomment-2896416
-semver_regex='^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[a-zA-Z\d][-a-zA-Z.\d]*)?(\+[a-zA-Z\d][-a-zA-Z.\d]*)?$'
-
-# Todo improve regex to something more official. Like the link below but with support
-# for bash standard.
-# https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-
+# Regex found from https://gist.github.com/rverst/1f0b97da3cbeb7d93f4986df6e8e5695
+function check_version() {
+  if [[ $1 =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+    echo "$1"
+  else
+    echo ""
+  fi
+}
 
 # Getting current version of VERSION.json
 prev_version=$(jq -r '.ck8s' "$file")
-if [[ ! "$prev_version" =~ ${semver_regex} ]]; then
+if [[ ! $(check_version ${prev_version}) ]]; then
     echo "ERROR: $prev_version from version.json does not match semantic versioning"
     #exit 1
 fi
@@ -47,7 +47,7 @@ elif [[ "$1" == "major" ]]; then
     a[2]=0
     new_version="${a[0]}.${a[1]}.${a[2]}"
 elif [[ "$1" == "-v" ]]; then
-    if [[ "$2" =~ ${semver_regex} ]]; then
+    if [[ $(check_version ${2}) ]]; then
         echo "setting version $2"
         new_version=$2
     else
@@ -60,8 +60,6 @@ else
     echo "usage: $0 [patch|minor|major|-v version]"
     exit 1
 fi
-echo "good regex"
-exit 1
 short_version="${new_version//./}"
 DATE=$(date +'%Y-%m-%d')
 echo "replacing previous version: $prev_version with new version: $new_version"
@@ -93,8 +91,8 @@ git add version.json ${CHANGELOG} ${WIP}
 git commit -m "Releasing v${new_version}"
 git tag -a "v${new_version}" -m "releasing version ${new_version}"
 
-# echo ""
-# echo "finish release with:"
-# echo ""
-# echo "  git push; git push --tags"
-# echo ""
+echo ""
+echo "finish release with:"
+echo ""
+echo "  git push; git push --tags"
+echo ""
