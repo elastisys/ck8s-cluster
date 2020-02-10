@@ -224,7 +224,18 @@ jobs:
       image: elastisys/ck8s-bitbucket-pipeline:1.0.9
     steps:
     - uses: actions/checkout@v1
+    - name: Download kube_config
+      uses: actions/download-artifact@v1
+      with:
+        name: kube_config_eck-sc.yaml
+        path: .
+    - run: ./pipeline/cleanup-safespring-volumes.sh
+      shell: bash
+      env: 
+        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
+        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
     - run: ./pipeline/cleanup-safespring.sh
+      if: always()
       shell: bash
       env: 
         TF_TOKEN: ${{ secrets.TF_TOKEN }}

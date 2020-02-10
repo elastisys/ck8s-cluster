@@ -19,6 +19,19 @@ echo "running deploy-sc.sh"
 kubectl get pods --all-namespaces
 kubectl get nodes
 
+cd ${CONFIG_PATH}
+echo "Storing files in vault"
+
+FILES="certs/service_cluster/kube-system/certs/*"
+for file in ${FILES}
+do
+    echo "Trying to store file $file"
+    cat ${file} | base64 | vault kv put eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file} base64-content=-
+    if [ $? == 0 ]
+    then echo "Success"
+    fi
+done
+
 # Revoke vault token.
 curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST "${VAULT_ADDR}/v1/auth/token/revoke-self"
 echo "Deploy sc completed!"
