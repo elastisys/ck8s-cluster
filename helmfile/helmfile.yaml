@@ -6,6 +6,8 @@ repositories:
   url: https://charts.jetstack.io
 - name: kiwigrid
   url: https://kiwigrid.github.io
+- name: vmware-tanzu
+  url: https://vmware-tanzu.github.io/helm-charts
 
 # service_cluster specific repositories
 {{ if eq .Environment.Name "service_cluster" }}
@@ -326,8 +328,8 @@ releases:
   namespace: velero
   labels:
     app: velero
-  chart: stable/velero
-  version: 2.1.7
+  chart: vmware-tanzu/velero
+  version: 2.8.2
   missingFileHandler: error
   values:
   - values/velero.yaml.gotmpl
