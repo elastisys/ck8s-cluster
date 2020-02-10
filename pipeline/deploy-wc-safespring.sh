@@ -9,7 +9,7 @@ source pipeline/vault-variables.sh
 export VAULT_TOKEN=$(./pipeline/vault-token-get.sh)
 #Generate and store passwords
 source scripts/get-gen-secrets.sh > /dev/null
-source pipeline/variables.sh
+source pipeline/variables-safespring.sh
 
 source ./scripts/post-infra-common.sh infra.json
 export KUBECONFIG=$(pwd)/kube_config_eck-wc.yaml
