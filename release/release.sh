@@ -14,17 +14,22 @@ if [[ ! -f "$file" ]]; then
 fi
 
 # Regex supporting Major.Minor.Patch and optional - pre-release info - metadata
+# https://gist.github.com/jhorsman/62eeea161a13b80e39f5249281e17c39#gistcomment-2896416
 semver_regex='^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-[a-zA-Z\d][-a-zA-Z.\d]*)?(\+[a-zA-Z\d][-a-zA-Z.\d]*)?$'
 
-# Getting current version of VERSION.md
-#prev_version=$(head -n 1 VERSION.md | sed 's/^.*-\ \([0-9.]*\).*/\1/')
+# Todo improve regex to something more official. Like the link below but with support
+# for bash standard.
+# https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+
+
+# Getting current version of VERSION.json
 prev_version=$(jq -r '.ck8s' "$file")
 if [[ ! "$prev_version" =~ ${semver_regex} ]]; then
-    echo "ERROR: $prev_version from VERSION.md does not match semantic versioning"
-    exit 1
+    echo "ERROR: $prev_version from version.json does not match semantic versioning"
+    #exit 1
 fi
 
-### Calculating new version and updating VERSION.md ###
+### Calculating new version and updating VERSION.json ###
 a=( ${prev_version//./ } ) 
 if [[ "$1" == "patch" ]]; then
     echo "bumping patching version"
@@ -55,6 +60,8 @@ else
     echo "usage: $0 [patch|minor|major|-v version]"
     exit 1
 fi
+echo "good regex"
+exit 1
 short_version="${new_version//./}"
 DATE=$(date +'%Y-%m-%d')
 echo "replacing previous version: $prev_version with new version: $new_version"
