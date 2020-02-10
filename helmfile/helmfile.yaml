@@ -308,6 +308,19 @@ releases:
   values:
   - values/opa.yaml.gotmpl
 
+# opa policies
+{{ if eq (env "ENABLE_OPA") "true" }}
+- name: opa-policies
+  namespace: opa
+  labels:
+    app: opa
+  chart: ./charts/opa-policies
+  version: 0.1.0
+  missingFileHandler: error
+  values:
+  - values/opa-policies.yaml.gotmpl
+{{ end }}
+
 # Velero
 - name: velero
   namespace: velero
