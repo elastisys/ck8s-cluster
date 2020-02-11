@@ -71,7 +71,7 @@ backend http-backend
   # health checks every 2s, 2 fails => DOWN, 3 success => UP
   default-server inter 2s fall 2 rise 3
   {% for worker in groups[server_group] -%}
-  server {{ worker }} {{ hostvars[worker].private_ip }}:80 check on-marked-down shutdown-sessions
+  server {{ worker }} {{ hostvars[worker].private_ip }}:80 check on-marked-down shutdown-sessions send-proxy
   {% endfor %}
 
 backend https-backend
@@ -83,5 +83,5 @@ backend https-backend
   # health checks every 2s, 2 fails => DOWN, 3 success => UP
   default-server inter 2s fall 2 rise 3
   {% for worker in groups[server_group] -%}
-  server {{ worker }} {{ hostvars[worker].private_ip }}:443 check on-marked-down shutdown-sessions
+  server {{ worker }} {{ hostvars[worker].private_ip }}:443 check on-marked-down shutdown-sessions send-proxy
   {% endfor %}
