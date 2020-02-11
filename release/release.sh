@@ -22,14 +22,14 @@ function check_version() {
   fi
 }
 
-# Getting current version of VERSION.json
+# Getting current version of version.json
 prev_version=$(jq -r '.ck8s' "$file")
 if [[ ! $(check_version ${prev_version}) ]]; then
     echo "ERROR: $prev_version from version.json does not match semantic versioning"
     #exit 1
 fi
 
-### Calculating new version and updating VERSION.json ###
+### Calculating new version and updating version.json ###
 a=( ${prev_version//./ } ) 
 if [[ "$1" == "patch" ]]; then
     echo "bumping patching version"
