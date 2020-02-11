@@ -27,6 +27,7 @@ DEPLOYMENTS=(
     "monitoring blackbox-prometheus-blackbox-exporter"
     "ck8sdash ck8sdash"
     "fluentd fluentd-aggregator"
+    "velero velero"
 )
 
 echo
@@ -49,6 +50,7 @@ DAEMONSETS=(
     "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
     "fluentd fluentd"
+    "velero restic"
 )
 
 echo

@@ -27,10 +27,10 @@ configuration:
     # Bucket to store backups in. Required.
     bucket: {{ requiredEnv "S3_VELERO_BUCKET_NAME" }}
     # Prefix within bucket under which to store backups. Optional.
-    prefix:
+    prefix: service-cluster
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
-    config: 
+    config:
       region: {{ requiredEnv "S3_REGION" }}
       s3ForcePathStyle: "true"
       s3Url: {{ requiredEnv "S3_REGION_ENDPOINT" }}
@@ -93,7 +93,7 @@ restic:
 #       storageLocation: ""
 #       ttl: 720h0m0s
 #       volumeSnapshotLocations: null
-schedules: 
+schedules:
   daily-backup:
     schedule: "0 0 * * *" #once per day
     template:

@@ -261,6 +261,17 @@ releases:
   values:
   - values/fluentd-aggregator.yaml.gotmpl
 
+# Velero
+- name: velero
+  namespace: velero
+  labels:
+    app: velero
+  chart: vmware-tanzu/velero
+  version: 2.8.2
+  missingFileHandler: error
+  values:
+  - values/velero-sc.yaml.gotmpl
+
 # End of system services releases
 {{ end }}
 
@@ -332,7 +343,7 @@ releases:
   version: 2.8.2
   missingFileHandler: error
   values:
-  - values/velero.yaml.gotmpl
+  - values/velero-wc.yaml.gotmpl
 
 # Customer RBAC
 - name: customer-rbac
