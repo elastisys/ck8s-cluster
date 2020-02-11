@@ -18,6 +18,13 @@
       copy:
         src: ./daemon.json
         dest: /etc/docker/daemon.json
+      register: docker_config
+
+    - name: Restart docker if config changed
+      service:
+        name: docker
+        state: restarted
+      when: docker_config.changed
 
     - name: enable docker
       service:
