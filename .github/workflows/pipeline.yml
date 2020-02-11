@@ -240,7 +240,7 @@ jobs:
         path: version.json
 
   clean-up:
-    needs: [test-sc,test-wc]
+    needs: [test-sc,test-wc,get-versions]
     if: always()
     runs-on: ubuntu-latest
     container: 
