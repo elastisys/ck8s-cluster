@@ -1,5 +1,6 @@
 #!/bin/bash
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 export ECK_BASE_DOMAIN=$(cat infra.json | jq -r '.service_cluster.domain_name')
 export ECK_OPS_DOMAIN=$(cat infra.json | jq -r '.service_cluster.domain_name' | sed 's/^/ops./')
 export CERT_TYPE=staging

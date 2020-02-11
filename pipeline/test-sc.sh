@@ -1,5 +1,6 @@
 set -e
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 echo "sourcing variables"
 export ENVIRONMENT_NAME="pipeline-$GITHUB_RUN_ID"
 

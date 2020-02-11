@@ -10,6 +10,8 @@
 # DOCKERHUB_PASSWORD
 
 set -e
+
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 if [[ -z "$GITHUB_RUN_ID" ]]; then
