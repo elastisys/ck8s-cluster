@@ -188,9 +188,10 @@ jobs:
       with:
         name: kube_config_eck-sc.yaml
         path: .
-    - run: ./pipeline/test-sc-safespring.sh
+    - run: ./pipeline/test-sc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: safespring
         EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
@@ -213,9 +214,10 @@ jobs:
       with:
         name: kube_config_eck-wc.yaml
         path: .
-    - run: ./pipeline/test-wc-safespring.sh
+    - run: ./pipeline/test-wc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: safespring
         EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
