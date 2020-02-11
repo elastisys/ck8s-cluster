@@ -23,9 +23,14 @@ if [[ -z "$GITHUB_RUN_ID" ]]; then
 fi
 
 echo "initializing variables"
-export CLOUD_PROVIDER=exoscale
 export ENVIRONMENT_NAME="pipeline-$GITHUB_RUN_ID"
-source ${SCRIPTS_PATH}/init-exoscale.sh
+if [[ "$CLOUD_PROVIDER" = "exoscale" ]]
+then
+    source ${SCRIPTS_PATH}/init-exoscale.sh
+elif [[ "$CLOUD_PROVIDER" = "safespring" ]]
+then
+    source ${SCRIPTS_PATH}/init-safespring.sh
+fi
 source ${SCRIPTS_PATH}/vault-variables.sh
 
 if [[ "$MANUAL" == true ]]; then
@@ -55,7 +60,13 @@ ${SCRIPTS_PATH}/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashbo
 echo "Destroying infrastructure"
 export TF_VAR_dns_prefix=pipeline-$GITHUB_RUN_ID
 #Destroy infrastructure
-cd ${SCRIPTS_PATH}/../terraform/exoscale
+if [[ "$CLOUD_PROVIDER" = "exoscale" ]]
+then
+    cd ${SCRIPTS_PATH}/../terraform/exoscale
+elif [[ "$CLOUD_PROVIDER" = "safespring" ]]
+then
+    cd ${SCRIPTS_PATH}/../terraform/safespring
+fi
 echo '1' | TF_WORKSPACE=pipeline terraform init
 terraform workspace select pipeline-$GITHUB_RUN_ID
 terraform destroy -auto-approve

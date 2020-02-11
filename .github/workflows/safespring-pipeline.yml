@@ -241,10 +241,11 @@ jobs:
       env: 
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - run: ./pipeline/cleanup-safespring.sh
+    - run: ./pipeline/cleanup.sh
       if: always()
       shell: bash
       env: 
+        CLOUD_PROVIDER: safespring
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}

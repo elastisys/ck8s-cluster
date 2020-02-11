@@ -273,6 +273,7 @@ jobs:
     - run: ./pipeline/cleanup.sh
       shell: bash
       env: 
+        CLOUD_PROVIDER: exoscale
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
