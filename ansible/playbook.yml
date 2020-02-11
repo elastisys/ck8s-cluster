@@ -13,7 +13,12 @@
         name: ubuntu
         groups: docker
         append: yes
-    
+
+    - name: Write docker daemon config file
+      copy:
+        src: ./daemon.json
+        dest: /etc/docker/daemon.json
+
     - name: enable docker
       service:
         name: docker
@@ -30,7 +35,7 @@
     - name: Create filesystem
       filesystem: dev={{ device_path }} fstype=ext4
 
-    - name: Configure mount point 
+    - name: Configure mount point
       mount: name=/mnt/disks/disk1 src={{ device_path }} fstype=ext4 state=mounted
 
 - hosts: "*master*"
