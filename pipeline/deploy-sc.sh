@@ -1,7 +1,7 @@
 set -e
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 echo "Sourcing variables"
-export CLOUD_PROVIDER=exoscale
 export ENVIRONMENT_NAME="pipeline-$GITHUB_RUN_ID"
 
 echo "Initializing vault usage"
@@ -18,6 +18,22 @@ echo "running deploy-sc.sh"
 ./scripts/deploy-sc.sh > "${GITHUB_WORKSPACE}/deploy-sc-output"
 kubectl get pods --all-namespaces
 kubectl get nodes
+
+if [[ "$CLOUD_PROVIDER" = "safespring" ]]
+then
+    cd ${CONFIG_PATH}
+    echo "Storing helm certificates in vault"
+
+    FILES="certs/service_cluster/kube-system/certs/*"
+    for file in ${FILES}
+    do
+        echo "Trying to store file $file"
+        cat ${file} | base64 | vault kv put eck/v1/${CLOUD_PROVIDER}/${ENVIRONMENT_NAME}/${file} base64-content=-
+        if [ $? == 0 ]
+        then echo "Success"
+        fi
+    done
+fi
 
 # Revoke vault token.
 curl --header "X-Vault-Token: $VAULT_TOKEN" --request POST "${VAULT_ADDR}/v1/auth/token/revoke-self"

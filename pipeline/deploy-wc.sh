@@ -1,7 +1,7 @@
 set -e
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 echo "sourcing variables"
-export CLOUD_PROVIDER=exoscale
 export ENVIRONMENT_NAME="pipeline-$GITHUB_RUN_ID"
 
 echo "getting vault passwords"

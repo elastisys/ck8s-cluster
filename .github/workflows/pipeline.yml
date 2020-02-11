@@ -34,6 +34,7 @@ jobs:
     - run: ./pipeline/infra.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: exoscale
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
@@ -67,6 +68,7 @@ jobs:
     - run: ./pipeline/rke-sc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: exoscale
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
         EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
@@ -99,6 +101,7 @@ jobs:
     - run: ./pipeline/rke-wc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: exoscale
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
         EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
@@ -136,6 +139,9 @@ jobs:
     - run: ./pipeline/deploy-sc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: exoscale
+        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        S3_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
@@ -166,6 +172,9 @@ jobs:
     - run: ./pipeline/deploy-wc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: exoscale
+        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        S3_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}

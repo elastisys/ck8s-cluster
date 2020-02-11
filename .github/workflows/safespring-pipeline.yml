@@ -53,9 +53,10 @@ jobs:
       with:
         name: infra.json
         path: .
-    - run: ./pipeline/rke-sc-safespring.sh
+    - run: ./pipeline/rke-sc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: safespring
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
         OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
@@ -86,9 +87,10 @@ jobs:
       with:
         name: infra.json
         path: .
-    - run: ./pipeline/rke-wc-safespring.sh
+    - run: ./pipeline/rke-wc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: safespring
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
         OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
@@ -124,9 +126,10 @@ jobs:
       with:
         name: kube_config_eck-sc.yaml
         path: .
-    - run: ./pipeline/deploy-sc-safespring.sh
+    - run: ./pipeline/deploy-sc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: safespring
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
         S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
@@ -154,9 +157,10 @@ jobs:
       with:
         name: kube_config_eck-wc.yaml
         path: .
-    - run: ./pipeline/deploy-wc-safespring.sh
+    - run: ./pipeline/deploy-wc.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: safespring
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
         S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}

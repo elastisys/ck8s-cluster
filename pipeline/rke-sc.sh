@@ -1,9 +1,15 @@
 set -e
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 echo "sourcing variables"
-export CLOUD_PROVIDER=exoscale
 export ENVIRONMENT_NAME="pipeline-$GITHUB_RUN_ID"
-source pipeline/init-exoscale.sh
+if [[ "$CLOUD_PROVIDER" = "exoscale" ]]
+then
+    source pipeline/init-exoscale.sh
+elif [[ "$CLOUD_PROVIDER" = "safespring" ]]
+then
+    source pipeline/init-safespring.sh
+fi
 source pipeline/init-ssh.sh
 export TF_VAR_dns_prefix="pipeline-$GITHUB_RUN_ID"
 

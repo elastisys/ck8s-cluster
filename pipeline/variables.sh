@@ -6,16 +6,25 @@ export CERT_TYPE=staging
 
 source common-env.sh
 
-export S3_ACCESS_KEY=$EXOSCALE_API_KEY
-export S3_SECRET_KEY=$EXOSCALE_SECRET_KEY
-export S3_REGION=ch-gva-2
-export S3_REGION_ENDPOINT=https://sos-ch-gva-2.exo.io
-export S3_HARBOR_BUCKET_NAME=harbor
-export S3_VELERO_BUCKET_NAME=velero
-export S3_ES_BACKUP_BUCKET_NAME=es-backup
-export S3_SC_FLUENTD_BUCKET_NAME=sc-logs
-# Influx backup variables
-export S3_INFLUX_BUCKET_URL=s3://influxdb-backups
+if [[ "$CLOUD_PROVIDER" = "exoscale" ]]
+then
+    export S3_REGION=ch-gva-2
+    export S3_REGION_ENDPOINT=https://sos-ch-gva-2.exo.io
+    export S3_HARBOR_BUCKET_NAME=harbor
+    export S3_VELERO_BUCKET_NAME=velero
+    export S3_ES_BACKUP_BUCKET_NAME=es-backup
+    export S3_INFLUX_BUCKET_URL=s3://influxdb-backups
+    export S3_SC_FLUENTD_BUCKET_NAME=sc-logs
+elif [[ "$CLOUD_PROVIDER" = "safespring" ]]
+then
+    export S3_REGION=sto1
+    export S3_REGION_ENDPOINT=https://s3.sto1.safedc.net
+    export S3_HARBOR_BUCKET_NAME=harbor-pipeline
+    export S3_VELERO_BUCKET_NAME=velero-pipeline
+    export S3_ES_BACKUP_BUCKET_NAME=elasticsearch-pipeline
+    export S3_INFLUX_BUCKET_URL=s3://influxdb-pipeline
+    export S3_SC_FLUENTD_BUCKET_NAME=sc-logs-pipeline
+fi
 
 # Disable alerts
 export ALERT_TO=null
