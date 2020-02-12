@@ -70,3 +70,14 @@ grafana.ini:
     allowed_domains: {{ requiredEnv "OAUTH_ALLOWED_DOMAINS" }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ requiredEnv "TLS_SKIP_VERIFY" }}
+
+# Velero backup
+
+labels:
+  velero: backup
+
+podLabels:
+  velero: backup
+
+podAnnotations:
+  backup.velero.io/backup-volumes: storage
