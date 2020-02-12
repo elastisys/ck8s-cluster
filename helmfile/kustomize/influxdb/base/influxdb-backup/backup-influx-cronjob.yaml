@@ -31,6 +31,12 @@ spec:
             - '-c'
             - |
               influxd backup -host $(INFLUX_ADDR) -portable /backups/backup_$(date +%Y%m%d_%H%M%S)
+            env:
+            - name: INFLUX_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: influx-env-cm
+                  key: INFLUX_ADDR
             resources:
               requests:
                 cpu: 50m
@@ -51,7 +57,20 @@ spec:
             env:
             # Aws s3 cli variables.
             - name: AWS_DEFAULT_REGION
-              value: $(S3_REGION)
+              valueFrom:
+                configMapKeyRef:
+                  name: influx-env-cm
+                  key: S3_REGION
+            - name: S3_REGION_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: influx-env-cm
+                  key: S3_REGION_ENDPOINT
+            - name: S3_INFLUX_BUCKET_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: influx-env-cm
+                  key: S3_INFLUX_BUCKET_URL
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
