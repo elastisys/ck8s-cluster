@@ -48,7 +48,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [RKE](https://github.com/rancher/rke/releases) (tested with 1.0.0)
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
 - [helm](https://github.com/helm/helm/releases) (tested with 2.14.3)
-- [helmfile](https://github.com/roboll/helmfile) (tested with v0.81.3)
+- [helmfile](https://github.com/roboll/helmfile) (tested with v0.99.0)
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.5-1-a5b5cbe)
 - htpasswd available directly in ubuntus repositories

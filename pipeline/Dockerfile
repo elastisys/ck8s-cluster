@@ -31,7 +31,7 @@ RUN wget https://github.com/databus23/helm-diff/releases/download/v2.11.0%2B5/he
     #helm plugin install diff/bin/diff
 
 #Helmfile
-RUN wget https://github.com/roboll/helmfile/releases/download/v0.81.0/helmfile_linux_amd64 && \
+RUN wget https://github.com/roboll/helmfile/releases/download/v0.99.0/helmfile_linux_amd64 && \
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile
 

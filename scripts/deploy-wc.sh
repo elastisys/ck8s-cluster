@@ -121,10 +121,10 @@ cd ${SCRIPTS_PATH}/../helmfile
 if [[ $CLOUD_PROVIDER != "exoscale" ]]
 then
     # Install cert-manager.
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 else
     # Install cert-manager and nfs-client-provisioner.
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff
 fi
 
 
@@ -145,7 +145,7 @@ charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-s
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
 
 # Install rest of the charts excluding charts in charts_ignore_list.
-helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply
+helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
 
 # Create basic auth credentials for accessing workload cluster prometheus
 htpasswd -c -b auth prometheus ${PROMETHEUS_PWD}
@@ -158,7 +158,7 @@ success=false
 
 for i in $(seq 1 $tries)
 do
-    if helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE apply
+    if helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE apply --suppress-diff
     then
         success=true
         break
@@ -190,9 +190,7 @@ kubectl -n fluentd create secret generic elasticsearch \
     --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 
 # Install fluentd
-helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply
-
-
+helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply --suppress-diff
 
 # Create kubeconfig for the customer
 

@@ -209,10 +209,10 @@ cd ${SCRIPTS_PATH}/../helmfile
 if [ $CLOUD_PROVIDER != "exoscale" ]
 then
     # Install cert-manager.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 else
     # Install cert-manager and nfs-client-provisioner.
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff 
 fi
 
 # Get status of the cert-manager webhook api.
@@ -227,13 +227,13 @@ then
 fi
 
 # Install dex.
-helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply
+helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff
 
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
 
 [[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"
 
-helmfile -f helmfile.yaml -e service_cluster -l "$charts_ignore_list" $INTERACTIVE apply
+helmfile -f helmfile.yaml -e service_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
 
 # Install prometheus-operator. Retry three times.
 tries=3
@@ -241,7 +241,7 @@ success=false
 
 for i in $(seq 1 $tries)
 do
-    if helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE apply
+    if helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE apply --suppress-diff
     then
         success=true
         break
@@ -277,7 +277,7 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/curator.yaml
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
 
 #install elasticsearch-prometheus-exporter
-helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply
+helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply --suppress-diff
 
 # Restore InfluxDB from backup
 if [[ $ECK_RESTORE_CLUSTER != "false" ]]
