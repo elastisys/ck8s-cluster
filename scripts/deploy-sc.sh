@@ -231,7 +231,8 @@ helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --sup
 ${SCRIPTS_PATH}/gen-kustomize-env-files.sh
 
 # Set environment variable for the directory containing the kustomize plugin directory
-export XDG_CONFIG_HOME=$(pwd)
+export KUSTOMIZE_PLUGIN_HOME=${SCRIPTS_PATH}/../helmfile/kustomize/plugin
+
 
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
 
