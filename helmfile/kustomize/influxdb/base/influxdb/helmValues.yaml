@@ -39,6 +39,8 @@ resources:
     memory: 4Gi
     cpu: 2
 
+# TODO: don't run when restoring the cluster
+# TODO: make the duration configurable 
 initScripts:
   enabled: true
   scripts:
