@@ -13,9 +13,10 @@ jobs:
       shell: bash
     - run: env
       shell: bash
-    - run: ./pipeline/infra-safespring.sh
+    - run: ./pipeline/infra.sh
       shell: bash
       env:
+        CLOUD_PROVIDER: safespring
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
         SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
         SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
