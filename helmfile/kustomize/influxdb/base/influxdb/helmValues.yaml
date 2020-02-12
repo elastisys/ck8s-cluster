@@ -30,6 +30,7 @@ config:
     index_version: tsi1
   http:
     auth_enabled: true
+    log_enabled: false
 
 resources:
   requests:
