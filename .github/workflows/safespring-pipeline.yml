@@ -238,9 +238,6 @@ jobs:
         path: .
     - run: ./pipeline/cleanup-safespring-volumes.sh
       shell: bash
-      env: 
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
     - run: ./pipeline/cleanup.sh
       if: always()
       shell: bash
