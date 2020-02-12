@@ -128,6 +128,11 @@ kubeScheduler:
   enabled: false
 
 grafana:
+
+  image:
+    repository: grafana/grafana
+    tag: 6.5.2
+
   # admin username is "admin"
   adminPassword: {{ requiredEnv "GRAFANA_PWD" }}
 
@@ -141,7 +146,7 @@ grafana:
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     tls:
-    - secretName: grafana-general-tls
+    - secretName: grafana-ops-general-tls
       hosts:
       - grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
   rbac:
@@ -151,11 +156,9 @@ grafana:
   persistence:
     type: pvc
     enabled: true
-    # Specify a storage class to use or comment out to use the default
-    # storageClassName:
+    size: 10Gi
     accessModes:
       - ReadWriteOnce
-    size: 10Gi
 
   serviceAccount:
     create: true
@@ -163,25 +166,12 @@ grafana:
     nameTest:
 
   sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
     datasources:
       enabled: true
-      defaultDatasourceEnabled: false
-
-  dashboardProviders:
-    dashboardproviders.yaml:
-      apiVersion: 1
-      providers:
-      - name: 'default'
-        orgId: 1
-        folder: ''
-        type: file
-        disableDeletion: false
-        editable: true
-        options:
-          path: /var/lib/grafana/dashboards/default
-
-  dashboards:
-    default: {}
+      defaultDatasourceEnabled: true
 
   additionalDataSources:
   - name: prometheus-wc-reader
