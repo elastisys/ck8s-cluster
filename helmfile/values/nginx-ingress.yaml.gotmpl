@@ -7,6 +7,7 @@ controller:
 
   config:
     disable-ipv6-dns: "true"
+    proxy-body-size: "200m"
 
   # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
   # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
