@@ -5,7 +5,7 @@ resources:
     cpu: 500m
     memory: 200Mi
   requests:
-    cpu: 500m
+    cpu: 100m
     memory: 200Mi
 
 # Default args include "-q" which sets loglevel to warning.
@@ -21,6 +21,10 @@ additionalPlugins:
   #default: gem 'fluent-plugin-prometheus', '~>1.4.0'
 - name: fluent-plugin-prometheus
   version: 1.6.1
+
+env:
+  LIVENESS_THRESHOLD_SECONDS: 900
+  STUCK_THRESHOLD_SECONDS: 1200
 
 extraConfigMaps:
   system.conf: |-

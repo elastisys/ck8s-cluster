@@ -4,8 +4,8 @@ image:
 
 resources:
   limits:
-    cpu: 300m
-    memory: 300Mi
+    cpu: 500m
+    memory: 1000Mi
   requests:
     cpu: 300m
     memory: 300Mi
@@ -65,6 +65,8 @@ configMaps:
         @type file
 
         path /var/log/fluentd-buffers/s3
+        overflow_action block
+        total_limit_size 9GB
 
         timekey 10m
         timekey_wait 1m

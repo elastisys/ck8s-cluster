@@ -19,6 +19,10 @@ secret:
   secret_name: elasticsearch
   secret_key: password
 
+env:
+  LIVENESS_THRESHOLD_SECONDS: 900
+  STUCK_THRESHOLD_SECONDS: 1200
+
 additionalPlugins:
   #New version bugfixes for ilm
   #default: gem 'fluent-plugin-elasticsearch', '~>3.5.3'
