@@ -3,12 +3,24 @@ name: Safespring-pipeline
 on:
   schedule:
     - cron: "0 5 * * *"
-
 jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: whoan/docker-build-with-cache-action@v3
+      with:
+        username: "${{ secrets.DOCKERHUB_USER }}"
+        password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+        image_name: elastisys/ck8s-ops
+        image_tag: ${{ github.sha }}
+        context: pipeline
+
   infra:
+    needs: build-image
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - run: echo $GITHUB_RUN_ID
@@ -45,7 +57,7 @@ jobs:
     needs: infra
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - name: Download infra.json
@@ -78,8 +90,8 @@ jobs:
   rke-wc:
     needs: infra
     runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+    container:
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - name: Download infra.json
@@ -113,7 +125,7 @@ jobs:
     needs: [rke-sc,rke-wc]
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - name: Download infra.json
@@ -144,7 +156,7 @@ jobs:
     needs: [rke-sc,rke-wc]
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - name: Download infra.json
@@ -175,7 +187,7 @@ jobs:
     needs: [deploy-wc, deploy-sc]
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - name: Download infra.json
@@ -201,7 +213,7 @@ jobs:
     needs: [deploy-wc, deploy-sc]
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - name: Download infra.json
@@ -223,12 +235,37 @@ jobs:
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
 
+  get-versions:
+    needs: [deploy-wc, deploy-sc]
+    runs-on: ubuntu-latest
+    container: 
+      image: elastisys/ck8s-ops:${{ github.sha }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download kube_config
+      uses: actions/download-artifact@v1
+      with:
+        name: kube_config_eck-wc.yaml
+        path: .
+    - name: Download kube_config
+      uses: actions/download-artifact@v1
+      with:
+        name: kube_config_eck-sc.yaml
+        path: .
+    - run: ./pipeline/versions.sh
+      shell: bash
+    - name: Upload version.json
+      uses: actions/upload-artifact@v1
+      with:
+        name: version.json
+        path: version.json
+
   clean-up:
-    needs: [test-sc,test-wc]
+    needs: [test-sc,test-wc,get-versions]
     if: always()
     runs-on: ubuntu-latest
     container: 
-      image: elastisys/ck8s-bitbucket-pipeline:1.0.9
+      image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
     - name: Download kube_config
