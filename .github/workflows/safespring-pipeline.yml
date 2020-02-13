@@ -147,6 +147,7 @@ jobs:
         S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
     - name: Upload deploy output
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: deploy-sc-output
@@ -178,6 +179,7 @@ jobs:
         S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
     - name: Upload deploy output
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: deploy-wc-output

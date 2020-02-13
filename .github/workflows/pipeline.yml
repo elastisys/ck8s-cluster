@@ -10,7 +10,7 @@ on:
 jobs:
   build-image:
     runs-on: ubuntu-latest
-    steps: 
+    steps:
     - uses: actions/checkout@v1
     - uses: whoan/docker-build-with-cache-action@v3
       with:
@@ -43,11 +43,13 @@ jobs:
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
     - name: Upload infra.json
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: infra.json
         path: infra.json
     - name: upload terraform output
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: tfoutput        
@@ -56,7 +58,7 @@ jobs:
   rke-sc:
     needs: infra
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
@@ -81,6 +83,7 @@ jobs:
         name: kube_config_eck-sc.yaml
         path: kube_config_eck-sc.yaml
     - name: Upload rke output
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: rke-sc-output
@@ -114,6 +117,7 @@ jobs:
         name: kube_config_eck-wc.yaml
         path: kube_config_eck-wc.yaml
     - name: Upload rke output
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: rke-wc-output
@@ -147,6 +151,7 @@ jobs:
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
     - name: Upload deploy output
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: deploy-sc-output
@@ -180,6 +185,7 @@ jobs:
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
     - name: Upload deploy output
+      if: always()
       uses: actions/upload-artifact@v1
       with:
         name: deploy-wc-output
@@ -236,7 +242,7 @@ jobs:
         EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
         VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-  
+
   get-versions:
     needs: [deploy-wc, deploy-sc]
     runs-on: ubuntu-latest
