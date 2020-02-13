@@ -25,6 +25,16 @@ locals {
   set = setproduct(var.dns_list, local.workers_ip)
 }
 
+data "exoscale_compute_template" "rancher" {
+  zone = var.zone
+  name = "Linux RancherOS 1.5.5 64-bit"
+}
+
+data "exoscale_compute_template" "ubuntu" {
+  zone = var.zone
+  name = "Linux Ubuntu 18.04 LTS 64-bit"
+}
+
 resource "exoscale_network" "net" {
   zone             = var.zone
   name             = "${var.prefix}-network"
@@ -39,7 +49,7 @@ resource "exoscale_compute" "master" {
   for_each = toset(var.master_names)
 
   display_name    = "${var.prefix}-${each.value}"
-  template        = "Linux RancherOS 1.5.5 64-bit"
+  template_id     = data.exoscale_compute_template.rancher.id
   size            = var.master_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
@@ -72,7 +82,7 @@ resource "exoscale_compute" "worker" {
   for_each = toset(var.worker_names)
 
   display_name    = "${var.prefix}-${each.value}"
-  template        = "Linux RancherOS 1.5.5 64-bit"
+  template_id     = data.exoscale_compute_template.rancher.id
   size            = var.worker_name_size_map[each.value]
   disk_size       = 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
@@ -104,7 +114,7 @@ resource "exoscale_compute" "worker" {
 
 resource "exoscale_compute" "nfs" {
   display_name    = "${var.prefix}-nfs"
-  template        = "Linux Ubuntu 18.04 LTS 64-bit"
+  template_id     = data.exoscale_compute_template.ubuntu.id
   size            = var.nfs_size
   disk_size       = 200
   key_pair        = exoscale_ssh_keypair.ssh_key.name
