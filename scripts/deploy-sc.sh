@@ -289,3 +289,21 @@ fi
 ## Maybe this can become problematic if cluster is being restored?
 # Install InfluxDB backup cron-job.
 envsubst < ${SCRIPTS_PATH}/../manifests/backup/backup-influx-cronjob.yaml | kubectl -n influxdb-prometheus apply -f -
+
+if [ "${RESTORE_VELERO}" = "true" ]
+then
+    if [ "${ENABLE_CUSTOMER_GRAFANA}" = "true" ]
+    then
+        # Need to delete the customer-grafana deployment and pvc created by
+        # Helm before restoring it from backup.
+        kubectl delete deployment -n monitoring customer-grafana
+        kubectl delete pvc -n monitoring customer-grafana
+    fi
+
+    if [ ! -z "${VELERO_BACKUP_NAME}" ]
+    then
+        velero restore create --from-backup "${VELERO_BACKUP_NAME}" -w
+    else
+        velero restore create --from-schedule velero-daily-backup -w
+    fi
+fi
