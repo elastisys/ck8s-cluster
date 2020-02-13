@@ -2,9 +2,10 @@
 # Script used by pipeline to cleanup run.
 # Can be used manually if these vars are set. and arg1 is set to build-number
 # Run number can be found in first step of infra as GITHUB_RUN_ID.
+# CLOUD_PROVIDER
 # TF_TOKEN
-# EXOSCALE_API_KEY
-# EXOSCALE_SECRET_KEY
+# EXOSCALE_API_KEY or OS_USERNAME
+# EXOSCALE_SECRET_KEY or OS_PASSWORD
 # VAULT_TOKEN
 # DOCKERHUB_USER
 # DOCKERHUB_PASSWORD
