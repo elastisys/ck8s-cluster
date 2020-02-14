@@ -90,7 +90,7 @@ fi
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
-# NAMESPACES
+echo "Creating namespaces" >&2
 NAMESPACES="cert-manager elastic-system dex influxdb-prometheus monitoring ck8sdash fluentd"
 for namespace in ${NAMESPACES}
 do
@@ -104,7 +104,7 @@ then
     kubectl create namespace harbor --dry-run -o yaml | kubectl apply -f -
 fi
 
-# PSP
+echo "Creating pod security policies" >&2
 if [[ $ENABLE_PSP == "true" ]]
 then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
@@ -130,13 +130,13 @@ then
 
 fi
 
-# HELM and TILLER
+echo "Initializing helm" >&2
 mkdir -p ${CONFIG_PATH}/certs/service_cluster/kube-system/certs
 ${SCRIPTS_PATH}/initialize-cluster.sh ${CONFIG_PATH}/certs/service_cluster "helm"
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/service_cluster/kube-system/certs "helm"
 
 
-# CERT-MANAGER
+echo "Preparing cert manager and creating Issuers" >&2
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
@@ -153,14 +153,13 @@ then
     kubectl -n harbor apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 fi
 
-# Fluentd and Fluentd aggregator.
-
+echo "Installing fluentd" >&2
 kubectl create secret generic s3-credentials -n fluentd \
     --from-literal=s3_access_key=${S3_ACCESS_KEY} \
     --from-literal=s3_secret_key=${S3_SECRET_KEY} \
     --dry-run -o yaml | kubectl apply -f -
 
-# Elasticsearch and kibana.
+echo "Deploying Elastic search and Kibana" >&2
 kubectl  -n  elastic-system create secret generic elasticsearch-es-elastic-user \
     --from-literal=elastic=$ELASTIC_USER_SECRET \
     --dry-run -o yaml | kubectl apply -f -
@@ -175,7 +174,7 @@ kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/kibana.yaml
 cat ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/ingress.yaml | envsubst | kubectl apply -f -
 
 
-# HARBOR
+echo "Installing Harbor" >&2
 if [[ $ENABLE_PSP == "true" && $ENABLE_HARBOR == "true" ]]
 then
     kubectl -n harbor create rolebinding harbor-privileged-psp \
@@ -183,7 +182,7 @@ then
         --dry-run -o yaml | kubectl apply -f -
 fi
 
-# Prometheus - install CRDS.
+echo "Creating Prometheus CRD" >&2
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/alertmanager.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheus.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheusrule.crd.yaml
@@ -196,22 +195,22 @@ then
     storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "cinder-storage") | .name')
     if [ -z "$storage" ]
     then
-        # Install cinder StorageClass.
+        echo "Install cinder storage class" >&2 
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
     fi
 fi
 
 
-echo -e "\nContinuing with Helmfile\n"
+echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
 
 if [ $CLOUD_PROVIDER != "exoscale" ]
 then
-    # Install cert-manager.
+    echo "Install cert-manager" >&2
     helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 else
-    # Install cert-manager and nfs-client-provisioner.
+    echo "Install cert-manager and nfs-client-provisioner" >&2
     helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff 
 fi
 
@@ -221,21 +220,22 @@ STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=js
 # Just want to see if this ever happens.
 if [ $STATUS != "Available" ]
 then
-   echo -e  "##\n##\nWaiting for cert-manager webhook to become ready\n##\n##"
+   echo -e  "Waiting for cert-manager webhook to become ready" >&2
    kubectl wait --for=condition=Available --timeout=300s \
        apiservice v1beta1.webhook.certmanager.k8s.io
 fi
 
-# Install dex.
+echo "Installing Dex" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff
 
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
 
 [[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"
 
+echo "Installing the rest of the charts" >&2
 helmfile -f helmfile.yaml -e service_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
 
-# Install prometheus-operator. Retry three times.
+echo "Installing prometheus operator" >&2
 tries=3
 success=false
 
@@ -254,40 +254,36 @@ done
 # Then prometheus operator failed too many times
 if [ $success != "true" ]
 then
+    echo "Error: Prometheus failed to install three times" >&2
     exit 1
 fi
 
 # Adding backup job and repository to elasticsearch
 while [[ $(kubectl get elasticsearches.elasticsearch.k8s.elastic.co -n elastic-system elasticsearch -o 'jsonpath={.status.health}') != "green" ]]
 do
-    echo "Waiting until elasticsearch is ready"
+    echo "Waiting until elasticsearch is ready" >&2
     sleep 2
 done
 
-
-
 export ES_PW=$(kubectl get secret elasticsearch-es-elastic-user -n elastic-system -o=jsonpath='{.data.elastic}' | base64 --decode)
 
-# Create curator configmap
+echo "Start curator cronjob" >&2
 ${SCRIPTS_PATH}/gen-curator-conf.sh | kubectl apply -f -
-
-# Create curator cronjob
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/curator.yaml
-
 kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch-kibana/backup-job.yaml
 
-#install elasticsearch-prometheus-exporter
+echo "Install elasticsearch prometheus exporter" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply --suppress-diff
 
 # Restore InfluxDB from backup
 if [[ $ECK_RESTORE_CLUSTER != "false" ]]
 then
-    echo "Restoring InfluxDB"
+    echo "Restoring InfluxDB" >&2
     envsubst < ${SCRIPTS_PATH}/../manifests/restore/restore-influx.yaml | kubectl -n influxdb-prometheus apply -f -
 fi
 
 ## Maybe this can become problematic if cluster is being restored?
-# Install InfluxDB backup cron-job.
+echo "Install InfluxDB backup cron-job" >&2
 envsubst < ${SCRIPTS_PATH}/../manifests/backup/backup-influx-cronjob.yaml | kubectl -n influxdb-prometheus apply -f -
 
 if [ "${RESTORE_VELERO}" = "true" ]
@@ -307,3 +303,4 @@ then
         velero restore create --from-schedule velero-daily-backup -w
     fi
 fi
+echo "Deploc sc completed!" >&2

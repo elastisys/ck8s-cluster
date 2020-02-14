@@ -40,9 +40,8 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
-# NAMESPACES
+echo "Creating namespaces" >&2
 NAMESPACES="cert-manager monitoring fluentd ck8sdash"
-
 [ "$ENABLE_FALCO" == "true" ] && NAMESPACES+=" falco"
 [ "$ENABLE_OPA" == "true" ] && NAMESPACES+=" opa"
 
@@ -52,7 +51,7 @@ do
     kubectl label --overwrite namespace ${namespace} owner=operator
 done
 
-# PSP
+echo "Creating pod security policies" >&2
 if [[ $ENABLE_PSP == "true" ]]
 then
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/restricted-psp.yaml
@@ -79,13 +78,13 @@ then
     fi
 fi
 
-# HELM, TILLER
+echo "Initializing helm" >&2
 mkdir -p ${CONFIG_PATH}/certs/workload_cluster/kube-system/certs
 ${SCRIPTS_PATH}/initialize-cluster.sh ${CONFIG_PATH}/certs/workload_cluster "helm"
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/workload_cluster/kube-system/certs "helm"
 
 
-# CERT-MANAGER
+echo "Preparing cert-manager and issuers" >&2
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
@@ -98,7 +97,7 @@ do
 done
 
 
-# Prometheus CRDS
+echo "Creating prometheus CRDs" >&2
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/alertmanager.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheus.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheusrule.crd.yaml
@@ -109,21 +108,22 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 
 # Install cinder storageclass if it is not installed.
 if [[ $CLOUD_PROVIDER != "exoscale" ]]; then
+    echo "Installing cinder storageclass" >&2
     [ $(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[] | select(.metadata.name == "cinder-storage") | length') > 0 ] || kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
 fi
 
 
 
-echo -e "\nContinuing with Helmfile\n"
+echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
 
 if [[ $CLOUD_PROVIDER != "exoscale" ]]
 then
-    # Install cert-manager.
+    echo "Installing cert-manager" >&2
     helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 else
-    # Install cert-manager and nfs-client-provisioner.
+    echo "Installing cert-manage and nfs-client-provisioner" >&2
     helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff
 fi
 
@@ -134,25 +134,24 @@ STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=js
 # Just want to see if this ever happens.
 if [ $STATUS != "Available" ]
 then
-    echo -e  "##\n##\nWaiting for cert-manager webhook to become ready\n##\n##"
+    echo -e  "Waiting for cert-manager webhook to become ready" >&2
     kubectl wait --for=condition=Available --timeout=300s \
         apiservice v1beta1.webhook.certmanager.k8s.io
 fi
 
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator"
-
 [[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=opa"
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
 
-# Install rest of the charts excluding charts in charts_ignore_list.
+echo "Installing the remaining helm charts" >&2
 helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
 
-# Create basic auth credentials for accessing workload cluster prometheus
+echo "Create basic auth credentials for accessing workload cluster prometheus" >&2
 htpasswd -c -b auth prometheus ${PROMETHEUS_PWD}
 kubectl -n monitoring create secret generic prometheus-auth --from-file=auth --dry-run -o yaml | kubectl apply -f -
 rm auth
 
-# Install prometheus-operator. Retry three times.
+echo "Installing prometheus operator" >&2
 tries=3
 success=false
 
@@ -168,14 +167,15 @@ do
     fi
 done
 
-# Then prometheus operator failed too many times
+
 if [ $success != "true" ]
 then
+    echo "Error: Prometheus failed to install three times" >&2
     exit 1
 fi
 
 
-# FLUENTD
+echo "Creating Elasticsearch and fluentd secrets" >&2
 kubectl -n kube-system create secret generic template-secret --from-file=../manifests/other_template \
     --from-file=../manifests/kubecomponents_template --from-file=../manifests/kubeaudit_template \
     --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
@@ -183,16 +183,16 @@ kubectl -n fluentd create secret generic template-secret --from-file=../manifest
     --from-file=../manifests/kubecomponents_template --from-file=../manifests/kubeaudit_template \
     --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
 
-# Password for accessing elasticsearch
+
 kubectl -n kube-system create secret generic elasticsearch \
     --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 kubectl -n fluentd create secret generic elasticsearch \
     --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 
-# Install fluentd
+echo "Installing fluentd" >&2
 helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply --suppress-diff
 
-# Create kubeconfig for the customer
+echo "Creating kubeconfig for the customer" >&2
 
 # Get server and certificate from the admin kubeconfig generated by RKE
 CUSTOMER_SERVER=$(kubectl config view \
@@ -240,6 +240,7 @@ kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-pl
 
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
+    echo "Adding customer prometheus" >&2
     # This Prometheus instance could be added just as we do with other prometheus
     # instances in the service cluster using helm, but then we risk overwriting
     # customer changes.
@@ -263,6 +264,7 @@ fi
 
 if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
 then
+    echo "Adding customer alertmanager" >&2
     # Use `kubectl create` to avoid overwriting customer changes
     kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
         2> /dev/null || echo "Example issuer alredy in place. Ignoring."
@@ -287,3 +289,4 @@ then
         rm auth
     fi
 fi
+echo "Deploy-wc completed!" >&2
