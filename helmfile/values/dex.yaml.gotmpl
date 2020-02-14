@@ -58,6 +58,7 @@ config:
       secret: {{ requiredEnv "KUBELOGIN_CLIENT_SECRET" }}
       redirectURIs:
       - http://localhost:8000
+      - http://localhost:8080/oauth2/callback
       - https://ck8sdash.{{ requiredEnv "ECK_BASE_DOMAIN" }}/oauth2/callback
       - https://ck8sdash.{{ requiredEnv "ECK_OPS_DOMAIN" }}/oauth2/callback
     - id: grafana
