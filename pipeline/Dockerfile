@@ -46,7 +46,8 @@ RUN python3 -m pip install pip
 RUN python3.6 -m pip install pipenv
 
 # kustomize
-RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
+RUN wget https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.5.4/kustomize_v3.5.4_linux_amd64.tar.gz && \
+    tar -zxvf kustomize_v3.5.4_linux_amd64.tar.gz && \
     mv kustomize /usr/local/bin/kustomize
 
 ENTRYPOINT ["/bin/bash"]
