@@ -1,6 +1,6 @@
 ingress:
   enabled: true
-certType: {{ requiredEnv "CERT_TYPE" }}
+  certType: {{ requiredEnv "CERT_TYPE" }}
 
 harbor:
   url: "https://harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
