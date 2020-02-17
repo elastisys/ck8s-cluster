@@ -50,4 +50,11 @@ RUN wget https://github.com/kubernetes-sigs/kustomize/releases/download/kustomiz
     tar -zxvf kustomize_v3.5.4_linux_amd64.tar.gz && \
     mv kustomize /usr/local/bin/kustomize
 
+# s3cmd
+RUN wget https://github.com/s3tools/s3cmd/releases/download/v2.0.2/s3cmd-2.0.2.tar.gz && \
+    tar -zxvf s3cmd-2.0.2.tar.gz && \
+    pip3 install setuptools==45.2.0 && \
+    cd s3cmd-2.0.2 && \
+    python3 setup.py install
+
 ENTRYPOINT ["/bin/bash"]
