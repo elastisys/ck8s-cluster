@@ -1,9 +1,9 @@
-Elastisys Compliant Kubernetes A1 demo
-======================================
+Elastisys Compliant Kubernetes
+==============================
 
 # Overview
 
-The Elastisys Compliant Kubernetes (ECK) A1 demo platform runs two Kubernetes
+The Elastisys Compliant Kubernetes (ck8s) platform runs two Kubernetes
 clusters. One called "service" and one called "workload".
 
 The _service cluster_ provides observability, log aggregation,
@@ -27,11 +27,11 @@ following services:
 
 # Setup
 
-The management of the ECK platform is separated into different stages,
+The management of the ck8s platform is separated into different stages,
 Exoscale cloud infrastructure (terraform), Kubernetes cluster (rke) and
 Kubernetes resources (helm, kubectl).
 
-When first setting up the demo environment each stage needs to be done in
+When first setting up the environment each stage needs to be done in
 sequential order since they are dependent on each other. Once the initial
 installation is done, each stage can be updated independently.
 
