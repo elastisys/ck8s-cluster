@@ -201,7 +201,7 @@ source common-env.sh
 source ${CLOUD_PROVIDER}-common-env.sh
 ```
 
-Create 4 S3 buckets, one for each of Harbor, Velero, Elasticsearch and Influxdb.
+Create five S3 buckets, one for each of Harbor, Velero, Elasticsearch, Influxdb and Fluentd.
 If you have `s3cmd` configured, you can do it like this:
 
 ```
@@ -209,6 +209,7 @@ s3cmd mb s3://harbor-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 s3cmd mb s3://velero-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 s3cmd mb s3://elasticsearch-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 s3cmd mb s3://influxdb-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+s3cmd mb s3://fluentd-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 ```
 
 *Note:* The names for the buckets are specified in the `env.sh` file and must match the buckets you create!
