@@ -1,3 +1,7 @@
+# TODO: Move index template and ILM policy creation back to fluentd if the
+#       following issues gets fixed (maybe):
+#       https://github.com/uken/fluent-plugin-elasticsearch/issues/715
+#       https://github.com/uken/fluent-plugin-elasticsearch/issues/716
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -5,18 +9,160 @@ metadata:
 data:
   configure-es.sh: |
     #!/bin/sh
-    set -e 
+    set -e
+
     echo "configuring s3 backups"
     curl -f -X PUT "https://{{ .Values.ES.endpoint }}/_snapshot/s3_backup_repository?pretty" \
       -H 'Content-Type: application/json' \
       -d' {"type": "s3", "settings":{ "bucket": "'"{{ .Values.ES.backupBucketName }}"'", "client": "default"}}' \
       -k -u elastic:${ES_PW}
+
     echo "changing poll interval"
     curl -f -X PUT "https://{{ .Values.ES.endpoint }}/_cluster/settings?pretty" \
       -H 'Content-Type: application/json' \
       -k -u elastic:${ES_PW} \
       -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'
+
     echo "setting up kibana dashboard"
     curl -f -kL -X POST "https://{{ .Values.kibana.endpoint }}/api/saved_objects/_import" -H "kbn-xsrf: true" \
       --form file=@/scripts/kibana-dashboards.ndjson -u elastic:${ES_PW}
-  kibana-dashboards.ndjson: {{ .Files.Get "dashboards/kibana-dashboards.ndjson" | quote -}}
+
+    echo
+    echo "creating index templates"
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/kubeaudit" \
+      -H "Content-Type: application/json" \
+      -d@/scripts/kubeaudit_template.json -k -u elastic:${ES_PW}
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/kubecomponents" \
+      -H "Content-Type: application/json" \
+      -d@/scripts/kubecomponents_template.json -k -u elastic:${ES_PW}
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/kubernetes" \
+      -H "Content-Type: application/json" \
+      -d@/scripts/kubernetes_template.json -k -u elastic:${ES_PW}
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/other" \
+      -H "Content-Type: application/json" \
+      -d@/scripts/other_template.json -k -u elastic:${ES_PW}
+
+    echo
+    echo "creating ILM policies"
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/kubeaudit" \
+      -H "Content-Type: application/json" \
+     -d@/scripts/kubeaudit_policy.json -k -u elastic:${ES_PW}
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/kubecomponents" \
+      -H "Content-Type: application/json" \
+     -d@/scripts/kubecomponents_policy.json -k -u elastic:${ES_PW}
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/kubernetes" \
+      -H "Content-Type: application/json" \
+     -d@/scripts/kubernetes_policy.json -k -u elastic:${ES_PW}
+    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/other" \
+      -H "Content-Type: application/json" \
+     -d@/scripts/other_policy.json -k -u elastic:${ES_PW}
+  kibana-dashboards.ndjson: {{ .Files.Get "dashboards/kibana-dashboards.ndjson" | quote }}
+  kubeaudit_template.json: |
+    {
+      "index_patterns": [
+        "kubeaudit-*"
+      ],
+      "settings": {
+        "index.refresh_interval": "10s",
+        "index.lifecycle.name": "kubeaudit_policy",
+        "index.lifecycle.rollover_alias": "kubeaudit",
+        "mapping.total_fields.limit": "1000"
+      }
+    }
+  kubecomponents_template.json: |
+    {
+      "index_patterns": [
+        "kubecomponents-*"
+      ],
+      "settings": {
+        "index.refresh_interval": "10s",
+        "index.lifecycle.name": "kubecomponents_policy",
+        "index.lifecycle.rollover_alias": "kubecomponents",
+        "mapping.total_fields.limit": "1000"
+      }
+    }
+  kubernetes_template.json: |
+    {
+      "index_patterns": [
+        "kubernetes-*"
+      ],
+      "settings": {
+        "index.refresh_interval": "10s",
+        "index.lifecycle.name": "kubernetes_policy",
+        "index.lifecycle.rollover_alias": "kubernetes",
+        "mapping.total_fields.limit": "1000"
+      }
+    }
+  other_template.json: |
+    {
+      "index_patterns": [
+        "other-*"
+      ],
+      "settings": {
+        "index.refresh_interval": "10s",
+        "index.lifecycle.name": "other_policy",
+        "index.lifecycle.rollover_alias": "other",
+        "mapping.total_fields.limit": "1000"
+      }
+    }
+  kubeaudit_policy.json: |
+    {
+      "policy": {
+        "phases": {
+          "hot": {
+            "actions": {
+              "rollover": {
+                "max_size": "{{ .Values.ilm.rollover_size }}GB",
+                "max_age": "{{ .Values.ilm.rollover_age }}d"
+              }
+            }
+          }
+        }
+      }
+    }
+  kubecomponents_policy.json: |
+    {
+      "policy": {
+        "phases": {
+          "hot": {
+            "actions": {
+              "rollover": {
+                "max_size": "{{ .Values.ilm.rollover_size }}GB",
+                "max_age": "{{ .Values.ilm.rollover_age }}d"
+              }
+            }
+          }
+        }
+      }
+    }
+  kubernetes_policy.json: |
+    {
+      "policy": {
+        "phases": {
+          "hot": {
+            "actions": {
+              "rollover": {
+                "max_size": "{{ .Values.ilm.rollover_size }}GB",
+                "max_age": "{{ .Values.ilm.rollover_age }}d"
+              }
+            }
+          }
+        }
+      }
+    }
+  other_policy.json: |
+    {
+      "policy": {
+        "phases": {
+          "hot": {
+            "actions": {
+              "rollover": {
+                "max_size": "{{ .Values.ilm.rollover_size }}GB",
+                "max_age": "{{ .Values.ilm.rollover_age }}d"
+              }
+            }
+          }
+        }
+      }
+    }
+

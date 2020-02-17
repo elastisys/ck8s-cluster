@@ -176,13 +176,6 @@ fi
 
 
 echo "Creating Elasticsearch and fluentd secrets" >&2
-kubectl -n kube-system create secret generic template-secret --from-file=../manifests/other_template \
-    --from-file=../manifests/kubecomponents_template --from-file=../manifests/kubeaudit_template \
-    --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
-kubectl -n fluentd create secret generic template-secret --from-file=../manifests/other_template \
-    --from-file=../manifests/kubecomponents_template --from-file=../manifests/kubeaudit_template \
-    --from-file=../manifests/kubernetes_template --dry-run -o yaml | kubectl apply -f -
-
 
 kubectl -n kube-system create secret generic elasticsearch \
     --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -

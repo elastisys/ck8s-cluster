@@ -3,3 +3,6 @@ ES:
   backupBucketName: {{ requiredEnv "S3_ES_BACKUP_BUCKET_NAME" }}
 kibana:
   endpoint: kibana-kb-http:5601
+ilm:
+  rollover_size: {{ requiredEnv "ROLLOVER_SIZE" }}
+  rollover_age: {{ requiredEnv "ROLLOVER_AGE" }}

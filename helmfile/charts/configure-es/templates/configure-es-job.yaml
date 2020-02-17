@@ -1,3 +1,7 @@
+# TODO: Preferably the Elasticsearch and Kibana settings configuration gets
+#       supported directly in ECK. If this happens this job can be replaced.
+#       https://github.com/elastic/cloud-on-k8s/issues/2157
+#       https://github.com/elastic/cloud-on-k8s/issues/2155
 apiVersion: batch/v1
 kind: Job
 metadata:

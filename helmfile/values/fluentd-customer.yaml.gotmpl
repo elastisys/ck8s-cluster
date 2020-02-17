@@ -202,15 +202,6 @@ extraConfigMaps:
         deflector_alias kubecomponents
         index_prefix kubecomponents
         index_date_pattern "now/d"
-        # Ilm configuration
-        enable_ilm true
-        # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id kubecomponents_policy
-        ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
-        # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name kubecomponents_template
-        template_file /etc/templates/kubecomponents_template
-        customize_template {"<<index_prefix>>": "kubecomponents"}
         # Custom parameters --END--
         <buffer>
           @type file
@@ -251,15 +242,6 @@ extraConfigMaps:
         deflector_alias kubeaudit
         index_prefix kubeaudit
         index_date_pattern "now/d"
-        # Ilm configuration
-        enable_ilm true
-        # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id kubeaudit_policy
-        ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
-        # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name kubeaudit_template
-        template_file /etc/templates/kubeaudit_template
-        customize_template {"<<index_prefix>>": "kubeaudit"}
         # Custom parameters --END--
         <buffer>
           @type file
@@ -300,15 +282,6 @@ extraConfigMaps:
         deflector_alias kubernetes
         index_prefix kubernetes
         index_date_pattern "now/d"
-        # Ilm configuration
-        enable_ilm true
-        # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id kubernetes_policy
-        ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
-        # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name kubernetes_template
-        template_file /etc/templates/kubernetes_template
-        customize_template {"<<index_prefix>>": "kubernetes"}
         # Custom parameters --END--
         <buffer>
           @type file
@@ -349,15 +322,6 @@ extraConfigMaps:
         deflector_alias other
         index_prefix other
         index_date_pattern "now/d"
-        # Ilm configuration
-        enable_ilm true
-        # Policy is already created by init container so fluentd will skip it's creation
-        ilm_policy_id other_policy
-        ilm_policy {"policy": {"phases": {"hot": {"actions": {"rollover": {"max_size": "{{ requiredEnv "ROLLOVER_SIZE" }}GB","max_age": "{{ requiredEnv "ROLLOVER_AGE" }}d"}}}}}}
-        # Template name is not used if ilm is in effect but it's mandatory parameter
-        template_name other_template
-        template_file /etc/templates/other_template
-        customize_template {"<<index_prefix>>": "other"}
         # Custom parameters --END--
         <buffer>
           @type file
@@ -379,10 +343,6 @@ extraVolumes:
     configMap:
       name: fluentd-extra-config
     optional: true
-  - name: template-secret
-    secret:
-      defaultMode: 420
-      secretName: template-secret
   - name: fluentd-extra-plugins
     configMap:
       defaultMode: 420
@@ -390,9 +350,6 @@ extraVolumes:
 extraVolumeMounts:
   - name: extra-config
     mountPath: /etc/fluent/extra-config.d
-    readOnly: true
-  - name: template-secret
-    mountPath: /etc/templates/
     readOnly: true
   - name: fluentd-extra-plugins
     mountPath: /etc/fluent/plugin

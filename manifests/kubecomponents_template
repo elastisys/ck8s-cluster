@@ -1,1 +1,0 @@
-{"index_patterns": ["kubecomponents-*"], "settings": {"index.refresh_interval" : "10s","index.lifecycle.name": "kubecomponents_policy", "index.lifecycle.rollover_alias": "kubecomponents", "mapping.total_fields.limit": "1000"}}

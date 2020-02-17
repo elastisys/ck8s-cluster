@@ -4,3 +4,6 @@ ES:
   backupBucketName: ""
 kibana:
   endpoint: kibana-kb-http:5601
+ilm:
+  rollover_size: 1
+  rollover_age: 1
