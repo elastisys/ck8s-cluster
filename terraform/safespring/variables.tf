@@ -36,6 +36,7 @@ variable "prefix_wc" {
 # b.medium : 9d82d1ee-ca29-4928-a868-d56e224b92a1
 # b.large  : 16d11558-62fe-4bce-b8de-f49a077dc881
 # m.medium : 2c1708d1-3974-4ab8-97cc-cbf58aa27ad9
+# b.xlarge : fce2b54d-c0ef-4ad4-aa81-bcdcaa54f7cb
 variable worker_names_sc {
   description = "List of names for worker instances to create." 
   type        = list(string)
@@ -48,7 +49,7 @@ variable worker_name_flavor_map_sc {
   type        = map
 
   default     = {
-    "worker-0" : "16d11558-62fe-4bce-b8de-f49a077dc881",
+    "worker-0" : "fce2b54d-c0ef-4ad4-aa81-bcdcaa54f7cb",
     "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"  
   }
 }
