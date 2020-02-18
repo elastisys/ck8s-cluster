@@ -52,9 +52,9 @@ module "workload_cluster" {
 
   prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
 
-  worker_names          = var.worker_names_sc
+  worker_names          = var.worker_names_wc
   worker_name_size_map  = var.worker_name_size_map_wc
-  master_names          = var.master_names_sc
+  master_names          = var.master_names_wc
   master_name_size_map  = var.master_name_size_map_wc
 
   nfs_size = var.nfs_size
