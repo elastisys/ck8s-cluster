@@ -52,6 +52,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.5-1-a5b5cbe)
 - htpasswd available directly in ubuntus repositories
+- [kustomize](https://github.com/kubernetes-sigs/kustomize) (tested with 3.5.4)
 
 Soft (recommended) requirements:
 
