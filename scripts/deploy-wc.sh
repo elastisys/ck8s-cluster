@@ -234,6 +234,8 @@ kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-pl
 if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
 then
     echo "Adding customer prometheus" >&2
+    kubectl apply --namespace "${CONTEXT_NAMESPACE}" \
+        -f "${SCRIPTS_PATH}/../manifests/issuers/selfsigned.yaml"
     # This Prometheus instance could be added just as we do with other prometheus
     # instances in the service cluster using helm, but then we risk overwriting
     # customer changes.
@@ -243,8 +245,6 @@ then
     envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus-ingress.yaml | \
         kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
         echo "Example ingress alredy in place. Ignoring."
-    kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
-        2> /dev/null || echo "Example issuer alredy in place. Ignoring."
     envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus.yaml | \
         kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
         echo "Example prometheus alredy in place. Ignoring."
@@ -259,8 +259,6 @@ if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
 then
     echo "Adding customer alertmanager" >&2
     # Use `kubectl create` to avoid overwriting customer changes
-    kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/issuer.yaml \
-        2> /dev/null || echo "Example issuer alredy in place. Ignoring."
     kubectl -n ${CONTEXT_NAMESPACE} create -f ${SCRIPTS_PATH}/../manifests/examples/monitoring/alertmanager-instance.yaml \
         2> /dev/null || echo "Example alertmanager alredy in place. Ignoring."
 
@@ -279,6 +277,8 @@ then
         htpasswd -c -b auth alertmanager ${CUSTOMER_ALERTMANAGER_PWD}
         kubectl -n ${CONTEXT_NAMESPACE} create secret generic alertmanager-auth --from-file=auth \
             2> /dev/null || echo "Example alertmanager auth secret alredy in place. Ignoring."
+        kubectl apply --namespace "${CONTEXT_NAMESPACE}" \
+            -f "${SCRIPTS_PATH}/../manifests/issuers/selfsigned.yaml"
         rm auth
     fi
 fi
