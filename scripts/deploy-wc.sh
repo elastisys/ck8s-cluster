@@ -231,7 +231,7 @@ kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-co
 kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml \
     2> /dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring."
 
-if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
+if [ "$ENABLE_CUSTOMER_PROMETHEUS" == "true" ]
 then
     echo "Adding customer prometheus" >&2
     kubectl apply --namespace "${CONTEXT_NAMESPACE}" \
@@ -256,11 +256,11 @@ then
     rm auth
 fi
 
-if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
+if [ "$ENABLE_CUSTOMER_ALERTMANAGER" == "true" ]
 then
     echo "Adding customer alertmanager" >&2
     # Use `kubectl create` to avoid overwriting customer changes
-    if [ $ENABLE_CUSTOMER_ALERTMANAGER_INGRESS == "true" ]
+    if [ "$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" == "true" ]
     then
         kubectl apply --namespace "${CONTEXT_NAMESPACE}" \
             -f "${SCRIPTS_PATH}/../manifests/issuers/selfsigned.yaml"
