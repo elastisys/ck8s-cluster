@@ -171,8 +171,22 @@ releases:
   chart: ./charts/elasticsearch-operator
   version: 0.1.0
   missingFileHandler: error
+  wait: true
   values:
   - values/elasticsearch-operator.yaml.gotmpl
+
+# Elasticsearch
+- name: elasticsearch
+  namespace: elastic-system
+  labels:
+    app: elasticsearch
+  chart: ./charts/elasticsearch
+  version: 0.1.0
+  missingFileHandler: error
+  needs:
+  - elastic-system/elasticsearch-operator
+  values:
+  - values/elasticsearch.yaml.gotmpl
 
 #Elasticsearch-prometheus-exporter
 - name: elasticsearch-prometheus-exporter
@@ -182,6 +196,8 @@ releases:
   chart: stable/elasticsearch-exporter
   version: 2.1.1
   missingFileHandler: error
+  needs:
+  - elastic-system/elasticsearch
   values:
   - values/elasticsearch-prometheus-exporter.yaml.gotmpl
 
@@ -193,6 +209,8 @@ releases:
   chart: ./charts/configure-es
   version: 0.1.0
   missingFileHandler: error
+  needs:
+  - elastic-system/elasticsearch
   values:
   - values/configure-es.yaml.gotmpl
 
