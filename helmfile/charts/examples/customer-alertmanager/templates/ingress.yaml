@@ -14,7 +14,7 @@ metadata:
   name: alertmanager
 spec:
   rules:
-  - host: alertmanager.${ECK_BASE_DOMAIN}
+  - host: alertmanager.{{ .Values.baseDomain }}
     http:
       paths:
       - backend:
@@ -24,5 +24,5 @@ spec:
         path: /
   tls:
   - hosts:
-    - alertmanager.${ECK_BASE_DOMAIN}
+    - alertmanager.{{ .Values.baseDomain }}
     secretName: alertmanager-certs
