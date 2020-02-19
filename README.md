@@ -174,6 +174,7 @@ export CERT_TYPE={prod|staging}
 
 export S3_ACCESS_KEY=<exoscale_api_key>
 export S3_SECRET_KEY=<exoscale_secret_key>
+export S3COMMAND_CONFIG_FILE=~/.s3cfg
 export S3_HARBOR_BUCKET_NAME=harbor-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 export S3_VELERO_BUCKET_NAME=velero-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 export S3_ES_BACKUP_BUCKET_NAME=elasticsearch-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
@@ -202,19 +203,21 @@ source common-env.sh
 source ${CLOUD_PROVIDER}-common-env.sh
 ```
 
-Create five S3 buckets, one for each of Harbor, Velero, Elasticsearch, Influxdb and Fluentd.
-If you have `s3cmd` configured, you can do it like this:
+Create five S3 buckets, one for each of Harbor, Velero, Elasticsearch, Influxdb and Fluentd, by running the following scripts (you have to have `s3cmd` installed). Alternatively, you
+can create them manually using a cloud provider specific web portal.
 
 ```
-s3cmd mb s3://harbor-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
-s3cmd mb s3://velero-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
-s3cmd mb s3://elasticsearch-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
-s3cmd mb s3://influxdb-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
-s3cmd mb s3://fluentd-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+# Configures s3cmd
+./scripts/gen-s3cfg.sh
+
+# Creates missing S3 buckets
+./scripts/manage-s3-buckets.sh --create
 ```
 
-*Note:* The names for the buckets are specified in the `env.sh` file and must match the buckets you create!
-If you run into problems, such as a bucket name already being taken, pick another name and modify `env.sh` to reflect this.
+*Note:* The bucket names are specified in the `env.sh` file and the scripts above are using these names.
+If you create buckets manually you need to make sure to use the same names.
+If you run into problems, such as a bucket name already being taken, pick another name, modify `env.sh` to reflect this, source it, and rerun `manage-s3-buckets.sh` script.
+You can modify the location of file with `s3cmd` configuration by altering `S3COMMAND_CONFIG_FILE` variable in the `env.sh` file, for example to avoid overwriting your default configuration.
 
 Generate ssh-keys and folder structure:
 
