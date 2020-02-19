@@ -14,7 +14,7 @@ then
     export S3_HARBOR_BUCKET_NAME=harbor
     export S3_VELERO_BUCKET_NAME=velero
     export S3_ES_BACKUP_BUCKET_NAME=es-backup
-    export S3_INFLUX_BUCKET_URL=s3://influxdb-backups
+    export S3_INFLUX_BUCKET_NAME=influxdb-backups
     export S3_SC_FLUENTD_BUCKET_NAME=sc-logs
 elif [[ "$CLOUD_PROVIDER" = "safespring" ]]
 then
@@ -23,7 +23,7 @@ then
     export S3_HARBOR_BUCKET_NAME=harbor-pipeline
     export S3_VELERO_BUCKET_NAME=velero-pipeline
     export S3_ES_BACKUP_BUCKET_NAME=elasticsearch-pipeline
-    export S3_INFLUX_BUCKET_URL=s3://influxdb-pipeline
+    export S3_INFLUX_BUCKET_NAME=influxdb-pipeline
     export S3_SC_FLUENTD_BUCKET_NAME=sc-logs-pipeline
 fi
 

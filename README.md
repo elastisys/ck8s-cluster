@@ -177,7 +177,7 @@ export S3_SECRET_KEY=<exoscale_secret_key>
 export S3_HARBOR_BUCKET_NAME=harbor-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 export S3_VELERO_BUCKET_NAME=velero-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 export S3_ES_BACKUP_BUCKET_NAME=elasticsearch-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
-export S3_INFLUX_BUCKET_URL=s3://influxdb-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
+export S3_INFLUX_BUCKET_NAME=influxdb-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 export S3_SC_FLUENTD_BUCKET_NAME=sc-logs-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 
 # Cloud provider specific env. Add these to env.sh

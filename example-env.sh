@@ -20,7 +20,7 @@ export S3_SECRET_KEY=somelongsecret
 export S3_HARBOR_BUCKET_NAME=harbor-bucket-name
 export S3_VELERO_BUCKET_NAME=velero-bucket-name
 export S3_ES_BACKUP_BUCKET_NAME=es-backup-name
-export S3_INFLUX_BUCKET_URL=s3://influxdb-bucket-name
+export S3_INFLUX_BUCKET_NAME=influxdb-bucket-name
 export S3_SC_FLUENTD_BUCKET_NAME=sc-logs
 
 # Note: You should just specify variables for ONE cloud provider!

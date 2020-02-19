@@ -12,7 +12,7 @@ Once the init-container is finished the main conatiner, which runs Atlassians `p
 Before the manifest can be deployed the following environment variables needs to to be set
 
     INFLUX_ADDR -> The address, including the rpc port, from which influxdb can be reached from within the Kubernetes cluster, e.g. influxdb.influxdb-prometheus.svc:8088
-    S3_INFLUX_BUCKET_URL -> The URL to the bucket where you want the backup to be stored, e.g. `s3://influxdb-backups` 
+    S3_INFLUX_BUCKET_NAME -> The name of the bucket where you want the backup to be stored, e.g. `influxdb-backups` 
 
     S3_REGION -> The region in which the bucket is located, e.g. `ch-gva-2`
     S3_REGION_ENDPOINT -> The endpoint to reach the bucket, e.g. `https://sos-ch-gva-2.exo.io`

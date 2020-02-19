@@ -12,7 +12,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
 # Inlfux backup variables.
 : "${INFLUX_ADDR:?Missing INFLUX_ADDR}"
-: "${S3_INFLUX_BUCKET_URL:?Missing S3_INFLUX_BUCKET_URL}"
+: "${S3_INFLUX_BUCKET_NAME:?Missing S3_INFLUX_BUCKET_NAME}"
 
 # Fluentd aggregator S3 output variables.
 : "${S3_SC_FLUENTD_BUCKET_NAME:?Missing S3_SC_FLUENTD_BUCKET_NAME}"

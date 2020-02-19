@@ -53,7 +53,7 @@ spec:
             - '-c'
             - |
               printenv
-              aws s3 --endpoint-url $(S3_REGION_ENDPOINT) sync /backups $(S3_INFLUX_BUCKET_URL) --acl "private"
+              aws s3 --endpoint-url $(S3_REGION_ENDPOINT) sync /backups s3://$(S3_INFLUX_BUCKET_NAME) --acl "private"
             env:
             # Aws s3 cli variables.
             - name: AWS_DEFAULT_REGION
@@ -66,11 +66,11 @@ spec:
                 configMapKeyRef:
                   name: influx-env-cm
                   key: S3_REGION_ENDPOINT
-            - name: S3_INFLUX_BUCKET_URL
+            - name: S3_INFLUX_BUCKET_NAME
               valueFrom:
                 configMapKeyRef:
                   name: influx-env-cm
-                  key: S3_INFLUX_BUCKET_URL
+                  key: S3_INFLUX_BUCKET_NAME
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

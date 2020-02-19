@@ -18,7 +18,7 @@ spec:
     - '-c'
     - |
       printenv
-      aws s3 --endpoint-url $S3_REGION_ENDPOINT sync "$S3_INFLUX_BUCKET_URL/$INFLUX_BACKUP_NAME" /backups/$INFLUX_BACKUP_NAME 
+      aws s3 --endpoint-url $S3_REGION_ENDPOINT sync "s3://$S3_INFLUX_BUCKET_NAME/$INFLUX_BACKUP_NAME" /backups/$INFLUX_BACKUP_NAME 
     env:
     - name: AWS_DEFAULT_REGION
       value: $S3_REGION
