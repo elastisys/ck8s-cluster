@@ -239,19 +239,20 @@ then
     # This Prometheus instance could be added just as we do with other prometheus
     # instances in the service cluster using helm, but then we risk overwriting
     # customer changes.
-    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus-rbac.yaml | \
-        kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
-        echo "Example prometheus RBAC alredy in place. Ignoring."
-    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus-ingress.yaml | \
-        kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
-        echo "Example ingress alredy in place. Ignoring."
-    envsubst < ${SCRIPTS_PATH}/../manifests/examples/monitoring/prometheus.yaml | \
-        kubectl -n ${CONTEXT_NAMESPACE} create -f - 2> /dev/null || \
-        echo "Example prometheus alredy in place. Ignoring."
+    helm template ./charts/prometheus-instance \
+        --name prometheus --namespace "${CONTEXT_NAMESPACE}" \
+        --set alerting.alertmanagers[0].namespace="${CONTEXT_NAMESPACE}" \
+        --set ingress.hosts[0].host="prometheus.${ECK_BASE_DOMAIN}" \
+        --set ingress.tls[0].hosts="{prometheus.${ECK_BASE_DOMAIN}}" \
+        --values values/examples/customer-prometheus.yaml \
+        | kubectl -n "${CONTEXT_NAMESPACE}" create -f - 2> /dev/null || \
+        echo "Example prometheus already in place. Ignoring."
+
     # Create basic auth credentials for the customers prometheus instance
-    htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_PWD}
-    kubectl -n ${CONTEXT_NAMESPACE} create secret generic prometheus-auth --from-file=auth \
-        2> /dev/null || echo "Example prometheus auth secret alredy in place. Ignoring."
+    htpasswd -c -b auth prometheus "${CUSTOMER_PROMETHEUS_PWD}"
+    kubectl -n "${CONTEXT_NAMESPACE}" create secret generic prometheus-auth \
+        --from-file=auth 2> /dev/null ||\
+        echo "Example prometheus auth secret already in place. Ignoring."
     rm auth
 fi
 
