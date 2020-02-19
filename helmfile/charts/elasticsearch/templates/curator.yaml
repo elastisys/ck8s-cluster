@@ -2,7 +2,6 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: curator
-  namespace: elastic-system
 spec:
   # Run every 5 minutes
   schedule: "*/5 * * * *"
@@ -14,7 +13,7 @@ spec:
           containers:
           - name: elasticsearch-curator
             # https://hub.docker.com/r/bobrik/curator/tags/
-            image: bobrik/curator:5.7.6
+            image: bobrik/curator:5.8.1
             imagePullPolicy: IfNotPresent
             args:
             - --config
@@ -29,6 +28,8 @@ spec:
                   secretKeyRef:
                     name: elasticsearch-es-elastic-user
                     key: elastic
+              - name: ELASTICSEARCH_AUTH
+                value: elastic:$(ELASTICSEARCH_PWD)
             volumeMounts:
               - name: config-volume
                 mountPath: /etc/config

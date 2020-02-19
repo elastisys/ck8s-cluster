@@ -6,8 +6,8 @@ client:
   port: 9200
   use_ssl: True
   ssl_no_validate: True
-  {{- /* Note: the elasticsearch password is taken from the env var at runtime */ -}}
-  http_auth: elastic:${ELASTICSEARCH_PWD}
+  # Note: the elasticsearch password is taken from the env var at runtime
+  http_auth: ${ELASTICSEARCH_AUTH}
   timeout: 30
   master_only: False
 logging:

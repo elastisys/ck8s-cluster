@@ -2,7 +2,6 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: elasticsearch-backup-job
-  namespace: elastic-system
 spec:
   schedule: "@daily"
   concurrencyPolicy: Forbid
