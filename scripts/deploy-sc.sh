@@ -184,6 +184,8 @@ then
     fi
 fi
 
+echo "Creating elasticsearch-operator CRD" >&2
+kubectl apply -f "${SCRIPTS_PATH}/../manifests/elasticsearch-operator/crds.yaml"
 
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
