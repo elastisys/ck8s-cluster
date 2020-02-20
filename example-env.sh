@@ -97,7 +97,7 @@ export CUSTOMER_ADMIN_USERS="admin1@example.com admin2@example.com" # default "a
 # Create a static dex user "admin@example.com"
 export ENABLE_STATIC_DEX_LOGIN="<true|false>" # default false
 # Dex static user password bcrypt hash (generate e.g. here https://bcrypt-generator.com/)
-export DEX_STATIC_PWD='some-bcrypt-hash' # default hash of "password"
+export DEX_STATIC_PWD='$2y$12$uHfoo.raWolRAisWPBIQM.kzioR2voTrDkM7JmfasJnRGVDpgbyja' # default hash of "password"
 
 # Passwords for services
 # If you are using vault, you should not set these, they will be set by `get-gen-secrets.sh` instead.
