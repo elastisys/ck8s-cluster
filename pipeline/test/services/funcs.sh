@@ -53,6 +53,25 @@ function testStatefulsetStatus {
     fi
 }
 
+# This function is required for statefulsets with update strategy OnDelete
+# since `kubectl rollout status` doesn't work for them.
+#Args:
+#   1. namespace
+#   2. name of statefulset
+function testStatefulsetStatusByPods {
+    REPLICAS=$(kubectl get statefulset -n $1 $2 -o jsonpath="{.status.replicas}")
+
+    for replica in $(seq 0 $((REPLICAS - 1))); do
+        POD_NAME=$2-$replica
+        if ! kubectl wait -n $1 --for=condition=ready pod $POD_NAME --timeout=60s > /dev/null; then
+            echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+            DEBUG_OUTPUT+=($(kubectl get statefulset -n $1 $2 -o json))
+            return
+        fi
+    done
+    echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+}
+
 #Args:
 #   1. namespace
 #   2. name of job
