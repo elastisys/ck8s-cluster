@@ -252,25 +252,24 @@ then
         --from-file=auth 2> /dev/null ||\
         echo "Example prometheus auth secret already in place. Ignoring."
     rm auth
-fi
-
-if [ "$ENABLE_CUSTOMER_ALERTMANAGER" == "true" ]
-then
-    echo "Adding customer alertmanager" >&2
-    # Use `kubectl create` to avoid overwriting customer changes
-    if [ "$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" == "true" ]
+    if [ "$ENABLE_CUSTOMER_ALERTMANAGER" == "true" ]
     then
-        htpasswd -c -b auth alertmanager "${CUSTOMER_ALERTMANAGER_PWD}"
-        kubectl -n "${CONTEXT_NAMESPACE}" create secret generic alertmanager-auth \
-            --from-file=auth 2> /dev/null || \
-            echo "Example alertmanager auth secret already in place. Ignoring."
-        rm auth
+        echo "Adding customer alertmanager" >&2
+        # Use `kubectl create` to avoid overwriting customer changes
+        if [ "$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" == "true" ]
+        then
+            htpasswd -c -b auth alertmanager "${CUSTOMER_ALERTMANAGER_PWD}"
+            kubectl -n "${CONTEXT_NAMESPACE}" create secret generic alertmanager-auth \
+                --from-file=auth 2> /dev/null || \
+                echo "Example alertmanager auth secret already in place. Ignoring."
+            rm auth
+        fi
+        helm template ./charts/examples/customer-alertmanager \
+                --namespace "${CONTEXT_NAMESPACE}" \
+                --set baseDomain="${ECK_BASE_DOMAIN}" \
+                --set ingress.enabled="$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" \
+                | kubectl -n "${CONTEXT_NAMESPACE}" create -f - 2> /dev/null || \
+                echo "Example alertmanager already in place. Ignoring."
     fi
-    helm template ./charts/examples/customer-alertmanager \
-            --namespace "${CONTEXT_NAMESPACE}" \
-            --set baseDomain="${ECK_BASE_DOMAIN}" \
-            --set ingress.enabled="$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" \
-            | kubectl -n "${CONTEXT_NAMESPACE}" create -f - 2> /dev/null || \
-            echo "Example alertmanager already in place. Ignoring."
 fi
 echo "Deploy-wc completed!" >&2
