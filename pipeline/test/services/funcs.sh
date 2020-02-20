@@ -31,13 +31,16 @@ function testDeploymentStatus {
 #   2. name of daemonset
 function testDaemonsetStatus {
     DESIRED=$(kubectl get ds -n $1 $2 -o jsonpath="{.status.desiredNumberScheduled}")
-    READY=$(kubectl get ds -n $1 $2 -o jsonpath="{.status.numberReady}")
-    if [[ $DESIRED -eq $READY ]]
-    then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-    else
-        echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
-        DEBUG_OUTPUT+=$(kubectl get ds -n $1 $2 -o json)
-    fi
+    for _ in {1..10}; do
+        READY=$(kubectl get ds -n $1 $2 -o jsonpath="{.status.numberReady}")
+        if [[ $DESIRED -eq $READY ]]; then
+            echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+            return
+        fi
+        sleep 6 # timeout ~60s
+    done
+    echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
+    DEBUG_OUTPUT+=$(kubectl get ds -n $1 $2 -o json)
 }
 
 #Args:
