@@ -102,6 +102,15 @@ do
     fi
 done
 
+# elasticsearch-es-nodes has update strategy OnDelete.
+# Therefore `kubectl rollout status` which is used in the other test doesn't
+# work
+STATEFULSET="elastic-system elasticsearch-es-nodes"
+echo -n -e "\nelasticsearch-es-nodes\t"
+if testResourceExistence statefulset $STATEFULSET; then
+    testStatefulsetStatusByPods $STATEFULSET
+fi
+
 # Format:
 # namespace job-name timeout
 JOBS=(
