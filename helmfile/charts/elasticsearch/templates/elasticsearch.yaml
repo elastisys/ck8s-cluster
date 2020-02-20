@@ -29,8 +29,10 @@ spec:
             bin/elasticsearch-plugin install --batch repository-s3
         containers:
         - name: elasticsearch
+          {{- with .Values.elasticsearch.resources }}
           resources:
-{{ toYaml .Values.elasticsearch.resources | indent 12 }}
+{{ toYaml . | indent 12 }}
+          {{- end }}
         affinity:
           podAntiAffinity:
             preferredDuringSchedulingIgnoredDuringExecution:
