@@ -9,12 +9,12 @@ variable exoscale_secret_key {
   type        = string
 }
 
-variable "prefix_sc" {
+variable prefix_sc {
   description = "Prefix for resource names"
   default     = ""
 }
 
-variable "prefix_wc" {
+variable prefix_wc {
   description = "Prefix for resource names"
   default     = ""
 }

@@ -20,12 +20,12 @@ variable public_v4_network {
   default     = "71b10496-2617-47ae-abbc-36239f0863bb"
 }
 
-variable "prefix_sc" {
+variable prefix_sc {
   description = "Prefix for resource names"
   default     = ""
 }
 
-variable "prefix_wc" {
+variable prefix_wc {
   description = "Prefix for resource names"
   default     = ""
 }
