@@ -24,6 +24,9 @@ elasticsearch:
     secret_key: replace-me
   storageClassName: nfs-client
   storageSize: 40Gi
+  env: []
+    # - name: ES_JAVA_OPTS
+    #   value: -Xms2g -Xmx2g
   resources: {}
     # requests:
     #   memory: 2Gi

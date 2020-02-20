@@ -29,6 +29,10 @@ spec:
             bin/elasticsearch-plugin install --batch repository-s3
         containers:
         - name: elasticsearch
+          {{- with .Values.elasticsearch.env }}
+          env:
+{{ toYaml . | indent 12 }}
+          {{- end }}
           {{- with .Values.elasticsearch.resources }}
           resources:
 {{ toYaml . | indent 12 }}
