@@ -7,3 +7,11 @@ spec:
   count: 1
   elasticsearchRef:
     name: elasticsearch
+  podTemplate:
+    spec:
+      containers:
+      - name: kibana
+        {{- with .Values.kibana.resources }}
+        resources:
+{{ toYaml . | indent 10 }}
+        {{- end }}
