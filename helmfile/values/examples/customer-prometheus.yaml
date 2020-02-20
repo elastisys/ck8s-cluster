@@ -12,7 +12,7 @@ prometheusSpec:
   ruleSelector:
     matchLabels:
       app: prometheus
-  
+
   serviceAccountName: default
   serviceMonitorSelector:
     matchLabels:
@@ -35,6 +35,8 @@ prometheusSpec:
 
 ingress:
   enabled: true
+  issuer:
+    selfSigned: true
   annotations:
     certmanager.k8s.io/issuer: self-signed
     # type of authentication
