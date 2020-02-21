@@ -174,7 +174,7 @@ export CERT_TYPE={prod|staging}
 
 export S3_ACCESS_KEY=<exoscale_api_key>
 export S3_SECRET_KEY=<exoscale_secret_key>
-export S3COMMAND_CONFIG_FILE=~/.s3cfg
+export S3COMMAND_CONFIG_FILE=.s3cfg_${ENVIRONMENT_NAME}
 export S3_HARBOR_BUCKET_NAME=harbor-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 export S3_VELERO_BUCKET_NAME=velero-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
 export S3_ES_BACKUP_BUCKET_NAME=elasticsearch-${ENVIRONMENT_NAME}-${CLOUD_PROVIDER}.compliantk8s.com
@@ -217,7 +217,7 @@ can create them manually using a cloud provider specific web portal.
 *Note:* The bucket names are specified in the `env.sh` file and the scripts above are using these names.
 If you create buckets manually you need to make sure to use the same names.
 If you run into problems, such as a bucket name already being taken, pick another name, modify `env.sh` to reflect this, source it, and rerun `manage-s3-buckets.sh` script.
-You can modify the location of file with `s3cmd` configuration by altering `S3COMMAND_CONFIG_FILE` variable in the `env.sh` file, for example to avoid overwriting your default configuration.
+You can modify the location of file with `s3cmd` configuration by altering `S3COMMAND_CONFIG_FILE` variable in the `env.sh` file.
 
 Generate ssh-keys and folder structure:
 
