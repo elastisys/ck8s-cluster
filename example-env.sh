@@ -17,7 +17,7 @@ export AWS_SECRET_ACCESS_KEY=somelongsecret
 # S3 buckets
 export S3_ACCESS_KEY=12345abcde
 export S3_SECRET_KEY=somelongsecret
-export S3COMMAND_CONFIG_FILE=~/.s3cfg
+export S3COMMAND_CONFIG_FILE=.s3cfg_${ENVIRONMENT_NAME}
 export S3_HARBOR_BUCKET_NAME=harbor-bucket-name
 export S3_VELERO_BUCKET_NAME=velero-bucket-name
 export S3_ES_BACKUP_BUCKET_NAME=es-backup-name
