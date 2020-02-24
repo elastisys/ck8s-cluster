@@ -248,6 +248,19 @@ prometheus:
       matchLabels:
         role: operator
 
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: {{ requiredEnv "STORAGE_CLASS" }}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_SC" }}
+        selector: {}
+
   serviceMonitor:
     relabelings:
     - targetLabel: cluster
