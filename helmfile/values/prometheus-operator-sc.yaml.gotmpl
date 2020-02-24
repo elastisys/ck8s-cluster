@@ -119,6 +119,12 @@ alertmanager:
     - targetLabel: cluster
       replacement: service_cluster
 
+  alertmanagerSpec:
+    ## Time duration Alertmanager shall retain data for. Default is '120h', and must match the regular expression
+    ## [0-9]+(ms|s|m|h) (milliseconds seconds minutes hours).
+    ##
+    retention: {{ requiredEnv "ALERTMANAGER_RETENTION" }}
+
 # TODO: These do not work out of the box with RKE
 # If we switch to kubeadm they should be fine, otherwise we should look into
 # how to configure them properly for RKE.
