@@ -71,6 +71,15 @@ prometheus:
       limits:
         memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
         cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+
+    ## How long to retain metrics
+    ##
+    retention: {{ requiredEnv "PROMETHEUS_RETENTION_WC" }}
+
+    ## Maximum size of metrics
+    ##
+    retentionSize: {{ requiredEnv "PROMETHEUS_RETENTION_SIZE_WC" }}
+
     ## Prometheus StorageSpec for persistent data
     ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
     ##
