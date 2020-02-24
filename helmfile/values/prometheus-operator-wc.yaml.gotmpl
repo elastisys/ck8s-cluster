@@ -71,6 +71,19 @@ prometheus:
       limits:
         memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
         cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: {{ requiredEnv "STORAGE_CLASS" }}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
+        selector: {}
+
     {{ if eq (env "ENABLE_POSTGRESQL") "true"  }}
     additionalScrapeConfigs:
     - job_name: 'postgresql_metrics'
