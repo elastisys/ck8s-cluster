@@ -137,3 +137,13 @@ export ROLLOVER_AGE=1 #AGE in days when indices should perform rollover
 
 export INFLUXDB_RETENTION_WC=7d # Retention policy for influxdb workload cluster database
 export INFLUXDB_RETENTION_SC=7d # Retention policy for influxdb service cluster database
+
+export PROMETHEUS_RETENTION_WC=3d # Time-based retention policy for Prometheus workload cluster database
+export PROMETHEUS_STORAGE_SIZE_WC="5Gi"
+export PROMETHEUS_RETENTION_SIZE_WC="4GiB" # Size-based retention policy for Prometheus workload cluster database
+
+export PROMETHEUS_RETENTION_SC=3d # Time-based retention policy for Prometheus service cluster database
+export PROMETHEUS_STORAGE_SIZE_SC="5Gi"
+export PROMETHEUS_RETENTION_SIZE_SC="4GiB" # Size-based retention policy for Prometheus service cluster database
+
+export ALERTMANAGER_RETENTION=72h # Time-based retention policy for Alertmanager
