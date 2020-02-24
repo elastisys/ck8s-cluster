@@ -248,6 +248,14 @@ prometheus:
       matchLabels:
         role: operator
 
+    ## How long to retain metrics
+    ##
+    retention: {{ requiredEnv "PROMETHEUS_RETENTION_SC" }}
+
+    ## Maximum size of metrics
+    ##
+    retentionSize: {{ requiredEnv "PROMETHEUS_RETENTION_SIZE_SC" }}
+
     ## Prometheus StorageSpec for persistent data
     ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
     ##
