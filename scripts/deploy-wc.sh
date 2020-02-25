@@ -2,6 +2,7 @@
 
 set -e
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
 : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
 : "${S3_REGION:?Missing S3_REGION}"
@@ -31,12 +32,21 @@ then
     fi
 fi
 
-if [[ $CLOUD_PROVIDER != "exoscale" ]]
-then
+case $CLOUD_PROVIDER in
+
+  safespring | citycloud)
     export STORAGE_CLASS=cinder-storage
-else
+    ;;
+
+  exoscale)
     export STORAGE_CLASS=nfs-client
-fi
+    ;;
+
+  *)
+    echo "ERROR: Unknown CLOUD_PROVIDER [$CLOUD_PROVIDER], STORAGE_CLASS value could not be set."
+    exit 1
+    ;;
+esac
 
 export CUSTOMER_NAMESPACES_COMMASEPARATED=$(echo "$CUSTOMER_NAMESPACES" | tr ' ' ,)
 export CUSTOMER_ADMIN_USERS_COMMASEPARATED=$(echo "$CUSTOMER_ADMIN_USERS" | tr ' ' ,)
@@ -114,7 +124,7 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 
 
 # Install cinder storageclass if it is not installed.
-if [[ $CLOUD_PROVIDER != "exoscale" ]]; then
+if [ $STORAGE_CLASS == "cinder-storage" ]; then
     echo "Installing cinder storageclass" >&2
     [ $(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[] | select(.metadata.name == "cinder-storage") | length') > 0 ] || kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
 fi
@@ -125,13 +135,13 @@ echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
 
-if [[ $CLOUD_PROVIDER != "exoscale" ]]
+if [ $STORAGE_CLASS == "nfs-client" ]
 then
-    echo "Installing cert-manager" >&2
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
-else
     echo "Installing cert-manage and nfs-client-provisioner" >&2
     helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff
+else
+    echo "Installing cert-manager" >&2
+    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 fi
 
 
