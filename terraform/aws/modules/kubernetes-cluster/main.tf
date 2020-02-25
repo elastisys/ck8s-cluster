@@ -138,3 +138,62 @@ resource "aws_security_group_rule" "nodeport" {
   cidr_blocks       = var.public_ingress_cidr_whitelist
   security_group_id = aws_security_group.worker_sg.id
 }
+
+# AWS keys
+
+resource "aws_key_pair" "auth" {
+  key_name   = var.key_name
+  public_key = file(var.public_key_path)
+}
+
+# Master instance
+
+resource "aws_instance" "master" {
+  for_each = var.master_nodes
+
+  connection {
+    user = "ubuntu"
+    host = self.public_ip
+  }
+
+  associate_public_ip_address = true
+
+  instance_type          = each.value
+  ami                    = lookup(var.aws_amis, var.aws_region)
+  vpc_security_group_ids = [aws_security_group.master_sg.id, aws_security_group.cluster_sg.id]
+  subnet_id              = aws_subnet.main_sn.id
+  iam_instance_profile   = aws_iam_instance_profile.master.name
+  key_name = aws_key_pair.auth.key_name
+
+  depends_on = [aws_internet_gateway.gateway]
+
+  tags = {
+    Name = "${var.prefix}-${each.key}"
+  }
+}
+
+# Worker instance
+
+resource "aws_instance" "worker" {
+  for_each = var.worker_nodes
+
+  connection {
+    user = "ubuntu"
+    host = self.public_ip
+  }
+
+  associate_public_ip_address = true
+
+  instance_type          = each.value
+  ami                    = lookup(var.aws_amis, var.aws_region)
+  vpc_security_group_ids = [aws_security_group.worker_sg.id, aws_security_group.cluster_sg.id]
+  subnet_id              = aws_subnet.main_sn.id
+  iam_instance_profile   = aws_iam_instance_profile.worker.name
+  key_name = aws_key_pair.auth.key_name
+
+  depends_on = [aws_internet_gateway.gateway]
+
+  tags = {
+    Name = "${var.prefix}-${each.key}"
+  }
+}
