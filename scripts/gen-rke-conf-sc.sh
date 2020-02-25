@@ -5,7 +5,7 @@ set -e
 : "${ECK_OPS_DOMAIN:?Missing ECK_OPS_DOMAIN}"
 : "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 
-if [ $CLOUD_PROVIDER != "exoscale" ]
+if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
 then
 : "${OS_USERNAME:?Missing OS_USERNAME}"
 : "${OS_PASSWORD:?Missing OS_PASSWORD}"
@@ -150,7 +150,7 @@ ingress:
     provider: none
 EOF
 
-if [ $CLOUD_PROVIDER != "exoscale" ]; then
+if [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]; then
 cat <<EOF
 
 cloud_provider:
