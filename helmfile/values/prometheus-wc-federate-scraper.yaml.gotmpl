@@ -14,6 +14,14 @@ prometheusSpec:
       memory: 2Gi
       cpu: 1
 
+    ## How long to retain metrics
+    ##
+    retention: {{ requiredEnv "PROMETHEUS_RETENTION_WC" }}
+
+    ## Maximum size of metrics
+    ##
+    retentionSize: {{ requiredEnv "PROMETHEUS_RETENTION_SIZE_WC" }}
+
     ## Prometheus StorageSpec for persistent data
     ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
     ##
