@@ -4,6 +4,8 @@ set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 
+: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
+
 # General aws S3 cli variables.
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
 : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
@@ -71,12 +73,21 @@ then
     : "${INFLUX_BACKUP_NAME:?Missing INFLUX_BACKUP_NAME}"
 fi
 
-if [[ $CLOUD_PROVIDER != "exoscale" ]]
-then
+case $CLOUD_PROVIDER in
+
+  safespring | citycloud)
     export STORAGE_CLASS=cinder-storage
-else
+    ;;
+
+  exoscale)
     export STORAGE_CLASS=nfs-client
-fi
+    ;;
+
+  *)
+    echo "ERROR: Unknown CLOUD_PROVIDER [$CLOUD_PROVIDER], STORAGE_CLASS value could not be set."
+    exit 1
+    ;;
+esac
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then
@@ -174,7 +185,7 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
 
 
-if [ $CLOUD_PROVIDER != "exoscale" ]
+if [ $STORAGE_CLASS == "cinder-storage" ]
 then
     storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "cinder-storage") | .name')
     if [ -z "$storage" ]
@@ -191,13 +202,13 @@ echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
 
-if [ $CLOUD_PROVIDER != "exoscale" ]
+if [ $STORAGE_CLASS == "nfs-client" ]
 then
-    echo "Install cert-manager" >&2
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
-else
     echo "Install cert-manager and nfs-client-provisioner" >&2
     helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff
+else
+    echo "Install cert-manager" >&2
+    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 fi
 
 # Get status of the cert-manager webhook api.
