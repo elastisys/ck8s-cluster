@@ -31,6 +31,13 @@ then
     fi
 fi
 
+if [[ $CLOUD_PROVIDER != "exoscale" ]]
+then
+    export STORAGE_CLASS=cinder-storage
+else
+    export STORAGE_CLASS=nfs-client
+fi
+
 export CUSTOMER_NAMESPACES_COMMASEPARATED=$(echo "$CUSTOMER_NAMESPACES" | tr ' ' ,)
 export CUSTOMER_ADMIN_USERS_COMMASEPARATED=$(echo "$CUSTOMER_ADMIN_USERS" | tr ' ' ,)
 
