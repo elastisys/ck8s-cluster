@@ -14,6 +14,19 @@ prometheusSpec:
       memory: 2Gi
       cpu: 1
 
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: {{ requiredEnv "STORAGE_CLASS" }}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
+        selector: {}
+        
   enableAdminAPI: false
   logFormat: logfmt
   logLevel: info
