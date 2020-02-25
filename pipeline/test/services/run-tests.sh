@@ -1,31 +1,49 @@
-#!/bin/bash
+set -e
 
 #
 # Script that runs service cluster and worker cluster tests on a local container
 #
 
 #
-# User inputs necessary
+# User inputs if necessary
 #
-echo 'Local repository path (ex /home/user/ck8s):' 
-read localPath
-echo 'Image repository tag (ex v0.1.0-dev):' 
-read repoTag
-echo 'Enviorment Variables (ex daniel-test):'
-read envVar
+if [[ -z "${CK8S}" ]]; then
+  echo 'Local path to repository (ex /home/user/ck8s):'
+  read localPath
+else
+  localPath=$CK8S
+fi
+
+echo 'Choose image repository tag'
+echo '1: v0.1.0'
+echo '2: v0.1.0-dev'
+echo '3: Insert tag manually'
+read readRepo
+case $readRepo in
+  1)
+    echo 'Using tag: v0.1.0'
+    repoTag='v0.1.0'
+    ;;
+  2)
+    echo 'Using tag: v0.1.0-dev'
+    repoTag='v0.1.0-dev'
+    ;;
+  *)
+    echo 'Insert tag manually:'
+    read repoTag
+    ;;
+esac
+
+if [[ -z "${ENVIRONMENT_NAME}" ]]; then
+  echo 'Environment Variable (ex daniel-test):'
+  read envVar
+else
+  envVar=$ENVIRONMENT_NAME
+fi
 
 #
 # Create variables for commands
 #
-createCreds=$(cat > $localPath/pipeline/test/services/credentials.sh << EOF
-export CLOUD_PROVIDER='exoscale'
-export ECK_OPS_DOMAIN='ops.$envVar.a1ck.io'
-export ECK_BASE_DOMAIN='$envVar.a1ck.io'
-export ENABLE_CUSTOMER_GRAFANA='false'
-export CUSTOMER_NAMESPACES='demo1 demo2 demo3'
-export CUSTOMER_ADMIN_USERS='admin1@example.com admin2@example.com'
-EOF)
-
 createScCfg=$(cat > $localPath/kube-bench/cfg/kube_config_eck-sc.yaml << EOF
 apiVersion: v1
 kind: Config
@@ -72,17 +90,47 @@ EOF)
 
 createContainerScript=$(cat > $localPath/pipeline/test/services/container-entrypoint.sh << 'EOF'
 #!/bin/bash
-createCreds="source /home/ck8s/pipeline/test/services/credentials.sh"
+#
+# Check if variables exist
+#
+if [[ -z "${CLOUD_PROVIDER}" ]]; then
+  exportCP="export CLOUD_PROVIDER='exoscale'"
+  eval $exportCP
+fi
+if [[ -z "${CUSTOMER_NAMESPACES}" ]]; then
+  customerNS="export CUSTOMER_NAMESPACES='demo1 demo2 demo3'"
+  eval $customerNS
+fi
+if [[ -z "${CUSTOMER_ADMIN_USERS}" ]]; then
+  customerAU="export CUSTOMER_ADMIN_USERS='admin1@example.com admin2@example.com'"
+  eval $customerAU
+fi
+if [[ -z "${ECK_OPS_DOMAIN}" ]]; then
+  eckOD="export ECK_OPS_DOMAIN='ops.$envVar.a1ck.io'"
+  eval $eckOD
+fi
+if [[ -z "${ECK_BASE_DOMAIN}" ]]; then
+  eckBD="export ECK_BASE_DOMAIN='$envVar.a1ck.io'"
+  eval $eckBD
+fi
+if [[ -z "${ENABLE_CUSTOMER_GRAFANA}" ]]; then
+  enableCG="export ENABLE_CUSTOMER_GRAFANA='false'"
+  eval $enableCG
+fi
+
 exportScCfg="export KUBECONFIG=/home/ck8s/kube-bench/cfg/kube_config_eck-sc.yaml"
 runScTest="bash /home/ck8s/pipeline/test/services/test-sc.sh"
 exportWcCfg="export KUBECONFIG=/home/ck8s/kube-bench/cfg/kube_config_eck-wc.yaml"
 runWcTest="bash /home/ck8s/pipeline/test/services/test-wc.sh"
 
-eval $createCreds
 eval $exportScCfg
 eval $runScTest
 eval $exportWcCfg
 eval $runWcTest
+
+#
+# Check if variables exist
+#
 EOF)
 
 makeExec="chmod +x $localPath/pipeline/test/services/container-entrypoint.sh"
@@ -91,7 +139,6 @@ dockerRun="docker run -it -v $localPath:/home/ck8s --entrypoint=/home/ck8s/pipel
 #
 # Execute commands in the right order
 #
-eval $createCreds
 eval $createScCfg
 eval $createWcCfg
 eval $createContainerScript
