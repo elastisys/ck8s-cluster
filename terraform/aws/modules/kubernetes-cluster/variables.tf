@@ -17,13 +17,10 @@ variable "key_name" {
   description = "Desired name of AWS key pair"
 }
 
-# Ubuntu 18.04 LTS
+# BaseOS
 variable "aws_amis" {
   default = {
-    us-west-1 = "ami-08fc2905b265936b7"
-    us-west-2 = "ami-03392f4dbaa105b49"
-    us-east-1 = "ami-0966b6f5f146f738b"
-    us-east-2 = "ami-04ba6a052833f9870"
+    us-west-1 = "ami-08f7e448df967347b"
   }
 }
 
