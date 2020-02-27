@@ -10,7 +10,7 @@ export ECK_BASE_DOMAIN=${ECK_BASE_DOMAIN:-"$envVar.a1ck.io"}
 export ENABLE_CUSTOMER_GRAFANA=${ENABLE_CUSTOMER_GRAFANA:-"false"}
 
 # Execute commands
-export KUBECONFIG=$cfgPath/rke/kube_config_eck-sc.yaml
-bash $localPath/pipeline/test/services/test-sc.sh
-export KUBECONFIG=$cfgPath/rke/kube_config_eck-wc.yaml
-bash $localPath/pipeline/test/services/test-wc.sh
+export KUBECONFIG=$CONFIG_PATH/rke/kube_config_eck-sc.yaml
+bash $CK8S/pipeline/test/services/test-sc.sh
+export KUBECONFIG=$CONFIG_PATH/rke/kube_config_eck-wc.yaml
+bash $CK8S/pipeline/test/services/test-wc.sh
