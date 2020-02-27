@@ -4,5 +4,7 @@ ingress:
 grafana:
   url: "https://grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}"
   password: "{{ requiredEnv "GRAFANA_PWD" }}"
-  apiKeyName: "ck8sdash-wc"
+  apiKeyName: "ck8sdash-sc"
   datasource: "prometheus-ss"
+elastic: 
+  apiKeyName: "ck8sdash-key-sc"

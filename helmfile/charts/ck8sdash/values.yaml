@@ -50,6 +50,7 @@ elastic:
   url: ""
   username: "elastic"
   password: ""
+  apiKeyName: ""
   kubernetesIndexPrefix: "kubernetes-default"
   componentsIndexDefault: "kubecomponents-default"
 oidc:

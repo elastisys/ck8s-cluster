@@ -39,7 +39,27 @@ spec:
         - name: NAMESPACE
           value: {{ .Release.Namespace }}
         volumeMounts:
-        - name: scripts
+        - name: grafana-init-script
+          mountPath: /scripts
+      - name: create-elastic-api-key
+        image: elastisys/curl-jq
+        command: ['sh', '/scripts/init.sh']
+        env:
+        - name: ELASTIC_USERNAME
+          value: {{ .Values.elastic.username }}
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{include "ck8sdash.fullname" . }}-secrets
+              key: elastic-password
+        - name: ELASTIC_URL
+          value: {{ .Values.elastic.url }}
+        - name: ELASTIC_API_KEY_NAME
+          value: {{ .Values.elastic.apiKeyName }}
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}
+        volumeMounts:
+        - name: elastic-init-script
           mountPath: /scripts
       containers:
       - name: ck8sdash-nginx
@@ -76,6 +96,16 @@ spec:
             secretKeyRef:
               name: ck8sdash-grafana-api-key
               key: grafana-api-key
+        - name: ELASTIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-elastic-api-key
+              key: elastic-api-key
+        - name: ELASTIC_API_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-elastic-api-key
+              key: elastic-api-key-id
         - name: GRAFANA_URL
           value: {{ .Values.grafana.url }}
         - name: HARBOR_URL
@@ -93,13 +123,6 @@ spec:
             secretKeyRef:
               name: {{include "ck8sdash.fullname" . }}-secrets
               key: harbor-password
-        - name: ELASTIC_USERNAME
-          value: {{ .Values.elastic.username }}
-        - name: ELASTIC_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{include "ck8sdash.fullname" . }}-secrets
-              key: elastic-password
         - name: OIDC_CLIENT_ID
           value: {{ .Values.oidc.clientId }}
         - name: OIDC_SECRET
@@ -120,9 +143,12 @@ spec:
         ports:
         - containerPort: {{ .Values.server.port }}
       volumes:
-      - name: scripts
+      - name: grafana-init-script
         configMap:
-          name: {{ include "ck8sdash.fullname" . }}-init-script
+          name: {{ include "ck8sdash.fullname" . }}-grafana-init-script
+      - name: elastic-init-script
+        configMap:
+          name: {{ include "ck8sdash.fullname" . }}-elastic-init-script
       - name: info-text
         configMap:
           name: {{ include "ck8sdash.fullname" . }}-info-text
