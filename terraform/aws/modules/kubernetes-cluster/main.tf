@@ -309,3 +309,64 @@ resource "aws_instance" "worker" {
     Name = "${var.prefix}-${each.key}"
   }
 }
+
+
+# IAM roles, policies, profiles
+# See https://github.com/kubernetes-sigs/kubespray/tree/master/contrib/aws_iam
+
+resource "aws_iam_instance_profile" "master" {
+  name = "${var.prefix}-master"
+  role = aws_iam_role.master.name
+}
+
+resource "aws_iam_role" "master" {
+  name = "${var.prefix}-master-role"
+
+  assume_role_policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": { "Service": "ec2.amazonaws.com"},
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  }
+  EOF
+}
+
+resource "aws_iam_role_policy" "master" {
+  name = "${var.prefix}-master-policy"
+  role = aws_iam_role.master.id
+
+  policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": ["ec2:*"],
+        "Resource": ["*"]
+      },
+      {
+        "Effect": "Allow",
+        "Action": ["elasticloadbalancing:*"],
+        "Resource": ["*"]
+      },
+      {
+        "Effect": "Allow",
+        "Action": ["route53:*"],
+        "Resource": ["*"]
+      },
+      {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": [
+          "arn:aws:s3:::kubernetes-*"
+        ]
+      }
+    ]
+  }
+  EOF
+}
