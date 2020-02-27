@@ -4,7 +4,6 @@ ingress:
 
 harbor:
   url: "https://harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
-  password: "{{ requiredEnv "HARBOR_PWD" }}"
 kibana:
   url: "https://kibana.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
 elastic:
