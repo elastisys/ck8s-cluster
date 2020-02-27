@@ -7,7 +7,7 @@ set -e
 if [ "$1" == "" ]; then
   echo 'Error: no argument found'
   echo 'Insert the docker image tag as an argument when running the script (ex ./run-tests.sh v0.1.0-dev)'
-  bash $CK8S/pipeline/test/services/run-tests.sh
+  exit 2
 fi
 
 if [[ -z "${CK8S}" ]]; then
