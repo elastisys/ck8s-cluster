@@ -22,8 +22,9 @@ fi
 
 if [[ -z "${ENVIRONMENT_NAME}" ]]; then
   echo 'Missing ENVIRONMENT_NAME variable, insert environment variable (ex user-test):'
-  read ENVIRONMENT_NAME
+  read ENV_NAME
+  export ENVIRONMENT_NAME=$ENV_NAME
 fi
 
 # run container with entrypoint script
-docker run -it -v "${CK8S}:${CK8S}" -v "${CONFIG_PATH}:${CONFIG_PATH}" --entrypoint=$CK8S/pipeline/test/services/container-entrypoint.sh -e=CK8S=$CK8S -e=CONFIG_PATH=$CONFIG_PATH elastisys/ck8s-ops:$1
+docker run -it -v "${CK8S}:${CK8S}" -v "${CONFIG_PATH}:${CONFIG_PATH}" --entrypoint=$CK8S/pipeline/test/services/container-entrypoint.sh -e=CK8S=$CK8S -e=CONFIG_PATH=$CONFIG_PATH -e=ENVIRONMENT_NAME=$ENVIRONMENT_NAME elastisys/ck8s-ops:$1
