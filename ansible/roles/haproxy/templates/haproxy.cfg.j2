@@ -1,4 +1,3 @@
-# Default haproxy config
 global
         log /dev/log    local0
         log /dev/log    local1 notice
@@ -26,6 +25,8 @@ defaults
         mode    http
         option  httplog
         option  dontlognull
+        # Raise the maximum number of connections (default 2000).
+        maxconn 5000
         timeout connect 5000
         timeout client  50000
         timeout server  50000
@@ -37,7 +38,8 @@ defaults
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
 
-# End of defaults -------------------------------------------------------------
+# Most of the values above are defaults.
+# Values below are specific for our setup.
 
 # show stats
 frontend stats
