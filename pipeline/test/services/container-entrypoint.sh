@@ -11,6 +11,6 @@ export ENABLE_CUSTOMER_GRAFANA=${ENABLE_CUSTOMER_GRAFANA:-"false"}
 
 # Execute commands
 export KUBECONFIG=$CONFIG_PATH/rke/kube_config_eck-sc.yaml
-bash $CK8S/pipeline/test/services/test-sc.sh
+bash $CK8S/pipeline/test/services/test-sc.sh || true
 export KUBECONFIG=$CONFIG_PATH/rke/kube_config_eck-wc.yaml
 bash $CK8S/pipeline/test/services/test-wc.sh
