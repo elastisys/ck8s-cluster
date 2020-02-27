@@ -12,11 +12,6 @@ else
   bash $localPath/pipeline/test/services/run-tests.sh
 fi
 
-if [[ -z "${CONFIG_PATH}" ]]; then
-  echo 'Error: missing CONFIG_PATH variable'
-  exit 2
-fi
-
 if [[ -z "${CK8S}" ]]; then
   echo 'Missing CK8S variable, insert local path to repository (ex /home/user/ck8s):'
   read localPath
@@ -25,7 +20,7 @@ else
 fi
 
 if [[ -z "${CONFIG_PATH}" ]]; then
-  echo 'Missing CONFIG_PATH variable, insert local path to config files:'
+  echo 'Missing CONFIG_PATH variable, insert local path to eck config files:'
   read cfgPath
 else
   cfgPath=$CONFIG_PATH
