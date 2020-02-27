@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ck8sdash.fullname" . }}-elastic-init-script
+  labels:
+{{ include "ck8sdash.labels" . | indent 4 }}
+data:
+  init.sh: |
+    #!/bin/sh
+    set -e 
+    echo "Starting init script"
+
+    APISERVER=https://kubernetes.default.svc
+    SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount 
+    TOKEN=$(cat ${SERVICEACCOUNT}/token) 
+    CACERT=${SERVICEACCOUNT}/ca.crt 
+
+    if [ "404" == $(curl -s --cacert ${CACERT} -o /dev/null -w "%{http_code}" \
+        --header "Authorization: Bearer ${TOKEN}" \
+        ${APISERVER}/api/v1/namespaces/ck8sdash/secrets/ck8sdash-elastic-api-key) ]
+    then
+        echo "Secret does not exist. Must create new api key."
+        while [ "200" != $(curl -ksI -o /dev/null -X GET -w "%{http_code}" -u ${ELASTIC_USERNAME}:${ELASTIC_PASSWORD} \
+            ${ELASTIC_URL}) ]
+        do
+            echo "Waiting for elastic endpoint to be ready"
+            sleep 1
+        done
+
+        echo "Revoking earlier api keys with name=${ELASTIC_API_KEY_NAME}"
+        curl -X DELETE -k "${ELASTIC_URL}/_security/api_key?pretty" \
+            -u ${ELASTIC_USERNAME}:${ELASTIC_PASSWORD} \
+            -H 'Content-Type: application/json' -d'
+            {
+                "name" : "'${ELASTIC_API_KEY_NAME}'"
+            }'
+
+        echo "creating new api key"
+        export output=$(curl -k -X POST "${ELASTIC_URL}/_security/api_key?pretty" \
+            -u ${ELASTIC_USERNAME}:${ELASTIC_PASSWORD} \
+            -H 'Content-Type: application/json' -d'
+            {
+              "name": "'${ELASTIC_API_KEY_NAME}'",
+              "role_descriptors": {
+                "read-kube": {
+                  "cluster": ["all"],
+                  "index": [
+                    {
+                      "names": ["kubecomponents-default*","kubernetes-default*"],
+                      "privileges": ["read"]
+                    }
+                  ]
+                }
+              }
+            }
+            ')
+        export ELASTIC_API_KEY=$(echo $output | jq -r '.api_key')
+        export ELASTIC_API_KEY_ID=$(echo $output | jq -r '.id')
+
+        if [[ -z $ELASTIC_API_KEY ]] && [[ -z $ELASTIC_API_KEY_ID ]]; then
+            echo "ERROR could not create ELASTIC API key"
+            exit 1
+        fi
+        echo
+        echo "Created new api key with id $ELASITC_API_KEY_ID"
+
+        export key=$(echo -n $ELASTIC_API_KEY | base64 - | tr -d '\n')
+        export keyId=$(echo -n $ELASTIC_API_KEY_ID | base64 - | tr -d '\n')
+
+
+        curl -o /dev/null -s --cacert ${CACERT} -H "Authorization: Bearer ${TOKEN}" -X POST \
+        ${APISERVER}/api/v1/namespaces/ck8sdash/secrets  -H "Content-Type: application/json"\
+        -d '{
+          "apiVersion": "v1", 
+          "kind": "Secret", 
+          "data": {
+            "elastic-api-key": "'"${key}"'",
+            "elastic-api-key-id": "'"${keyId}"'"            
+          }, 
+          "metadata": {
+            "name": "ck8sdash-elastic-api-key",
+            "namespace": "'$NAMESPACE'"
+          },
+          "type": "Opaque"
+        }'
+        echo "Created new secret"
+    else
+        echo "Secret already exists. Not creating new api key."
+    fi
