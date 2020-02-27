@@ -12,6 +12,7 @@ terraform {
 provider "aws" {
   version = "~> 2.50"
   region  = var.region
+  shared_credentials_file = var.credentials_file
 }
 
 module "service_cluster" {

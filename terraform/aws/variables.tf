@@ -3,6 +3,10 @@ variable "region" {
   default = "us-west-1"
 }
 
+variable "credentials_file" {
+  default = "$HOME/.aws/credentials"
+}
+
 variable "public_ingress_cidr_whitelist" {
   type = list(string)
 }
