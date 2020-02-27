@@ -29,6 +29,115 @@ resource "aws_subnet" "main_sn" {
 }
 
 
+# Internet gateway
+
+resource "aws_internet_gateway" "gateway" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "${var.prefix}-gateway"
+  }
+}
+
+
+# Routing
+
+resource "aws_route_table" "rt" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.prefix}-rt"
+  }
+}
+
+resource "aws_route" "egress_via_gateway" {
+  route_table_id         = aws_route_table.rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gateway.id
+}
+
+resource "aws_route_table_association" "rtassociation" {
+  subnet_id      = aws_subnet.main_sn.id
+  route_table_id = aws_route_table.rt.id
+}
+
+
+# Master loadbalancer
+
+resource "aws_lb" "master_lb_external" {
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = [aws_subnet.main_sn.id]
+
+  tags = {
+    Name = "${var.prefix}-master-lb-external"
+  }
+}
+
+resource "aws_lb" "master_lb_internal" {
+  internal           = true
+  load_balancer_type = "network"
+  subnets            = [aws_subnet.main_sn.id]
+
+  tags = {
+    Name = "${var.prefix}-master-lb-internal"
+  }
+}
+
+resource "aws_lb_target_group" "master_tg_external" {
+  name        = "${var.prefix}-master-tg-external"
+  port        = 6443
+  protocol    = "TCP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.main.id
+}
+
+resource "aws_lb_target_group" "master_tg_internal" {
+  name        = "${var.prefix}-master-tg-internal"
+  port        = 6443
+  protocol    = "TCP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.main.id
+}
+
+resource "aws_lb_target_group_attachment" "master_tga_external" {
+  for_each = aws_instance.master
+
+  target_group_arn = aws_lb_target_group.master_tg_external.arn
+  target_id        = each.value.private_ip
+  port             = 6443
+}
+
+resource "aws_lb_target_group_attachment" "master_tga_internal" {
+  for_each = aws_instance.master
+
+  target_group_arn = aws_lb_target_group.master_tg_internal.arn
+  target_id        = each.value.private_ip
+  port             = 6443
+}
+
+resource "aws_lb_listener" "master_listener_external" {
+  load_balancer_arn = aws_lb.master_lb_external.arn
+  port              = 6443
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.master_tg_external.arn
+  }
+}
+
+resource "aws_lb_listener" "master_listener_internal" {
+  load_balancer_arn = aws_lb.master_lb_internal.arn
+  port              = 6443
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.master_tg_internal.arn
+  }
+}
+
+
 # Cluster security group + rules
 
 resource "aws_security_group" "cluster_sg" {
@@ -139,12 +248,14 @@ resource "aws_security_group_rule" "nodeport" {
   security_group_id = aws_security_group.worker_sg.id
 }
 
+
 # AWS keys
 
 resource "aws_key_pair" "auth" {
   key_name   = var.key_name
   public_key = file(var.public_key_path)
 }
+
 
 # Master instance
 
@@ -171,6 +282,7 @@ resource "aws_instance" "master" {
     Name = "${var.prefix}-${each.key}"
   }
 }
+
 
 # Worker instance
 
