@@ -4,33 +4,30 @@ The releases will follow semantic versioning and be handled with git tags.
 https://semver.org/
 
 ## Major releases
-When ready to cut a new major release create a release branch `release-x`.
-This will when pushed trigger the pipeline to create and test a new cluster. 
-Run all tests necessary and if everything passes get the artifact version.json from
-the pipeline and update the local version.json. 
-When everything else is done run: 
-```./release.sh [patch|minor|major|-v verion]```
-
-`patch, minor or major` will bump the current version found in `version.json` while
-using `-v version` will set a specific version.
-
-The script will do the following:
-
-1. Increase the CK8S version in `version.json`
-2. Append what ever is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
-3. Clear `WIP-CHANGELOG.md`
-4. Create a git commit with message `release version vx.x.x`
-5. Create a tag named `vx.x.x`
-
-The last step is running `git push; git push --tags` manually then opening a pull request
-back to master.
+When ready to cut a new major release create a release branch `release-x`. The rest
+of the workflow will be handled by a pipeline see [Trigger a release](#trigger-a-release)
 
 ## Minor and Patch releases
 For minor and patch releases pull in the desired changes to the existing release branch.
 Minor changes can be pulled from feature branches and add new features while a patch 
 should only include hotfixes that does not require any downtime to be pulled in.
 
-The rest follows the workflow from a major release.
+## Trigger a release
+To trigger the release pipeline make sure you have the correct release branch checked out. Then create another branch called `pre-release-<patch|minor|major|version>`.
+If the suffix is `patch`, `minor` or `major` then the version in `version.json` will be bumped. Otherwise the suffix must be a version following the semver standard.
+
+When this pre-release branch is pushed a pipeline will be triggered which:
+
+1. Tests the standard pipeline and creates a `version.json` with the running versions.
+2. Increase the CK8S version in `version.json`
+3. Append what ever is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
+4. Clear `WIP-CHANGELOG.md`
+4. Create a git commit with message `release version vx.x.x`
+5. Create a tag named `vx.x.x`
+6. Creates a pr to the `release-x` branch.
+
+When this is done review the new PR and merge it to finalize the release.
+
 
 ## While developing
 
