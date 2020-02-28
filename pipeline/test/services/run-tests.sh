@@ -16,7 +16,7 @@ if [[ -z "${CK8S}" ]]; then
 fi
 
 if [[ -z "${CONFIG_PATH}" ]]; then
-  echo 'Missing CONFIG_PATH variable, insert local path to eck config files:'
+  echo 'Missing CONFIG_PATH variable, insert local path to eck config files (ex /home/user/ck8s-config):'
   read CONFIG_PATH
 fi
 
@@ -26,5 +26,17 @@ if [[ -z "${ENVIRONMENT_NAME}" ]]; then
   export ENVIRONMENT_NAME=$ENV_NAME
 fi
 
-# run container with entrypoint script
-docker run -it -v "${CK8S}:${CK8S}" -v "${CONFIG_PATH}:${CONFIG_PATH}" --entrypoint=$CK8S/pipeline/test/services/container-entrypoint.sh -e=CK8S=$CK8S -e=CONFIG_PATH=$CONFIG_PATH -e=ENVIRONMENT_NAME=$ENVIRONMENT_NAME elastisys/ck8s-ops:$1
+# run container with entrypoint script and env variables
+docker run -it -v "${CK8S}:/ck8s" \
+-v "${CONFIG_PATH}:/ck8s-config" \
+--entrypoint=/ck8s/pipeline/test/services/container-entrypoint.sh \
+-e CK8S=/ck8s \
+-e CONFIG_PATH=/ck8s-config \
+-e ENVIRONMENT_NAME=$ENVIRONMENT_NAME \
+-e CLOUD_PROVIDER=$CLOUD_PROVIDER \
+-e CUSTOMER_NAMESPACES=$CUSTOMER_NAMESPACES \
+-e CUSTOMER_ADMIN_USERS=$CUSTOMER_ADMIN_USERS \
+-e ECK_OPS_DOMAIN=$ECK_OPS_DOMAIN \
+-e ECK_BASE_DOMAIN=$ECK_BASE_DOMAIN \
+-e ENABLE_CUSTOMER_GRAFANA=$ENABLE_CUSTOMER_GRAFANA \
+elastisys/ck8s-ops:$1
