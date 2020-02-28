@@ -6,7 +6,7 @@ on:
       - master
   push:
     branches:
-      - 'release-*'
+      - 'pre-release-*'
 jobs:
   build-image:
     runs-on: ubuntu-latest
@@ -250,6 +250,7 @@ jobs:
         VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
 
   get-versions:
+    if: startsWith(github.ref , 'refs/heads/pre-release-' )
     needs: [deploy-wc, deploy-sc]
     runs-on: ubuntu-latest
     container: 
@@ -273,6 +274,29 @@ jobs:
       with:
         name: version.json
         path: version.json
+  
+  create-release-pr:
+    if: startsWith(github.ref , 'refs/heads/pre-release-')
+    needs: [get-versions]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: download version.json
+      uses: actions/download-artifact@v1
+      with: 
+        name: version.json
+        path: ./release/verision.json
+    - run: ./release/release.sh
+      id: release-script
+      shell: bash
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: pull-request
+      uses: repo-sync/pull-request@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        destination_branch: "${{ steps.release-script.outputs.MERGE_BRANCH }}"
+        pr_title: "Releasing version ${{ steps.release-script.outputs.RELEASE_VERSION }}"
 
   clean-up:
     needs: [test-sc,test-wc,get-versions]
