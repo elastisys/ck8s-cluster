@@ -3,8 +3,12 @@ variable "region" {
   default = "us-west-1"
 }
 
-variable "credentials_file" {
-  default = "$HOME/.aws/credentials"
+variable "infra_credentials_file_path" {
+  description = "Path to credentials file, passed to pathexpand"
+}
+
+variable "dns_credentials_file_path" {
+  description = "Path to credentials file, passed to pathexpand"
 }
 
 variable "public_ingress_cidr_whitelist" {
@@ -16,6 +20,10 @@ variable "prefix_sc" {
 }
 
 variable "prefix_wc" {
+  type = string
+}
+
+variable "dns_prefix" {
   type = string
 }
 
