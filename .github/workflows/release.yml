@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Get the version
+        id: get_version 
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -19,18 +22,21 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            See [CHANGELOG.md](https://github.com/elastisys/ck8s/blob/${{ github.ref }}/CHANGELOG.md) for details.
+            See [CHANGELOG.md](https://github.com/elastisys/ck8s/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
                       
   build-image:
     runs-on: ubuntu-latest
-    steps: 
+    steps:
     - uses: actions/checkout@v1
+    - name: Get the version
+      id: get_version 
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
     - uses: whoan/docker-build-with-cache-action@v3
       with:
         username: "${{ secrets.DOCKERHUB_USER }}"
         password: "${{ secrets.DOCKERHUB_PASSWORD }}"
         image_name: elastisys/ck8s-ops
-        image_tag: ${{ github.ref }}
+        image_tag: ${{ steps.get_version.outputs.VERSION }}
         context: pipeline
     - uses: whoan/docker-build-with-cache-action@v3
       with:
@@ -44,6 +50,6 @@ jobs:
         username: "${{ secrets.DOCKERHUB_USER }}"
         password: "${{ secrets.DOCKERHUB_PASSWORD }}"
         image_name: elastisys/ck8s-ops
-        image_tag: ${{ github.ref }}-dev
+        image_tag: ${{ steps.get_version.outputs.VERSION }}-dev
         context: pipeline
         dockerfile: Dockerfile.dev

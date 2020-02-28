@@ -7,7 +7,7 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 file=${SCRIPTS_PATH}/version.json
 CHANGELOG=${SCRIPTS_PATH}/../CHANGELOG.md
-WIP=${SCRIPTS_PATH}/WIP-CHANGELOG.md
+WIP=${SCRIPTS_PATH}/../WIP-CHANGELOG.md
 if [[ ! -f "$file" ]]; then
   echo "ERROR:  $file does not exist"
   exit 1
