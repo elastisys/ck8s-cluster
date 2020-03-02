@@ -11,14 +11,32 @@ data:
     #!/bin/sh
     set -e
 
-    echo "configuring s3 backups"
-    curl -f -X PUT "https://{{ .Values.ES.endpoint }}/_snapshot/s3_backup_repository?pretty" \
+    echo "Registering s3 snapshot repository"
+    curl -f -X PUT "https://{{ .Values.es_endpoint }}/_snapshot/s3_{{ .Values.snapshot.s3_provider }}_7.x?pretty" \
       -H 'Content-Type: application/json' \
-      -d' {"type": "s3", "settings":{ "bucket": "'"{{ .Values.ES.backupBucketName }}"'", "client": "default"}}' \
+      -d' {"type": "s3", "settings":{ "bucket": "'"{{ .Values.snapshot.target_bucket_name }}"'", "client": "default"}}' \
       -k -u elastic:${ES_PW}
 
+    echo "Setting up snapshot policy"
+    curl -f -X PUT "https://{{ .Values.es_endpoint }}/_slm/policy/nightly-snapshots?pretty" \
+      -H 'Content-Type: application/json' \
+      -k -u elastic:${ES_PW} \
+      -d' {
+             "schedule": "{{ .Values.snapshot.schedule }}",
+             "name": "{{ .Values.snapshot.name }}",
+             "repository": "s3_{{ .Values.snapshot.s3_provider }}_7.x",
+             "config": {
+               "indices": "{{ .Values.snapshot.indices }}"
+             },
+             "retention": {
+               "expire_after": "{{ .Values.snapshot.expire_after}}",
+               "min_count": {{ .Values.snapshot.min_count }},
+               "max_count": {{ .Values.snapshot.max_count }}
+             }
+           }'
+
     echo "changing poll interval"
-    curl -f -X PUT "https://{{ .Values.ES.endpoint }}/_cluster/settings?pretty" \
+    curl -f -X PUT "https://{{ .Values.es_endpoint }}/_cluster/settings?pretty" \
       -H 'Content-Type: application/json' \
       -k -u elastic:${ES_PW} \
       -d' {"transient": {"indices.lifecycle.poll_interval": "10s" }}'
@@ -29,31 +47,31 @@ data:
 
     echo
     echo "creating index templates"
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/kubeaudit" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_template/kubeaudit" \
       -H "Content-Type: application/json" \
       -d@/scripts/kubeaudit_template.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/kubecomponents" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_template/kubecomponents" \
       -H "Content-Type: application/json" \
       -d@/scripts/kubecomponents_template.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/kubernetes" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_template/kubernetes" \
       -H "Content-Type: application/json" \
       -d@/scripts/kubernetes_template.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_template/other" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_template/other" \
       -H "Content-Type: application/json" \
       -d@/scripts/other_template.json -k -u elastic:${ES_PW}
 
     echo
     echo "creating ILM policies"
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/kubeaudit" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/kubeaudit" \
       -H "Content-Type: application/json" \
      -d@/scripts/kubeaudit_policy.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/kubecomponents" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/kubecomponents" \
       -H "Content-Type: application/json" \
      -d@/scripts/kubecomponents_policy.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/kubernetes" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/kubernetes" \
       -H "Content-Type: application/json" \
      -d@/scripts/kubernetes_policy.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.ES.endpoint }}/_ilm/policy/other" \
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/other" \
       -H "Content-Type: application/json" \
      -d@/scripts/other_policy.json -k -u elastic:${ES_PW}
   kibana-dashboards.ndjson: {{ .Files.Get "dashboards/kibana-dashboards.ndjson" | quote }}

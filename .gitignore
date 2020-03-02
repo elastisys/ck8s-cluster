@@ -17,3 +17,4 @@ clusters
 **/*.coverage
 **/__pycache__
 .vscode
+.s3cfg*

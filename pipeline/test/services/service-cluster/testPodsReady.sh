@@ -139,7 +139,6 @@ CRONJOBS=(
   "influxdb-prometheus influxdb-metrics-retention-cronjob"
   "influxdb-prometheus influxdb-backup"
   "elastic-system curator"
-  "elastic-system elasticsearch-backup-job"
 )
 
 echo
