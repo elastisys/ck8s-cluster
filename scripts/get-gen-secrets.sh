@@ -8,7 +8,6 @@ env_vars=(
     ["kubelogin_client"]="KUBELOGIN_CLIENT_SECRET"
     ["grafana_client"]="GRAFANA_CLIENT_SECRET"
     ["harbor_client"]="HARBOR_CLIENT_SECRET"
-    ["prometheus"]="PROMETHEUS_PWD"
     ["customer_prometheus"]="CUSTOMER_PROMETHEUS_PWD"
     ["customer_grafana"]="CUSTOMER_GRAFANA_PWD"
     ["customer_alertmanager"]="CUSTOMER_ALERTMANAGER_PWD"

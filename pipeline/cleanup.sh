@@ -19,7 +19,7 @@ if [[ -z "$GITHUB_RUN_ID" ]]; then
     if [[ -n "$1" ]]; then
         export MANUAL=true
         GITHUB_RUN_ID=$1
-    else 
+    else
         echo "ERROR: GITHUB_RUN_ID is empty and no arg1 is set. One is required"
         exit 1
     fi
@@ -55,10 +55,10 @@ curl -i -X DELETE \
   -H "Accept: application/json" \
   -H "Authorization: JWT ${TOKEN}" \
   https://hub.docker.com/v2/repositories/elastisys/ck8s-ops/tags/${GITHUB_SHA}/
-  
+
 # Revoke vault token, remove password secrets for services
 echo "Cleanup vault"
-${SCRIPTS_PATH}/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user harbor_client
+${SCRIPTS_PATH}/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashboard_client grafana_client customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user harbor_client
 
 echo "Destroying infrastructure"
 export TF_VAR_dns_prefix=pipeline-$GITHUB_RUN_ID

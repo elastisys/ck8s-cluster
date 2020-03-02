@@ -84,7 +84,7 @@ scrapeConfig:
       - '{job="kubelet"}'
   basic_auth:
     username: prometheus
-    password: {{ requiredEnv "PROMETHEUS_PWD"}}
+    password: {{ requiredEnv "CUSTOMER_PROMETHEUS_PWD"}}
 
   tls_config:
     insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}
@@ -107,7 +107,7 @@ scrapeConfig:
       - '{job!="kubelet", job=~".+"}'
   basic_auth:
     username: prometheus
-    password: {{ requiredEnv "PROMETHEUS_PWD"}}
+    password: {{ requiredEnv "CUSTOMER_PROMETHEUS_PWD"}}
 
   tls_config:
     insecure_skip_verify: {{ requiredEnv "TLS_SKIP_VERIFY"}}

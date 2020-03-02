@@ -13,7 +13,6 @@ set -e
 : "${ENABLE_PSP:?Missing ENABLE_PSP}"
 : "${CUSTOMER_NAMESPACES:?Missing CUSTOMER_NAMESPACES}"
 : "${CUSTOMER_ADMIN_USERS:?Missing CUSTOMER_ADMIN_USERS}"
-: "${PROMETHEUS_PWD:?Missing PROMETHEUS_PWD}"
 : "${HARBOR_PWD:?Missing HARBOR_PWD}"
 : "${CUSTOMER_GRAFANA_PWD:?Missing CUSTOMER_GRAFANA_PWD}"
 : "${ELASTIC_USER_SECRET:?Missing ELASTIC_USER_SECRET}"
@@ -164,7 +163,7 @@ echo "Installing the remaining helm charts" >&2
 helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
 
 echo "Create basic auth credentials for accessing workload cluster prometheus" >&2
-htpasswd -c -b auth prometheus ${PROMETHEUS_PWD}
+htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_PWD}
 kubectl -n monitoring create secret generic prometheus-auth --from-file=auth --dry-run -o yaml | kubectl apply -f -
 rm auth
 
