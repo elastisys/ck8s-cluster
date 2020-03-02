@@ -93,6 +93,17 @@ prometheus:
               storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
         selector: {}
 
+    {{ if eq (env "STORAGE_CLASS") "nfs-client"  }}
+    additionalScrapeConfigs:
+    - job_name: 'node-exporter'
+      scrape_interval: 30s
+      metrics_path: /metrics
+      scheme: http
+      static_configs:
+      - targets:
+        - '{{ requiredEnv "NFS_WC_SERVER_IP" }}:9100'
+    {{ end }}
+
     {{ if eq (env "ENABLE_POSTGRESQL") "true"  }}
     additionalScrapeConfigs:
     - job_name: 'postgresql_metrics'
