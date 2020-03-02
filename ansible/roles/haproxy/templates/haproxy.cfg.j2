@@ -8,6 +8,9 @@ global
         group haproxy
         daemon
 
+        # Raise global maxconn
+        maxconn 5000
+
         # Default SSL material locations
         ca-base /etc/ssl/certs
         crt-base /etc/ssl/private
