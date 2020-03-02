@@ -143,18 +143,6 @@ releases:
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/dex.yaml"
 
 
-{{ if eq (env "ENABLE_CUSTOMER_PROMETHEUS") "true" }}
-# Prometheus-instance for scraping customer metrics
-- name: customer-scraper
-  namespace: monitoring
-  labels:
-    app: customer-federate-scraper
-  chart: ./charts/prometheus-instance
-  version: 0.1.0
-  missingFileHandler: error
-  values:
-  - values/prometheus-customer-federate-scraper.yaml.gotmpl
-{{ end }}
 # Prometheus-instance for scraping workload cluster metrics
 - name: wc-scraper
   namespace: monitoring

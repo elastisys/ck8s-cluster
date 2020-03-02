@@ -82,10 +82,6 @@ STATEFULSETS=(
     "harbor harbor-harbor-redis"
     "influxdb-prometheus influxdb"
 )
-if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
-then
-    STATEFULSETS+=("monitoring prometheus-customer-scraper-prometheus-instance")
-fi
 
 echo
 echo
