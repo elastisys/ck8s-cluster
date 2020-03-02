@@ -75,7 +75,6 @@ export ENABLE_HARBOR="<true|false>" # default true
 export ENABLE_FALCO="<true|false>" # default true
 export ENABLE_PSP="<true|false>" # default true
 export ENABLE_OPA="<true|false>" # default true
-export ENABLE_CUSTOMER_PROMETHEUS="<true|false>" # default false
 export ENABLE_CUSTOMER_GRAFANA="<true|false>" # default true
 export ENABLE_CUSTOMER_ALERTMANAGER="<true|false>" # default false
 export ENABLE_CUSTOMER_ALERTMANAGER_INGRESS="<true|false>" # default false
