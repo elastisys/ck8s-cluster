@@ -248,45 +248,23 @@ kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-co
 kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml \
     2> /dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring."
 
-if [ "$ENABLE_CUSTOMER_PROMETHEUS" == "true" ]
+if [ "$ENABLE_CUSTOMER_ALERTMANAGER" == "true" ]
 then
-    echo "Adding customer prometheus" >&2
-    # This Prometheus instance could be added just as we do with other prometheus
-    # instances in the service cluster using helm, but then we risk overwriting
-    # customer changes.
-    helm template ./charts/prometheus-instance \
-        --name prometheus --namespace "${CONTEXT_NAMESPACE}" \
-        --set alerting.alertmanagers[0].namespace="${CONTEXT_NAMESPACE}" \
-        --set ingress.hosts[0].host="prometheus.${ECK_BASE_DOMAIN}" \
-        --set ingress.tls[0].hosts="{prometheus.${ECK_BASE_DOMAIN}}" \
-        --values values/examples/customer-prometheus.yaml \
-        | kubectl -n "${CONTEXT_NAMESPACE}" create -f - 2> /dev/null || \
-        echo "Example prometheus already in place. Ignoring."
-
-    # Create basic auth credentials for the customers prometheus instance
-    htpasswd -c -b auth prometheus "${CUSTOMER_PROMETHEUS_PWD}"
-    kubectl -n "${CONTEXT_NAMESPACE}" create secret generic prometheus-auth \
-        --from-file=auth 2> /dev/null ||\
-        echo "Example prometheus auth secret already in place. Ignoring."
-    rm auth
-    if [ "$ENABLE_CUSTOMER_ALERTMANAGER" == "true" ]
+    echo "Adding customer alertmanager" >&2
+    # Use `kubectl create` to avoid overwriting customer changes
+    if [ "$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" == "true" ]
     then
-        echo "Adding customer alertmanager" >&2
-        # Use `kubectl create` to avoid overwriting customer changes
-        if [ "$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" == "true" ]
-        then
-            htpasswd -c -b auth alertmanager "${CUSTOMER_ALERTMANAGER_PWD}"
-            kubectl -n "${CONTEXT_NAMESPACE}" create secret generic alertmanager-auth \
-                --from-file=auth 2> /dev/null || \
-                echo "Example alertmanager auth secret already in place. Ignoring."
-            rm auth
-        fi
-        helm template ./charts/examples/customer-alertmanager \
-                --namespace "${CONTEXT_NAMESPACE}" \
-                --set baseDomain="${ECK_BASE_DOMAIN}" \
-                --set ingress.enabled="$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" \
-                | kubectl -n "${CONTEXT_NAMESPACE}" create -f - 2> /dev/null || \
-                echo "Example alertmanager already in place. Ignoring."
+        htpasswd -c -b auth alertmanager "${CUSTOMER_ALERTMANAGER_PWD}"
+        kubectl -n "monitoring" create secret generic alertmanager-auth \
+            --from-file=auth 2> /dev/null || \
+            echo "Example alertmanager auth secret already in place. Ignoring."
+        rm auth
     fi
+    helm template ./charts/examples/customer-alertmanager \
+            --namespace "monitoring" \
+            --set baseDomain="${ECK_BASE_DOMAIN}" \
+            --set ingress.enabled="$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" \
+            | kubectl -n "monitoring" create -f - 2> /dev/null || \
+            echo "Example alertmanager already in place. Ignoring."
 fi
 echo "Deploy-wc completed!" >&2

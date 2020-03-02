@@ -67,10 +67,6 @@ STATEFULSETS=(
 )
 set -- ${CUSTOMER_NAMESPACES}
 CONTEXT_NAMESPACE=$1
-if [ $ENABLE_CUSTOMER_PROMETHEUS == "true" ]
-then
-    STATEFULSETS+=("$CONTEXT_NAMESPACE prometheus-prometheus")
-fi
 if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
 then
     STATEFULSETS+=("$CONTEXT_NAMESPACE alertmanager-alertmanager")

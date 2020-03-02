@@ -34,7 +34,7 @@ prometheusSpec:
             requests:
               storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
         selector: {}
-        
+
   enableAdminAPI: false
   logFormat: logfmt
   logLevel: info
@@ -57,7 +57,7 @@ prometheusSpec:
     matchLabels:
       app: prometheus-operator
       release: prometheus-operator
-  
+
   externalLabels:
     scraper: wc-scraper
 
@@ -91,7 +91,7 @@ scrapeConfig:
 
   static_configs:
     - targets:
-      - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
+      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
 
 - job_name: 'federate-others'
   scrape_interval: 30s
@@ -103,16 +103,8 @@ scrapeConfig:
 
   params:
     'match[]':
-      - '{job="kube-state-metrics"}'
-      - '{job="node-exporter"}'
-      - '{job="coredns"}'
-      - '{job="apiserver"}'
-      - '{job="prometheus-operator-prometheus"}'
-      - '{job="prometheus-operator-operator"}'
-      - '{job="postgresql_metrics"}'
-      - '{job="postgresql_node_metrics"}'
-      - '{__name__=~"job:.*"}'
-      - '{__name__=~"namespace(_|:).*"}'
+      # Match all non empty job labels except "kubelet"
+      - '{job!="kubelet", job=~".+"}'
   basic_auth:
     username: prometheus
     password: {{ requiredEnv "PROMETHEUS_PWD"}}
@@ -122,4 +114,4 @@ scrapeConfig:
 
   static_configs:
     - targets:
-      - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
+      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}

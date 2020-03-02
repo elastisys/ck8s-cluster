@@ -43,13 +43,13 @@ prometheus:
       certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
     labels: {}
     hosts:
-    - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
+    - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
     paths:
     - /
     tls:
     - secretName: prometheus-general-tls
       hosts:
-      - prometheus.{{ requiredEnv "ECK_OPS_DOMAIN"}}
+      - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
 
   prometheusSpec:
     externalLabels:
@@ -58,12 +58,20 @@ prometheus:
     # Dont add prometheus labels.
     prometheusExternalLabelNameClear: true
     replicaExternalLabelNameClear: true
-    
-    serviceMonitorNamespaceSelector:
-      # We don't want to pick up all (customer) ServiceMonitors that may exist
-      # in the cluster. Just select namespaces we own.
-      matchLabels:
-        owner: operator
+
+    # Empty selector to select all namespaces
+    serviceMonitorNamespaceSelector: {}
+    # Select all service monitors
+    serviceMonitorSelector: {}
+
+    {{ if eq (env "ENABLE_CUSTOMER_ALERTMANAGER") "true"  }}
+    # Connect to separately managed alertmanager
+    alertingEndpoints:
+      - name: alertmanager-operated
+        namespace: monitoring
+        port: web
+        pathPrefix: /
+    {{ end }}
     resources:
       requests:
         memory: 1Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
