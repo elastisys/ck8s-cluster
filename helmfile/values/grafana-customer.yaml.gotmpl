@@ -38,22 +38,13 @@ datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
-    - name: app-metrics
-      type: prometheus
-      url: http://customer-scraper-prometheus-instance.monitoring.svc.cluster.local:9090
-      access: proxy
-      isDefault: true
-      basicAuth: false
-      editable: false
-      isDefault: true
-      orgId: 1
-    - name: k8s-metrics
+    - name: ck8s-metrics
       type: prometheus
       access: proxy
       url: http://wc-scraper-prometheus-instance.monitoring.svc.cluster.local:9090
       basicAuth: false
       editable: false
-      isDefault: false
+      isDefault: true
       orgId: 1
       version: 1
 
