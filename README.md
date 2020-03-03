@@ -375,6 +375,7 @@ prometheus
 customer_prometheus
 customer_grafana
 customer_alertmanager
+harbor_client
 elasticsearch-es-elastic-user
 certs/service_cluster/kube-system/certs/ca-key.pem
 certs/service_cluster/kube-system/certs/ca.pem
@@ -427,6 +428,11 @@ Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elast
 For using OpenID Connect with kubectl, see
 [kubelogin/README.md](kubelogin/README.md).
 
+## OpenID Connect with Harbor
+
+When using Harbor as a reqistry and authenticating with OIDC docker need to be logged 
+in to that user. For more information how to use it see 
+[Using OIDC from the Docker or Helm CLI](https://github.com/goharbor/harbor/blob/master/docs/1.10/administration/configure-authentication/oidc-auth.md#using-oidc-from-the-docker-or-helm-cli)
 
 ## Vault
 
