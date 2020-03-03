@@ -30,7 +30,7 @@ masters=$(echo $infra | jq -r '.workload_cluster.master_ip_addresses | keys[]')
 workers=$(echo $infra | jq -r '.workload_cluster.worker_ip_addresses | keys[]')
 
 cat <<EOF
-cluster_name: eck-workload_cluster
+cluster_name: ${ENVIRONMENT_NAME}_${CLOUD_PROVIDER}_wc
 
 ssh_agent_auth: true
 
