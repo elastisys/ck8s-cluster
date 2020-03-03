@@ -66,6 +66,13 @@ config:
       name: 'Grafana'
       redirectURIs:
         - https://grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}/login/generic_oauth
+{{ if eq (env "ENABLE_HARBOR") "true" }}
+    - id: harbor
+      secret: {{ requiredEnv "HARBOR_CLIENT_SECRET" }}
+      name: 'Harbor'
+      redirectURIs:
+        - https://harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}/c/oidc/callback
+{{ end }}
 
 {{ if eq (env "ENABLE_STATIC_DEX_LOGIN") "true" }}
   enablePasswordDB: true
