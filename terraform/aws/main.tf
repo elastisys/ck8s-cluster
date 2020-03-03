@@ -56,7 +56,7 @@ module "service_dns" {
     "kibana.${var.dns_prefix}",
     "notary.harbor.${var.dns_prefix}"
   ]
-  dns_records = module.service_cluster.worker_public_ips
+  dns_records = module.service_cluster.worker_ips.*.public_ip
 }
 
 module "workload_dns" {
@@ -68,7 +68,7 @@ module "workload_dns" {
     "*.${var.dns_prefix}",
     "prometheus.ops.${var.dns_prefix}"
   ]
-  dns_records = module.workload_cluster.worker_public_ips
+  dns_records = module.workload_cluster.worker_ips.*.public_ip
 }
 
 data "template_file" "ansible_inventory" {
