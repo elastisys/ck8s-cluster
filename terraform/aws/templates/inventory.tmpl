@@ -1,0 +1,24 @@
+${master_hosts}
+${worker_hosts}
+
+[all:vars]
+k8s_version=1.17.2
+k8s_pod_cidr=10.42.0.0/16
+k8s_service_cidr=10.43.0.0/16
+control_plane_endpoint=tf-lb-20200302081943506400000003-e3323aea461414ba.elb.us-west-1.amazonaws.com
+
+ansible_user='ubuntu'
+ansible_port=22
+
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[masters]
+${masters}
+
+[workers]
+${workers}
+
+[nodes]
+${masters}
+${workers}

@@ -41,3 +41,7 @@ output "sc_dns_name" {
 output "domain_name" {
   value = "${var.dns_prefix}.${module.service_dns.dns_suffix}"
 }
+
+output "ansible_inventory" {
+  value = data.template_file.ansible_inventory.rendered
+}
