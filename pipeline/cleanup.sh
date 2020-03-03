@@ -58,7 +58,7 @@ curl -i -X DELETE \
   
 # Revoke vault token, remove password secrets for services
 echo "Cleanup vault"
-${SCRIPTS_PATH}/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user
+${SCRIPTS_PATH}/vault-cleanup.sh grafana harbor influxdb kubelogin_client dashboard_client grafana_client prometheus customer_prometheus customer_grafana customer_alertmanager elasticsearch-es-elastic-user harbor_client
 
 echo "Destroying infrastructure"
 export TF_VAR_dns_prefix=pipeline-$GITHUB_RUN_ID
