@@ -14,6 +14,17 @@ spec:
         - name: run
           image: elastisys/curl-jq:latest
           command: ['/bin/sh', '/scripts/init-harbor.sh']
+          env:
+            - name: HARBOR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name:  harbor-init-secret
+                  key: harbor-password
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name:  harbor-init-secret
+                  key: oidc-client-secret
           volumeMounts:
             - name: scripts
               mountPath: /scripts
