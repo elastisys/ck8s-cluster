@@ -276,6 +276,13 @@ resource "aws_instance" "master" {
   iam_instance_profile   = aws_iam_instance_profile.master.name
   key_name = aws_key_pair.auth.key_name
 
+  # Required for AWS in-tree cloud provider at the moment.
+  # Hostname must match node name specified by cloud provider.
+  user_data = <<-EOF
+  #!/bin/bash
+  hostnamectl set-hostname $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)
+  EOF
+
   depends_on = [aws_internet_gateway.gateway]
 
   tags = {
@@ -302,6 +309,13 @@ resource "aws_instance" "worker" {
   subnet_id              = aws_subnet.main_sn.id
   iam_instance_profile   = aws_iam_instance_profile.worker.name
   key_name = aws_key_pair.auth.key_name
+
+  # Required for AWS in-tree cloud provider at the moment.
+  # Hostname must match node name specified by cloud provider.
+  user_data = <<-EOF
+  #!/bin/bash
+  hostnamectl set-hostname $(curl -s http://169.254.169.254/latest/meta-data/local-hostname)
+  EOF
 
   depends_on = [aws_internet_gateway.gateway]
 

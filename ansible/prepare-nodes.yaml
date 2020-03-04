@@ -1,0 +1,10 @@
+---
+- hosts: nodes
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Create directory for kubeadm
+      file:
+        path: /etc/kubeadm
+        state: directory
