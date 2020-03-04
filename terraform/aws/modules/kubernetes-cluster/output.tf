@@ -1,30 +1,16 @@
-output "master_public_ips" {
+output "master_ips" {
   value = [
     for instance in aws_instance.master: {
       "public_ip": instance.public_ip
-    }
-  ]
-}
-
-output "master_private_ips" {
-  value = [
-    for instance in aws_instance.master: {
       "private_ip": instance.private_ip
     }
   ]
 }
 
-output "worker_public_ips" {
+output "worker_ips" {
   value = [
     for instance in aws_instance.worker: {
       "public_ip": instance.public_ip
-    }
-  ]
-}
-
-output "worker_private_ips" {
-  value = [
-    for instance in aws_instance.worker: {
       "private_ip": instance.private_ip
     }
   ]
