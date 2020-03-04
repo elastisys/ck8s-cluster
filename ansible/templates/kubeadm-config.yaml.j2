@@ -18,6 +18,9 @@ apiServer:
 {% if control_plane_endpoint %}
   certSANs:
     - "{{ control_plane_endpoint }}"
+{% if public_endpoint %}
+    - "{{ public_endpoint }}"
+{% endif %}
 {% endif %}
   extraVolumes:
     - name: "kubernetes-conf"

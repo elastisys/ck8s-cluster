@@ -149,6 +149,13 @@ resource "aws_security_group" "cluster_sg" {
   description = "CK8s cluster security group"
   vpc_id      = aws_vpc.main.id
 
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to ingress to ignore k8s ELB ingress
+      ingress
+    ]
+  }
+
   tags = {
     Name = "${var.prefix}-cluster-sg"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
@@ -493,5 +500,8 @@ ${var.prefix}-${index}
 %{endfor~}
 EOF
     control_plane_endpoint = aws_lb.master_lb_internal.dns_name
+    public_endpoint = aws_lb.master_lb_external.dns_name
+    cluster_name = var.prefix
+    cloud_provider = "aws"
   }
 }
