@@ -24,8 +24,7 @@ elasticsearch:
     endpoint: https://s3.example.com
     access_key: replace-me
     secret_key: replace-me
-  storageClassName: nfs-client
-  storageSize: 40Gi
+  storageSize: 25Gi
   env: []
     # - name: ES_JAVA_OPTS
     #   value: -Xms2g -Xmx2g
