@@ -95,8 +95,7 @@ git config --local user.email "techteam@elastisys.com"
 git config --local user.name "Elastisys"
 git add ${file} ${changelog} ${wip}
 git commit -m "Release v${new_version}"
-git tag -a "v${new_version}" -m "Release version ${new_version}"
-git push "${remote_repo}" HEAD:${GITHUB_REF} --follow-tags
+git push "${remote_repo}" HEAD:${GITHUB_REF}
 
 # Sets output to github actions
 v=( ${new_version//./ } )

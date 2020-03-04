@@ -3,38 +3,40 @@ name: Release
 on: 
   pull_request:
     types: [closed]
-    tags:
-    - 'v*.*.*'
+    branches:
+    - 'release-*'
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
+    # Only trigger if merged from pre-release-* branch
+    if: github.event.pull_request.merged == true && startsWith(github.ref , 'refs/heads/pre-release-')
     name: Create Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Get the version
         id: get_version 
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: version=$(cat release/version.json | jq -r '.ck8s') && echo ::set-output name=VERSION::${version}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          release_name: Release v${{ steps.get_version.outputs.VERSION }}
           body: |
-            See [CHANGELOG.md](https://github.com/elastisys/ck8s/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
+            See [CHANGELOG.md](https://github.com/elastisys/ck8s/blob/v${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
                       
   build-image:
-    if: github.event.pull_request.merged == true
+    # Only trigger if merged from pre-release-* branch
+    if: github.event.pull_request.merged == true && startsWith(github.ref , 'refs/heads/pre-release-')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - name: Get the version
       id: get_version 
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      run: version=$(cat release/version.json | jq -r '.ck8s') && echo ::set-output name=VERSION::${version}
     - uses: whoan/docker-build-with-cache-action@v3
       with:
         username: "${{ secrets.DOCKERHUB_USER }}"
