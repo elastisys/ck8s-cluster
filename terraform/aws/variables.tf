@@ -53,8 +53,7 @@ variable worker_nodes_wc {
   type        = map
 
   default = {
-    "worker-0" : "t3.small",
-    "worker-1" : "t3.small"
+    "worker-0" : "t3.small"
   }
 }
 
