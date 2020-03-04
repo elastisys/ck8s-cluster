@@ -60,9 +60,19 @@ prometheus:
     replicaExternalLabelNameClear: true
 
     # Empty selector to select all namespaces
-    serviceMonitorNamespaceSelector: {}
+    serviceMonitorNamespaceSelector:
+      matchLabels: {}
     # Select all service monitors
-    serviceMonitorSelector: {}
+    serviceMonitorSelector:
+      matchLabels: {}
+    podMonitorNamespaceSelector:
+      matchLabels: {}
+    podMonitorSelector:
+      matchLabels: {}
+    ruleNamespaceSelector:
+      matchLabels: {}
+    ruleSelector:
+      matchLabels: {}
 
     {{ if eq (env "ENABLE_CUSTOMER_ALERTMANAGER") "true"  }}
     # Connect to separately managed alertmanager
