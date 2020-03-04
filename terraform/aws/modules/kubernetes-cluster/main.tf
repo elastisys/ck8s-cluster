@@ -13,6 +13,7 @@ resource "aws_vpc" "main" {
 
   tags = {
     Name = "${var.prefix}-vpc"
+    "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
 
@@ -25,6 +26,7 @@ resource "aws_subnet" "main_sn" {
 
   tags = {
     Name = "${var.prefix}-main-sn"
+    "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
 
@@ -35,6 +37,7 @@ resource "aws_internet_gateway" "gateway" {
   vpc_id = aws_vpc.main.id
   tags = {
     Name = "${var.prefix}-gateway"
+    "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
 
@@ -46,6 +49,7 @@ resource "aws_route_table" "rt" {
 
   tags = {
     Name = "${var.prefix}-rt"
+    "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
 
@@ -147,6 +151,7 @@ resource "aws_security_group" "cluster_sg" {
 
   tags = {
     Name = "${var.prefix}-cluster-sg"
+    "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
 
@@ -287,6 +292,7 @@ resource "aws_instance" "master" {
 
   tags = {
     Name = "${var.prefix}-${each.key}"
+    "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
 
@@ -321,6 +327,7 @@ resource "aws_instance" "worker" {
 
   tags = {
     Name = "${var.prefix}-${each.key}"
+    "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
 
