@@ -496,6 +496,10 @@ Example using the CLI:
 
 **Exoscale:** See [docs](https://community.exoscale.com/documentation/storage/quick-start/#setup) for how to configure s3cmd for Exoscale.
 
+## Adding additional configuration
+
+To add or override the default configuration that is used for all the helm charts that are installed through helmfile, one can set the environement variable `CK8S_ADDITIONAL_VALUES` that should point to a path containing the `{release-name-to-add-or-override}.yaml` files.
+
 ## Issues and limitations
 
 Currently there is an issue where instances, that have been added to the EIP

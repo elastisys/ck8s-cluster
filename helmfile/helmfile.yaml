@@ -49,10 +49,12 @@ releases:
     app: nginx-ingress
   chart: stable/nginx-ingress
   version: 1.26.2
-  missingFileHandler: error
+  missingFileHandler: Info
   wait: true
   values:
   - values/nginx-ingress.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/nginx-ingress.yaml"
+
 
 # NFS
 - name: nfs-client-provisioner
@@ -61,15 +63,18 @@ releases:
     app: nfs-client-provisioner
   chart: stable/nfs-client-provisioner
   version: 1.2.6
-  missingFileHandler: error
+  missingFileHandler: Info
   wait: true
   values:
   {{ if eq .Environment.Name "service_cluster" }}
   - values/nfs-client-provisioner-sc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/nfs-client-provisioner-sc.yaml"
   {{ end }}
   {{ if eq .Environment.Name "workload_cluster" }}
   - values/nfs-client-provisioner-wc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/nfs-client-provisioner-wc.yaml"
   {{ end }}
+
 
 # Cert-manager
 - name: cert-manager
@@ -78,8 +83,11 @@ releases:
     app: cert-manager
   chart: jetstack/cert-manager
   version: v0.10.0
-  missingFileHandler: error
+  missingFileHandler: Info
   wait: true
+  values:
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/cert-manager.yaml"
+
 
 # Prometheus-operator
 - name: prometheus-operator
@@ -88,14 +96,17 @@ releases:
     app: prometheus-operator
   chart: stable/prometheus-operator
   version: 8.3.3
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   - values/prometheus-operator-sc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-operator-sc.yaml"
 {{ end }}
 {{ if eq .Environment.Name "workload_cluster" }}
   - values/prometheus-operator-wc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-operator-wc.yaml"
 {{ end }}
+
 
 - name: ck8sdash
   namespace: ck8sdash
@@ -103,15 +114,18 @@ releases:
     app: ck8sdash
   chart: ./charts/ck8sdash
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/ck8sdash-common.yaml.gotmpl
 {{ if eq .Environment.Name "service_cluster" }}
   - values/ck8sdash-sc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/ck8sdash-sc.yaml"
 {{ end }}
 {{ if eq .Environment.Name "workload_cluster" }}
   - values/ck8sdash-wc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/ck8sdash-wc.yaml"
 {{ end }}
+
 
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
@@ -122,10 +136,12 @@ releases:
     app: dex
   chart: stable/dex
   version: 2.5.0
-  missingFileHandler: error
+  missingFileHandler: Info
   wait: true
   values:
   - values/dex.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/dex.yaml"
+
 
 {{ if eq (env "ENABLE_CUSTOMER_PROMETHEUS") "true" }}
 # Prometheus-instance for scraping customer metrics
@@ -146,9 +162,11 @@ releases:
     app: customer-federate-scraper
   chart: ./charts/prometheus-instance
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/prometheus-wc-federate-scraper.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-wc-federate-scraper.yaml"
+
 
 {{ if eq (env "ENABLE_CUSTOMER_GRAFANA") "true" }}
 # Grafana instance for customer
@@ -158,10 +176,12 @@ releases:
     app: customer-grafana
   chart: stable/grafana
   version: 4.2.2
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/grafana-customer.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/grafana-customer.yaml"
 {{ end }}
+
 
 # Elasticsearch-operator
 - name: elasticsearch-operator
@@ -170,10 +190,12 @@ releases:
     app: elasticsearch-operator
   chart: ./charts/elasticsearch-operator
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   wait: true
   values:
   - values/elasticsearch-operator.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch-operator.yaml"
+
 
 # Elasticsearch
 - name: elasticsearch
@@ -182,11 +204,13 @@ releases:
     app: elasticsearch
   chart: ./charts/elasticsearch
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   needs:
   - elastic-system/elasticsearch-operator
   values:
   - values/elasticsearch.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch.yaml"
+
 
 #Elasticsearch-prometheus-exporter
 - name: elasticsearch-prometheus-exporter
@@ -195,11 +219,13 @@ releases:
     app: elasticsearch-prometheus-exporter
   chart: stable/elasticsearch-exporter
   version: 2.1.1
-  missingFileHandler: error
+  missingFileHandler: Info
   needs:
   - elastic-system/elasticsearch
   values:
   - values/elasticsearch-prometheus-exporter.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch-prometheus-exporter.yaml"
+
 
 # configure elasticsearch
 - name: configure-es
@@ -208,11 +234,13 @@ releases:
     app: config
   chart: ./charts/configure-es
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   needs:
   - elastic-system/elasticsearch
   values:
   - values/configure-es.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/configure-es.yaml"
+
 
 # Harbor
 - name: harbor-certs
@@ -221,9 +249,11 @@ releases:
     app: harbor
   chart: ./charts/harbor-certs
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/harbor-certs.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/harbor-certs.yaml"
+
 
 - name: harbor
   namespace: harbor
@@ -231,11 +261,13 @@ releases:
     app: harbor
   chart: harbor/harbor
   version: 1.3.0
-  missingFileHandler: error
+  missingFileHandler: Info
   wait: true
   timeout: 600
   values:
   - values/harbor.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/harbor.yaml"
+
 
 - name: init-harbor
   namespace: harbor
@@ -243,9 +275,11 @@ releases:
     app: harbor
   chart: ./charts/init-harbor
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/init-harbor.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/init-harbor.yaml"
+
 
 # InfluxDB with disk usage monitoring and metrics retention
 # Generated with helmify script using kustomize
@@ -266,9 +300,11 @@ releases:
     app: blackbox
   chart: ./charts/blackbox
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/blackbox.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/blackbox.yaml"
+
 
 # Fluentd
 - name: fluentd
@@ -277,9 +313,11 @@ releases:
     app: fluentd
   chart: kiwigrid/fluentd-elasticsearch
   version: 5.1.1
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/fluentd-sc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/fluentd-sc.yaml"
+
 
 # Fluentd aggregator
 - name: fluentd-aggregator
@@ -288,9 +326,11 @@ releases:
     app: fluentd-aggregator
   chart: stable/fluentd
   version: 2.3.2
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/fluentd-aggregator.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/fluentd-aggregator.yaml"
+
 
 # Velero
 - name: velero
@@ -299,9 +339,11 @@ releases:
     app: velero
   chart: vmware-tanzu/velero
   version: 2.8.2
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/velero-sc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/velero-sc.yaml"
+
 
 # End of system services releases
 {{ end }}
@@ -315,9 +357,11 @@ releases:
     app: falco
   chart: stable/falco
   version: 1.0.11
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/falco.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/falco.yaml"
+
 
 # Fluentd
 - name: fluentd-system
@@ -326,9 +370,11 @@ releases:
     app: fluentd
   chart: kiwigrid/fluentd-elasticsearch
   version: 5.1.1
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/fluentd-wc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/fluentd-wc.yaml"
+
 
 # Fluentd configurable by the customer
 - name: fluentd
@@ -337,9 +383,11 @@ releases:
     app: fluentd
   chart: kiwigrid/fluentd-elasticsearch
   version: 5.1.1
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/fluentd-customer.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/fluentd-customer.yaml"
+
 
 # opa
 - name: opa
@@ -348,9 +396,11 @@ releases:
     app: opa
   chart: stable/opa
   version: 1.6.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/opa.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/opa.yaml"
+
 
 # opa policies
 {{ if eq (env "ENABLE_OPA") "true" }}
@@ -360,9 +410,10 @@ releases:
     app: opa
   chart: ./charts/opa-policies
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/opa-policies.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/opa-policies.yaml"
 {{ end }}
 
 # Velero
@@ -372,9 +423,11 @@ releases:
     app: velero
   chart: vmware-tanzu/velero
   version: 2.8.2
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/velero-wc.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/velero-wc.yaml"
+
 
 # Customer RBAC
 - name: customer-rbac
@@ -383,7 +436,8 @@ releases:
     app: customer-rbac
   chart: ./charts/customer-rbac
   version: 0.1.0
-  missingFileHandler: error
+  missingFileHandler: Info
   values:
   - values/customer-rbac.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/customer-rbac.yaml"
 {{ end }}
