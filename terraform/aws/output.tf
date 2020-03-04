@@ -18,8 +18,16 @@ output "sc_master_external_loadbalancer_fqdn" {
   value = module.service_cluster.master_external_loadbalancer_fqdn
 }
 
+output "sc_master_internal_loadbalancer_fqdn" {
+  value = module.service_cluster.master_internal_loadbalancer_fqdn
+}
+
 output "wc_master_external_loadbalancer_fqdn" {
   value = module.workload_cluster.master_external_loadbalancer_fqdn
+}
+
+output "wc_master_internal_loadbalancer_fqdn" {
+  value = module.workload_cluster.master_internal_loadbalancer_fqdn
 }
 
 output "wc_dns_name" {
