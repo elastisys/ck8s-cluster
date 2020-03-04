@@ -48,7 +48,7 @@ defaults
 # show stats
 frontend stats
   mode   http
-  bind   0.0.0.0:31936
+  bind   0.0.0.0:{{ haproxy_stats_port }}
   mode   http
   option httplog
   option dontlognull

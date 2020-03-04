@@ -1,0 +1,12 @@
+[Unit]
+Description=HAProxy exporter for Prometheus
+Documentation=https://github.com/prometheus/haproxy_exporter
+After=network.target haproxy.service
+
+[Service]
+ExecStart=/usr/local/bin/haproxy_exporter --haproxy.scrape-uri="http://localhost:{{ haproxy_stats_port}}/;csv"
+Restart=always
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

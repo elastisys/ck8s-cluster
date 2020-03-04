@@ -84,6 +84,7 @@
     server_group: wc_workers
   roles:
     - haproxy
+    - haproxy_exporter
   tags:
     - loadbalancer
 
@@ -94,5 +95,6 @@
     server_group: sc_workers
   roles:
     - haproxy
+    - haproxy_exporter
   tags:
     - loadbalancer
