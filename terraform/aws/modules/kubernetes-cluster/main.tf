@@ -274,7 +274,7 @@ resource "aws_instance" "master" {
   vpc_security_group_ids = [aws_security_group.master_sg.id, aws_security_group.cluster_sg.id]
   subnet_id              = aws_subnet.main_sn.id
   iam_instance_profile   = aws_iam_instance_profile.master.name
-  key_name = aws_key_pair.auth.key_name
+  key_name               = aws_key_pair.auth.key_name
 
   # Required for AWS in-tree cloud provider at the moment.
   # Hostname must match node name specified by cloud provider.
@@ -308,7 +308,7 @@ resource "aws_instance" "worker" {
   vpc_security_group_ids = [aws_security_group.worker_sg.id, aws_security_group.cluster_sg.id]
   subnet_id              = aws_subnet.main_sn.id
   iam_instance_profile   = aws_iam_instance_profile.worker.name
-  key_name = aws_key_pair.auth.key_name
+  key_name               = aws_key_pair.auth.key_name
 
   # Required for AWS in-tree cloud provider at the moment.
   # Hostname must match node name specified by cloud provider.
@@ -458,4 +458,33 @@ resource "aws_iam_role_policy" "worker" {
     ]
   }
   EOF
+}
+
+# Ansible inventory
+
+data "template_file" "ansible_inventory" {
+  template = file("${path.module}/templates/inventory.tmpl")
+  vars = {
+    master_hosts           = <<-EOF
+%{for index, master in aws_instance.master~}
+${var.prefix}-${index} ansible_host=${master.public_ip} private_ip=${master.private_ip} ansible_ssh_private_key_file='${var.private_key_path}'
+%{endfor~}
+EOF
+    masters                = <<-EOF
+%{for index, master in aws_instance.master~}
+${var.prefix}-${index}
+%{endfor~}
+EOF
+    worker_hosts           = <<-EOF
+%{for index, worker in aws_instance.worker~}
+${var.prefix}-${index} ansible_host=${worker.public_ip} private_ip=${worker.private_ip} ansible_ssh_private_key_file='${var.private_key_path}'
+%{endfor~}
+EOF
+    workers                = <<-EOF
+%{for index, worker in aws_instance.worker~}
+${var.prefix}-${index}
+%{endfor~}
+EOF
+    control_plane_endpoint = aws_lb.master_lb_internal.dns_name
+  }
 }

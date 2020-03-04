@@ -27,15 +27,27 @@ variable "dns_prefix" {
   type = string
 }
 
-variable "public_key_path" {
+variable "public_key_path_sc" {
   type = string
 }
 
-variable "sc_key_name" {
+variable "public_key_path_wc" {
   type = string
 }
 
-variable "wc_key_name" {
+variable "private_key_path_sc" {
+  type = string
+}
+
+variable "private_key_path_wc" {
+  type = string
+}
+
+variable "key_name_sc" {
+  type = string
+}
+
+variable "key_name_wc" {
   type = string
 }
 
@@ -71,16 +83,4 @@ variable master_nodes_wc {
   default = {
     "master-0" : "t3.small"
   }
-}
-
-variable ansible_ssh_key_sc {
-  description = "Path to ansible private ssh key."
-  type = string
-  default = "clusters/aws/test/ssh-keys/id_rsa_sc"
-}
-
-variable ansible_ssh_key_wc {
-  description = "Path to ansible private ssh key."
-  type = string
-  default = "clusters/aws/test/ssh-keys/id_rsa_wc"
 }

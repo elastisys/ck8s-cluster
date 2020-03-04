@@ -35,3 +35,7 @@ output "master_internal_loadbalancer_fqdn" {
 output "master_external_loadbalancer_fqdn" {
   value = aws_lb.master_lb_external.dns_name
 }
+
+output "ansible_inventory" {
+  value = data.template_file.ansible_inventory.rendered
+}

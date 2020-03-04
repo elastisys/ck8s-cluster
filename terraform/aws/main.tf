@@ -22,8 +22,9 @@ module "service_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
-  public_key_path = var.public_key_path
-  key_name        = var.sc_key_name
+  public_key_path  = var.public_key_path_sc
+  private_key_path = var.private_key_path_sc
+  key_name         = var.key_name_sc
 
   worker_nodes = var.worker_nodes_sc
   master_nodes = var.master_nodes_sc
@@ -36,8 +37,9 @@ module "workload_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
-  public_key_path = var.public_key_path
-  key_name        = var.wc_key_name
+  public_key_path  = var.public_key_path_wc
+  private_key_path = var.private_key_path_wc
+  key_name         = var.key_name_wc
 
   worker_nodes = var.worker_nodes_wc
   master_nodes = var.master_nodes_wc
@@ -69,42 +71,4 @@ module "workload_dns" {
     "prometheus.ops.${var.dns_prefix}"
   ]
   dns_records = module.workload_cluster.worker_ips.*.public_ip
-}
-
-data "template_file" "ansible_inventory" {
-  template = file("${path.module}/templates/inventory.tmpl")
-  vars  = {
-    master_hosts = <<EOT
-%{ for index,master in module.service_cluster.master_ips ~}
-${var.prefix_sc}-master-${index} ansible_host=${master.public_ip} private_ip=${master.private_ip} ansible_ssh_private_key_file='${var.ansible_ssh_key_sc}'
-%{ endfor ~}
-%{ for index,master in module.workload_cluster.master_ips ~}
-${var.prefix_wc}-master-${index} ansible_host=${master.public_ip} private_ip=${master.private_ip} ansible_ssh_private_key_file='${var.ansible_ssh_key_wc}'
-%{ endfor ~}
-EOT
-    masters = <<EOT
-%{ for index,master in module.service_cluster.master_ips ~}
-${var.prefix_sc}-master-${index}
-%{ endfor ~}
-%{ for index,master in module.workload_cluster.master_ips ~}
-${var.prefix_wc}-master-${index}
-%{ endfor ~}
-EOT
-    worker_hosts = <<EOT
-%{ for index,worker in module.service_cluster.worker_ips ~}
-${var.prefix_sc}-worker-${index} ansible_host=${worker.public_ip} private_ip=${worker.private_ip} ansible_ssh_private_key_file='${var.ansible_ssh_key_sc}'
-%{ endfor ~}
-%{ for index,worker in module.workload_cluster.worker_ips ~}
-${var.prefix_wc}-worker-${index} ansible_host=${worker.public_ip} private_ip=${worker.private_ip} ansible_ssh_private_key_file='${var.ansible_ssh_key_wc}'
-%{ endfor ~}
-EOT
-    workers = <<EOT
-%{ for index,worker in module.service_cluster.worker_ips ~}
-${var.prefix_sc}-worker-${index}
-%{ endfor ~}
-%{ for index,worker in module.workload_cluster.worker_ips ~}
-${var.prefix_wc}-worker-${index}
-%{ endfor ~}
-EOT
-  }
 }
