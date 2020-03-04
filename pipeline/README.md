@@ -14,12 +14,24 @@ for debugging or working with the cluster.
 
 In `Dockerfile.dev` these tools can be added to provide an image better suited for developers.
 This image will also be built on every release under the name `elastisys/ck8s-ops:<version>-dev`
-This image can also be built locally with:
-```
-docker build -t local-ck8s-ops -f Dockerfile.dev .
-```
 
-To run the dockerfile and mounting the local ck8s repo run:
+## Run ops image
+To run the ops image locally with your home directory mounted:
 ```
-docker run -it -v <path-to-repo>:ck8s elastisys/ck8s-ops:<version>-dev
+./run-local-dockerfile.sh
 ```
+This will be just like running your local shell but with the requirements of the 
+checked out version of ck8s. Use it to set up new clusters or to run operations
+on an old version of ck8s.
+
+#### Example scenario
+
+You have a customer running on version 0.1.0 of ck8s. In 0.1.0 helm 2.14 is used in
+the cluster. In master helm has been upgraded to helm 3. You need to run maintenance
+on the customers cluster. Instead of downgrading your binary to helm 2.14 you do these steps.
+
+```
+cd customer-config-repo/ck8s
+./pipeline/run-local-dockerfile.sh
+```
+Then run what ever maintenance you need on that cluster.
