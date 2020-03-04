@@ -135,6 +135,9 @@ then
 
 fi
 
+echo "Creating local storage class for elasticsearch nodes" >&2
+kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch/local-storage-class.yaml
+
 echo "Initializing helm" >&2
 "${SCRIPTS_PATH}/initialize-tiller.sh" kube-system \
     "${CONFIG_PATH}/certs/service_cluster/kube-system/certs" ""
