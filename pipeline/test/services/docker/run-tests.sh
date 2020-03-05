@@ -29,7 +29,7 @@ fi
 # run container with entrypoint script and env variables
 docker run -it -v "${CK8S}:/ck8s" \
 -v "${CONFIG_PATH}:/ck8s-config" \
---entrypoint=/ck8s/pipeline/test/services/container-entrypoint.sh \
+--entrypoint=/ck8s/pipeline/test/services/docker/container-entrypoint.sh \
 -e CK8S=/ck8s \
 -e CONFIG_PATH=/ck8s-config \
 -e ENVIRONMENT_NAME=$ENVIRONMENT_NAME \
