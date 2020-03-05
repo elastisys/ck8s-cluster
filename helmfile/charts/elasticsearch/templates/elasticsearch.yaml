@@ -37,19 +37,14 @@ spec:
           resources:
 {{ toYaml . | indent 12 }}
           {{- end }}
+          {{- with .Values.elasticsearch.affinity }}
         affinity:
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 80
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: common.k8s.elastic.co/type
-                    operator: In
-                    values:
-                    - elasticsearch
-                topologyKey: "kubernetes.io/hostname"
-
+{{ toYaml . | indent 10 }}
+          {{- end }}
+          {{- with .Values.elasticsearch.tolerations }}
+        tolerations:
+{{ toYaml . | indent 10 }}
+          {{- end }}          
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
