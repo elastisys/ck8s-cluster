@@ -135,8 +135,8 @@ then
 fi
 
 echo "Initializing helm" >&2
-mkdir -p ${CONFIG_PATH}/certs/service_cluster/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${CONFIG_PATH}/certs/service_cluster "helm"
+"${SCRIPTS_PATH}/initialize-tiller.sh" kube-system \
+    "${CONFIG_PATH}/certs/service_cluster/kube-system/certs" ""
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/service_cluster/kube-system/certs "helm"
 
 

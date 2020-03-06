@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# This is the main entrypoint to Compliant Kubernetes.
+
+set -eu -o pipefail
+
+here="$(dirname "$(readlink -f "$0")")"
+source "${here}/common.bash"
+
+usage() {
+    echo "Usage:" 1>&2
+    echo "  init" 1>&2
+    echo "  apply <infra|k8s|apps|all>" 1>&2
+    exit 1
+}
+
+case "${1}" in
+    init)
+        "${here}/init.bash"
+        ;;
+    apply)
+        [[ "${2}" =~ ^(infra|k8s|apps|all)$ ]] || usage
+        with_config_secrets "${here}/apply.bash" ${2}
+        ;;
+    *) usage ;;
+esac
