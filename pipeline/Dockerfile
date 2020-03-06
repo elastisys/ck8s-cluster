@@ -39,7 +39,7 @@ RUN unzip vault_1.2.2_linux_amd64.zip && \
     mv vault /usr/local/bin/vault
 
 # Pipenv
-RUN apt install python3-pip -y
+RUN apt update && apt install python3-pip -y
 RUN python3 -m pip install pip
 RUN python3.6 -m pip install pipenv
 
