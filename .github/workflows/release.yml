@@ -9,7 +9,7 @@ on:
 jobs:
   release:
     # Only trigger if merged from pre-release-* branch
-    if: github.event.pull_request.merged == true && startsWith(github.ref , 'refs/heads/pre-release-')
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref , 'pre-release-')
     name: Create Release
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
                       
   build-image:
     # Only trigger if merged from pre-release-* branch
-    if: github.event.pull_request.merged == true && startsWith(github.ref , 'refs/heads/pre-release-')
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref , 'pre-release-')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
