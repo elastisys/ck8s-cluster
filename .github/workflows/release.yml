@@ -19,7 +19,7 @@ jobs:
         run: version=$(cat release/version.json | jq -r '.ck8s') && echo ::set-output name=VERSION::${version}
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: fleskesvor/create-release@1a72e235c178bf2ae6c51a8ae36febc24568c5fe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         with:
