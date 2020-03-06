@@ -147,7 +147,7 @@ releases:
 - name: wc-scraper
   namespace: monitoring
   labels:
-    app: customer-federate-scraper
+    app: wc-scraper
   chart: ./charts/prometheus-instance
   version: 0.1.0
   missingFileHandler: Info
