@@ -6,3 +6,6 @@ runcmd:
   #       Remove this if it ever gets solved.
   # https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030138
   - sudo iptables -t nat -A PREROUTING -d ${eip_ip_address} -j DNAT --to 127.0.0.1
+  - if [ ! -f /mnt/elasticsearch.fs ]; then sudo dd if=/dev/zero of=/mnt/elasticsearch.fs bs=1024 count=$((26*1024*1024)) && sudo mkfs.ext4 /mnt/elasticsearch.fs; fi
+  - sudo mkdir -p /mnt/disks/elasticsearch-node-local-storage && sudo chown nobody:nogroup /mnt/disks/elasticsearch-node-local-storage
+  - sudo mount /mnt/elasticsearch.fs /mnt/disks/elasticsearch-node-local-storage
