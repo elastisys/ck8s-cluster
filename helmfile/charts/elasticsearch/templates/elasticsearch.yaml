@@ -5,7 +5,7 @@ metadata:
 spec:
   version: 7.5.2
   nodeSets:
-  - count: 3
+  - count: {{ .Values.elasticsearch.node.count }}
     name: nodes
     config:
       node.master: true

@@ -14,6 +14,8 @@ elasticsearch:
     extraAnnotations:
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "ELASTICSEARCH_WHITELIST_SOURCE_RANGE" }}
     {{ end }}
+  node:
+    count: {{ requiredEnv "ES_NODE_COUNT" }}
   s3:
     endpoint: {{ requiredEnv "S3_REGION_ENDPOINT" }}
     access_key: {{ requiredEnv "S3_ACCESS_KEY" }}

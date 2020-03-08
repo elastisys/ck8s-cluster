@@ -20,6 +20,8 @@ elasticsearch:
     host: elastic.example.com
     issuer: letsencrypt-staging
     extraAnnotations: {}
+  node:
+    count: 3
   s3:
     endpoint: https://s3.example.com
     access_key: replace-me

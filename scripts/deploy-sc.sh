@@ -25,6 +25,9 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 : "${OAUTH_ALLOWED_DOMAINS:?Missing OAUTH_ALLOWED_DOMAINS}"
 : "${ENABLE_CK8SDASH_SC:?Missing ENABLE_CK8SDASH_SC}"
 
+# Elasticsearch
+: "${ES_NODE_COUNT:?Missing ES_NODE_COUNT}"
+
 # Alerting
 : "${ALERT_TO:?Missing ALERT_TO}"
 : "${ENABLE_HEARTBEAT:?Missing ENABLE_HEARTBEAT}"
