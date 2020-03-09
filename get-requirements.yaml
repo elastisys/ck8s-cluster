@@ -13,7 +13,6 @@
       apache2utils_version: "2.4.29-1ubuntu4.11"
       vault_version: "1.2.3"
       s3cmd_version: "2.0.1-2"
-      kustomize_version: "3.5.4"
     connection: local
     become: yes
     become_user: root
@@ -79,8 +78,3 @@
     - name: install s3cmd
       apt:
         name: s3cmd={{ s3cmd_version }}
-    - name: "Get kustomize"
-      unarchive:
-        src: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv{{ kustomize_version }}/kustomize_v{{ kustomize_version }}_linux_amd64.tar.gz
-        dest: "{{ install_path }}"
-        remote_src: yes
