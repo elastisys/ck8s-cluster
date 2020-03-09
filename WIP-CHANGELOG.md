@@ -16,6 +16,7 @@
 - Add command `ck8s s3cmd` that makes it possible to run s3cmd with the
   encrypted s3cmd config file.
 - Auto-completion for the cli
+- S3 support for the AWS cloud provider
 
 ### Fixed
 
