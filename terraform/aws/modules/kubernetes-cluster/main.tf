@@ -2,6 +2,9 @@ locals {
   internal_cidr_prefix = "172.16.0.0/16"
 }
 
+provider "template" {
+  version = "~> 2.1"
+}
 
 # VPC
 
