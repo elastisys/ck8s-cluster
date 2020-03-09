@@ -70,28 +70,27 @@ resource "aws_route_table_association" "rtassociation" {
 
 # Master loadbalancer
 
-resource "aws_lb" "master_lb_external" {
+resource "aws_lb" "master_lb_ext" {
   internal           = false
   load_balancer_type = "network"
   subnets            = [aws_subnet.main_sn.id]
 
   tags = {
-    Name = "${var.prefix}-master-lb-external"
+    Name = "${var.prefix}-master-lb-ext"
   }
 }
 
-resource "aws_lb" "master_lb_internal" {
+resource "aws_lb" "master_lb_int" {
   internal           = true
   load_balancer_type = "network"
   subnets            = [aws_subnet.main_sn.id]
 
   tags = {
-    Name = "${var.prefix}-master-lb-internal"
+    Name = "${var.prefix}-master-lb-int"
   }
 }
 
-resource "aws_lb_target_group" "master_tg_external" {
-  name        = "${var.prefix}-master-tg-external"
+resource "aws_lb_target_group" "master_tg_ext" {
   port        = 6443
   protocol    = "TCP"
   target_type = "ip"
@@ -107,8 +106,7 @@ resource "aws_lb_target_group" "master_tg_external" {
   }
 }
 
-resource "aws_lb_target_group" "master_tg_internal" {
-  name        = "${var.prefix}-master-tg-internal"
+resource "aws_lb_target_group" "master_tg_int" {
   port        = 6443
   protocol    = "TCP"
   target_type = "ip"
@@ -124,41 +122,41 @@ resource "aws_lb_target_group" "master_tg_internal" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "master_tga_external" {
+resource "aws_lb_target_group_attachment" "master_tga_ext" {
   for_each = aws_instance.master
 
-  target_group_arn = aws_lb_target_group.master_tg_external.arn
+  target_group_arn = aws_lb_target_group.master_tg_ext.arn
   target_id        = each.value.private_ip
   port             = 6443
 }
 
-resource "aws_lb_target_group_attachment" "master_tga_internal" {
+resource "aws_lb_target_group_attachment" "master_tga_int" {
   for_each = aws_instance.master
 
-  target_group_arn = aws_lb_target_group.master_tg_internal.arn
+  target_group_arn = aws_lb_target_group.master_tg_int.arn
   target_id        = each.value.private_ip
   port             = 6443
 }
 
-resource "aws_lb_listener" "master_listener_external" {
-  load_balancer_arn = aws_lb.master_lb_external.arn
+resource "aws_lb_listener" "master_listener_ext" {
+  load_balancer_arn = aws_lb.master_lb_ext.arn
   port              = 6443
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.master_tg_external.arn
+    target_group_arn = aws_lb_target_group.master_tg_ext.arn
   }
 }
 
-resource "aws_lb_listener" "master_listener_internal" {
-  load_balancer_arn = aws_lb.master_lb_internal.arn
+resource "aws_lb_listener" "master_listener_int" {
+  load_balancer_arn = aws_lb.master_lb_int.arn
   port              = 6443
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.master_tg_internal.arn
+    target_group_arn = aws_lb_target_group.master_tg_int.arn
   }
 }
 
