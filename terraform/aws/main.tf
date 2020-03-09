@@ -20,11 +20,12 @@ module "service_cluster" {
 
   prefix = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
 
+  aws_region  = var.region
+  k8s_version = var.k8s_version
+
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
   ssh_pub_key  = var.ssh_pub_key_sc
-  ssh_priv_key = var.ssh_priv_key_sc
-  key_name     = var.key_name_sc
 
   worker_nodes = var.worker_nodes_sc
   master_nodes = var.master_nodes_sc
@@ -35,11 +36,12 @@ module "workload_cluster" {
 
   prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
 
+  aws_region  = var.region
+  k8s_version = var.k8s_version
+
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
   ssh_pub_key  = var.ssh_pub_key_wc
-  ssh_priv_key = var.ssh_priv_key_wc
-  key_name     = var.key_name_wc
 
   worker_nodes = var.worker_nodes_wc
   master_nodes = var.master_nodes_wc
