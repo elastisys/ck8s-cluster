@@ -11,6 +11,7 @@ usage() {
     echo "Usage:" 1>&2
     echo "  init" 1>&2
     echo "  apply <infra|k8s|apps|all>" 1>&2
+    echo "  dry-run" 1>&2
     exit 1
 }
 
@@ -21,6 +22,9 @@ case "${1}" in
     apply)
         [[ "${2}" =~ ^(infra|k8s|apps|all)$ ]] || usage
         with_config_secrets "${here}/apply.bash" ${2}
+        ;;
+    dry-run)
+        with_config_secrets "${here}/dry-run.bash"
         ;;
     *) usage ;;
 esac
