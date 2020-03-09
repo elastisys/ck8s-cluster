@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-du-monitoring-script
+data:
+  export-influxdb-database-size.sh: |
+    #!/bin/sh
+    
+    PROMETHEUS_INFLUXDB_METRIC=$(cat /etc/config/prometheus-influxdb-retention-metric-name)
+    INFLUXDB_DATABASE=$(cat /etc/config/influxdb-retention-database)
+
+    echo ${PROMETHEUS_INFLUXDB_METRIC} $(du -s /var/lib/influxdb/data/${INFLUXDB_DATABASE} | cut -f 1) > /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom.$$
+    mv /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom.$$ /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom

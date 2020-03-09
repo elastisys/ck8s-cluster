@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-env-vars-cm
+data:
+  influxdb-retention-database: service_cluster
+  prometheus-influxdb-retention-metric-name: influxdb_service_cluster_size

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb-du-monitoring-service
+  labels:
+    app: influxdb-du-monitoring
+    release: prometheus-operator
+spec:
+  selector:
+    app: influxdb
+  ports:
+    - name: web
+      port: 9100
+      protocol: TCP
+      targetPort: 9100
