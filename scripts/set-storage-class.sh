@@ -17,6 +17,11 @@ case $CLOUD_PROVIDER in
     export ES_STORAGE_CLASS=local-storage
     ;;
 
+  aws)
+    export STORAGE_CLASS=ebs-gp2
+    export ES_STORAGE_CLASS=ebs-gp2
+    ;;
+
   *)
     echo "ERROR: Unknown CLOUD_PROVIDER [$CLOUD_PROVIDER], STORAGE_CLASS value could not be set."
     exit 1

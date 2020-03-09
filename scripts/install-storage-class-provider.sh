@@ -19,5 +19,13 @@ install_storage_class_provider() {
             kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
         fi
     ;;
+    "ebs-gp2")
+        storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "ebs-gp2") | .name')
+        if [ -z "$storage" ]
+        then
+            echo "Install EBS GP2 storage class" >&2
+            kubectl apply -f "${SCRIPTS_PATH}/../manifests/storageclass/aws/ebs-gp2.yaml"
+        fi
+    ;;
     esac
 }
