@@ -206,6 +206,19 @@ releases:
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch-operator.yaml"
 
 
+# Local volume provisioner
+- name: local-volume-provisioner
+  namespace: kube-system
+  labels:
+    app: local-volume-provisioner
+  chart: ./charts/local-volume-provisioner
+  version: 2.3.4
+  missingFileHandler: Info
+  values:
+  - values/local-volume-provisioner.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/local-volume-provisioner.yaml"
+
+
 # Elasticsearch
 - name: elasticsearch
   namespace: elastic-system
