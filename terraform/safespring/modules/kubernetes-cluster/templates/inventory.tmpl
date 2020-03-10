@@ -3,8 +3,8 @@ ${worker_hosts}
 
 [all:vars]
 k8s_version=${k8s_version}
-k8s_pod_cidr=10.42.0.0/16
-k8s_service_cidr=10.43.0.0/16
+k8s_pod_cidr=192.168.0.0/16
+k8s_service_cidr=10.96.0.0/12
 
 ansible_user='ubuntu'
 ansible_port=22

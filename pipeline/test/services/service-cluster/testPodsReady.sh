@@ -9,6 +9,7 @@ DEPLOYMENTS=(
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
     "elastic-system kibana-kb"
+    "kube-system calico-kube-controllers"
     "kube-system coredns"
     "kube-system coredns-autoscaler"
     "kube-system metrics-server"
@@ -57,7 +58,7 @@ do
 done
 
 DAEMONSETS=(
-    "kube-system canal"
+    "kube-system calico-node"
     "kube-system node-local-dns"
     "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
