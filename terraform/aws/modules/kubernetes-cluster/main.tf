@@ -93,6 +93,15 @@ resource "aws_lb_target_group" "master_tg_external" {
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
+
+  health_check {
+    protocol            = "TCP"
+    enabled             = true
+    interval            = 10
+    port                = 6443
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 resource "aws_lb_target_group" "master_tg_internal" {
@@ -101,6 +110,15 @@ resource "aws_lb_target_group" "master_tg_internal" {
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
+
+  health_check {
+    protocol            = "TCP"
+    enabled             = true
+    interval            = 10
+    port                = 6443
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 resource "aws_lb_target_group_attachment" "master_tga_external" {
