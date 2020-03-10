@@ -1,6 +1,0 @@
----
-- import_playbook: prepare-nodes.yaml
-- import_playbook: initialize-master.yaml
-- import_playbook: ha-control-plane.yaml
-  when: groups.masters | count > 1
-- import_playbook: join-cluster.yaml
