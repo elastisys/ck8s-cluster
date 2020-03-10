@@ -8,3 +8,26 @@
       file:
         path: /etc/kubeadm
         state: directory
+
+- hosts: masters
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Create conf directory for kubernetes
+      file:
+        path: /etc/kubernetes/conf
+        state: directory
+
+    - name: Create audit log directory
+      file:
+        path: /var/log/kube-audit
+        state: directory
+
+    - name: Add audit policy
+      copy:
+        src: audit-policy.yaml
+        dest: /etc/kubernetes/conf/audit-policy.yaml
+        owner: root
+        group: root
+        mode: '0644'

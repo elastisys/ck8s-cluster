@@ -34,24 +34,6 @@
   serial: 1
   tasks:
 
-    - name: Create conf directory for kubernetes
-      file:
-        path: /etc/kubernetes/conf
-        state: directory
-
-    - name: Create audit log directory
-      file:
-        path: /var/log/kube-audit
-        state: directory
-
-    - name: Add audit policy
-      copy:
-        src: audit-policy.yaml
-        dest: /etc/kubernetes/conf/audit-policy.yaml
-        owner: root
-        group: root
-        mode: '0644'
-
     - name: Render kubeadm join config
       template:
         src: kubeadm-join-master.yaml.j2

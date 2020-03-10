@@ -4,24 +4,6 @@
   become_user: root
   tasks:
 
-    - name: Create conf directory for kubernetes
-      file:
-        path: /etc/kubernetes/conf
-        state: directory
-
-    - name: Create audit log directory
-      file:
-        path: /var/log/kube-audit
-        state: directory
-
-    - name: Add audit policy
-      copy:
-        src: audit-policy.yaml
-        dest: /etc/kubernetes/conf/audit-policy.yaml
-        owner: root
-        group: root
-        mode: '0644'
-
     - name: Render kubeadm config
       template:
         src: kubeadm-config.yaml.j2
@@ -45,6 +27,11 @@
       copy:
         src: "../manifests/podSecurityPolicy/restricted-psp.yaml"
         dest: /etc/kubeadm/restricted-psp.yaml
+
+    - name: Wait for load balancer to set master as healthy
+      command: 'for '
+      register: lb_status
+      until:  lb_status.stdout == "True"
 
     - name: Install default PSP
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f {{ item }}
