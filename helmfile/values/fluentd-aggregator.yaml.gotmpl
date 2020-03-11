@@ -55,9 +55,13 @@ configMaps:
 
       aws_key_id "#{ENV['AWS_ACCESS_KEY_ID']}"
       aws_sec_key "#{ENV['AWS_ACCESS_SECRET_KEY']}"
+      {{ if eq (env "CLOUD_PROVIDER") "aws" -}}
+      s3_region {{ requiredEnv "S3_REGION" }}
+      {{ else -}}
       s3_endpoint {{ requiredEnv "S3_REGION_ENDPOINT" }}
-      s3_bucket {{ requiredEnv "S3_SC_FLUENTD_BUCKET_NAME" }}
       force_path_style true
+      {{ end -}}
+      s3_bucket {{ requiredEnv "S3_SC_FLUENTD_BUCKET_NAME" }}
 
       path logs/%Y%m%d/${tag}/
 
