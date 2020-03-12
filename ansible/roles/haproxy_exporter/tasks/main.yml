@@ -10,6 +10,7 @@
   copy:
     src: /tmp/haproxy_exporter-{{ haproxy_exporter_version }}.linux-amd64/haproxy_exporter
     dest: /usr/local/bin/haproxy_exporter
+    remote_src: yes
     mode: u=rwx,g=rwx,o=rx
   tags:
     - haproxy_exporter
