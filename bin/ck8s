@@ -8,10 +8,13 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    echo "Usage:" 1>&2
-    echo "  init" 1>&2
-    echo "  apply <infra|k8s|apps|all>" 1>&2
-    echo "  dry-run" 1>&2
+    echo "COMMANDS:" 1>&2
+    echo "  init                initialize the config path" 1>&2
+    echo "  apply infra         apply the cloud infrastructure" 1>&2
+    echo "  apply k8s           apply Kubernetes" 1>&2
+    echo "  apply apps          apply the service applications" 1>&2
+    echo "  apply all           apply all of the above" 1>&2
+    echo "  dry-run             run terraform plan and helmfile diff" 1>&2
     exit 1
 }
 
