@@ -11,3 +11,7 @@
 ## Removed
 
 - Kustomize is no longer needed and has been removed.
+
+## Fixed
+
+- Invalid index selection in SLM policy for nightly elasticsearch snapshots.
