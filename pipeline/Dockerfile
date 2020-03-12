@@ -55,4 +55,3 @@ RUN wget https://github.com/s3tools/s3cmd/releases/download/v2.0.2/s3cmd-2.0.2.t
     cd s3cmd-2.0.2 && \
     python3 setup.py install
 
-ENTRYPOINT ["/bin/bash"]
