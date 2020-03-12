@@ -57,6 +57,29 @@ Installs Ansible and the requirements using the playbook get-requirements.yaml
 sudo apt-get install ansible=2.5.1+dfsg-1ubuntu0.1 -y && ansible-playbook --connection=local --inventory=127.0.0.1 --limit 127.0.0.1 get-requirements.yaml
 ```
 
+## PGP
+
+Configuration secrets in ck8s are encrypted using
+[SOPS](https://github.com/mozilla/sops). We currently only support using PGP
+when encrypting secrets. Because of this, before you can start using ck8s,
+you need to generate your own PGP key:
+
+```bash
+gpg --full-generate-key
+```
+
+Note that it's generally preferable that you generate and store your primary
+key and revocation certificate offline. That way you can make sure you're able
+to revoke keys in the case of them getting lost, or worse yet, accessed by
+someone that's not you.
+
+Instead create subkeys for specific devices such as your laptop that you use
+for encryption and/or signing.
+
+If this is all new to you, here's a
+[link](https://riseup.net/en/security/message-security/openpgp/best-practices)
+worth reading!
+
 ## Quick setup of a new environment
 
 In order to setup a new Compliant Kubernetes cluster you will need to do the following.
@@ -68,6 +91,8 @@ In order to setup a new Compliant Kubernetes cluster you will need to do the fol
 export CK8S_CLOUD_PROVIDER=[exoscale|safespring]
 export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
 # For encrypting config secrets using SOPS
+# You can run `gpg --list-keys` to find the fingerprint of PGP keys in your
+# keyring.
 export SOPS_PGP_FP=[PGP fingerprint]
 # For setting the Terraform remote workspace execution mode to local
 export TF_TOKEN=[Terraform token]
