@@ -197,9 +197,6 @@ extraVolumeMounts:
     readOnly: true
 
 tolerations:
-- effect: NoExecute
-  key: "node-role.kubernetes.io/etcd"
-  value: "true"
 - effect: NoSchedule
-  key: "node-role.kubernetes.io/controlplane"
-  value: "true"
+  key: "node-role.kubernetes.io/master"
+  value: ""
