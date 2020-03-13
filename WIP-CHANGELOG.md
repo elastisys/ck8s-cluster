@@ -18,6 +18,7 @@
 - Auto-completion for the cli
 - S3 support for the AWS cloud provider
 - Ansible inventory generated directly in terraform for Exoscale and Safespring
+- `metrics-server` is installed on kubeadm-installed clusters as well.
 
 ### Fixed
 

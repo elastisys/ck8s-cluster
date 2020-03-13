@@ -136,6 +136,18 @@ releases:
   values:
   - values/node-local-dns.yaml.gotmpl
 
+# metrics-server
+- name: metrics-server
+  namespace: kube-system
+  labels:
+    app: metrics-server
+  chart: stable/metrics-server
+  version: 2.10.0
+  missingFileHandler: Error
+  values:
+  - values/metrics-server.yaml.gotmpl
+
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex
