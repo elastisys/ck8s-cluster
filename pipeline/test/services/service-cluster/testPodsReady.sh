@@ -9,14 +9,6 @@ DEPLOYMENTS=(
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
     "elastic-system kibana-kb"
-    "harbor harbor-harbor-chartmuseum"
-    "harbor harbor-harbor-clair"
-    "harbor harbor-harbor-core"
-    "harbor harbor-harbor-jobservice"
-    "harbor harbor-harbor-notary-server"
-    "harbor harbor-harbor-notary-signer"
-    "harbor harbor-harbor-portal"
-    "harbor harbor-harbor-registry"
     "kube-system coredns"
     "kube-system coredns-autoscaler"
     "kube-system metrics-server"
@@ -33,6 +25,18 @@ DEPLOYMENTS=(
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
     DEPLOYMENTS+=("kube-system nfs-client-provisioner")
+fi
+if [ "$ENABLE_HARBOR" == true ]; then
+    DEPLOYMENTS+=(
+        "harbor harbor-harbor-chartmuseum"
+        "harbor harbor-harbor-clair"
+        "harbor harbor-harbor-core"
+        "harbor harbor-harbor-jobservice"
+        "harbor harbor-harbor-notary-server"
+        "harbor harbor-harbor-notary-signer"
+        "harbor harbor-harbor-portal"
+        "harbor harbor-harbor-registry"
+    )
 fi
 
 echo
@@ -78,10 +82,14 @@ STATEFULSETS=(
     "monitoring prometheus-wc-scraper-prometheus-instance"
     "monitoring alertmanager-prometheus-operator-alertmanager"
     "elastic-system elastic-operator"
-    "harbor harbor-harbor-database"
-    "harbor harbor-harbor-redis"
     "influxdb-prometheus influxdb"
 )
+if [ "$ENABLE_HARBOR" == true ]; then
+    STATEFULSETS+=(
+        "harbor harbor-harbor-database"
+        "harbor harbor-harbor-redis"
+    )
+fi
 
 echo
 echo
@@ -110,9 +118,13 @@ fi
 # Format:
 # namespace job-name timeout
 JOBS=(
-  "harbor init-harbor-job 120s"
   "elastic-system configure-es-job 120s"
 )
+if [ "$ENABLE_HARBOR" == true ]; then
+    JOBS+=(
+        "harbor init-harbor-job 120s"
+    )
+fi
 
 echo
 echo
