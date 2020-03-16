@@ -168,7 +168,19 @@ echo "======================"
 
 echo -n -e "\nelasticsearch\t"
 # This checks the health status of the elasticsearch custom resource
-RES=$(kubectl -n elastic-system get elasticsearches.elasticsearch.k8s.elastic.co -o jsonpath="{.items[0].status.health}")
+retries=5
+while true; do
+    RES=$(kubectl -n elastic-system get elasticsearches.elasticsearch.k8s.elastic.co -o jsonpath="{.items[0].status.health}")
+
+    retries=$((retries - 1))
+
+    [ "${retries}" -lt 1 ] || [ "${RES}" = "green" ] && break
+
+    echo "health not green yet, retrying..."
+    echo -n -e "elasticsearch\t"
+
+    sleep 10
+done
 if [[ $RES == "green" ]]
 then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
 else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
