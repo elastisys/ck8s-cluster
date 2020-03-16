@@ -30,3 +30,9 @@ rm -f "${rkestate_sc}"
 rm -f "${rkestate_wc}"
 rm -f "${kube_config_sc}"
 rm -f "${kube_config_wc}"
+
+log_info "Aborting multipart uploads to S3 buckets"
+with_s3cfg "${s3cfg_file}" "${scripts_path}/manage-s3-buckets.sh" --abort
+
+log_info "Deleting S3 buckets"
+with_s3cfg "${s3cfg_file}" "${scripts_path}/manage-s3-buckets.sh" --delete
