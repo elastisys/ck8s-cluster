@@ -5,6 +5,9 @@
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 : "${SOPS_PGP_FP:?Missing SOPS_PGP_FP}"
 
+# Make CK8S_CONFIG_PATH absolute
+export CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
+
 here="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 root_path="${here}/.."
 config_defaults_path="${root_path}/config"

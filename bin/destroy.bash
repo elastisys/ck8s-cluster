@@ -18,7 +18,7 @@ config_load
 log_info "Destroying Terraform infrastructure"
 
 pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
-terraform init
+echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init
 terraform workspace select "${ENVIRONMENT_NAME}"
 terraform destroy \
     -var-file="${tfvars_file}" \

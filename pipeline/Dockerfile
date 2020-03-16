@@ -33,11 +33,6 @@ RUN wget https://github.com/roboll/helmfile/releases/download/v0.99.0/helmfile_l
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile
 
-# Vault
-RUN wget https://releases.hashicorp.com/vault/1.2.2/vault_1.2.2_linux_amd64.zip
-RUN unzip vault_1.2.2_linux_amd64.zip && \
-    mv vault /usr/local/bin/vault
-
 # Pipenv
 RUN apt update && apt install python3-pip -y
 RUN python3 -m pip install pip
@@ -55,3 +50,21 @@ RUN wget https://github.com/s3tools/s3cmd/releases/download/v2.0.2/s3cmd-2.0.2.t
     cd s3cmd-2.0.2 && \
     python3 setup.py install
 
+# sops
+# TODO: Use release when exit code propagation is released.
+#       See: https://github.com/mozilla/sops/issues/626
+#RUN wget https://github.com/mozilla/sops/releases/download/vX.Y.Z/sops-vX.Y.Z.linux && \
+#    chmod +x sops-vX.Y.Z.linux && \
+#    mv sops-vX.Y.Z.linux /usr/local/bin/sops && \
+RUN apt update && apt install -y git
+RUN wget https://dl.google.com/go/go1.14.linux-amd64.tar.gz && \
+    tar -xvzf go1.14.linux-amd64.tar.gz && \
+    export PATH=/go/bin:$PATH && \
+    rm -rf /go1.14.linux-amd64.tar.gz
+ENV PATH="/go/bin:${PATH}"
+RUN go get go.mozilla.org/sops/v3 && \
+    cd /root/go/src/go.mozilla.org/sops/v3 && \
+    git checkout 7f350d81b50926a1a07294b6b8d8bb6ed3428186 && \
+    make install && \
+    mv /root/go/bin/sops /usr/local/bin && \
+    rm -rf /root/go
