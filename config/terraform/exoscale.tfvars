@@ -39,6 +39,7 @@ master_name_size_map_wc = {
 
 nfs_size = "Small"
 
+# TODO: Remove Elastisys and A1 ranges before making repository public
 public_ingress_cidr_whitelist = [
   # Elastisys office
   "194.132.164.168/32",

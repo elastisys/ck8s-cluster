@@ -47,4 +47,5 @@ worker_extra_volume_size_sc = {}
 
 worker_extra_volume_size_wc = {}
 
+# TODO: Remove Elastisys range before making repository public
 public_ingress_cidr_whitelist = "194.132.164.168/32" # Elastisys office
