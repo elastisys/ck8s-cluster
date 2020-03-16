@@ -18,3 +18,6 @@
 ### Fixed
 
 - Invalid index selection in SLM policy for nightly elasticsearch snapshots.
+- `S3COMMAND_CONFIG_FILE` is now used as the config file path for all s3cmd
+  executions in `manage-s3-bucket.sh`. Previously the `--abort` flag did not
+  use it and instead defaulted to `${HOME}/.s3cfg`.
