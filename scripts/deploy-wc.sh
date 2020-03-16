@@ -2,6 +2,8 @@
 
 set -e
 
+SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
+
 : "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 : "${S3_ACCESS_KEY:?Missing S3_ACCESS_KEY}"
 : "${S3_SECRET_KEY:?Missing S3_SECRET_KEY}"
@@ -28,27 +30,12 @@ then
     fi
 fi
 
-case $CLOUD_PROVIDER in
-
-  safespring | citycloud)
-    export STORAGE_CLASS=cinder-storage
-    ;;
-
-  exoscale)
-    export STORAGE_CLASS=nfs-client
-    ;;
-
-  *)
-    echo "ERROR: Unknown CLOUD_PROVIDER [$CLOUD_PROVIDER], STORAGE_CLASS value could not be set."
-    exit 1
-    ;;
-esac
+source ${SCRIPTS_PATH}/set-storage-class.sh
 
 export CLUSTER_NAME="${ENVIRONMENT_NAME}_${CLOUD_PROVIDER}"
 export CUSTOMER_NAMESPACES_COMMASEPARATED=$(echo "$CUSTOMER_NAMESPACES" | tr ' ' ,)
 export CUSTOMER_ADMIN_USERS_COMMASEPARATED=$(echo "$CUSTOMER_ADMIN_USERS" | tr ' ' ,)
 
-SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
@@ -119,29 +106,14 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/servicemonitor.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
 
-
-
-# Install cinder storageclass if it is not installed.
-if [ $STORAGE_CLASS == "cinder-storage" ]; then
-    echo "Installing cinder storageclass" >&2
-    [ $(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[] | select(.metadata.name == "cinder-storage") | length') > 0 ] || kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
-fi
-
-
-
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
+echo "Installing cert-manager" >&2
+helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 
-if [ $STORAGE_CLASS == "nfs-client" ]
-then
-    echo "Installing cert-manage and nfs-client-provisioner" >&2
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff
-else
-    echo "Installing cert-manager" >&2
-    helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
-fi
-
+source ${SCRIPTS_PATH}/install-storage-class-provider.sh
+install_storage_class_provider "${STORAGE_CLASS}" workload_cluster
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')

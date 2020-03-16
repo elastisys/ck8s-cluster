@@ -71,21 +71,7 @@ then
     : "${INFLUX_BACKUP_NAME:?Missing INFLUX_BACKUP_NAME}"
 fi
 
-case $CLOUD_PROVIDER in
-
-  safespring | citycloud)
-    export STORAGE_CLASS=cinder-storage
-    ;;
-
-  exoscale)
-    export STORAGE_CLASS=nfs-client
-    ;;
-
-  *)
-    echo "ERROR: Unknown CLOUD_PROVIDER [$CLOUD_PROVIDER], STORAGE_CLASS value could not be set."
-    exit 1
-    ;;
-esac
+source ${SCRIPTS_PATH}/set-storage-class.sh
 
 if [[ $ENABLE_HARBOR == "true" ]]
 then
@@ -138,8 +124,6 @@ then
 
 fi
 
-echo "Creating local storage class for elasticsearch nodes" >&2
-kubectl apply -f ${SCRIPTS_PATH}/../manifests/elasticsearch/local-storage-class.yaml
 
 echo "Initializing helm" >&2
 "${SCRIPTS_PATH}/initialize-tiller.sh" kube-system \
@@ -186,32 +170,18 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/servicemonitor.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
 
-
-if [ $STORAGE_CLASS == "cinder-storage" ]
-then
-    storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "cinder-storage") | .name')
-    if [ -z "$storage" ]
-    then
-        echo "Install cinder storage class" >&2
-        kubectl apply -f ${SCRIPTS_PATH}/../manifests/cinder-storage.yaml
-    fi
-fi
-
 echo "Creating elasticsearch-operator CRD" >&2
 kubectl apply -f "${SCRIPTS_PATH}/../manifests/elasticsearch-operator/crds.yaml"
 
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
+echo "Install cert-manager" >&2
+helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 
-if [ $STORAGE_CLASS == "nfs-client" ]
-then
-    echo "Install cert-manager and nfs-client-provisioner" >&2
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager -l app=nfs-client-provisioner $INTERACTIVE apply --suppress-diff
-else
-    echo "Install cert-manager" >&2
-    helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
-fi
+source ${SCRIPTS_PATH}/install-storage-class-provider.sh
+install_storage_class_provider "${STORAGE_CLASS}" service_cluster
+install_storage_class_provider "${ES_STORAGE_CLASS}" service_cluster
 
 # Get status of the cert-manager webhook api.
 STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
@@ -227,8 +197,7 @@ fi
 echo "Installing Dex" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff
 
-
-charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
+charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=local-volume-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
 
 [[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"
 [[ $ENABLE_CK8SDASH_SC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
