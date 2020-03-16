@@ -1,7 +1,7 @@
 Elastisys Compliant Kubernetes
 ==============================
 
-# Overview
+## Overview
 
 The Elastisys Compliant Kubernetes (ck8s) platform runs two Kubernetes
 clusters. One called "service" and one called "workload".
@@ -24,7 +24,7 @@ following services:
 * Fluentd
 * Prometheus
 
-# Setup
+## Setup
 
 The management of the ck8s platform is separated into different stages,
 Exoscale cloud infrastructure (terraform), Kubernetes cluster (rke) and
@@ -34,12 +34,12 @@ When first setting up the environment each stage needs to be done in
 sequential order since they are dependent on each other. Once the initial
 installation is done, each stage can be updated independently.
 
-## Cloud providers
+### Cloud providers
 
 Currently we support two cloud providers: Exoscale and Safespring.
 The main difference between them is in setting up the cloud infrastructure. We have one terraform folder for each provider. The rest of the setup is controlled by the environment variable `CLOUD_PROVIDER` which should be set to `exoscale` or `safespring`.
 
-## Requirements
+### Requirements
 
 - [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.19)
 - [RKE](https://github.com/rancher/rke/releases) (tested with 1.0.0)
@@ -57,7 +57,22 @@ Installs Ansible and the requirements using the playbook get-requirements.yaml
 sudo apt-get install ansible=2.5.1+dfsg-1ubuntu0.1 -y && ansible-playbook --connection=local --inventory=127.0.0.1 --limit 127.0.0.1 get-requirements.yaml
 ```
 
-## PGP
+### Terraform Cloud
+
+The Terraform state is stored in the
+[Terraform Cloud remote backend](https://www.terraform.io/docs/backends/types/remote.html).
+If you haven't done so already, you first need to:
+
+1. [Create an account](https://app.terraform.io/signup/account) and request to
+be added to the
+[Elastisys organization](https://app.terraform.io/app/elastisys).
+
+2. Add your
+[authentication token](https://app.terraform.io/app/settings/tokens)
+in the `.terraformrc` file.
+[Read more here](https://www.terraform.io/docs/enterprise/free/index.html#configure-access-for-the-terraform-cli).
+
+### PGP
 
 Configuration secrets in ck8s are encrypted using
 [SOPS](https://github.com/mozilla/sops). We currently only support using PGP
@@ -80,7 +95,9 @@ If this is all new to you, here's a
 [link](https://riseup.net/en/security/message-security/openpgp/best-practices)
 worth reading!
 
-## Quick setup of a new environment
+## Usage
+
+### Quickstart
 
 In order to setup a new Compliant Kubernetes cluster you will need to do the following.
 
@@ -119,7 +136,7 @@ export CK8S_CONFIG_PATH=${HOME}/.ck8s/my-ck8s-cluster
 ./bin/ck8s apply all
 ```
 
-## Customer access
+### Customer access
 
 After the cluster setup has completed RBAC resources, namespaces and a
 kubeconfig file (`${CK8S_CONFIG_PATH}/customer/kubeconfig.yaml`) will have
@@ -134,7 +151,7 @@ CUSTOMER_ADMIN_USERS="admin1@example.com admin2@example.com"
 The customer kubeconfig will be configured to use the first namespace by
 default.
 
-## DNS
+### DNS
 
 The domain name will be automatically created with the name
 `${TF_VAR_dns_prefix}[.ops].a1ck.io` for Exoscale and
@@ -145,7 +162,7 @@ For Safespring the domain can be changed by setting the Terraform variable
 `aws_dns_zone_id` to an id of another hosted zone in AWS Route 53.
 
 
-## Setting up Google as identity provider for dex.
+### Setting up Google as identity provider for dex.
 
 1. Go to the [Google console](https://console.cloud.google.com/) and create a project.
 
@@ -157,18 +174,18 @@ Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elast
 
 4. Configure the options `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
 
-## OpenID Connect with kubectl
+### OpenID Connect with kubectl
 
 For using OpenID Connect with kubectl, see
 [kubelogin/README.md](kubelogin/README.md).
 
-## OpenID Connect with Harbor
+### OpenID Connect with Harbor
 
 When using Harbor as a reqistry and authenticating with OIDC docker need to be logged
 in to that user. For more information how to use it see
 [Using OIDC from the Docker or Helm CLI](https://github.com/goharbor/harbor/blob/master/docs/1.10/administration/configure-authentication/oidc-auth.md#using-oidc-from-the-docker-or-helm-cli)
 
-## Adding additional configuration
+### Adding additional configuration
 
 To add or override the default configuration that is used for all the helm charts that are installed through helmfile, one can set the environement variable `CK8S_ADDITIONAL_VALUES` that should point to a path containing the `{release-name-to-add-or-override}.yaml` files.
 
@@ -208,3 +225,9 @@ the caller which prevents them from being caught and be handled properly.
 To work around this issue, install SOPS from the development branch where a fix
 has been commited.
 See: https://github.com/mozilla/sops/issues/626
+
+### Terraform Cloud organization is not configurable
+
+The Terraform Cloud organization is currently not configurable. Therefore,
+without modifying the Terraform code you can only use ck8s while having access
+to the Elastisys organization.
