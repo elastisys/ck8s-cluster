@@ -15,12 +15,10 @@ worker_name_flavor_map_sc = {
 
 worker_names_wc = [
   "worker-0",
-  "worker-1",
 ]
 
 worker_name_flavor_map_wc = {
   "worker-0" : "16d11558-62fe-4bce-b8de-f49a077dc881",
-  "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881",
 }
 
 master_names_sc = [

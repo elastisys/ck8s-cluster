@@ -13,12 +13,10 @@ worker_name_size_map_sc = {
 
 worker_names_wc = [
   "worker-0",
-  "worker-1",
 ]
 
 worker_name_size_map_wc = {
   "worker-0" : "Large",
-  "worker-1" : "Large",
 }
 
 master_names_sc = [
