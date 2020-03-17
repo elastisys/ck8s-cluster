@@ -49,3 +49,4 @@
 - Using Neutron instead of Nova network for security rules in Safespring and Citycloud.
 - Clean up volumes also in the workload cluster for Safespring and Citycloud
 - Control plane logs (not audit logs) now go to the `kubernetes` index instead of `kubecomponents`.
+- AWS: The DNS terraform module is now to be used standalone instead of by the infrastructure module.
