@@ -2,9 +2,6 @@
 
 set -eu -o pipefail
 
-: "${CI_EXOSCALE_KEY:?Missing CI_EXOSCALE_KEY}"
-: "${CI_EXOSCALE_SECRET:?Missing CI_EXOSCALE_SECRET}"
-
 here="$(dirname "$(readlink -f "$0")")"
 ck8s="${here}/../bin/ck8s"
 
@@ -35,17 +32,36 @@ secrets_update() {
 
 }
 
-config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.a1ck.io"
-config_update ECK_OPS_DOMAIN "ops.${CK8S_ENVIRONMENT_NAME}.a1ck.io"
+case "${CK8S_CLOUD_PROVIDER}" in
+    "exoscale")
+    config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.a1ck.io"
+    config_update ECK_OPS_DOMAIN "ops.${CK8S_ENVIRONMENT_NAME}.a1ck.io"
 
-secrets_update TF_VAR_exoscale_api_key "${CI_EXOSCALE_KEY}"
-secrets_update TF_VAR_exoscale_secret_key "${CI_EXOSCALE_SECRET}"
-secrets_update S3_ACCESS_KEY "${CI_EXOSCALE_KEY}"
-secrets_update S3_SECRET_KEY "${CI_EXOSCALE_SECRET}"
+    secrets_update TF_VAR_exoscale_api_key "${CI_EXOSCALE_KEY}"
+    secrets_update TF_VAR_exoscale_secret_key "${CI_EXOSCALE_SECRET}"
+    secrets_update S3_ACCESS_KEY "${CI_EXOSCALE_KEY}"
+    secrets_update S3_SECRET_KEY "${CI_EXOSCALE_SECRET}"
 
-# No whitelisting
-sed -i ':a;N;$!ba;s/public_ingress_cidr_whitelist = \[[^]]*\]/public_ingress_cidr_whitelist = \["0.0.0.0\/0"\]/g' \
-    "${CK8S_CONFIG_PATH}/config.tfvars"
+    # No whitelisting
+    sed -i ':a;N;$!ba;s/public_ingress_cidr_whitelist = \[[^]]*\]/public_ingress_cidr_whitelist = \["0.0.0.0\/0"\]/g' \
+        "${CK8S_CONFIG_PATH}/config.tfvars"
+    ;;
+    "safespring")
+    config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.elastisys.se"
+    config_update ECK_OPS_DOMAIN "ops.${CK8S_ENVIRONMENT_NAME}.elastisys.se"
+
+    secrets_update OS_USERNAME "${CI_OS_USERNAME}"
+    secrets_update OS_PASSWORD "${CI_OS_PASSWORD}"
+    secrets_update S3_ACCESS_KEY "${CI_S3_ACCESS_KEY}"
+    secrets_update S3_SECRET_KEY "${CI_S3_SECRET_KEY}"
+    secrets_update AWS_ACCESS_KEY_ID "${CI_AWS_ACCESS_KEY_ID}"
+    secrets_update AWS_SECRET_ACCESS_KEY "${CI_AWS_SECRET_ACCESS_KEY}"
+
+    # No whitelisting
+    sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = "0.0.0.0\/0"/' \
+        "${CK8S_CONFIG_PATH}/config.tfvars"
+    ;;
+esac
 
 # TODO: The GitHub Actions runner does not run as root. Chmodding for now.
 #       Would be nice to find a cleaner solution.

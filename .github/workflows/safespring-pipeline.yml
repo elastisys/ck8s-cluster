@@ -3,6 +3,7 @@ name: Safespring-pipeline
 on:
   schedule:
     - cron: "0 5 * * *"
+
 jobs:
   build-image:
     runs-on: ubuntu-latest
@@ -16,293 +17,81 @@ jobs:
         image_tag: ${{ github.sha }}
         context: pipeline
 
-  infra:
+  init:
     needs: build-image
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - run: echo $GITHUB_RUN_ID
-      shell: bash
-    - run: env
-      shell: bash
-    - run: ./pipeline/infra.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: safespring
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
-        OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - run: ./pipeline/create-s3-buckets.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: safespring
-        S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
-        S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
-    - name: Upload infra.json
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: infra.json
-        path: infra.json
-    - name: upload terraform output
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: tfoutput        
-        path: tfoutput
-
-  rke-sc:
-    needs: infra
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - run: ./pipeline/rke-sc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: safespring
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
-        OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - name: Upload kube_config
-      uses: actions/upload-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: kube_config_eck-sc.yaml
-    - name: Upload rke output
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: rke-sc-output
-        path: rke-sc-output
-
-  rke-wc:
-    needs: infra
     runs-on: ubuntu-latest
     container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - run: ./pipeline/rke-wc.sh
+    - run: ./pipeline/init.bash
       shell: bash
       env:
-        CLOUD_PROVIDER: safespring
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
-        OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - name: Upload kube_config
-      uses: actions/upload-artifact@v1
-      with:
-        name: kube_config_eck-wc.yaml
-        path: kube_config_eck-wc.yaml
-    - name: Upload rke output
+        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
+        CK8S_CLOUD_PROVIDER: safespring
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+        # Prefixed with CI to prevent confusing people they are used from env
+        # and not from secrets.env.
+        CI_OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
+        CI_OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
+        CI_S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
+        CI_S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
+        CI_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        CI_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: Upload config
       if: always()
       uses: actions/upload-artifact@v1
       with:
-        name: rke-wc-output
-        path: rke-wc-output
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
 
-  deploy-sc:
-    needs: [rke-sc,rke-wc]
+  apply:
+    needs: init
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
-    - name: Download infra.json
+    - name: Download config
       uses: actions/download-artifact@v1
       with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: .
-    - run: ./pipeline/deploy-sc.sh
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
+    - run: ./pipeline/apply.bash
       shell: bash
       env:
-        CLOUD_PROVIDER: safespring
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-        S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
-        S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
-    - name: Upload deploy output
+        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+    - name: Upload config
       if: always()
       uses: actions/upload-artifact@v1
       with:
-        name: deploy-sc-output
-        path: deploy-sc-output
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
 
-  deploy-wc:
-    needs: [rke-sc,rke-wc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-wc.yaml
-        path: .
-    - run: ./pipeline/deploy-wc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: safespring
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-        S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
-        S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
-    - name: Upload deploy output
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: deploy-wc-output
-        path: deploy-wc-output
-  
-  test-sc:
-    needs: [deploy-wc, deploy-sc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: .
-    - run: ./pipeline/test-sc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: safespring
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-
-  test-wc:
-    needs: [deploy-wc, deploy-sc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-wc.yaml
-        path: .
-    - run: ./pipeline/test-wc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: safespring
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-
-  get-versions:
-    needs: [deploy-wc, deploy-sc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-wc.yaml
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: .
-    - run: ./pipeline/versions.sh
-      shell: bash
-    - name: Upload version.json
-      uses: actions/upload-artifact@v1
-      with:
-        name: version.json
-        path: version.json
-
-  clean-up:
-    needs: [test-sc,test-wc,get-versions]
+  cleanup:
+    needs: apply
     if: always()
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
-    - name: Download kube_config
+    - name: Download config
       uses: actions/download-artifact@v1
       with:
-        name: kube_config_eck-sc.yaml
-        path: .
-    - run: ./pipeline/cleanup-safespring-volumes.sh
-      shell: bash
-    - run: ./pipeline/cleanup.sh
-      if: always()
-      shell: bash
-      env: 
-        CLOUD_PROVIDER: safespring
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
-        OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-        S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
-        S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - run: ./pipeline/delete-s3-buckets.sh
-      if: always()
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
+    - run: ./pipeline/cleanup.bash
       shell: bash
       env:
-        CLOUD_PROVIDER: safespring
-        S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
-        S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
+        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+        DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
