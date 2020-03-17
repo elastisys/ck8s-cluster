@@ -44,31 +44,3 @@ module "workload_cluster" {
   worker_nodes = var.worker_nodes_wc
   master_nodes = var.master_nodes_wc
 }
-
-module "service_dns" {
-  source = "../aws-dns"
-
-  credentials_file_path = var.dns_credentials_file_path
-
-  dns_list = [
-    "*.ops.${var.dns_prefix}",
-    "grafana.${var.dns_prefix}",
-    "harbor.${var.dns_prefix}",
-    "dex.${var.dns_prefix}",
-    "kibana.${var.dns_prefix}",
-    "notary.harbor.${var.dns_prefix}"
-  ]
-  dns_records = module.service_cluster.worker_ips.*.public_ip
-}
-
-module "workload_dns" {
-  source = "../aws-dns"
-
-  credentials_file_path = var.dns_credentials_file_path
-
-  dns_list = [
-    "*.${var.dns_prefix}",
-    "prometheus.ops.${var.dns_prefix}"
-  ]
-  dns_records = module.workload_cluster.worker_ips.*.public_ip
-}

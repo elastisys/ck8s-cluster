@@ -30,18 +30,6 @@ output "wc_master_internal_loadbalancer_fqdn" {
   value = module.workload_cluster.master_internal_loadbalancer_fqdn
 }
 
-output "wc_dns_name" {
-  value = module.workload_dns.dns_record_name
-}
-
-output "sc_dns_name" {
-  value = module.service_dns.dns_record_name
-}
-
-output "domain_name" {
-  value = "${var.dns_prefix}.${module.service_dns.dns_suffix}"
-}
-
 output "ansible_inventory_sc" {
   value = module.service_cluster.ansible_inventory
 }
