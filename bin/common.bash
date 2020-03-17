@@ -53,6 +53,10 @@ log_info() {
     echo -e "[\e[34mck8s\e[0m] ${@}" 1>&2
 }
 
+log_warning() {
+    echo -e "[\e[33mck8s\e[0m] ${@}" 1>&2
+}
+
 log_error() {
     echo -e "[\e[31mck8s\e[0m] ${@}" 1>&2
 }
