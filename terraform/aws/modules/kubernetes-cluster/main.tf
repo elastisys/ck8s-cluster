@@ -1,5 +1,6 @@
 locals {
   internal_cidr_prefix = "172.16.0.0/16"
+  subnet_cidr_prefix   = "172.16.1.0/24"
 }
 
 provider "template" {
@@ -25,7 +26,7 @@ resource "aws_vpc" "main" {
 
 resource "aws_subnet" "main_sn" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = aws_vpc.main.cidr_block
+  cidr_block = local.subnet_cidr_prefix
 
   tags = {
     Name                                  = "${var.prefix}-main-sn"
