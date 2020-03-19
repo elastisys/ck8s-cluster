@@ -10,6 +10,9 @@ metadata:
     # TODO: Set an appropriate size, probably in synergy with fluentd buffer
     #       and elasticsearch size limits
     nginx.ingress.kubernetes.io/proxy-body-size: 8m
+{{- if .Values.elasticsearch.ingress.extraAnnotations }}
+{{ toYaml .Values.elasticsearch.ingress.extraAnnotations | indent 4 }}
+{{- end }}
 spec:
   tls:
   - hosts:
