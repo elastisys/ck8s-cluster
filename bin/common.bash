@@ -17,37 +17,37 @@ ansible_path="${root_path}/ansible"
 pipeline_path="${root_path}/pipeline"
 version_file="${root_path}/release/version.json"
 
-config_file="${CK8S_CONFIG_PATH}/config.sh"
-secrets_file="${CK8S_CONFIG_PATH}/secrets.env"
-tfvars_file="${CK8S_CONFIG_PATH}/config.tfvars"
 state_path="${CK8S_CONFIG_PATH}/.state"
-# TODO: Put in state?
 ssh_path="${CK8S_CONFIG_PATH}/ssh"
-
-infrastructure_file="${state_path}/infra.json"
-ansible_hosts="${state_path}/ansible_hosts.ini"
-
-s3cfg_file="${state_path}/s3cfg.ini"
-
-rke_config_sc="${state_path}/rke_sc.yaml"
-rke_config_wc="${state_path}/rke_wc.yaml"
-
-rkestate_sc="${state_path}/rke_sc.rkestate"
-rkestate_wc="${state_path}/rke_wc.rkestate"
-
-kube_config_sc="${state_path}/kube_config_rke_sc.yaml"
-kube_config_wc="${state_path}/kube_config_rke_wc.yaml"
-
-ssh_priv_key_sc="${ssh_path}/id_rsa_sc"
-ssh_pub_key_sc="${ssh_priv_key_sc}.pub"
-
-ssh_priv_key_wc="${ssh_path}/id_rsa_wc"
-ssh_pub_key_wc="${ssh_priv_key_wc}.pub"
-
 ssh_auth_sock="${ssh_path}/ssh_auth_sock"
-
 # TODO: Remove when Helm 3 is in place
 certs_path="${CK8S_CONFIG_PATH}/certs"
+
+declare -A config
+declare -A secrets
+
+config["config_file"]="${CK8S_CONFIG_PATH}/config.sh"
+config["tfvars_file"]="${CK8S_CONFIG_PATH}/config.tfvars"
+config["infrastructure_file"]="${state_path}/infra.json"
+config["ansible_hosts"]="${state_path}/ansible_hosts.ini"
+
+secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.env"
+secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
+
+secrets["rke_config_sc"]="${state_path}/rke_sc.yaml"
+secrets["rke_config_wc"]="${state_path}/rke_wc.yaml"
+
+secrets["rkestate_sc"]="${state_path}/rke_sc.rkestate"
+secrets["rkestate_wc"]="${state_path}/rke_wc.rkestate"
+
+secrets["kube_config_sc"]="${state_path}/kube_config_rke_sc.yaml"
+secrets["kube_config_wc"]="${state_path}/kube_config_rke_wc.yaml"
+
+secrets["ssh_priv_key_sc"]="${ssh_path}/id_rsa_sc"
+secrets["ssh_priv_key_wc"]="${ssh_path}/id_rsa_wc"
+
+config["ssh_pub_key_sc"]="${secrets[ssh_priv_key_sc]}.pub"
+config["ssh_pub_key_wc"]="${secrets[ssh_priv_key_wc]}.pub"
 
 log_info() {
     echo -e "[\e[34mck8s\e[0m] ${@}" 1>&2
@@ -123,7 +123,7 @@ validate_config() {
 
 # Load and validate all configuration options from the config path.
 config_load() {
-    source "${config_file}"
+    source "${config[config_file]}"
 
     validate_version
     validate_cloud "${CLOUD_PROVIDER}"
@@ -237,9 +237,9 @@ sops_exec_env() {
 # Run a command with the secrets config options available as environment
 # variables.
 with_config_secrets() {
-    sops_decrypt_verify "${secrets_file}"
+    sops_decrypt_verify "${secrets[secrets_file]}"
 
-    sops_exec_env "${secrets_file}" "${*}"
+    sops_exec_env "${secrets[secrets_file]}" "${*}"
 }
 
 # Run a command with a temporary SSH agent with a temporarily decrypted SSH

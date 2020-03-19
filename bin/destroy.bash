@@ -31,11 +31,12 @@ if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
     set +e
     (
         set -e
-        with_kubeconfig "${kube_config_sc}" \
+        with_kubeconfig "${secrets[kube_config_sc]}" \
             'kubectl delete ns elastic-system harbor monitoring fluentd influxdb-prometheus'
-        with_kubeconfig "${kube_config_sc}" 'kubectl delete pv --all --wait'
+        with_kubeconfig "${secrets[kube_config_sc]}" \
+            'kubectl delete pv --all --wait'
 
-        volumes_left="$(with_kubeconfig "${kube_config_sc}" \
+        volumes_left="$(with_kubeconfig "${secrets[kube_config_sc]}" \
             'kubectl get pv -o json |
                 jq ".items[] | {
                     pv_name: .metadata.name,
@@ -66,18 +67,20 @@ pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
 echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init
 terraform workspace select "${ENVIRONMENT_NAME}"
 terraform destroy \
-    -var-file="${tfvars_file}" \
-    -var ssh_pub_key_file_sc="${ssh_path}/id_rsa_sc.pub" \
-    -var ssh_pub_key_file_wc="${ssh_path}/id_rsa_wc.pub"
+    -var-file="${config[tfvars_file]}" \
+    -var ssh_pub_key_file_sc="${config[ssh_pub_key_sc]}" \
+    -var ssh_pub_key_file_wc="${config[ssh_pub_key_wc]}"
 popd > /dev/null
 
-rm -f "${rkestate_sc}"
-rm -f "${rkestate_wc}"
-rm -f "${kube_config_sc}"
-rm -f "${kube_config_wc}"
+rm -f "${secrets[rkestate_sc]}"
+rm -f "${secrets[rkestate_wc]}"
+rm -f "${secrets[kube_config_sc]}"
+rm -f "${secrets[kube_config_wc]}"
 
 log_info "Aborting multipart uploads to S3 buckets"
-with_s3cfg "${s3cfg_file}" "${scripts_path}/manage-s3-buckets.sh" --abort
+with_s3cfg "${secrets[s3cfg_file]}" \
+    "${scripts_path}/manage-s3-buckets.sh" --abort
 
 log_info "Deleting S3 buckets"
-with_s3cfg "${s3cfg_file}" "${scripts_path}/manage-s3-buckets.sh" --delete
+with_s3cfg "${secrets[s3cfg_file]}" \
+    "${scripts_path}/manage-s3-buckets.sh" --delete

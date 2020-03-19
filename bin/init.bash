@@ -54,8 +54,8 @@ ssh_gen() {
 
 log_info "Generating SSH keys"
 
-ssh_gen "${ssh_priv_key_sc}"
-ssh_gen "${ssh_priv_key_wc}"
+ssh_gen "${secrets[ssh_priv_key_sc]}"
+ssh_gen "${secrets[ssh_priv_key_wc]}"
 
 # TODO: Not a fan of this directory, we should probably have a separate script
 #       for generating customer configurations and not store it as a part of
@@ -77,36 +77,37 @@ gen_helm_certs() {
 gen_helm_certs service_cluster
 gen_helm_certs workload_cluster
 
-if [ -f "${config_file}" ]; then
-    log_info "${config_file} already exists, not overwriting config"
+if [ -f "${config[config_file]}" ]; then
+    log_info "${config[config_file]} already exists, not overwriting config"
 else
     export CK8S_VERSION=$(version_get)
     cat "${config_defaults_path}/config/head.sh" \
         "${config_defaults_path}/config/${CK8S_CLOUD_PROVIDER}.sh" \
         "${config_defaults_path}/config/tail.sh" | \
-        envsubst > "${config_file}"
+        envsubst > "${config[config_file]}"
 fi
 
-if [ -f "${secrets_file}" ]; then
-    log_info "${secrets_file} already exists, not overwriting secrets"
+if [ -f "${secrets[secrets_file]}" ]; then
+    log_info "${secrets[secrets_file]} already exists, not overwriting secrets"
 else
     # TODO: Generate random passwords
 
     cat "${config_defaults_path}/secrets/${CK8S_CLOUD_PROVIDER}.env" \
         "${config_defaults_path}/secrets/secrets.env" | \
-        sops_encrypt_stdin dotenv "${secrets_file}"
+        sops_encrypt_stdin dotenv "${secrets[secrets_file]}"
 fi
 
-if [ -f "${tfvars_file}" ]; then
-    log_info "${tfvars_file} already exists, not overwriting Terraform config"
+if [ -f "${config[tfvars_file]}" ]; then
+    log_info "${config[tfvars_file]} already exists, not overwriting " \
+             "Terraform config"
 else
     cp "${config_defaults_path}/terraform/${CK8S_CLOUD_PROVIDER}.tfvars" \
-        "${tfvars_file}"
+        "${config[tfvars_file]}"
 fi
 
 log_info "Config initialized"
 
 log_info "Time to edit the following files:"
-log_info "${config_file}"
-log_info "${secrets_file}"
-log_info "${tfvars_file}"
+log_info "${config[config_file]}"
+log_info "${secrets[secrets_file]}"
+log_info "${config[tfvars_file]}"

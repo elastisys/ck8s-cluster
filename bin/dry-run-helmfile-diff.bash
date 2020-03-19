@@ -32,7 +32,7 @@ esac
 export CUSTOMER_NAMESPACES_COMMASEPARATED=$(echo "$CUSTOMER_NAMESPACES" | tr ' ' ,)
 export CUSTOMER_ADMIN_USERS_COMMASEPARATED=$(echo "$CUSTOMER_ADMIN_USERS" | tr ' ' ,)
 
-source "${scripts_path}/post-infra-common.sh" "${infrastructure_file}"
+source "${scripts_path}/post-infra-common.sh" "${config[infrastructure_file]}"
 
 cd "${here}/../helmfile"
 

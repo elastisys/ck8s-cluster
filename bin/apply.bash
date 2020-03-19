@@ -19,13 +19,14 @@ infra_s3_gen() {
     log_info "Generating S3 config"
 
     S3COMMAND_CONFIG_FILE=/dev/stdout "${scripts_path}/gen-s3cfg.sh" | \
-        sops_encrypt_stdin ini "${s3cfg_file}"
+        sops_encrypt_stdin ini "${secrets[s3cfg_file]}"
 }
 
 infra_s3_run() {
     log_info "Creating S3 buckets"
 
-    with_s3cfg "${s3cfg_file}" "${scripts_path}/manage-s3-buckets.sh" --create
+    with_s3cfg "${secrets[s3cfg_file]}" \
+        "${scripts_path}/manage-s3-buckets.sh" --create
 }
 
 infra_tf_run() {
@@ -35,27 +36,27 @@ infra_tf_run() {
     echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init
     terraform workspace select "${ENVIRONMENT_NAME}"
     terraform apply \
-        -var-file="${tfvars_file}" \
-        -var ssh_pub_key_file_sc="${ssh_pub_key_sc}" \
-        -var ssh_pub_key_file_wc="${ssh_pub_key_wc}"
+        -var-file="${config[tfvars_file]}" \
+        -var ssh_pub_key_file_sc="${config[ssh_pub_key_sc]}" \
+        -var ssh_pub_key_file_wc="${config[ssh_pub_key_wc]}"
     popd > /dev/null
 
-    "${scripts_path}/gen-infra.sh" > "${infrastructure_file}"
+    "${scripts_path}/gen-infra.sh" > "${config[infrastructure_file]}"
 }
 
 infra_validate_ssh() {
     log_info "Validating SSH access"
 
     (
-        with_ssh_agent "${ssh_priv_key_sc}" \
+        with_ssh_agent "${secrets[ssh_priv_key_sc]}" \
             "${pipeline_path}/test/infrastructure/ssh.sh" service_cluster \
-                "${infrastructure_file}"
+                "${config[infrastructure_file]}"
     )
 
     (
-        with_ssh_agent "${ssh_priv_key_wc}" \
+        with_ssh_agent "${secrets[ssh_priv_key_wc]}" \
             "${pipeline_path}/test/infrastructure/ssh.sh" workload_cluster \
-                "${infrastructure_file}"
+                "${config[infrastructure_file]}"
     )
 }
 
@@ -64,18 +65,18 @@ infra_ansible_run() {
        [ "${CLOUD_PROVIDER}" = "citycloud" ]; then
         log_info "Running Ansible script to prepare hosts e.g. install Docker"
 
-        "${scripts_path}/generate-inventory.sh" "${infrastructure_file}" > \
-            "${ansible_hosts}"
+        "${scripts_path}/generate-inventory.sh" \
+            "${config[infrastructure_file]}" > "${config[ansible_hosts]}"
 
         (
-            with_ssh_agent "${ssh_priv_key_sc}" \
-                ansible-playbook -i "${ansible_hosts}" --limit 'sc_*' \
+            with_ssh_agent "${secrets[ssh_priv_key_sc]}" \
+                ansible-playbook -i "${config[ansible_hosts]}" --limit 'sc_*' \
                     "${ansible_path}/playbook.yml"
         )
 
         (
-            with_ssh_agent "${ssh_priv_key_wc}" \
-                ansible-playbook -i "${ansible_hosts}" --limit 'wc_*' \
+            with_ssh_agent "${secrets[ssh_priv_key_wc]}" \
+                ansible-playbook -i "${config[ansible_hosts]}" --limit 'wc_*' \
                     "${ansible_path}/playbook.yml"
         )
     fi
@@ -84,7 +85,7 @@ infra_ansible_run() {
 infra_validate() {
     log_info "Validating S3 buckets"
 
-    with_s3cfg "${s3cfg_file}" \
+    with_s3cfg "${secrets[s3cfg_file]}" \
         "${pipeline_path}/test/infrastructure/s3-buckets.sh"
 }
 
@@ -110,10 +111,10 @@ infra() {
 k8s_init() {
     log_info "Generating rke configs"
 
-    "${scripts_path}/gen-rke-conf-sc.sh" "${infrastructure_file}" | \
-        sops_encrypt_stdin yaml "${rke_config_sc}"
-    "${scripts_path}/gen-rke-conf-wc.sh" "${infrastructure_file}" | \
-        sops_encrypt_stdin yaml "${rke_config_wc}"
+    "${scripts_path}/gen-rke-conf-sc.sh" "${config[infrastructure_file]}" | \
+        sops_encrypt_stdin yaml "${secrets[rke_config_sc]}"
+    "${scripts_path}/gen-rke-conf-wc.sh" "${config[infrastructure_file]}" | \
+        sops_encrypt_stdin yaml "${secrets[rke_config_wc]}"
 }
 
 k8s_run_rke() {
@@ -145,26 +146,26 @@ k8s_run_rke() {
 k8s_run() {
     log_info "Running rke up for service cluster"
 
-    k8s_run_rke "${rke_config_sc}" "${rkestate_sc}" "${kube_config_sc}" \
-                "${ssh_priv_key_sc}"
+    k8s_run_rke "${secrets[rke_config_sc]}" "${secrets[rkestate_sc]}" \
+                "${secrets[kube_config_sc]}" "${secrets[ssh_priv_key_sc]}"
 
     log_info "Running rke up for workload cluster"
 
-    k8s_run_rke "${rke_config_wc}" "${rkestate_wc}" "${kube_config_wc}" \
-                "${ssh_priv_key_wc}"
+    k8s_run_rke "${secrets[rke_config_wc]}" "${secrets[rkestate_wc]}" \
+                "${secrets[kube_config_wc]}" "${secrets[ssh_priv_key_wc]}"
 
 }
 
 k8s_validate() {
     log_info "Validating Kubernetes nodes"
 
-    with_kubeconfig "${kube_config_sc}" \
+    with_kubeconfig "${secrets[kube_config_sc]}" \
         "${pipeline_path}/test/k8s/check-nodes.sh" service_cluster \
-            "${infrastructure_file}"
+            "${config[infrastructure_file]}"
 
-    with_kubeconfig "${kube_config_wc}" \
+    with_kubeconfig "${secrets[kube_config_wc]}" \
         "${pipeline_path}/test/k8s/check-nodes.sh" workload_cluster \
-            "${infrastructure_file}"
+            "${config[infrastructure_file]}"
 }
 
 k8s() {
@@ -187,7 +188,8 @@ apps_init() {
     # TODO: We should try to get rid of the post-infra-common script.
 
     log_info "Running post infra script"
-    source "${scripts_path}/post-infra-common.sh" "${infrastructure_file}"
+    source "${scripts_path}/post-infra-common.sh" \
+        "${config[infrastructure_file]}"
 }
 
 apps_run() {
@@ -200,7 +202,7 @@ apps_run() {
         sops_decrypt "${certs}/helm-key.pem"
         sops_decrypt "${certs}/tiller-key.pem"
 
-        with_kubeconfig "${kube_config_sc}" \
+        with_kubeconfig "${secrets[kube_config_sc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-sc.sh"
     )
 
@@ -213,7 +215,7 @@ apps_run() {
         sops_decrypt "${certs}/helm-key.pem"
         sops_decrypt "${certs}/tiller-key.pem"
 
-        with_kubeconfig "${kube_config_wc}" \
+        with_kubeconfig "${secrets[kube_config_wc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-wc.sh"
     )
 }
@@ -221,12 +223,12 @@ apps_run() {
 apps_validate() {
     log_info "Validating service cluster"
 
-    with_kubeconfig "${kube_config_sc}" \
+    with_kubeconfig "${secrets[kube_config_sc]}" \
         "${pipeline_path}/test/services/test-sc.sh"
 
     log_info "Validating workload cluster"
 
-    with_kubeconfig "${kube_config_wc}" \
+    with_kubeconfig "${secrets[kube_config_wc]}" \
         "${pipeline_path}/test/services/test-wc.sh"
 }
 

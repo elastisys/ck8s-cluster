@@ -25,17 +25,17 @@ pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
 terraform init
 terraform workspace select "${ENVIRONMENT_NAME}"
 terraform plan \
-    -var-file="${tfvars_file}" \
-    -var ssh_pub_key_file_sc="${ssh_pub_key_sc}" \
-    -var ssh_pub_key_file_wc="${ssh_pub_key_wc}"
+    -var-file="${config[tfvars_file]}" \
+    -var ssh_pub_key_file_sc="${config[ssh_pub_key_sc]}" \
+    -var ssh_pub_key_file_wc="${config[ssh_pub_key_wc]}"
 popd > /dev/null
 
 #
 # Helmfile diff
 #
 
-with_kubeconfig "${kube_config_sc}" "${here}/dry-run-helmfile-diff.bash" \
-    service_cluster
+with_kubeconfig "${secrets[kube_config_sc]}" \
+    "${here}/dry-run-helmfile-diff.bash" service_cluster
 
-with_kubeconfig "${kube_config_wc}" "${here}/dry-run-helmfile-diff.bash" \
-    workload_cluster
+with_kubeconfig "${secrets[kube_config_wc]}" \
+    "${here}/dry-run-helmfile-diff.bash" workload_cluster
