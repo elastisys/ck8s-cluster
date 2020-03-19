@@ -9,8 +9,8 @@ worker_names_sc = [
 ]
 
 worker_name_flavor_map_sc = {
-  "worker-0" : "fce2b54d-c0ef-4ad4-aa81-bcdcaa54f7cb",
-  "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881",
+  "worker-0" : "ea0dbe3b-f93a-47e0-84e4-b09ec5873bdf", # lb.xlarge.1d
+  "worker-1" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
 
 worker_names_wc = [
@@ -18,7 +18,7 @@ worker_names_wc = [
 ]
 
 worker_name_flavor_map_wc = {
-  "worker-0" : "16d11558-62fe-4bce-b8de-f49a077dc881",
+  "worker-0" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
 
 master_names_sc = [
@@ -26,7 +26,8 @@ master_names_sc = [
 ]
 
 master_name_flavor_map_sc = {
-  "master-0" : "9d82d1ee-ca29-4928-a868-d56e224b92a1",
+  # TODO: could go with smaller flavor here if made available
+  "master-0" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
 
 master_names_wc = [
@@ -34,7 +35,8 @@ master_names_wc = [
 ]
 
 master_name_flavor_map_wc = {
-  "master-0" : "9d82d1ee-ca29-4928-a868-d56e224b92a1",
+  # TODO: could go with smaller flavor here if made available
+  "master-0" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
 
 worker_extra_volume_sc = []
