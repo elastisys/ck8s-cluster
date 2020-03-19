@@ -18,7 +18,6 @@ DEPLOYMENTS=(
     "monitoring prometheus-operator-grafana"
     "monitoring prometheus-operator-kube-state-metrics"
     "monitoring blackbox-prometheus-blackbox-exporter"
-    "ck8sdash ck8sdash"
     "fluentd fluentd-aggregator"
     "velero velero"
 )
@@ -37,6 +36,9 @@ if [ "$ENABLE_HARBOR" == true ]; then
         "harbor harbor-harbor-portal"
         "harbor harbor-harbor-registry"
     )
+fi
+if [ "$ENABLE_CK8SDASH_SC" == true ]; then
+    DEPLOYMENTS+=("ck8sdash ck8sdash")
 fi
 
 echo

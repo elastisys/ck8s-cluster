@@ -21,7 +21,9 @@ fi
 
 testEndpoint Grafana https://grafana.${ECK_OPS_DOMAIN}/ admin:${GRAFANA_PWD}
 
-testEndpoint ck8sdash https://ck8sdash.${ECK_BASE_DOMAIN}/
+if [ "$ENABLE_CK8SDASH_SC" == true ]; then
+    testEndpoint ck8sdash https://ck8sdash.${ECK_OPS_DOMAIN}/
+fi
 
 if [ $ENABLE_CUSTOMER_GRAFANA == "true" ]
 then

@@ -11,6 +11,7 @@ set -e
 : "${KUBELOGIN_CLIENT_SECRET:?Missing KUBELOGIN_CLIENT_SECRET}"
 : "${ENABLE_OPA:?Missing ENABLE_OPA}"
 : "${ENABLE_PSP:?Missing ENABLE_PSP}"
+: "${ENABLE_CK8SDASH_WC:?Missing ENABLE_CK8SDASH_WC}"
 : "${CUSTOMER_NAMESPACES:?Missing CUSTOMER_NAMESPACES}"
 : "${CUSTOMER_ADMIN_USERS:?Missing CUSTOMER_ADMIN_USERS}"
 : "${HARBOR_PWD:?Missing HARBOR_PWD}"
@@ -53,7 +54,8 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 INTERACTIVE=${1:-""}
 
 echo "Creating namespaces" >&2
-NAMESPACES="cert-manager monitoring fluentd ck8sdash"
+NAMESPACES="cert-manager monitoring fluentd"
+[ "$ENABLE_CK8SDASH_WC" == "true" ] && NAMESPACES+=" ck8sdash"
 [ "$ENABLE_FALCO" == "true" ] && NAMESPACES+=" falco"
 [ "$ENABLE_OPA" == "true" ] && NAMESPACES+=" opa"
 
@@ -101,7 +103,8 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
 
-issuer_namespaces='kube-system monitoring ck8sdash'
+issuer_namespaces='kube-system monitoring'
+[ "$ENABLE_CK8SDASH_WC" == "true" ] && issuer_namespaces+=" ck8sdash"
 for ns in $issuer_namespaces
 do
     kubectl -n ${ns} apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
@@ -154,6 +157,7 @@ fi
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator"
 [[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=opa"
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
+[[ $ENABLE_CK8SDASH_WC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
 
 echo "Installing the remaining helm charts" >&2
 helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff

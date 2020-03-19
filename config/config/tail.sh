@@ -19,6 +19,8 @@ export ENABLE_CUSTOMER_GRAFANA="true"
 export ENABLE_CUSTOMER_ALERTMANAGER="false"
 export ENABLE_CUSTOMER_ALERTMANAGER_INGRESS="false"
 export ENABLE_POSTGRESQL="false"
+export ENABLE_CK8SDASH_SC="true"
+export ENABLE_CK8SDASH_WC="true"
 
 export CUSTOMER_NAMESPACES="demo1 demo2 demo3"
 export CUSTOMER_ADMIN_USERS="admin1@elastisys.com admin2@elastisys.com"

@@ -15,11 +15,13 @@ DEPLOYMENTS=(
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
-    "ck8sdash ck8sdash"
 )
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
     DEPLOYMENTS+=("kube-system nfs-client-provisioner")
+fi
+if [ "$ENABLE_CK8SDASH_WC" == true ]; then
+    DEPLOYMENTS+=("ck8sdash ck8sdash")
 fi
 
 echo

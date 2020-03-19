@@ -23,6 +23,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 : "${ENABLE_HARBOR:?Missing ENABLE_HARBOR}"
 : "${ENABLE_CUSTOMER_GRAFANA:?Missing ENABLE_CUSTOMER_GRAFANA}"
 : "${OAUTH_ALLOWED_DOMAINS:?Missing OAUTH_ALLOWED_DOMAINS}"
+: "${ENABLE_CK8SDASH_SC:?Missing ENABLE_CK8SDASH_SC}"
 
 # Alerting
 : "${ALERT_TO:?Missing ALERT_TO}"
@@ -95,7 +96,8 @@ fi
 INTERACTIVE=${1:-""}
 
 echo "Creating namespaces" >&2
-NAMESPACES="cert-manager elastic-system dex influxdb-prometheus monitoring ck8sdash fluentd"
+NAMESPACES="cert-manager elastic-system dex influxdb-prometheus monitoring fluentd"
+[ $ENABLE_CK8SDASH_SC == "true" ] && NAMESPACES+=" ck8sdash"
 for namespace in ${NAMESPACES}
 do
     kubectl create namespace ${namespace} --dry-run -o yaml | kubectl apply -f -
@@ -145,7 +147,8 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
 
-issuer_namespaces='dex elastic-system kube-system monitoring ck8sdash'
+issuer_namespaces='dex elastic-system kube-system monitoring'
+[ $ENABLE_CK8SDASH_SC == "true" ] && issuer_namespaces+=" ck8sdash"
 for ns in $issuer_namespaces
 do
     kubectl -n ${ns} apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-prod.yaml
@@ -223,6 +226,7 @@ helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --sup
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
 
 [[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"
+[[ $ENABLE_CK8SDASH_SC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
 
 echo "Installing the rest of the charts" >&2
 helmfile -f helmfile.yaml -e service_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
