@@ -277,6 +277,18 @@ releases:
   - values/init-harbor.yaml.gotmpl
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/init-harbor.yaml"
 
+- name: harbor-backup
+  namespace: harbor
+  labels:
+    app: harbor
+    component: backup
+  chart: ./charts/harbor-backup
+  version: 0.1.0
+  missingFileHandler: Info
+  values:
+  - values/harbor-backup.yaml.gotmpl
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/init-harbor.yaml"
+
 
 # InfluxDB with disk usage monitoring and metrics retention
 - name: influxdb

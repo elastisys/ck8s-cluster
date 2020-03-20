@@ -79,3 +79,6 @@ notary:
       limits:
         memory: 512Mi
         cpu: 200m
+database:
+  internal:
+    password: {{ requiredEnv "HARBOR_DB_PWD" }}

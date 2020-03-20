@@ -5,6 +5,7 @@
 - SOPS secrets management.
 - OIDC support for harbor.
 - Node local DNS cache
+- Backup chart for harbor using a cronjob.
 
 ### Changed
 
