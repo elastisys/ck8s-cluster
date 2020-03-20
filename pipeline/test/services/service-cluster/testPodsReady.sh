@@ -56,6 +56,7 @@ done
 
 DAEMONSETS=(
     "kube-system canal"
+    "kube-system node-local-dns"
     "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
     "fluentd fluentd"

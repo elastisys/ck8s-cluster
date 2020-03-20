@@ -23,6 +23,9 @@ export ENABLE_POSTGRESQL="false"
 export CUSTOMER_NAMESPACES="demo1 demo2 demo3"
 export CUSTOMER_ADMIN_USERS="admin1@elastisys.com admin2@elastisys.com"
 
+# IP of the cluster DNS in kubernetes (needed for node-local-dns)
+export CLUSTER_DNS="10.43.0.10"
+
 # One of opsgenie, slack or null
 export ALERT_TO="null"
 # Use opsgenie heartbeat feature

@@ -126,6 +126,15 @@ releases:
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/ck8sdash-wc.yaml"
 {{ end }}
 
+- name: node-local-dns
+  namespace: kube-system
+  labels:
+    app: node-local-dns
+  chart: ./charts/node-local-dns
+  version: 0.1.0
+  missingFileHandler: Info
+  values:
+  - values/node-local-dns.yaml.gotmpl
 
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}

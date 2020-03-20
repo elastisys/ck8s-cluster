@@ -42,6 +42,7 @@ DAEMONSETS=(
     "fluentd fluentd-fluentd-elasticsearch"
     "kube-system fluentd-system-fluentd-elasticsearch"
     "kube-system canal"
+    "kube-system node-local-dns"
     "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
     "velero restic"

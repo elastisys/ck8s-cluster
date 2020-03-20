@@ -4,6 +4,7 @@
 - Initial version of configuration and command facade.
 - SOPS secrets management.
 - OIDC support for harbor.
+- Node local DNS cache
 
 ### Changed
 
