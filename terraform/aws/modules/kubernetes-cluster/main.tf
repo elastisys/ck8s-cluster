@@ -1,3 +1,6 @@
+# Heavily inspired by HA cluster installer
+# https://github.com/elastisys/hakube-installer
+
 locals {
   vpc_cidr_prefix      = "172.16.0.0/16"
   subnet_cidr_prefix   = "172.16.1.0/24"
@@ -66,6 +69,142 @@ resource "aws_route" "egress_via_gateway" {
 resource "aws_route_table_association" "rtassociation" {
   subnet_id      = aws_subnet.main_sn.id
   route_table_id = aws_route_table.rt.id
+}
+
+
+# External master loadbalancer
+
+# security group allowing traffic from permitted ip ranges to the
+# public apiserver loadbalancer
+resource "aws_security_group" "master-lb-ext-sg" {
+  description = "allow selected IP addresses to access public apiserver LB"
+  vpc_id      = aws_vpc.main.id
+
+  # outgoing traffic from LB allowed to go anywhere
+  egress {
+    from_port         = "0"
+    to_port           = "0"
+    protocol          = "-1"
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = "6443"
+    to_port = "6443"
+    protocol = "tcp"
+    cidr_blocks = var.public_ingress_cidr_whitelist
+  }
+
+  tags = {
+    Name = "${var.prefix}-master-lb-ext-sg"
+  }
+}
+
+# public (internet-facing) master network loadbalancer
+resource "aws_elb" "master_lb_ext" {
+  subnets = [aws_subnet.main_sn.id]
+  internal = false
+  security_groups = [aws_security_group.master-lb-ext-sg.id]
+
+  listener {
+    instance_port = 6443
+    instance_protocol = "tcp"
+    lb_port = 6443
+    lb_protocol = "tcp"
+  }
+
+  # connection idle timeout in seconds
+  idle_timeout    = 300
+  cross_zone_load_balancing = true
+  connection_draining = false
+  connection_draining_timeout = 300
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    target              = "SSL:6443"
+    interval            = 10
+  }
+
+  tags = {
+    Name = "${var.prefix}-master-lb-ext"
+  }
+}
+
+resource "aws_elb_attachment" "public_elb_masters" {
+  for_each = aws_instance.master
+
+  elb      = aws_elb.master_lb_ext.id
+  instance = each.value.id
+}
+
+# Internal master loadbalancer
+
+# security group allowing all traffic originating from private IPs within
+# the VPC access to the internal loadbalancer
+resource "aws_security_group" "master_lb_int_sg" {
+  description = "allow access to internal LB from all private IPs in VPC"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 6443
+    to_port         = 6443
+    protocol        = "tcp"
+    cidr_blocks     = [aws_vpc.main.cidr_block]
+  }
+
+  # outgoing traffic from LB allowed to go anywhere
+  egress {
+    from_port         = "0"
+    to_port           = "0"
+    protocol          = "-1"
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.prefix}-master-lb-int-sg"
+  }
+}
+
+# internal apiserver loadbalancer that will be used internally by
+# kubernetes nodes
+resource "aws_elb" "master_lb_int" {
+  subnets            = [aws_subnet.main_sn.id]
+  internal           = true
+  security_groups = [aws_security_group.master_lb_int_sg.id]
+
+  listener {
+    instance_port     = 6443
+    instance_protocol = "tcp"
+    lb_port           = 6443
+    lb_protocol       = "tcp"
+  }
+
+  # connection idle timeout in seconds
+  idle_timeout    = 300
+  cross_zone_load_balancing = true
+  connection_draining = false
+  connection_draining_timeout = 300
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    target              = "SSL:6443"
+    interval            = 10
+  }
+
+  tags = {
+    Name = "${var.prefix}-master-lb-int"
+  }
+}
+
+resource "aws_elb_attachment" "internal_elb_masters" {
+  for_each = aws_instance.master
+
+  elb      = aws_elb.master_lb_int.id
+  instance = each.value.id
 }
 
 

@@ -29,11 +29,11 @@ output "subnet_cidr_blocks" {
 }
 
 output "master_internal_loadbalancer_fqdn" {
-  value = aws_lb.master_lb_int.dns_name
+  value = aws_elb.master_lb_int.dns_name
 }
 
 output "master_external_loadbalancer_fqdn" {
-  value = aws_lb.master_lb_ext.dns_name
+  value = aws_elb.master_lb_ext.dns_name
 }
 
 output "ansible_inventory" {
