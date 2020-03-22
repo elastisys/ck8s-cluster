@@ -7,7 +7,7 @@
       rancher_version: "1.0.0"
       kubectl_version: "1.15.2"
       helm_version: "2.14.3"
-      helmfile_version: "v0.99.0"
+      helmfile_version: "0.99.0"
       helmdiff_version: "2.11.0+5"
       jq_version: "1.5+dfsg-2"
       apache2utils_version: "2.4.29-1ubuntu4.11"
