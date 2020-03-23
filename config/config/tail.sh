@@ -41,6 +41,19 @@ export OAUTH_ALLOWED_DOMAINS="elastisys.com"
 # Create a static dex user "admin@example.com"
 export ENABLE_STATIC_DEX_LOGIN="false"
 
+# If set to "true", set nginx-ingress external traffic policy to "Local".
+# Must be "true" for IP whitelisting to work.
+export EXTERNAL_TRAFFIC_POLICY_LOCAL="false"
+
+# Global NGINX IP whitelist
+# If you enable this, make sure to set EXTERNAL_TRAFFIC_POLICY_LOCAL to "true".
+# Comma-separated list of CIDRs.
+# https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#whitelist-source-range
+# Note that elasticsearch must allow traffic from all nodes in the workload
+# cluster in order to get logs from fluentd. Prometheus in the workload cluster
+# must allow traffic from the service cluster so that metrics can be federated.
+#export GLOBAL_WHITELIST_SOURCE_RANGE="0.0.0.0/0"
+
 export INFLUXDB_USER="admin"
 # Influx cronjob backup variables.
 # TODO: Does this really need to be configurable?

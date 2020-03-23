@@ -8,6 +8,9 @@ controller:
   config:
     disable-ipv6-dns: "true"
     proxy-body-size: "200m"
+    {{ if env "GLOBAL_WHITELIST_SOURCE_RANGE" }}
+    whitelist-source-range: {{ env "GLOBAL_WHITELIST_SOURCE_RANGE" }}
+    {{ end }}
     {{ if eq (env "CLOUD_PROVIDER") "safespring" }}
     use-proxy-protocol: "true"
     {{ end }}
@@ -53,6 +56,13 @@ controller:
   terminationGracePeriodSeconds: 60
 
   service:
+    {{ if eq (env "EXTERNAL_TRAFFIC_POLICY_LOCAL") "true" }}
+    ## Set external traffic policy to: "Local" to preserve source IP on
+    ## providers supporting it
+    ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
+    ## Required for IP whitelisting
+    externalTrafficPolicy: "Local"
+    {{ end }}
     enabled: false
 
 ## Default 404 backend
