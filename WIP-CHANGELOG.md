@@ -4,6 +4,8 @@
 - NGINX IP whitelist support
 - Enable setting local `externalTrafficPolicy` in `nginx-ingress`
 - Support to create a cluster on Citycloud
+- Ability to add and remove PGP keys from SOPS config through the CLI:
+  `ck8s team add-pgp [fp]` and `ck8s team remove-pgp [fp]`
 
 ### Fixed
 
