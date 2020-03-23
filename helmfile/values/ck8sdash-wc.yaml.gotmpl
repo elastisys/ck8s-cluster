@@ -1,10 +1,14 @@
 ingress:
   clusterDomain: {{ requiredEnv "ECK_BASE_DOMAIN" }}
+  {{ if (env "CK8SDASH_WC_WHITELIST_SOURCE_RANGE") }}
+  extraAnnotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "CK8SDASH_WC_WHITELIST_SOURCE_RANGE" }}
+  {{ end }}
 
 grafana:
   url: "https://grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
   password: {{ requiredEnv "CUSTOMER_GRAFANA_PWD" }}
   apiKeyName: "ck8sdash-wc"
   datasource: "k8s-metrics"
-elastic: 
+elastic:
   apiKeyName: "ck8sdash-key-wc"

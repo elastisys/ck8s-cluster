@@ -7,6 +7,9 @@ expose:
   ingress:
     annotations:
       certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
+      {{ if (env "HARBOR_WHITELIST_SOURCE_RANGE") }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "HARBOR_WHITELIST_SOURCE_RANGE" }}
+      {{ end }}
     hosts:
       core: harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}
       notary: notary.harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}

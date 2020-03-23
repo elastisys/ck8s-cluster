@@ -2,10 +2,18 @@ kibana:
   ingress:
     host: kibana.{{ requiredEnv "ECK_BASE_DOMAIN" }}
     issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
+    {{ if (env "KIBANA_WHITELIST_SOURCE_RANGE") }}
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "KIBANA_WHITELIST_SOURCE_RANGE" }}
+    {{ end }}
 elasticsearch:
   ingress:
     host: elastic.{{ requiredEnv "ECK_OPS_DOMAIN" }}
     issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
+    {{ if (env "ELASTICSEARCH_WHITELIST_SOURCE_RANGE") }}
+    extraAnnotations:
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "ELASTICSEARCH_WHITELIST_SOURCE_RANGE" }}
+    {{ end }}
   s3:
     endpoint: {{ requiredEnv "S3_REGION_ENDPOINT" }}
     access_key: {{ requiredEnv "S3_ACCESS_KEY" }}

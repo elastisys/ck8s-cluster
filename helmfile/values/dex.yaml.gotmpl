@@ -12,6 +12,9 @@ ingress:
   enabled: true
   annotations:
     certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
+    {{ if (env "DEX_WHITELIST_SOURCE_RANGE") }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "DEX_WHITELIST_SOURCE_RANGE" }}
+    {{ end }}
   tls:
   - secretName: dex-tls
     hosts:

@@ -41,6 +41,9 @@ prometheus:
       # message to display with an appropriate context why the authentication is required
       nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
       certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
+      {{ if (env "PROMETHEUS_WC_WHITELIST_SOURCE_RANGE") }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "PROMETHEUS_WC_WHITELIST_SOURCE_RANGE" }}
+      {{ end }}
     labels: {}
     hosts:
     - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}

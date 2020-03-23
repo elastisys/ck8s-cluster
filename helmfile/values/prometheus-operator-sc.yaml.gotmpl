@@ -147,6 +147,9 @@ grafana:
     annotations:
       ingress.kubernetes.io/rewrite-target: /
       certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
+      {{ if (env "GRAFANA_OPS_WHITELIST_SOURCE_RANGE") }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "GRAFANA_OPS_WHITELIST_SOURCE_RANGE" }}
+      {{ end }}
     hosts:
     - grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}
     ## TLS configuration for grafana Ingress
