@@ -36,9 +36,6 @@ source "${scripts_path}/post-infra-common.sh" "${infrastructure_file}"
 
 cd "${here}/../helmfile"
 
-${scripts_path}/gen-kustomize-env-files.sh
-export KUSTOMIZE_PLUGIN_HOME=${scripts_path}/../helmfile/kustomize/plugin
-
 certs="${certs_path}/${1}/kube-system/certs"
 sops_decrypt "${certs}/ca-key.pem"
 sops_decrypt "${certs}/helm-key.pem"

@@ -38,11 +38,6 @@ RUN apt update && apt install python3-pip -y
 RUN python3 -m pip install pip
 RUN python3.6 -m pip install pipenv
 
-# kustomize
-RUN wget https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.5.4/kustomize_v3.5.4_linux_amd64.tar.gz && \
-    tar -zxvf kustomize_v3.5.4_linux_amd64.tar.gz && \
-    mv kustomize /usr/local/bin/kustomize
-
 # s3cmd
 RUN wget https://github.com/s3tools/s3cmd/releases/download/v2.0.2/s3cmd-2.0.2.tar.gz && \
     tar -zxvf s3cmd-2.0.2.tar.gz && \
