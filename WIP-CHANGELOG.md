@@ -3,6 +3,7 @@
 - Customer RBAC for managing ServiceMonitors, PodMonitors and PrometheusRules
 - Initial version of configuration and command facade.
 - SOPS secrets management.
+- OIDC support for harbor.
 
 ### Changed
 
