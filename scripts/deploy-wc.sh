@@ -215,7 +215,7 @@ kubectl config view --raw \
 CUSTOMER_KUBECONFIG=${CONFIG_PATH}/customer/kubeconfig.yaml
 
 if [ -f "${CUSTOMER_KUBECONFIG}" ]; then
-    sops -d -i "${CUSTOMER_KUBECONFIG}"
+    sops --config "${CONFIG_PATH}/.sops.yaml" -d -i "${CUSTOMER_KUBECONFIG}"
 fi
 
 kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-cluster compliantk8s \
@@ -243,7 +243,7 @@ kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-context \
 kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config use-context \
     user@compliantk8s
 
-sops -e -i "${CUSTOMER_KUBECONFIG}"
+sops --config "${CONFIG_PATH}/.sops.yaml" -e -i "${CUSTOMER_KUBECONFIG}"
 
 rm ${CUSTOMER_CERTIFICATE_AUTHORITY}
 

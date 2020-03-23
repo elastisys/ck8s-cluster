@@ -1,4 +1,3 @@
-
 ### Added
 
 - Allow disabling the `ck8sdash` deployment
@@ -14,3 +13,9 @@
 ### Removed
 
 - Documentation regarding operations.
+
+### Changed
+
+- `SOPS_PGP_FP` is deprecated in favor of using a
+  [SOPS config file](https://github.com/mozilla/sops/blob/master/README.rst#using-sops-yaml-conf-to-select-kms-pgp-for-new-files).
+  Use `CK8S_PGP_UID` or `CK8S_PGP_FP` when initializing the CK8S config.

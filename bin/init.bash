@@ -18,6 +18,36 @@ source "${here}/common.bash"
 
 validate_cloud "${CK8S_CLOUD_PROVIDER}"
 
+mkdir -p "${CK8S_CONFIG_PATH}"
+
+#
+# SOPS config
+#
+
+if [ -f "${sops_config}" ]; then
+    log_info "SOPS config already exists: ${sops_config}"
+    validate_sops_config
+else
+    if [ "${CK8S_PGP_FP+x}" != "" ]; then
+        fingerprint="${CK8S_PGP_FP}"
+    elif [ "${CK8S_PGP_UID+x}" != "" ]; then
+        fingerprint=$(gpg --list-keys --with-colons "${CK8S_PGP_UID}" | \
+                      awk -F: '$1 == "fpr" {print $10;}' | head -n 1)
+        if [ -z "${fingerprint}" ]; then
+            log_error "ERROR: Unable to get fingerprint from gpg keyring."
+            log_error "CK8S_PGP_UID=${CK8S_PGP_UID}"
+            exit 1
+        fi
+    else
+        log_error "ERROR: CK8S_PGP_FP and CK8S_PGP_UID can't both be unset"
+        exit 1
+    fi
+
+    log_info "Initializing SOPS config with PGP fingerprint: ${fingerprint}"
+
+    sops_config_write_fingerprints "${fingerprint}"
+fi
+
 #
 # Terraform
 #
@@ -37,7 +67,6 @@ CLOUD_PROVIDER="${CK8S_CLOUD_PROVIDER}" ${scripts_path}/set-execution-mode.sh
 
 log_info "Initializing CK8S configuration"
 
-mkdir -p "${CK8S_CONFIG_PATH}"
 mkdir -p "${state_path}"
 mkdir -p "${ssh_path}"
 

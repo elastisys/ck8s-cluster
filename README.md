@@ -51,6 +51,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - htpasswd available directly in ubuntus repositories
 - [sops](https://github.com/mozilla/sops) (tested with 3.5.0)
 - [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)
+- [yq](https://github.com/mikefarah/yq) (tested with 3.2.1)
 
 Installs Ansible and the requirements using the playbook get-requirements.yaml
 ```
@@ -106,11 +107,15 @@ In order to setup a new Compliant Kubernetes cluster you will need to do the fol
 
 ```bash
 export CK8S_CLOUD_PROVIDER=[exoscale|safespring]
+
 export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
-# For encrypting config secrets using SOPS
-# You can run `gpg --list-keys` to find the fingerprint of PGP keys in your
-# keyring.
-export SOPS_PGP_FP=[PGP fingerprint]
+
+# PGP key used to encrypt secrets.
+export CK8S_PGP_UID=[PGP key User ID]
+# Optionally use CK8S_PGP_FP instead to use exact fingerprint(s).
+# Useful when having subkeys in your keyring or to initialize multiple keys:
+# export CK8S_PGP_FP=XXXXXXXXXXX,YYYYYYYYYY
+
 # For setting the Terraform remote workspace execution mode to local
 export TF_TOKEN=[Terraform token]
 ```

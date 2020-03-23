@@ -3,7 +3,13 @@
 # are used throughout all of the scripts.
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
-: "${SOPS_PGP_FP:?Missing SOPS_PGP_FP}"
+
+if [ "${SOPS_PGP_FP+x}" != "" ]; then
+    echo "SOPS_PGP_FP is deprecated." >&2
+    echo "Set CK8S_PGP_UID or CK8S_PGP_FP and run \`ck8s init\` to" \
+         "generate a sops config file instead." >&2
+    exit 1
+fi
 
 # Make CK8S_CONFIG_PATH absolute
 export CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
@@ -17,6 +23,7 @@ ansible_path="${root_path}/ansible"
 pipeline_path="${root_path}/pipeline"
 version_file="${root_path}/release/version.json"
 
+sops_config="${CK8S_CONFIG_PATH}/.sops.yaml"
 state_path="${CK8S_CONFIG_PATH}/.state"
 ssh_path="${CK8S_CONFIG_PATH}/ssh"
 ssh_auth_sock="${ssh_path}/ssh_auth_sock"
@@ -121,6 +128,29 @@ validate_config() {
     validate secrets.env ${options}
 }
 
+validate_sops_config() {
+    if [ ! -f "${sops_config}" ]; then
+        log_error "ERROR: SOPS config not found: ${sops_config}"
+        exit 1
+    fi
+
+    rule_count=$(cat "${sops_config}" | yq r - --length creation_rules)
+    if [ "${rule_count:-0}" -gt 1 ]; then
+        log_error "ERROR: SOPS config has more than one creation rule."
+        exit 1
+    fi
+
+    fingerprints=$(cat "${sops_config}" | yq r - 'creation_rules[0].pgp')
+    if ! [[ "${fingerprints}" =~ ^[A-Z0-9,]+$ ]]; then
+        log_error "ERROR: SOPS config contains no or invalid PGP keys."
+        log_error "fingerprints=${fingerprints}"
+        log_error "Fingerprints must be uppercase and separated by colon."
+        log_error "Delete or edit the SOPS config to fix the issue"
+        log_error "SOPS config: ${sops_config}"
+        exit 1
+    fi
+}
+
 # Load and validate all configuration options from the config path.
 config_load() {
     source "${config[config_file]}"
@@ -128,6 +158,7 @@ config_load() {
     validate_version
     validate_cloud "${CLOUD_PROVIDER}"
     validate_config
+    validate_sops_config
 }
 
 # Normally a signal handler can only run one command. Use this to be able to
@@ -151,9 +182,15 @@ append_trap() {
     trap "$(new_trap)" "${signal}"
 }
 
+# Write PGP fingerprints to SOPS config
+sops_config_write_fingerprints() {
+    yq n 'creation_rules[0].pgp' "${1}" > "${sops_config}"
+}
+
 # Encrypt stdin to file. If the file already exists it's overwritten.
 sops_encrypt_stdin() {
-    sops -e --input-type "${1}" --output-type "${1}" /dev/stdin > "${2}"
+    sops --config "${sops_config}" -e --input-type "${1}" \
+         --output-type "${1}" /dev/stdin > "${2}"
 }
 
 # Encrypt a file in place.
@@ -169,7 +206,7 @@ sops_encrypt() {
 
     log_info "Encrypting ${1}"
 
-    sops -e -i "${1}"
+    sops --config "${sops_config}" -e -i "${1}"
 }
 
 # Check that a file exists and is actually encrypted using SOPS.
@@ -204,7 +241,7 @@ sops_decrypt() {
 
     sops_decrypt_verify "${1}"
 
-    sops -d -i "${1}"
+    sops --config "${sops_config}" -d -i "${1}"
     append_trap "sops_encrypt ${1}" EXIT
 }
 
@@ -212,7 +249,7 @@ sops_decrypt() {
 sops_exec_file() {
     sops_decrypt_verify "${1}"
 
-    sops exec-file "${1}" "${2}"
+    sops --config "${sops_config}" exec-file "${1}" "${2}"
 }
 
 # The same as sops_exec_file except the decrypted file is written as a normal
@@ -223,7 +260,7 @@ sops_exec_file() {
 sops_exec_file_no_fifo() {
     sops_decrypt_verify "${1}"
 
-    sops exec-file --no-fifo "${1}" "${2}"
+    sops --config "${sops_config}" exec-file --no-fifo "${1}" "${2}"
 }
 
 # Temporarily decrypts a file and loads the content as environment variables
@@ -231,7 +268,7 @@ sops_exec_file_no_fifo() {
 sops_exec_env() {
     sops_decrypt_verify "${1}"
 
-    sops exec-env "${1}" "${2}"
+    sops --config "${sops_config}" exec-env "${1}" "${2}"
 }
 
 # Run a command with the secrets config options available as environment

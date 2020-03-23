@@ -9,14 +9,12 @@ export HELM_HOME=/root/.helm
 
 export TF_IN_AUTOMATION="true"
 
-# Import PGP key, export SOPS_PGP_FP and preset passphrase
+# Import PGP key and preset passphrase
 sops_pgp_setup() {
+    # Not supplying PGP_KEY or PGP_PASSPHRASE assumes interactive run.
     if [ -z ${PGP_KEY+x} ] || [ -z ${PGP_PASSPHRASE+x} ]; then
-        if [ -z ${SOPS_PGP_FP+x} ]; then
-            echo "SOPS_PGP_FP required if PGP_KEY or PGP_PASSPHRASE unset." >&2
-            exit 1
-        fi
-        echo "PGP_KEY or PGP_PASSPHRASE not set. Assuming key in keyring." >&2
+        echo "PGP_KEY or PGP_PASSPHRASE not set." >&2
+        echo "Assuming interactive run and key already in keyring." >&2
         return
     fi
 
@@ -29,7 +27,6 @@ sops_pgp_setup() {
 
     keys=$(gpg --list-keys --with-colons --with-keygrip)
     keygrip=$(echo "${keys}" | awk -F: '$1 == "grp" {print $10;}')
-    export SOPS_PGP_FP=$(echo "${keys}" | awk -F: '$1 == "fpr" {print $10;}')
 
     echo "${PGP_PASSPHRASE}" | \
         /usr/lib/gnupg2/gpg-preset-passphrase --preset "${keygrip}"

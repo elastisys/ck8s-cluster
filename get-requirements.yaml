@@ -13,6 +13,7 @@
       apache2utils_version: "2.4.29-1ubuntu4.13"
       s3cmd_version: "2.0.1-2"
       sops_version: "3.5.0"
+      yq_version: "3.2.1"
     connection: local
     become: yes
     become_user: root
@@ -76,4 +77,9 @@
       get_url:
         url: https://github.com/mozilla/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
         dest: "{{ install_path }}/sops"
+        mode: 0775
+    - name: "Get yq"
+      get_url:
+        url: https://github.com/mikefarah/yq/releases/download/{{ yq_version }}/yq_linux_amd64
+        dest: "{{ install_path }}/yq"
         mode: 0775

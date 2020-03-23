@@ -63,3 +63,8 @@ RUN go get go.mozilla.org/sops/v3 && \
     make install && \
     mv /root/go/bin/sops /usr/local/bin && \
     rm -rf /root/go
+
+# yq
+RUN wget https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64 && \
+    chmod +x yq_linux_amd64 && \
+    mv yq_linux_amd64 /usr/local/bin/yq

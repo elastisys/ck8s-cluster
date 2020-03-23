@@ -26,9 +26,9 @@ config_update() {
 
 secrets_update() {
     secrets_env="${CK8S_CONFIG_PATH}/secrets.env"
-    sops -d -i "${secrets_env}"
+    sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -d -i "${secrets_env}"
     sed -i 's/'"${1}"'=.*/'"${1}"'='"${2}"'/g' "${secrets_env}"
-    sops -e -i "${secrets_env}"
+    sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -e -i "${secrets_env}"
 
 }
 
