@@ -5,6 +5,7 @@ ingress:
   enabled: false
   certType: "staging"
   clusterDomain: ""
+  extraAnnotations: {}
 
 nginx:
   image:
