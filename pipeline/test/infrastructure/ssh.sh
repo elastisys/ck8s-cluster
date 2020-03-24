@@ -48,7 +48,7 @@ function check_hosts () {
         success="false"
         wait_time=0
 
-        while [[ "$success" != "true" ]] && [[ "$wait_time" < 60 ]]
+        while [[ "$success" != "true" ]] && [[ $wait_time -lt 240 ]]
         do
             echo "Retrying host: $host"
             success="true"
