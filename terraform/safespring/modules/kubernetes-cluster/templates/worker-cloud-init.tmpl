@@ -1,0 +1,6 @@
+#cloud-config
+# Falco requires kernel headers to dynamically build and insert its kernel
+# module on pod start.
+runcmd:
+  - apt-get -y install linux-headers-$(uname -r)
+  

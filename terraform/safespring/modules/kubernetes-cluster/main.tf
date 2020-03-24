@@ -187,6 +187,11 @@ module "worker" {
     openstack_compute_secgroup_v2.cluster_sg.id,
     openstack_compute_secgroup_v2.worker_sg.id,
   ]
+
+  user_data = templatefile(
+    "${path.module}/templates/worker-cloud-init.tmpl",
+    {}
+  )
 }
 
 resource "openstack_blockstorage_volume_v2" "worker_volume" {
