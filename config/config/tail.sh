@@ -73,6 +73,8 @@ export INFLUXDB_RETENTION_SC="3d"
 
 # TODO: Prefix these variables with ES/ELASTICSEARCH
 export ES_NODE_COUNT="2"
+# SIZE of the ES node storage
+export ES_STORAGE_SIZE="25Gi"
 
 # SIZE in GB when auditlogs should be removed for index 'kubeaudit'
 export KUBEAUDIT_RETENTION_SIZE="100"
