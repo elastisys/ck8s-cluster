@@ -9,6 +9,7 @@ DEBUG_LOGS=("")
 
 source ${SCRIPTS_PATH}/service-cluster/testPodsReady.sh
 source ${SCRIPTS_PATH}/service-cluster/testEndpoints.sh
+source ${SCRIPTS_PATH}/service-cluster/testPrometheusTargets.sh
 
 echo -e "\nSuccesses: $SUCCESSES"
 echo "Failures: $FAILURES"
