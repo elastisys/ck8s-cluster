@@ -45,7 +45,6 @@ spec:
             args:
             - '-c'
             - |
-              printenv
               aws s3 --endpoint-url $(S3_REGION_ENDPOINT) sync /backups s3://$(S3_INFLUX_BUCKET_NAME) --acl "private"
             env:
             # Aws s3 cli variables.
