@@ -21,6 +21,7 @@ elasticsearch:
     access_key: {{ requiredEnv "S3_ACCESS_KEY" }}
     secret_key: {{ requiredEnv "S3_SECRET_KEY" }}
   storageClassName: {{ requiredEnv "ES_STORAGE_CLASS" }}
+  storageSize: {{ requiredEnv "ES_STORAGE_SIZE" }}
   resources:
     requests:
       memory: 2Gi
