@@ -96,6 +96,10 @@ log_migration "Migrating config"
 (
     CK8S_VERSION="0.1.0"
 
+    # Set new config options introduced in v0.2.0
+
+    CLUSTER_DNS="10.43.0.10"
+
     # Load old config
 
     source "${CK8S_CONFIG_PATH_OLD}/config.sh"
