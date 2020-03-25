@@ -77,7 +77,7 @@ export ES_NODE_COUNT="2"
 export ES_STORAGE_SIZE="25Gi"
 
 # SIZE in GB when auditlogs should be removed for index 'kubeaudit'
-export KUBEAUDIT_RETENTION_SIZE="100"
+export KUBEAUDIT_RETENTION_SIZE="20"
 # AGE in days when auditlogs should be removed for index 'kubeaudit'
 export KUBEAUDIT_RETENTION_AGE="30"
 # SIZE in GB when api-server logs should be removed for index 'kubecomponents'
@@ -85,7 +85,7 @@ export KUBECOMPONENTS_RETENTION_SIZE="10"
 # AGE in days when api-server logs should be removed for index 'kubecomponents'
 export KUBECOMPONENTS_RETENTION_AGE="10"
 # SIZE in GB when kubernetes container logs should be removed for index 'kubernetes'
-export KUBERNETES_RETENTION_SIZE="50"
+export KUBERNETES_RETENTION_SIZE="10"
 # AGE in days when kubernetes container  logs should be removed for index 'kubernetes'
 export KUBERNETES_RETENTION_AGE="30"
 # SIZE in GB when other logs should be removed for index 'other'
