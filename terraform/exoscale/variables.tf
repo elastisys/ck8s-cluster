@@ -113,3 +113,22 @@ variable dns_prefix {
   description = "Prefix name for dns"
   type        = string
 }
+
+variable es_local_storage_capacity_map_sc {
+  description = "Map of the size in GB of the Elasticsearch node local storage file system."
+  type        = map
+
+  default = {
+    "worker-0" : "26",
+    "worker-1" : "26"
+  }
+}
+
+variable es_local_storage_capacity_map_wc {
+  description = "Map of the size in GB of the Elasticsearch node local storage file system."
+  type        = map
+
+  default = {
+    "worker-0" : "0"
+  }
+}

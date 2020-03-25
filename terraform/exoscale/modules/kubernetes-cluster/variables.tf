@@ -48,3 +48,8 @@ variable "aws_dns_zone_id" {
 variable "role_arn" {
   default = "arn:aws:iam::248119176842:role/a1-pipeline"
 }
+
+variable es_local_storage_capacity_map {
+  description = "Map of the size in GB of the Elasticsearch node local storage file system."
+  type        = map
+}

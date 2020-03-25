@@ -46,6 +46,7 @@ resource "exoscale_compute" "worker" {
     "${path.module}/templates/worker-cloud-init.tmpl",
     {
       eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
+      es_local_storage_capacity = var.es_local_storage_capacity_map[each.value]
     }
   )
 }
