@@ -11,7 +11,7 @@ set -e
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
     host_bucket="%(bucket)s.$S3_REGION_ADDRESS"
-elif [ $CLOUD_PROVIDER == "safespring" ]
+elif [ $CLOUD_PROVIDER == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
 then
     host_bucket="$S3_REGION_ADDRESS"
 else
