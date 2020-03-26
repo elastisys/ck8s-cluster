@@ -15,7 +15,8 @@ source "${here}/common.bash"
 
 config_load
 
-if [ "${CLOUD_PROVIDER}" = "safespring" ]; then
+if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
+   [ "${CLOUD_PROVIDER}" = "citycloud" ]; then
     log_info "Cleaning up volumes"
 
     # TODO: We should find a way to make this general and in a way where PVs
@@ -31,8 +32,7 @@ if [ "${CLOUD_PROVIDER}" = "safespring" ]; then
     (
         set -e
         with_kubeconfig "${kube_config_sc}" \
-            'kubectl delete ns elastic-system harbor monitoring fluentd
-                               influxdb-prometheus'
+            'kubectl delete ns elastic-system harbor monitoring fluentd influxdb-prometheus'
         with_kubeconfig "${kube_config_sc}" 'kubectl delete pv --all --wait'
 
         volumes_left="$(with_kubeconfig "${kube_config_sc}" \

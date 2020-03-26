@@ -4,6 +4,7 @@
 - Allow disabling the `ck8sdash` deployment
 - NGINX IP whitelist support
 - Enable setting local `externalTrafficPolicy` in `nginx-ingress`
+- Support to create a cluster on Citycloud
 
 ### Fixed
 
