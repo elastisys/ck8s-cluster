@@ -24,7 +24,7 @@ function check_hosts () {
         host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[].public_ip" ))
         if [ "$CLOUD_PROVIDER" == "exoscale" ]
         then user="rancher"
-        elif [ "$CLOUD_PROVIDER" == "safespring" ]
+        elif [ "$CLOUD_PROVIDER" == "safespring" ] || [ $CLOUD_PROVIDER == "citycloud" ]
         then user="ubuntu"
         fi
     elif [ "$type" == "nfs" ]
