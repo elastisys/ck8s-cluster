@@ -16,13 +16,15 @@ sc_workers_extra_volume=$(echo $infra | jq -r '.service_cluster.worker_device_pa
 sc_masters=$(echo $infra | jq -r '.service_cluster.master_ip_addresses | keys[]')
 sc_workers=$(echo $infra | jq -r '.service_cluster.worker_ip_addresses | keys[]')
 
-sc_loadbalancers=$(echo $infra | jq -r '.service_cluster.loadbalancer_ip_addresses | keys[]')
-
 wc_workers_extra_volume=$(echo $infra | jq -r '.workload_cluster.worker_device_path | keys[]')
 wc_masters=$(echo $infra | jq -r '.workload_cluster.master_ip_addresses | keys[]')
 wc_workers=$(echo $infra | jq -r '.workload_cluster.worker_ip_addresses | keys[]')
 
-wc_loadbalancers=$(echo $infra | jq -r '.workload_cluster.loadbalancer_ip_addresses | keys[]')
+if [ "${CLOUD_PROVIDER}" = "safespring" ]
+then
+  sc_loadbalancers=$(echo $infra | jq -r '.service_cluster.loadbalancer_ip_addresses | keys[]')
+  wc_loadbalancers=$(echo $infra | jq -r '.workload_cluster.loadbalancer_ip_addresses | keys[]')
+fi
 
 function print_ansible_hosts {
   type="$1"
@@ -57,11 +59,14 @@ EOF
 print_ansible_hosts worker service_cluster ${sc_workers_extra_volume[@]}
 print_ansible_hosts worker workload_cluster ${wc_workers_extra_volume[@]}
 
-echo "[wc_loadbalancers]"
-echo "$(print_ansible_hosts loadbalancer workload_cluster ${wc_loadbalancers[@]})"
+if [ "${CLOUD_PROVIDER}" = "safespring" ]
+then
+  echo "[wc_loadbalancers]"
+  echo "$(print_ansible_hosts loadbalancer workload_cluster ${wc_loadbalancers[@]})"
 
-echo "[sc_loadbalancers]"
-echo "$(print_ansible_hosts loadbalancer service_cluster ${sc_loadbalancers[@]})"
+  echo "[sc_loadbalancers]"
+  echo "$(print_ansible_hosts loadbalancer service_cluster ${sc_loadbalancers[@]})"
+fi
 
 cat <<EOF
 [all:vars]
