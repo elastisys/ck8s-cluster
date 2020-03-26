@@ -97,7 +97,7 @@ metadata:
   name: custom-jar-monitor
   namespace: test
   labels:
-    scrape: "true"
+    app: my-app
 spec:
   selector:
     matchLabels:
@@ -106,21 +106,11 @@ spec:
   - port: metrics-port
 ```
 
+Prometheus will detect ServiceMonitors in all namespaces and scrate metrics from them automatically.
+You may also use [PodMonitors](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#podmonitor) in a similar fashion to ServiceMonitors.
+
 If your application doesn't already publish metrics in a suitable way for Prometheus to scrape, you may need to use an exporter of some kind.
 For example, the [JMX exporter](https://github.com/prometheus/jmx_exporter) exoses JMX metrics from Java applications.
-
-#### Configure Prometheus
-
-The default Prometheus instance that comes with Compliant Kubernetes is in the namespace that is default for your kubeconfig context.
-By default it will detect ServiceMonitors in all namespaces and include metrics from them if they have the label `scrape: "true"`.
-You can edit the Prometheus instance using this command:
-
-```
-kubectl edit prometheuses prometheus
-```
-
-Note that if you do not filter the ServiceMonitors in any way, you may end up scraping metrics from some system resources.
-To keep the number of metrics (and the storage capacity they require) down, we recommend that you keep the default `serviceMonitorSelector` setting.
 
 #### Prometheus alerts
 
@@ -137,7 +127,7 @@ kind: PrometheusRule
 metadata:
   name: example
   labels:
-    app: prometheus
+    app: my-app
 spec:
   groups:
   - name: example
@@ -151,8 +141,6 @@ spec:
       labels:
         severity: example
 ```
-
-Note that Prometheus picks up these rules based on the `ruleSelector`, by default set to match the labels `app: prometheus`.
 
 #### Federation
 

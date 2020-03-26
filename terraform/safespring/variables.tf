@@ -156,5 +156,4 @@ variable loadbalancer_name_flavor_map_wc {
 
 variable public_ingress_cidr_whitelist {
   type    = string
-  default = "194.132.164.168/32" # Elastisys office
 }

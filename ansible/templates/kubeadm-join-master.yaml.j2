@@ -1,0 +1,18 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: "{{ control_plane_endpoint | default(hostvars[groups.masters.0].private_ip) }}:6443"
+    token: "{{ hostvars[groups.masters.0].join_token }}"
+    caCertHashes:
+    - "sha256:{{ hostvars[groups.masters.0].ca_key_hash }}"
+{% if cloud_provider == 'aws' %}
+nodeRegistration:
+  kubeletExtraArgs:
+    cloud-provider: "aws"
+{% endif %}
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: "{{ private_ip }}"
+    bindPort: 6443
+  certificateKey: "{{ hostvars[groups.masters.0].cert_key }}"

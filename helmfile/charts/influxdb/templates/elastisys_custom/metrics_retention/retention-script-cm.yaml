@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-metrics-retention-script
+data:
+  influxdb_size_based_metrics_retention.py: |
+    {{ .Files.Get "files/influxdb_size_based_metrics_retention.py" | nindent 4 }}

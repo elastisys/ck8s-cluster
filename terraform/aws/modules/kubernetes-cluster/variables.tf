@@ -24,7 +24,8 @@ variable "key_name" {
 # BaseOS
 variable "aws_amis" {
   default = {
-    us-west-1 = "ami-08f7e448df967347b"
+    "us-west-1_1.17.2"  = "ami-08f7e448df967347b"
+    "us-west-1_1.15.10" = "ami-0791b6074a5a010ee"
   }
 }
 
@@ -36,4 +37,9 @@ variable worker_nodes {
 variable master_nodes {
   description = "Map of instance name to EC2 instance type."
   type        = map
+}
+
+variable k8s_version {
+  description = "Kubernetes version. Valid versions: 1.15.10, 1.17.2"
+  default     = "1.15.10"
 }

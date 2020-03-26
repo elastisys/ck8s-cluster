@@ -7,6 +7,8 @@ set -e
 
 buckets=("S3_HARBOR_BUCKET_NAME" "S3_VELERO_BUCKET_NAME" "S3_ES_BACKUP_BUCKET_NAME" "S3_INFLUX_BUCKET_NAME" "S3_SC_FLUENTD_BUCKET_NAME")
 
+s3cmd='s3cmd --config '"${S3COMMAND_CONFIG_FILE}"
+
 # check if all the environment variables with S3 backet names are set
 for bucket in ${buckets[@]}
 do
@@ -22,9 +24,9 @@ while [ "$1" != "" ]; do
         -c | --create )             ACTION=$CREATE_ACTION
                                     ;;
         -d | --delete )             ACTION=$DELETE_ACTION
-                                    ;;    
+                                    ;;
         -a | --abort  )             ACTION=$ABORT_UPLOAD_ACTION
-                                    ;;                                                                       
+                                    ;;
     esac
     shift
 done
@@ -37,9 +39,9 @@ function create_bucket() { # arguments: bucket name
 
     if [ $BUCKET_EXISTS ]; then
         echo "bucket [${!bucket_name}] already exists at [$CLOUD_PROVIDER], do nothing" >&2
-    else 
+    else
         echo "bucket [${!bucket_name}] does not exist at [$CLOUD_PROVIDER], creating it now" >&2
-        s3cmd --config=${S3COMMAND_CONFIG_FILE} mb s3://${!bucket_name}
+        ${s3cmd} mb s3://${!bucket_name}
     fi
 }
 
@@ -51,8 +53,8 @@ function delete_bucket() { # arguments: bucket name
 
     if [ $BUCKET_EXISTS ]; then
         echo "bucket [${!bucket_name}] exists at [$CLOUD_PROVIDER], deleting it now" >&2
-        s3cmd --config=${S3COMMAND_CONFIG_FILE} rb s3://${!bucket_name} --force --recursive
-    else 
+        ${s3cmd} rb s3://${!bucket_name} --force --recursive
+    else
         echo "bucket [${!bucket_name}] does not exist at [$CLOUD_PROVIDER], do nothing" >&2
     fi
 }
@@ -61,20 +63,21 @@ function abort_multipart_uploads() { # arguments: bucket name
     local bucket_name="$1"
 
     echo "checking status of bucket ["${!bucket_name}"] at [$CLOUD_PROVIDER]" >&2
-    ONGOING_UPLOADS=$(s3cmd multipart s3://${!bucket_name} | awk 'FNR > 2 { print $2 " " $3 }') # header has two lines
+    ONGOING_UPLOADS=$(${s3cmd} multipart s3://${!bucket_name} | \
+                      awk 'FNR > 2 { print $2 " " $3 }') # header has two lines
 
     if [ -n "$ONGOING_UPLOADS" ]; then
         echo "The are ongoing multipart uploads, aborting them now"
         echo "$ONGOING_UPLOADS" | while read line ; do
             echo "Aborting $line"
-            s3cmd abortmp $line
+            ${s3cmd} abortmp $line
         done
     fi
 }
 
 # get a list of all the S3 buckets
 # S3 configuration is set in gen-s3cfg.sh script
-S3_BUCKET_LIST=$(s3cmd --config=${S3COMMAND_CONFIG_FILE} ls)
+S3_BUCKET_LIST=$(${s3cmd} ls)
 
 if [[ "$ACTION" == "$CREATE_ACTION" ]] ; then
     echo 'Create buckets (only if they do not exist)' >&2

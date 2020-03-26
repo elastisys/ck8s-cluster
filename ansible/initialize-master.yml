@@ -1,0 +1,61 @@
+---
+- hosts: masters[0]
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Render kubeadm config
+      template:
+        src: kubeadm-config.yaml.j2
+        dest: /etc/kubeadm/kubeadm-config.yaml
+
+    - name: Initialize master
+      command: kubeadm init --config=/etc/kubeadm/kubeadm-config.yaml
+      args:
+        creates: /etc/kubernetes/admin.conf
+      register: initialized
+
+    - name: Upload default PSP manifests
+      copy:
+        src: "../manifests/podSecurityPolicy/common/{{ item }}"
+        dest: /etc/kubeadm/{{ item }}
+      loop:
+        - default-privileged-psp.yaml
+        - default-restricted-psp.yaml
+
+    - name: Upload restricted PSP manifest
+      copy:
+        src: "../manifests/podSecurityPolicy/restricted-psp.yaml"
+        dest: /etc/kubeadm/restricted-psp.yaml
+
+    - name: Install default PSP
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f {{ item }}
+      loop:
+        - /etc/kubeadm/default-privileged-psp.yaml
+        - /etc/kubeadm/default-restricted-psp.yaml
+        - /etc/kubeadm/restricted-psp.yaml
+      # Retries are needed here as the loadbalancer will forward requests to unhealthy master nodes
+      # until master[0] is marked as healthy.
+      register: result
+      retries: 15
+      delay: 5
+      until: result is not failed
+
+    - name: Render canal manifest
+      template:
+        src: canal.yaml.j2
+        dest: /etc/kubeadm/canal.yaml
+
+    - name: Install network plugin
+      shell: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /etc/kubeadm/canal.yaml
+      when: initialized is changed
+      register: result
+      retries: 15
+      delay: 5
+      until: result is not failed
+
+    - name: Wait for master to become ready
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}'
+      register: master_node_status
+      until: master_node_status.stdout == "True"
+      retries: 30

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influx-env-cm
+data:
+  INFLUX_ADDR: {{ .Values.elastisys_custom.influx_addr }}
+  S3_REGION: {{ .Values.elastisys_custom.s3_region }}
+  S3_REGION_ENDPOINT: {{ .Values.elastisys_custom.s3_region_endpoint }}
+  S3_INFLUX_BUCKET_NAME: {{ .Values.elastisys_custom.s3_influx_bucket_name }}

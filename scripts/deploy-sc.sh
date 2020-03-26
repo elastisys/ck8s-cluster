@@ -135,8 +135,8 @@ then
 fi
 
 echo "Initializing helm" >&2
-mkdir -p ${CONFIG_PATH}/certs/service_cluster/kube-system/certs
-${SCRIPTS_PATH}/initialize-cluster.sh ${CONFIG_PATH}/certs/service_cluster "helm"
+"${SCRIPTS_PATH}/initialize-tiller.sh" kube-system \
+    "${CONFIG_PATH}/certs/service_cluster/kube-system/certs" ""
 source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/service_cluster/kube-system/certs "helm"
 
 
@@ -218,12 +218,6 @@ fi
 
 echo "Installing Dex" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff
-
-# Generate environment variable files used by kustomize to create modified InfluxDB Helm Chart
-${SCRIPTS_PATH}/gen-kustomize-env-files.sh
-
-# Set environment variable for the directory containing the kustomize plugin directory
-export KUSTOMIZE_PLUGIN_HOME=${SCRIPTS_PATH}/../helmfile/kustomize/plugin
 
 
 charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"

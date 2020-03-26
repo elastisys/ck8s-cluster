@@ -93,6 +93,15 @@ resource "aws_lb_target_group" "master_tg_external" {
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
+
+  health_check {
+    protocol            = "TCP"
+    enabled             = true
+    interval            = 10
+    port                = 6443
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 resource "aws_lb_target_group" "master_tg_internal" {
@@ -101,6 +110,15 @@ resource "aws_lb_target_group" "master_tg_internal" {
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
+
+  health_check {
+    protocol            = "TCP"
+    enabled             = true
+    interval            = 10
+    port                = 6443
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 resource "aws_lb_target_group_attachment" "master_tga_external" {
@@ -282,7 +300,7 @@ resource "aws_instance" "master" {
   associate_public_ip_address = true
 
   instance_type          = each.value
-  ami                    = lookup(var.aws_amis, var.aws_region)
+  ami                    = lookup(var.aws_amis, "${var.aws_region}_${var.k8s_version}")
   vpc_security_group_ids = [aws_security_group.master_sg.id, aws_security_group.cluster_sg.id]
   subnet_id              = aws_subnet.main_sn.id
   iam_instance_profile   = aws_iam_instance_profile.master.name
@@ -317,7 +335,7 @@ resource "aws_instance" "worker" {
   associate_public_ip_address = true
 
   instance_type          = each.value
-  ami                    = lookup(var.aws_amis, var.aws_region)
+  ami                    = lookup(var.aws_amis, "${var.aws_region}_${var.k8s_version}")
   vpc_security_group_ids = [aws_security_group.worker_sg.id, aws_security_group.cluster_sg.id]
   subnet_id              = aws_subnet.main_sn.id
   iam_instance_profile   = aws_iam_instance_profile.worker.name
@@ -500,8 +518,9 @@ ${var.prefix}-${index}
 %{endfor~}
 EOF
     control_plane_endpoint = aws_lb.master_lb_internal.dns_name
-    public_endpoint = aws_lb.master_lb_external.dns_name
-    cluster_name = var.prefix
-    cloud_provider = "aws"
+    public_endpoint        = aws_lb.master_lb_external.dns_name
+    cluster_name           = var.prefix
+    cloud_provider         = "aws"
+    k8s_version            = var.k8s_version
   }
 }

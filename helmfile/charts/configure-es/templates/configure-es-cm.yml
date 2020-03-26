@@ -26,7 +26,7 @@ data:
              "name": "{{ .Values.snapshot.name }}",
              "repository": "s3_{{ .Values.snapshot.s3_provider }}_7.x",
              "config": {
-               "indices": "{{ .Values.snapshot.indices }}"
+               "indices": {{ .Values.snapshot.indices | toJson }}
              },
              "retention": {
                "expire_after": "{{ .Values.snapshot.expire_after}}",

@@ -9,14 +9,6 @@ DEPLOYMENTS=(
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
     "elastic-system kibana-kb"
-    "harbor harbor-harbor-chartmuseum"
-    "harbor harbor-harbor-clair"
-    "harbor harbor-harbor-core"
-    "harbor harbor-harbor-jobservice"
-    "harbor harbor-harbor-notary-server"
-    "harbor harbor-harbor-notary-signer"
-    "harbor harbor-harbor-portal"
-    "harbor harbor-harbor-registry"
     "kube-system coredns"
     "kube-system coredns-autoscaler"
     "kube-system metrics-server"
@@ -33,6 +25,18 @@ DEPLOYMENTS=(
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
     DEPLOYMENTS+=("kube-system nfs-client-provisioner")
+fi
+if [ "$ENABLE_HARBOR" == true ]; then
+    DEPLOYMENTS+=(
+        "harbor harbor-harbor-chartmuseum"
+        "harbor harbor-harbor-clair"
+        "harbor harbor-harbor-core"
+        "harbor harbor-harbor-jobservice"
+        "harbor harbor-harbor-notary-server"
+        "harbor harbor-harbor-notary-signer"
+        "harbor harbor-harbor-portal"
+        "harbor harbor-harbor-registry"
+    )
 fi
 
 echo
@@ -52,6 +56,7 @@ done
 
 DAEMONSETS=(
     "kube-system canal"
+    "kube-system node-local-dns"
     "nginx-ingress nginx-ingress-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
     "fluentd fluentd"
@@ -78,10 +83,14 @@ STATEFULSETS=(
     "monitoring prometheus-wc-scraper-prometheus-instance"
     "monitoring alertmanager-prometheus-operator-alertmanager"
     "elastic-system elastic-operator"
-    "harbor harbor-harbor-database"
-    "harbor harbor-harbor-redis"
     "influxdb-prometheus influxdb"
 )
+if [ "$ENABLE_HARBOR" == true ]; then
+    STATEFULSETS+=(
+        "harbor harbor-harbor-database"
+        "harbor harbor-harbor-redis"
+    )
+fi
 
 echo
 echo
@@ -110,9 +119,13 @@ fi
 # Format:
 # namespace job-name timeout
 JOBS=(
-  "harbor init-harbor-job 120s"
   "elastic-system configure-es-job 120s"
 )
+if [ "$ENABLE_HARBOR" == true ]; then
+    JOBS+=(
+        "harbor init-harbor-job 120s"
+    )
+fi
 
 echo
 echo
@@ -156,7 +169,19 @@ echo "======================"
 
 echo -n -e "\nelasticsearch\t"
 # This checks the health status of the elasticsearch custom resource
-RES=$(kubectl -n elastic-system get elasticsearches.elasticsearch.k8s.elastic.co -o jsonpath="{.items[0].status.health}")
+retries=5
+while true; do
+    RES=$(kubectl -n elastic-system get elasticsearches.elasticsearch.k8s.elastic.co -o jsonpath="{.items[0].status.health}")
+
+    retries=$((retries - 1))
+
+    [ "${retries}" -lt 1 ] || [ "${RES}" = "green" ] && break
+
+    echo "health not green yet, retrying..."
+    echo -n -e "elasticsearch\t"
+
+    sleep 10
+done
 if [[ $RES == "green" ]]
 then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
 else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))

@@ -39,8 +39,9 @@ externalURL: https://harbor.{{ requiredEnv "ECK_BASE_DOMAIN" }}
 harborAdminPassword: {{ requiredEnv "HARBOR_PWD" }}
 
 core:
-  secret: abcdefghijklmnop #TODO: Should be randomized
+  secret: {{ requiredEnv "HARBOR_CORE_SECRET" }}
   secretName: harbor-core-cert
+  xsrfKey: {{ requiredEnv "HARBOR_XSRF" }}
   resources:
       requests:
         memory: 256Mi
@@ -50,7 +51,7 @@ core:
         cpu: 200m
 
 jobservice:
-  secret: abcdefghijklmnop #TODO: Should be randomized
+  secret: {{ requiredEnv "HARBOR_JOBSERVICE_SECRET" }}
   resources:
       requests:
         memory: 256Mi
@@ -60,7 +61,7 @@ jobservice:
         cpu: 200m
 
 registry:
-  secret: abcdefghijklmnop #TODO: Should be randomized
+  secret: {{ requiredEnv "HARBOR_REGISTRY_SECRET" }}
   resources:
       requests:
         memory: 256Mi
@@ -78,3 +79,6 @@ notary:
       limits:
         memory: 512Mi
         cpu: 200m
+database:
+  internal:
+    password: {{ requiredEnv "HARBOR_DB_PWD" }}

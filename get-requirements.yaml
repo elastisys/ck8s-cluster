@@ -7,13 +7,12 @@
       rancher_version: "1.0.0"
       kubectl_version: "1.15.2"
       helm_version: "2.14.3"
-      helmfile_version: "v0.99.0"
+      helmfile_version: "0.99.0"
       helmdiff_version: "2.11.0+5"
       jq_version: "1.5+dfsg-2"
-      apache2utils_version: "2.4.29-1ubuntu4.11"
-      vault_version: "1.2.3"
+      apache2utils_version: "2.4.29-1ubuntu4.13"
       s3cmd_version: "2.0.1-2"
-      kustomize_version: "3.5.4"
+      sops_version: "3.5.0"
     connection: local
     become: yes
     become_user: root
@@ -70,17 +69,11 @@
     - name: "Install htpasswd by installing apache2-utils package"
       apt:
         name: apache2-utils={{ apache2utils_version }}
-    - name: "Get Vault"
-      unarchive:
-        src: https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip
-        dest: "{{ install_path }}"
-        mode: 0775
-        remote_src: yes
     - name: install s3cmd
       apt:
         name: s3cmd={{ s3cmd_version }}
-    - name: "Get kustomize"
-      unarchive:
-        src: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv{{ kustomize_version }}/kustomize_v{{ kustomize_version }}_linux_amd64.tar.gz
-        dest: "{{ install_path }}"
-        remote_src: yes
+    - name: "Get sops"
+      get_url:
+        url: https://github.com/mozilla/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
+        dest: "{{ install_path }}/sops"
+        mode: 0775

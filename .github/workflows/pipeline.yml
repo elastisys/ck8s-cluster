@@ -1,6 +1,6 @@
 name: Exoscale-pipeline
 
-on: 
+on:
   pull_request:
     branches:
       - master
@@ -20,270 +20,92 @@ jobs:
         image_tag: ${{ github.sha }}
         context: pipeline
 
-  infra:
+  init:
     needs: build-image
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - run: echo $GITHUB_RUN_ID
-      shell: bash
-    - run: env
-      shell: bash
-    - run: ./pipeline/infra.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: exoscale
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - run: ./pipeline/create-s3-buckets.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: exoscale
-        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        S3_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-    - name: Upload infra.json
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: infra.json
-        path: infra.json
-    - name: upload terraform output
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: tfoutput        
-        path: tfoutput
-
-  rke-sc:
-    needs: infra
     runs-on: ubuntu-latest
     container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - run: ./pipeline/rke-sc.sh
+    - run: ./pipeline/init.bash
       shell: bash
       env:
-        CLOUD_PROVIDER: exoscale
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - name: Upload kube_config
-      uses: actions/upload-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: kube_config_eck-sc.yaml
-    - name: Upload rke output
+        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
+        CK8S_CLOUD_PROVIDER: exoscale
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+        # Prefixed with CI to prevent confusing people they are used from env
+        # and not from secrets.env.
+        CI_EXOSCALE_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        CI_EXOSCALE_SECRET: ${{ secrets.EXOSCALE_SECRET_KEY }}
+    - name: Upload config
       if: always()
       uses: actions/upload-artifact@v1
       with:
-        name: rke-sc-output
-        path: rke-sc-output
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
 
-  rke-wc:
-    needs: infra
+  apply:
+    needs: init
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
-    - name: Download infra.json
+    - name: Download config
       uses: actions/download-artifact@v1
       with:
-        name: infra.json
-        path: .
-    - run: ./pipeline/rke-wc.sh
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
+    - run: ./pipeline/apply.bash
       shell: bash
       env:
-        CLOUD_PROVIDER: exoscale
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - name: Upload kube_config
-      uses: actions/upload-artifact@v1
-      with:
-        name: kube_config_eck-wc.yaml
-        path: kube_config_eck-wc.yaml
-    - name: Upload rke output
+        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+    - name: Upload config
       if: always()
       uses: actions/upload-artifact@v1
       with:
-        name: rke-wc-output
-        path: rke-wc-output
-
-  deploy-sc:
-    needs: [rke-sc,rke-wc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: .
-    - run: ./pipeline/deploy-sc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: exoscale
-        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        S3_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - name: Upload deploy output
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: deploy-sc-output
-        path: deploy-sc-output
-
-  deploy-wc:
-    needs: [rke-sc,rke-wc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-wc.yaml
-        path: .
-    - run: ./pipeline/deploy-wc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: exoscale
-        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        S3_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-    - name: Upload deploy output
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: deploy-wc-output
-        path: deploy-wc-output
-  
-  test-sc:
-    needs: [deploy-wc, deploy-sc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: .
-    - run: ./pipeline/test-sc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: exoscale
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-
-  test-wc:
-    needs: [deploy-wc, deploy-sc]
-    runs-on: ubuntu-latest
-    container: 
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download infra.json
-      uses: actions/download-artifact@v1
-      with:
-        name: infra.json
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-wc.yaml
-        path: .
-    - run: ./pipeline/test-wc.sh
-      shell: bash
-      env:
-        CLOUD_PROVIDER: exoscale
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
 
   get-versions:
     if: startsWith(github.ref , 'refs/heads/pre-release-' )
-    needs: [deploy-wc, deploy-sc]
+    needs: apply
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
-    - name: Download kube_config
+    - name: Download config
       uses: actions/download-artifact@v1
       with:
-        name: kube_config_eck-wc.yaml
-        path: .
-    - name: Download kube_config
-      uses: actions/download-artifact@v1
-      with:
-        name: kube_config_eck-sc.yaml
-        path: .
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
     - run: ./pipeline/versions.sh
       shell: bash
+      env:
+        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
     - name: Upload version.json
       uses: actions/upload-artifact@v1
       with:
         name: version.json
         path: version.json
-  
+
   create-release-pr:
     if: startsWith(github.ref , 'refs/heads/pre-release-')
-    needs: [get-versions]
+    needs: get-versions
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - name: download version.json
       uses: actions/download-artifact@v1
-      with: 
+      with:
         name: version.json
         path: ./release/verision.json
     - run: ./release/release.sh
@@ -298,31 +120,25 @@ jobs:
         destination_branch: "${{ steps.release-script.outputs.MERGE_BRANCH }}"
         pr_title: "Releasing version ${{ steps.release-script.outputs.RELEASE_VERSION }}"
 
-  clean-up:
-    needs: [test-sc,test-wc,get-versions]
+  cleanup:
+    needs: create-release-pr
     if: always()
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: elastisys/ck8s-ops:${{ github.sha }}
     steps:
     - uses: actions/checkout@v1
-    - run: ./pipeline/cleanup.sh
-      shell: bash
-      env: 
-        CLOUD_PROVIDER: exoscale
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-        SSH_KEY_SC: ${{ secrets.SSH_KEY_SC }}
-        SSH_KEY_WC: ${{ secrets.SSH_KEY_WC }}
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
-        VAULT_APPROLE_RID: ${{ secrets.VAULT_APPROLE_RID }}
-        VAULT_APPROLE_SID: ${{ secrets.VAULT_APPROLE_SID }}
-        DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-    - run: ./pipeline/delete-s3-buckets.sh
-      if: always()
+    - name: Download config
+      uses: actions/download-artifact@v1
+      with:
+        name: ck8s-config
+        path: ./ck8s_pipeline_config
+    - run: ./pipeline/cleanup.bash
       shell: bash
       env:
-        CLOUD_PROVIDER: exoscale
-        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        S3_SECRET_KEY: ${{ secrets.EXOSCALE_SECRET_KEY }}
+        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+        DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# This is the main entrypoint to Compliant Kubernetes.
+
+set -eu -o pipefail
+
+here="$(dirname "$(readlink -f "$0")")"
+source "${here}/common.bash"
+
+usage() {
+    echo "COMMANDS:" 1>&2
+    echo "  init                initialize the config path" 1>&2
+    echo "  apply infra         apply the cloud infrastructure" 1>&2
+    echo "  apply k8s           apply Kubernetes" 1>&2
+    echo "  apply apps          apply the service applications" 1>&2
+    echo "  apply all           apply all of the above" 1>&2
+    echo "  dry-run             run terraform plan and helmfile diff" 1>&2
+    exit 1
+}
+
+case "${1}" in
+    init)
+        "${here}/init.bash"
+        ;;
+    apply)
+        [[ "${2}" =~ ^(infra|k8s|apps|all)$ ]] || usage
+        with_config_secrets "${here}/apply.bash" ${2}
+        ;;
+    dry-run)
+        with_config_secrets "${here}/dry-run.bash"
+        ;;
+    *) usage ;;
+esac
