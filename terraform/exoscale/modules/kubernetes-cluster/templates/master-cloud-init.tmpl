@@ -6,20 +6,3 @@ runcmd:
   #       Remove this if it ever gets solved.
   # https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030138
   - sudo iptables -t nat -A PREROUTING -d ${eip_ip_address} -j DNAT --to 127.0.0.1
-
-write_files:
-  - encoding: b64
-    content: ${admission_control_config_b64}
-    owner: root:root
-    path: /etc/kubernetes/conf/admission-control-config.yaml
-    permissions: '0644'
-  - encoding: b64
-    content: ${podnodeselector_config_b64}
-    owner: root:root
-    path: /etc/kubernetes/conf/podnodeselector.yaml
-    permissions: '0644'
-  - encoding: b64
-    content: ${audit_policy_b64}
-    owner: root:root
-    path: /etc/kubernetes/conf/audit-policy.yaml
-    permissions: '0644'

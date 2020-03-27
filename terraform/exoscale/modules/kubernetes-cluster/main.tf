@@ -63,9 +63,6 @@ resource "exoscale_compute" "master" {
     "${path.module}/templates/master-cloud-init.tmpl",
     {
       eip_ip_address               = exoscale_ipaddress.ingress_controller_lb.ip_address
-      admission_control_config_b64 = filebase64("${path.module}/manifest/admission-control-config.yaml"),
-      podnodeselector_config_b64   = filebase64("${path.module}/manifest/podnodeselector.yaml"),
-      audit_policy_b64             = filebase64("${path.module}/manifest/audit-policy.yaml"),
 
       # TODO: Remove when managed virtual router/DHCP is working properly.
       # address = "${local.master_internal_ip_address}/${local.internal_cidr_prefix_length}",
