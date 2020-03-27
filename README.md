@@ -233,3 +233,8 @@ See: https://github.com/mozilla/sops/issues/626
 The Terraform Cloud organization is currently not configurable. Therefore,
 without modifying the Terraform code you can only use ck8s while having access
 to the Elastisys organization.
+
+### [Exoscale] Elasticsearch
+
+After a reboot of the host machine, a pod with Elasticsearch Node (`elasticsearch-es-nodes-*`) gets stuck in the `Init:CrashLoopBackOff` state.
+It is required to manually delete the pod in order to make it work again.
