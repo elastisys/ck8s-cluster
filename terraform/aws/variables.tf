@@ -35,11 +35,11 @@ variable "ssh_pub_key_wc" {
   type = string
 }
 
-variable "private_key_path_sc" {
+variable "ssh_priv_key_sc" {
   type = string
 }
 
-variable "private_key_path_wc" {
+variable "ssh_priv_key_wc" {
   type = string
 }
 

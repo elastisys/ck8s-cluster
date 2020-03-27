@@ -499,7 +499,7 @@ data "template_file" "ansible_inventory" {
   vars = {
     master_hosts           = <<-EOF
 %{for index, master in aws_instance.master~}
-${var.prefix}-${index} ansible_host=${master.public_ip} private_ip=${master.private_ip} ansible_ssh_private_key_file='${var.private_key_path}'
+${var.prefix}-${index} ansible_host=${master.public_ip} private_ip=${master.private_ip} ansible_ssh_private_key_file='${var.ssh_priv_key}'
 %{endfor~}
 EOF
     masters                = <<-EOF
@@ -509,7 +509,7 @@ ${var.prefix}-${index}
 EOF
     worker_hosts           = <<-EOF
 %{for index, worker in aws_instance.worker~}
-${var.prefix}-${index} ansible_host=${worker.public_ip} private_ip=${worker.private_ip} ansible_ssh_private_key_file='${var.private_key_path}'
+${var.prefix}-${index} ansible_host=${worker.public_ip} private_ip=${worker.private_ip} ansible_ssh_private_key_file='${var.ssh_priv_key}'
 %{endfor~}
 EOF
     workers                = <<-EOF

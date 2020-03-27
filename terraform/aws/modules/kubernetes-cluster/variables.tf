@@ -13,7 +13,7 @@ variable "ssh_pub_key" {
   description = "Path to the SSH public key to be used for authentication"
 }
 
-variable "private_key_path" {
+variable "ssh_priv_key" {
   description = "Path to the SSH private key to be used for authentication"
 }
 
