@@ -28,8 +28,8 @@ pushd "${terraform_path}/${CK8S_CLOUD_PROVIDER}" > /dev/null
 echo '1' | TF_WORKSPACE="${CK8S_ENVIRONMENT_NAME}" terraform init
 terraform workspace select "${CK8S_ENVIRONMENT_NAME}" || \
     terraform workspace new "${CK8S_ENVIRONMENT_NAME}"
-CLOUD_PROVIDER="${CK8S_CLOUD_PROVIDER}" ./set-execution-mode.sh
 popd > /dev/null
+CLOUD_PROVIDER="${CK8S_CLOUD_PROVIDER}" ${scripts_path}/set-execution-mode.sh
 
 #
 # Config
