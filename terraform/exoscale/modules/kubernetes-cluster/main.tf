@@ -290,7 +290,7 @@ resource "exoscale_secondary_ipaddress" "ingress_controller_lb" {
 
 resource "exoscale_ssh_keypair" "ssh_key" {
   name       = "${var.prefix}-ssh-key"
-  public_key = trimspace(file(pathexpand(var.ssh_pub_key_file)))
+  public_key = trimspace(file(pathexpand(var.ssh_pub_key)))
 }
 
 resource "exoscale_domain_record" "ingress" {

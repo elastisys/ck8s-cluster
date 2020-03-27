@@ -26,7 +26,7 @@ variable "master_name_size_map" {
 
 variable "nfs_size" {}
 
-variable "ssh_pub_key_file" {}
+variable "ssh_pub_key" {}
 
 variable "public_ingress_cidr_whitelist" {
   type = list(string)

@@ -24,12 +24,12 @@ data "openstack_images_image_v2" "os_image" {
 
 resource "openstack_compute_keypair_v2" "sshkey_sc" {
   name       = "${terraform.workspace}-ssh-key-sc"
-  public_key = file(pathexpand(var.ssh_pub_key_file_sc))
+  public_key = file(pathexpand(var.ssh_pub_key_sc))
 }
 
 resource "openstack_compute_keypair_v2" "sshkey_wc" {
   name       = "${terraform.workspace}-ssh-key-wc"
-  public_key = file(pathexpand(var.ssh_pub_key_file_wc))
+  public_key = file(pathexpand(var.ssh_pub_key_wc))
 }
 
 module "service_cluster" {

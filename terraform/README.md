@@ -22,8 +22,8 @@ echo "credentials \"app.terraform.io\" {
 ```
 TF_VAR_exoscale_api_key=xxx
 TF_VAR_exoscale_secret_key=yyy
-export TF_VAR_ssh_pub_key_file_sc=<Path to pub key for service cluster>
-export TF_VAR_ssh_pub_key_file_wc=<Path to pub key for workload cluster>
+export TF_VAR_ssh_pub_key_sc=<Path to pub key for service cluster>
+export TF_VAR_ssh_pub_key_wc=<Path to pub key for workload cluster>
 ```
 
 * Apply with `terraform apply`

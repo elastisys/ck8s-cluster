@@ -40,7 +40,7 @@ module "service_cluster" {
   ]
 
 
-  ssh_pub_key_file = var.ssh_pub_key_file_sc
+  ssh_pub_key = var.ssh_pub_key_sc
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
@@ -65,7 +65,7 @@ module "workload_cluster" {
     "prometheus.ops.${var.dns_prefix}"
   ]
 
-  ssh_pub_key_file = var.ssh_pub_key_file_wc
+  ssh_pub_key = var.ssh_pub_key_wc
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 }

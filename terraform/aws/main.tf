@@ -22,7 +22,7 @@ module "service_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
-  public_key_path  = var.public_key_path_sc
+  ssh_pub_key      = var.ssh_pub_key_sc
   private_key_path = var.private_key_path_sc
   key_name         = var.key_name_sc
 
@@ -37,7 +37,7 @@ module "workload_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
-  public_key_path  = var.public_key_path_wc
+  ssh_pub_key      = var.ssh_pub_key_wc
   private_key_path = var.private_key_path_wc
   key_name         = var.key_name_wc
 

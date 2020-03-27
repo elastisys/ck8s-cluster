@@ -68,8 +68,8 @@ echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init
 terraform workspace select "${ENVIRONMENT_NAME}"
 terraform destroy \
     -var-file="${config[tfvars_file]}" \
-    -var ssh_pub_key_file_sc="${config[ssh_pub_key_sc]}" \
-    -var ssh_pub_key_file_wc="${config[ssh_pub_key_wc]}"
+    -var ssh_pub_key_sc="${config[ssh_pub_key_sc]}" \
+    -var ssh_pub_key_wc="${config[ssh_pub_key_wc]}"
 popd > /dev/null
 
 rm -f "${secrets[rkestate_sc]}"

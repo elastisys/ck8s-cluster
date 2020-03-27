@@ -9,7 +9,7 @@ variable "aws_region" {
   default     = "us-west-1"
 }
 
-variable "public_key_path" {
+variable "ssh_pub_key" {
   description = "Path to the SSH public key to be used for authentication"
 }
 

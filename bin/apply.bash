@@ -37,8 +37,8 @@ infra_tf_run() {
     terraform workspace select "${ENVIRONMENT_NAME}"
     terraform apply \
         -var-file="${config[tfvars_file]}" \
-        -var ssh_pub_key_file_sc="${config[ssh_pub_key_sc]}" \
-        -var ssh_pub_key_file_wc="${config[ssh_pub_key_wc]}"
+        -var ssh_pub_key_sc="${config[ssh_pub_key_sc]}" \
+        -var ssh_pub_key_wc="${config[ssh_pub_key_wc]}"
     popd > /dev/null
 
     "${scripts_path}/gen-infra.sh" > "${config[infrastructure_file]}"

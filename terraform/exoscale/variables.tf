@@ -91,12 +91,12 @@ variable nfs_size {
 }
 
 
-variable ssh_pub_key_file_sc {
+variable ssh_pub_key_sc {
   description = "Path to public SSH key file which is injected into the VMs."
   type        = string
 }
 
-variable ssh_pub_key_file_wc {
+variable ssh_pub_key_wc {
   description = "Path to public SSH key file which is injected into the VMs."
   type        = string
 }
