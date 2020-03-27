@@ -17,6 +17,7 @@
   encrypted s3cmd config file.
 - Auto-completion for the cli
 - S3 support for the AWS cloud provider
+- Ansible inventory generated directly in terraform for Exoscale
 
 ### Fixed
 

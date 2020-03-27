@@ -1,0 +1,25 @@
+${master_hosts}
+${worker_hosts}
+
+[all:vars]
+k8s_version=${k8s_version}
+k8s_pod_cidr=10.42.0.0/16
+k8s_service_cidr=10.43.0.0/16
+
+ansible_user='ubuntu'
+ansible_port=22
+
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+cluster_name='${cluster_name}'
+
+[masters]
+${masters}
+
+[workers]
+${workers}
+
+[nodes]
+${masters}
+${workers}

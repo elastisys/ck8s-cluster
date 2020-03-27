@@ -46,6 +46,13 @@ output "wc_ingress_controller_lb_ip_address" {
   value = "${module.workload_cluster.ingress_controller_lb_ip_address}"
 }
 
+output "ansible_inventory_sc" {
+  value = module.service_cluster.ansible_inventory
+}
+
+output "ansible_inventory_wc" {
+  value = module.workload_cluster.ansible_inventory
+}
 
 # Unused variables for elastic-ip and internal ips.
 

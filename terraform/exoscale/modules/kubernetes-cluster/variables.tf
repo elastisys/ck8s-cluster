@@ -28,6 +28,11 @@ variable "nfs_size" {}
 
 variable "ssh_pub_key" {}
 
+variable k8s_version {
+  description = "Kubernetes version. Valid versions: 1.15.11"
+  default     = "1.15.11"
+}
+
 variable "public_ingress_cidr_whitelist" {
   type = list(string)
 }

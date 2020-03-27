@@ -30,6 +30,34 @@ output "dns_record_name" {
 output "dns_suffix" {
   value = "${var.dns_suffix}"
 }
+
+output "ansible_inventory" {
+  value = templatefile("${path.module}/templates/inventory.tmpl", {
+    master_hosts = <<-EOF
+%{for index, master in exoscale_compute.master~}
+${var.prefix}-${index} ansible_host=${master.ip_address} private_ip=${master.ip_address}
+%{endfor~}
+EOF
+    masters      = <<-EOF
+%{for index, master in exoscale_compute.master~}
+${var.prefix}-${index}
+%{endfor~}
+EOF
+    worker_hosts = <<-EOF
+%{for index, worker in exoscale_compute.worker~}
+${var.prefix}-${index} ansible_host=${worker.ip_address} private_ip=${worker.ip_address}
+%{endfor~}
+EOF
+    workers      = <<-EOF
+%{for index, worker in exoscale_compute.worker~}
+${var.prefix}-${index}
+%{endfor~}
+EOF
+    cluster_name = var.prefix
+    k8s_version  = var.k8s_version
+  })
+}
+
 #  value = "${exoscale_nic.master_internal.ip_address}"
 #output "master_internal_ip_address" {
 #}
