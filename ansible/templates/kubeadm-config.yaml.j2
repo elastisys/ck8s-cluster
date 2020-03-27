@@ -7,20 +7,18 @@ nodeRegistration:
   criSocket: /var/run/dockershim.sock
   kubeletExtraArgs:
     cgroup-driver: "systemd"
-{% if cloud_provider == 'aws' %}
-    cloud-provider: "aws"
+{% if cloud_provider is defined %}
+    cloud-provider: "{{ cloud_provider }}"
 {% endif %}
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 apiServer:
-{% if control_plane_endpoint %}
   certSANs:
+    - "{{ public_endpoint | default(ansible_host) }}"
+{% if control_plane_endpoint is defined %}
     - "{{ control_plane_endpoint }}"
-{% if public_endpoint %}
-    - "{{ public_endpoint }}"
-{% endif %}
 {% endif %}
   extraVolumes:
     - name: "kubernetes-conf"
@@ -48,19 +46,19 @@ apiServer:
     # Set max age for audit logs
     audit-log-maxage: "7"
     enable-admission-plugins: "PodSecurityPolicy,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
-{% if cloud_provider == 'aws' %}
-    cloud-provider: "aws"
+{% if cloud_provider is defined %}
+    cloud-provider: "{{ cloud_provider }}"
 {% endif %}
   timeoutForControlPlane: 4m0s
 certificatesDir: /etc/kubernetes/pki
 clusterName: {{ cluster_name }}
-{% if control_plane_endpoint %}
+{% if control_plane_endpoint is defined %}
 controlPlaneEndpoint: "{{ control_plane_endpoint }}:6443"
 {% endif %}
-{% if cloud_provider == 'aws' %}
+{% if cloud_provider is defined %}
 controllerManager:
   extraArgs:
-    cloud-provider: "aws"
+    cloud-provider: "{{ cloud_provider }}"
 {% else %}
 controllerManager: {}
 {% endif %}

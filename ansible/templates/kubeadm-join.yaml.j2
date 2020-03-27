@@ -6,8 +6,8 @@ discovery:
     token: "{{ hostvars[groups.masters.0].join_token }}"
     caCertHashes:
     - "sha256:{{ hostvars[groups.masters.0].ca_key_hash }}"
-{% if cloud_provider == 'aws' %}
+{% if cloud_provider is defined %}
 nodeRegistration:
   kubeletExtraArgs:
-    cloud-provider: "aws"
+    cloud-provider: "{{ cloud_provider }}"
 {% endif %}
