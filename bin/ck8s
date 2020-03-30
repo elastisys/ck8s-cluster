@@ -17,6 +17,9 @@ usage() {
     echo "  dry-run                run terraform plan and helmfile diff" 1>&2
     echo "  team add-pgp <fp>      add a new PGP key to secrets" 1>&2
     echo "  team remove-pgp <fp>   remove a PGP key from secrets and rotate the data encryption key" 1>&2
+    # TODO: We might want to make this command less visible once we have proper
+    #       support for OIDC logins.
+    echo "  ops kubectl <wc|sc>    run kubectl as cluster admin" 1>&2
     exit 1
 }
 
@@ -40,5 +43,15 @@ case "${1}" in
             *) usage ;;
         esac
         ;;
+    ops)
+        case "${2}" in
+            kubectl)
+                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
+                shift 2
+                "${here}/ops.bash" kubectl ${@}
+            ;;
+            *) usage ;;
+        esac
+    ;;
     *) usage ;;
 esac

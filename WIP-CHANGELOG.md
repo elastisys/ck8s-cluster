@@ -7,6 +7,8 @@
 - Ability to add and remove PGP keys from SOPS config through the CLI:
   `ck8s team add-pgp [fp]` and `ck8s team remove-pgp [fp]`
 - Label owner=operator to namespaces
+- Add command `ck8s ops kubectl` for emergency situations when normal kubectl
+  access is not possible.
 
 ### Fixed
 
