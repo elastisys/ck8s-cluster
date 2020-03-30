@@ -34,8 +34,5 @@ popd > /dev/null
 # Helmfile diff
 #
 
-with_kubeconfig "${secrets[kube_config_sc]}" \
-    "${here}/dry-run-helmfile-diff.bash" service_cluster
-
-with_kubeconfig "${secrets[kube_config_wc]}" \
-    "${here}/dry-run-helmfile-diff.bash" workload_cluster
+"${here}/ops.bash" helmfile sc diff
+"${here}/ops.bash" helmfile wc diff
