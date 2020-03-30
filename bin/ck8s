@@ -9,21 +9,22 @@ source "${here}/common.bash"
 
 usage() {
     echo "COMMANDS:" 1>&2
-    echo "  init                   initialize the config path" 1>&2
-    echo "  apply infra            apply the cloud infrastructure" 1>&2
-    echo "  apply k8s              apply Kubernetes" 1>&2
-    echo "  apply apps             apply the service applications" 1>&2
-    echo "  apply all              apply all of the above" 1>&2
-    echo "  dry-run                run terraform plan and helmfile diff" 1>&2
-    echo "  team add-pgp <fp>      add a new PGP key to secrets" 1>&2
-    echo "  team remove-pgp <fp>   remove a PGP key from secrets and rotate the data encryption key" 1>&2
+    echo "  init                                        initialize the config path" 1>&2
+    echo "  apply infra                                 apply the cloud infrastructure" 1>&2
+    echo "  apply k8s                                   apply Kubernetes" 1>&2
+    echo "  apply apps                                  apply the service applications" 1>&2
+    echo "  apply all                                   apply all of the above" 1>&2
+    echo "  dry-run                                     run terraform plan and helmfile diff" 1>&2
+    echo "  team add-pgp <fp>                           add a new PGP key to secrets" 1>&2
+    echo "  team remove-pgp <fp>                        remove a PGP key from secrets and rotate the data encryption key" 1>&2
     # TODO: We might want to make this command less visible once we have proper
     #       support for OIDC logins.
-    echo "  ops kubectl <wc|sc>    run kubectl as cluster admin" 1>&2
+    echo "  ops kubectl <wc|sc>                         run kubectl as cluster admin" 1>&2
     # TODO: We might want to make this command less visible once we feel
     #       confident that the apply command and migrations are good enough
     #       that direct Helmfile access is not necessary.
-    echo "  ops helmfile <wc|sc>   run helmfile as cluster admin" 1>&2
+    echo "  ops helmfile <wc|sc>                        run helmfile as cluster admin" 1>&2
+    echo "  ssh <wc|sc> <master-#|worker-#|nfs> [cmd]   open an SSH session or execute a remote command on a machine" 1>&2
     exit 1
 }
 
@@ -61,6 +62,16 @@ case "${1}" in
             ;;
             *) usage ;;
         esac
+    ;;
+    ssh)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        [[ "${3}" =~ ^(worker-[0-9]+|master-[0-9]+|nfs)$ ]] || usage
+        shift
+        # TODO: The only reason config secrets are required here is because
+        #       config_load validates options in secrets.env as well.
+        #       It would be nice if you could run a command with non-secret
+        #       config options only.
+        with_config_secrets "${here}/ssh.bash" ${@}
     ;;
     *) usage ;;
 esac

@@ -11,6 +11,8 @@
   access is not possible.
 - Add command `ck8s ops helmfile` for emergency situations when a partial
   Helmfile run is necessary.
+- Add command `ck8s ssh` that makes it possible to SSH to the various CK8S
+  machines.
 
 ### Fixed
 
