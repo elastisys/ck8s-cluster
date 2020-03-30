@@ -25,6 +25,7 @@ usage() {
     #       that direct Helmfile access is not necessary.
     echo "  ops helmfile <wc|sc>                        run helmfile as cluster admin" 1>&2
     echo "  ssh <wc|sc> <master-#|worker-#|nfs> [cmd]   open an SSH session or execute a remote command on a machine" 1>&2
+    echo "  s3cmd [cmd]                                 run s3cmd" 1>&2
     exit 1
 }
 
@@ -72,6 +73,10 @@ case "${1}" in
         #       It would be nice if you could run a command with non-secret
         #       config options only.
         with_config_secrets "${here}/ssh.bash" ${@}
+    ;;
+    s3cmd)
+        shift
+        sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '${@}
     ;;
     *) usage ;;
 esac

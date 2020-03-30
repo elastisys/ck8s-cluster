@@ -13,6 +13,8 @@
   Helmfile run is necessary.
 - Add command `ck8s ssh` that makes it possible to SSH to the various CK8S
   machines.
+- Add command `ck8s s3cmd` that makes it possible to run s3cmd with the
+  encrypted s3cmd config file.
 
 ### Fixed
 
