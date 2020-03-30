@@ -82,7 +82,7 @@ data:
       ],
       "settings": {
         "index.refresh_interval": "10s",
-        "index.lifecycle.name": "kubeaudit_policy",
+        "index.lifecycle.name": "kubeaudit",
         "index.lifecycle.rollover_alias": "kubeaudit",
         "mapping.total_fields.limit": "1000"
       }
@@ -94,7 +94,7 @@ data:
       ],
       "settings": {
         "index.refresh_interval": "10s",
-        "index.lifecycle.name": "kubecomponents_policy",
+        "index.lifecycle.name": "kubecomponents",
         "index.lifecycle.rollover_alias": "kubecomponents",
         "mapping.total_fields.limit": "1000"
       }
@@ -106,7 +106,7 @@ data:
       ],
       "settings": {
         "index.refresh_interval": "10s",
-        "index.lifecycle.name": "kubernetes_policy",
+        "index.lifecycle.name": "kubernetes",
         "index.lifecycle.rollover_alias": "kubernetes",
         "mapping.total_fields.limit": "1000"
       }
@@ -118,7 +118,7 @@ data:
       ],
       "settings": {
         "index.refresh_interval": "10s",
-        "index.lifecycle.name": "other_policy",
+        "index.lifecycle.name": "other",
         "index.lifecycle.rollover_alias": "other",
         "mapping.total_fields.limit": "1000"
       }
