@@ -65,3 +65,6 @@
 - Storage class for Elasticsearch Nodes is now configurable. Local storage is now used by default in the Exoscale environment. It is provisioned by [sig-storage-local-static-provisioner](https://github.com/kubernetes-sigs/sig-storage-local-static-provisioner).
 - Upgraded helm to v3
 - Terraform backend now configured from a seperated file `backend_config.hcl`
+- Ignore `falco syscall event dropped` messages. These messages were spamming and thus being
+  ignored anyway. (Should be enabled once falco reaches 1.0.0)
+  

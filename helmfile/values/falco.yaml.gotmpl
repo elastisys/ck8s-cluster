@@ -1,5 +1,12 @@
 falco:
   jsonOutput: true
+  syscallEventDrops:
+    # Should be removed when fixed. Probably in 1.0.0 https://github.com/falcosecurity/falco/milestone/3
+    actions:
+      - ignore
+auditLog:
+  # Need to change api-server arguments for it to work.
+  enabled: false
 resources:
   limits:
     cpu: 200m
