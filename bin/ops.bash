@@ -10,6 +10,7 @@ source "${here}/common.bash"
 
 usage() {
     echo "Usage: kubectl <wc|sc> ..." >&2
+    echo "       helmfile <wc|sc> ..." >&2
     exit 1
 }
 
@@ -24,10 +25,59 @@ ops_kubectl() {
     with_kubeconfig "${kubeconfig}" kubectl ${@}
 }
 
+# Run arbitrary Helmfile commands as cluster admin.
+ops_helmfile() {
+    config_load
+
+    case "${1}" in
+        sc)
+            cluster="service_cluster"
+            kubeconfig="${secrets[kube_config_sc]}"
+        ;;
+        wc)
+            cluster="workload_cluster"
+            kubeconfig="${secrets[kube_config_wc]}"
+
+            export CUSTOMER_NAMESPACES_COMMASEPARATED=$(echo "${CUSTOMER_NAMESPACES}" | tr ' ' ,)
+            export CUSTOMER_ADMIN_USERS_COMMASEPARATED=$(echo "${CUSTOMER_ADMIN_USERS}" | tr ' ' ,)
+        ;;
+        *) usage ;;
+    esac
+
+    shift
+
+    export CONFIG_PATH="${CK8S_CONFIG_PATH}"
+
+    # TODO: Get rid of this.
+    source "${scripts_path}/post-infra-common.sh" \
+        "${config[infrastructure_file]}"
+
+    # TODO: We really need make this unnecessary. Currently duplicates logic in
+    #       the deploy scripts.
+    case "${CLOUD_PROVIDER}" in
+        safespring|citycloud) export STORAGE_CLASS=cinder-storage ;;
+        exoscale) export STORAGE_CLASS=nfs-client ;;
+        *)
+            log_error "Unknown CLOUD_PROVIDER [${CLOUD_PROVIDER}] in config."
+            exit 1
+        ;;
+    esac
+
+    # TODO: Delete this when Helm 3 is in place.
+    sops_decrypt "${certs_path}/${cluster}/kube-system/certs/helm-key.pem"
+
+    with_kubeconfig "${kubeconfig}" \
+        helmfile -f "${here}/../helmfile/helmfile.yaml" -e ${cluster} ${@}
+}
+
 case "${1}" in
     kubectl)
         shift
         ops_kubectl ${@}
+    ;;
+    helmfile)
+        shift
+        ops_helmfile ${@}
     ;;
     *) usage ;;
 esac

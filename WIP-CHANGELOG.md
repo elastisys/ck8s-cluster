@@ -9,6 +9,8 @@
 - Label owner=operator to namespaces
 - Add command `ck8s ops kubectl` for emergency situations when normal kubectl
   access is not possible.
+- Add command `ck8s ops helmfile` for emergency situations when a partial
+  Helmfile run is necessary.
 
 ### Fixed
 

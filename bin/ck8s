@@ -20,6 +20,10 @@ usage() {
     # TODO: We might want to make this command less visible once we have proper
     #       support for OIDC logins.
     echo "  ops kubectl <wc|sc>    run kubectl as cluster admin" 1>&2
+    # TODO: We might want to make this command less visible once we feel
+    #       confident that the apply command and migrations are good enough
+    #       that direct Helmfile access is not necessary.
+    echo "  ops helmfile <wc|sc>   run helmfile as cluster admin" 1>&2
     exit 1
 }
 
@@ -49,6 +53,11 @@ case "${1}" in
                 [[ "${3}" =~ ^(wc|sc)$ ]] || usage
                 shift 2
                 "${here}/ops.bash" kubectl ${@}
+            ;;
+            helmfile)
+                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
+                shift 2
+                with_config_secrets "${here}/ops.bash" helmfile ${@}
             ;;
             *) usage ;;
         esac
