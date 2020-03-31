@@ -40,6 +40,9 @@ variable "compute_instance_image" {
 # b.large  : 16d11558-62fe-4bce-b8de-f49a077dc881
 # m.medium : 2c1708d1-3974-4ab8-97cc-cbf58aa27ad9
 # b.xlarge : fce2b54d-c0ef-4ad4-aa81-bcdcaa54f7cb
+# AMD flavors, preferred!
+# lb.tiny     : 51d480b8-2517-4ba8-bfe0-c649ac93eb61
+# lb.large.1d : dc67a9eb-0685-4bb6-9383-a01c717e02e8
 variable worker_names_sc {
   description = "List of names for worker instances to create."
   type        = list(string)
@@ -135,7 +138,7 @@ variable loadbalancer_name_flavor_map_sc {
   description = "Map of instance name to openstack flavor."
   type        = map
   default = {
-    "sc-lb-0" : "1493be98-d150-4f69-8154-4d59ea49681c"
+    "sc-lb-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
   }
 }
 
@@ -150,7 +153,7 @@ variable loadbalancer_name_flavor_map_wc {
   description = "Map of instance name to openstack flavor."
   type        = map
   default = {
-    "wc-lb-0" : "1493be98-d150-4f69-8154-4d59ea49681c"
+    "wc-lb-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
   }
 }
 
