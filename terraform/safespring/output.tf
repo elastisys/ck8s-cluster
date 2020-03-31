@@ -34,6 +34,14 @@ output "domain_name" {
   value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
 }
 
+output "ansible_inventory_sc" {
+  value = module.service_cluster.ansible_inventory
+}
+
+output "ansible_inventory_wc" {
+  value = module.workload_cluster.ansible_inventory
+}
+
 
 # The device paths for each instance.
 output "sc_worker_device_paths" {

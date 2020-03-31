@@ -1,13 +1,11 @@
 variable ssh_pub_key_sc {
   description = "Path to public SSH key file which is injected into the VMs."
-
-  type = string
+  type        = string
 }
 
 variable ssh_pub_key_wc {
   description = "Path to public SSH key file which is injected into the VMs."
-
-  type = string
+  type        = string
 }
 
 variable dns_prefix {
@@ -32,7 +30,7 @@ variable prefix_wc {
 
 variable "compute_instance_image" {
   description = "Base image used to provision master and worker instances"
-  default = "CK8S-BaseOS-v0.0.4"
+  default     = "CK8S-BaseOS-v0.0.4"
 }
 
 # For workers
@@ -52,7 +50,6 @@ variable worker_names_sc {
 variable worker_name_flavor_map_sc {
   description = "Map of instance name to openstack flavor."
   type        = map
-
   default = {
     "worker-0" : "fce2b54d-c0ef-4ad4-aa81-bcdcaa54f7cb",
     "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"
@@ -62,14 +59,12 @@ variable worker_name_flavor_map_sc {
 variable worker_names_wc {
   description = "List of names for worker instances to create."
   type        = list(string)
-
-  default = ["worker-0", "worker-1"]
+  default     = ["worker-0", "worker-1"]
 }
 
 variable worker_name_flavor_map_wc {
   description = "Map of instance name to openstack flavor."
   type        = map
-
   default = {
     "worker-0" : "16d11558-62fe-4bce-b8de-f49a077dc881",
     "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"

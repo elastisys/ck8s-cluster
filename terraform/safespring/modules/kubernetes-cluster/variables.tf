@@ -2,6 +2,11 @@ variable "prefix" {}
 variable "image_id" {}
 variable "key_pair" {}
 variable public_v4_network {}
+variable k8s_version {
+  description = "Kubernetes version. Valid versions: 1.15.11"
+  default     = "1.15.11"
+}
+
 ## DNS
 
 #variable "dns_name" {}
