@@ -22,50 +22,50 @@ variable prefix_wc {
 # For workers
 
 variable worker_names_sc {
-  description = "List of names for worker instances to create." 
+  description = "List of names for worker instances to create."
   type        = list(string)
 
-  default     = ["worker-0","worker-1"]
+  default = ["worker-0", "worker-1"]
 }
 
 variable worker_name_size_map_sc {
   description = "Map of instance name to openstack size."
   type        = map
 
-  default     = {
+  default = {
     "worker-0" : "Extra-large",
-    "worker-1" : "Large"  
+    "worker-1" : "Large"
   }
 }
 
 variable worker_names_wc {
-  description = "List of names for worker instances to create." 
+  description = "List of names for worker instances to create."
   type        = list(string)
 
-  default     = ["worker-0","worker-1"]
+  default = ["worker-0", "worker-1"]
 }
 
 variable worker_name_size_map_wc {
   description = "Map of instance name to openstack size."
   type        = map
 
-  default     = {
+  default = {
     "worker-0" : "Large",
-    "worker-1" : "Large"  
+    "worker-1" : "Large"
   }
 }
 
 # For masters
 variable master_names_sc {
   description = "List of names for master instances to create."
-  type = list(string)
+  type        = list(string)
   default     = ["master-0"]
 }
 
 variable master_name_size_map_sc {
   description = "Map of instance name to openstack size."
   type        = map
-  default     = {
+  default = {
     "master-0" : "Small"
   }
 }
@@ -79,7 +79,7 @@ variable master_names_wc {
 variable master_name_size_map_wc {
   description = "Map of instance name to openstack size."
   type        = map
-  default     = {
+  default = {
     "master-0" : "Small"
   }
 }
@@ -102,7 +102,7 @@ variable ssh_pub_key_file_wc {
 }
 
 variable public_ingress_cidr_whitelist {
-  type    = list(string)
+  type = list(string)
 }
 
 variable dns_prefix {

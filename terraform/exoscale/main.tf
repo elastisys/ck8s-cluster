@@ -19,17 +19,17 @@ provider "exoscale" {
 
 module "service_cluster" {
   source = "./modules/kubernetes-cluster"
-  
+
   prefix = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
-  
-  worker_names          = var.worker_names_sc
-  worker_name_size_map  = var.worker_name_size_map_sc
-  master_names          = var.master_names_sc
-  master_name_size_map  = var.master_name_size_map_sc
+
+  worker_names         = var.worker_names_sc
+  worker_name_size_map = var.worker_name_size_map_sc
+  master_names         = var.master_names_sc
+  master_name_size_map = var.master_name_size_map_sc
 
   nfs_size = var.nfs_size
 
-  dns_suffix   = "a1ck.io"
+  dns_suffix = "a1ck.io"
   dns_list = [
     "*.ops.${var.dns_prefix}",
     "grafana.${var.dns_prefix}",
@@ -52,14 +52,14 @@ module "workload_cluster" {
 
   prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
 
-  worker_names          = var.worker_names_wc
-  worker_name_size_map  = var.worker_name_size_map_wc
-  master_names          = var.master_names_wc
-  master_name_size_map  = var.master_name_size_map_wc
+  worker_names         = var.worker_names_wc
+  worker_name_size_map = var.worker_name_size_map_wc
+  master_names         = var.master_names_wc
+  master_name_size_map = var.master_name_size_map_wc
 
   nfs_size = var.nfs_size
 
-  dns_suffix   = "a1ck.io"
+  dns_suffix = "a1ck.io"
   dns_list = [
     "*.${var.dns_prefix}",
     "prometheus.ops.${var.dns_prefix}"

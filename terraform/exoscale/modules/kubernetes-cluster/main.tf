@@ -20,7 +20,7 @@ locals {
   )
 
   workers_ip = [
-    for k,v in exoscale_compute.worker: exoscale_compute.worker[k].ip_address
+    for k, v in exoscale_compute.worker : exoscale_compute.worker[k].ip_address
   ]
   set = setproduct(var.dns_list, local.workers_ip)
 }
@@ -36,8 +36,8 @@ data "exoscale_compute_template" "ubuntu" {
 }
 
 resource "exoscale_network" "net" {
-  zone             = var.zone
-  name             = "${var.prefix}-network"
+  zone = var.zone
+  name = "${var.prefix}-network"
   #network_offering = "PrivNet"
 
   start_ip = cidrhost(local.internal_cidr_prefix, 1)
@@ -292,9 +292,9 @@ resource "exoscale_ssh_keypair" "ssh_key" {
 }
 
 resource "exoscale_domain_record" "worker" {
-  count = length(local.set)
-  domain = var.dns_suffix
-  name = local.set[count.index][0]
+  count       = length(local.set)
+  domain      = var.dns_suffix
+  name        = local.set[count.index][0]
   record_type = "A"
   content     = local.set[count.index][1]
 }

@@ -1,6 +1,6 @@
 output "master_ip_addresses" {
   value = {
-    for key, instance in exoscale_compute.master:
+    for key, instance in exoscale_compute.master :
     instance.name => {
       "public_ip" = exoscale_compute.master[key].ip_address
     }
@@ -9,7 +9,7 @@ output "master_ip_addresses" {
 
 output "worker_ip_addresses" {
   value = {
-    for key, instance in exoscale_compute.worker:
+    for key, instance in exoscale_compute.worker :
     instance.name => {
       "public_ip" = exoscale_compute.worker[key].ip_address
     }

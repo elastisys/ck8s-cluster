@@ -29,7 +29,7 @@ variable "nfs_size" {}
 variable "ssh_pub_key_file" {}
 
 variable "public_ingress_cidr_whitelist" {
-  type    = list(string)
+  type = list(string)
 }
 
 ## DNS
