@@ -1,3 +1,8 @@
+data "openstack_images_image_v2" "lb_image" {
+  name        = "ubuntu-18.04-server-cloudimg-amd64-20190212.1"
+  most_recent = true
+}
+
 resource "openstack_networking_network_v2" "network" {
   name           = "${var.prefix}-network"
   admin_state_up = "true"
@@ -213,7 +218,7 @@ module "loadbalancer" {
   prefix          = var.prefix
   names           = var.loadbalancer_names
   name_flavor_map = var.loadbalancer_name_flavor_map
-  image_id        = var.image_id
+  image_id        = data.openstack_images_image_v2.lb_image.id
   key_pair        = var.key_pair
 
   network_id = openstack_networking_network_v2.network.id
