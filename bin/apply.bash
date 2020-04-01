@@ -63,20 +63,22 @@ infra_validate_ssh() {
 infra_ansible_run() {
     if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
        [ "${CLOUD_PROVIDER}" = "citycloud" ]; then
-        log_info "Running Ansible script to prepare hosts e.g. install Docker"
+        log_info "Running Ansible script for loadbalancers and extra volumes"
 
-        "${scripts_path}/generate-inventory.sh" \
-            "${config[infrastructure_file]}" > "${config[ansible_hosts]}"
+        pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
+        terraform output ansible_inventory_sc > "${config[ansible_hosts_sc]}"
+        terraform output ansible_inventory_wc > "${config[ansible_hosts_wc]}"
+        popd > /dev/null
 
         (
             with_ssh_agent "${secrets[ssh_priv_key_sc]}" \
-                ansible-playbook -i "${config[ansible_hosts]}" --limit 'sc_*' \
+                ansible-playbook -i "${config[ansible_hosts_sc]}" \
                     "${ansible_path}/infrastructure.yml"
         )
 
         (
             with_ssh_agent "${secrets[ssh_priv_key_wc]}" \
-                ansible-playbook -i "${config[ansible_hosts]}" --limit 'wc_*' \
+                ansible-playbook -i "${config[ansible_hosts_wc]}" \
                     "${ansible_path}/infrastructure.yml"
         )
     fi

@@ -36,7 +36,8 @@ declare -A secrets
 config["config_file"]="${CK8S_CONFIG_PATH}/config.sh"
 config["tfvars_file"]="${CK8S_CONFIG_PATH}/config.tfvars"
 config["infrastructure_file"]="${state_path}/infra.json"
-config["ansible_hosts"]="${state_path}/ansible_hosts.ini"
+config["ansible_hosts_sc"]="${state_path}/ansible_hosts_sc.ini"
+config["ansible_hosts_wc"]="${state_path}/ansible_hosts_wc.ini"
 
 secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.env"
 secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
