@@ -84,7 +84,8 @@ validate_version() {
 validate_cloud() {
     if [ "${1}" != "exoscale" ] &&
        [ "${1}" != "safespring" ] &&
-       [ "${1}" != "citycloud" ]; then
+       [ "${1}" != "citycloud" ] &&
+       [ "${1}" != "aws" ]; then
         log_error "ERROR: Unsupported cloud provider: ${1}"
         exit 1
     fi

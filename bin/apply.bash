@@ -162,6 +162,38 @@ k8s() {
 }
 
 #
+# DNS
+#
+# TODO:
+#   Remove this when we use Kubernetes version 1.16.0+ and use an elastic
+#   IP as address for the DNS records instead.
+#   In version 1.16.0, the cloud provider can associate elastic IPs with
+#   network loadbalancers (such as the one created for nginx).
+#
+
+aws_dns() {
+    log_info "Creating DNS records"
+
+    local workspace="${ENVIRONMENT_NAME}-dns"
+
+    sc_lb=$(with_kubeconfig "${secrets[kube_config_sc]}" \
+        kubectl -n nginx-ingress get service nginx-ingress-controller \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+    wc_lb=$(with_kubeconfig "${secrets[kube_config_wc]}" \
+        kubectl -n nginx-ingress get service nginx-ingress-controller \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+    pushd "${terraform_path}/aws-dns" > /dev/null
+    echo '1' | TF_WORKSPACE="${workspace}" terraform init
+    terraform workspace select "${workspace}"
+    terraform apply \
+        -var dns_record_sc="${sc_lb}" \
+        -var dns_record_wc="${wc_lb}"
+    popd > /dev/null
+}
+
+#
 # APPS
 #
 
@@ -213,6 +245,7 @@ apps() {
 
     apps_init
     apps_run
+    [ "$CLOUD_PROVIDER" = "aws" ] && aws_dns
     apps_validate
 
     log_info "Applications applied successfully!"

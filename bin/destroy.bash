@@ -49,6 +49,7 @@ delete_volumes() {
 }
 
 if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
+   [ "${CLOUD_PROVIDER}" = "aws" ] || \
    [ "${CLOUD_PROVIDER}" = "citycloud" ]; then
     log_info "Cleaning up volumes"
 
@@ -73,6 +74,44 @@ if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
         log_error \
             "ERROR: Volume cleanup failed. Manual cleanup might be required."
     fi
+    set -e
+fi
+
+# TODO: Remove this when we use Kubernetes version 1.16.0+ and use an elastic
+#       IP as address for the DNS records instead.
+#       In version 1.16.0, the cloud provider can associate elastic IPs with
+#       network loadbalancers (such as the one created for nginx).
+if [ "$CLOUD_PROVIDER" = "aws" ]; then
+    log_info "Destroying AWS DNS resources"
+    set +e
+    (
+        set -e
+        workspace="${ENVIRONMENT_NAME}-dns"
+
+        sc_lb=$(with_kubeconfig "${secrets[kube_config_sc]}" \
+            kubectl -n nginx-ingress get service nginx-ingress-controller \
+                -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        wc_lb=$(with_kubeconfig "${secrets[kube_config_wc]}" \
+            kubectl -n nginx-ingress get service nginx-ingress-controller \
+                -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+        pushd "${terraform_path}/aws-dns" > /dev/null
+        echo '1' | TF_WORKSPACE="${workspace}" terraform init
+        terraform workspace select "${workspace}"
+        terraform destroy \
+            -var dns_record_sc="${sc_lb}" \
+            -var dns_record_wc="${wc_lb}"
+        popd > /dev/null
+    )
+
+    log_info "Cleaning up AWS NLBs and target groups"
+    (
+        set -e
+        with_kubeconfig "${secrets[kube_config_sc]}" \
+            "kubectl -n nginx-ingress delete svc nginx-ingress-controller"
+        with_kubeconfig "${secrets[kube_config_wc]}" \
+            "kubectl -n nginx-ingress delete svc nginx-ingress-controller"
+    )
     set -e
 fi
 
