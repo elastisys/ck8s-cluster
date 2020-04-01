@@ -36,32 +36,37 @@ output "worker_device_path" {
 
 output "ansible_inventory" {
   value = templatefile("${path.module}/templates/inventory.tmpl", {
-    master_hosts   = <<-EOF
+    master_hosts  = <<-EOF
 %{for key, master in module.master.instance_ips~}
 ${key} ansible_host=${master.public_ip} private_ip=${master.private_ip}
 %{endfor~}
 EOF
-    masters        = <<-EOF
+    masters       = <<-EOF
 %{for key, master in module.master.instance_ips~}
 ${key}
 %{endfor~}
 EOF
-    worker_hosts   = <<-EOF
+    worker_hosts  = <<-EOF
 %{for key, worker in module.worker.instance_ips~}
 ${key} ansible_host=${worker.public_ip} private_ip=${worker.private_ip}
 %{endfor~}
 EOF
-    workers        = <<-EOF
+    workers       = <<-EOF
 %{for key, worker in module.worker.instance_ips~}
 ${key}
 %{endfor~}
 EOF
-    extra_volume   = <<-EOF
+    loadbalancers = <<-EOF
+%{for key, lb in module.loadbalancer.instance_ips~}
+${key} ansible_host=${lb.public_ip} private_ip=${lb.private_ip}
+%{endfor~}
+EOF
+    extra_volume  = <<-EOF
 %{for key, worker in var.worker_extra_volume~}
 ${key} device_path=${openstack_compute_volume_attach_v2.worker_va[worker].device}
 %{endfor~}
 EOF
-    cluster_name = var.prefix
-    k8s_version  = var.k8s_version
+    cluster_name  = var.prefix
+    k8s_version   = var.k8s_version
   })
 }

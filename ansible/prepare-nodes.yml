@@ -26,7 +26,7 @@
 
     - name: Add audit policy
       copy:
-        src: audit-policy.yaml
+        src: files/audit-policy.yaml
         dest: /etc/kubernetes/conf/audit-policy.yaml
         owner: root
         group: root

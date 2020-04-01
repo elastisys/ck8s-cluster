@@ -71,13 +71,13 @@ infra_ansible_run() {
         (
             with_ssh_agent "${secrets[ssh_priv_key_sc]}" \
                 ansible-playbook -i "${config[ansible_hosts]}" --limit 'sc_*' \
-                    "${ansible_path}/playbook.yml"
+                    "${ansible_path}/infrastructure.yml"
         )
 
         (
             with_ssh_agent "${secrets[ssh_priv_key_wc]}" \
                 ansible-playbook -i "${config[ansible_hosts]}" --limit 'wc_*' \
-                    "${ansible_path}/playbook.yml"
+                    "${ansible_path}/infrastructure.yml"
         )
     fi
 }

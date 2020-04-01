@@ -28,6 +28,7 @@
 ### Removed
 
 - Documentation regarding operations.
+- Ansible parts that are no longer needed with BaseOS, such as installing docker
 
 ### Changed
 
