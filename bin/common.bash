@@ -184,7 +184,8 @@ append_trap() {
 
 # Write PGP fingerprints to SOPS config
 sops_config_write_fingerprints() {
-    yq n 'creation_rules[0].pgp' "${1}" > "${sops_config}"
+    yq n 'creation_rules[0].pgp' "${1}" > "${sops_config}" || \
+      (log_error "Failed to write fingerprints" && rm "${sops_config}" && exit 1)
 }
 
 # Encrypt stdin to file. If the file already exists it's overwritten.
