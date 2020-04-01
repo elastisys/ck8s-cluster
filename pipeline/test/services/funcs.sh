@@ -96,12 +96,24 @@ function testJobStatus {
 #   3. (optional) username and password, <username>:<password>
 function testEndpoint {
     echo -e "Testing $1 endpoint"
-    if [ -z $3 ]
-    then
-        RES=$(curl -ksIL -o /dev/null -X GET -w "%{http_code}" $2)
-    else
-        RES=$(curl -ksIL -o /dev/null -X GET -w "%{http_code}" -u $3 $2)
-    fi
+
+    retries=6
+    while [ ${retries} -gt 0 ]; do
+        args=(
+            -ksIL
+            -o /dev/null
+            -X GET
+            -w "%{http_code}"
+        )
+        [ ! -z "${3}" ] && args+=(-u "${3}")
+
+        RES=$(curl "${args[@]}" "${2}")
+        [[ $RES == "200" ]] && break
+
+        sleep 10
+        retries=$((retries-1))
+    done
+
     if [[ $RES == "200" ]]
     then echo "success ✔"; SUCCESSES=$((SUCCESSES+1))
     else echo "failure ❌"; FAILURES=$((FAILURES+1))
