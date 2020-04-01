@@ -54,7 +54,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 INTERACTIVE=${1:-""}
 
 echo "Creating namespaces" >&2
-NAMESPACES="cert-manager monitoring fluentd"
+NAMESPACES="cert-manager fluentd kube-node-lease kube-public kube-system monitoring nginx-ingress velero"
 [ "$ENABLE_CK8SDASH_WC" == "true" ] && NAMESPACES+=" ck8sdash"
 [ "$ENABLE_FALCO" == "true" ] && NAMESPACES+=" falco"
 [ "$ENABLE_OPA" == "true" ] && NAMESPACES+=" opa"

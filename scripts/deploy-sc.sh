@@ -96,7 +96,7 @@ fi
 INTERACTIVE=${1:-""}
 
 echo "Creating namespaces" >&2
-NAMESPACES="cert-manager elastic-system dex influxdb-prometheus monitoring fluentd"
+NAMESPACES="cert-manager dex elastic-system fluentd harbor influxdb-prometheus kube-node-lease kube-public kube-system monitoring nginx-ingress velero"
 [ $ENABLE_CK8SDASH_SC == "true" ] && NAMESPACES+=" ck8sdash"
 for namespace in ${NAMESPACES}
 do
