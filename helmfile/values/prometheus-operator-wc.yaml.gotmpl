@@ -3,7 +3,7 @@ global:
     pspEnabled: {{ requiredEnv "ENABLE_PSP" }}
 
 alertmanager:
-  enabled: false
+  enabled: {{ requiredEnv "ENABLE_CUSTOMER_ALERTMANAGER" }}
 
 grafana:
   enabled: false

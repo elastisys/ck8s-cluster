@@ -37,6 +37,8 @@
 - New index patterns in Kibana that matches new inices.
 - Harbor init not completing in time for tests.
 - Added missing parameter to velero default volumesnapshotlocation
+- Alertmanager not getting installed in the WC even when 
+`ENABLE_CUSTOMER_ALERTMANAGER` is set to true
 
 ### Removed
 
