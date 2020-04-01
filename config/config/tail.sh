@@ -38,6 +38,16 @@ export OAUTH_ALLOWED_DOMAINS="elastisys.com"
 # Create a static dex user "admin@example.com"
 export ENABLE_STATIC_DEX_LOGIN="false"
 
+export ENABLE_FALCO_ALERTS="false"
+#"slack" or "alertmanager" supported
+export FALCO_ALERTS_TYPE="alertmanager" 
+#order is emergency|alert|critical|error|warning|notice|informational|debug
+export FALCO_ALERTS_PRIORITY="notice"
+export FALCO_ALERTS_ALERTMANAGER_HOSTPORT="http://prometheus-operator-alertmanager.monitoring:9093"
+# If FALCO_ALERTS_TYPE="slack"
+# make sure FALCO_ALERTS_SLACK_WEBHOOK is set in secrets file"
+ 
+
 # If set to "true", set nginx-ingress external traffic policy to "Local".
 # Must be "true" for IP whitelisting to work.
 export EXTERNAL_TRAFFIC_POLICY_LOCAL="false"

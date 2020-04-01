@@ -63,6 +63,9 @@ case "${CK8S_CLOUD_PROVIDER}" in
     ;;
 esac
 
+# Add additional config changes here
+config_update ENABLE_FALCO_ALERTS "true" 
+
 # TODO: The GitHub Actions runner does not run as root. Chmodding for now.
 #       Would be nice to find a cleaner solution.
 

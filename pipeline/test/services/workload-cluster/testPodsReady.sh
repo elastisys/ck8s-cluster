@@ -20,6 +20,7 @@ deployments=(
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
+    "falco falcosidekick"
 )
 if [ $CLOUD_PROVIDER == "exoscale" ]; then
     deployments+=("kube-system nfs-client-provisioner")

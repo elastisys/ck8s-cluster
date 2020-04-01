@@ -30,6 +30,8 @@
 - AWS: EBS storage class support
 - AWS: Additional storage class for sensitive/important data that is
   encrypted and retained
+- Support to configure falco alerts for slack and alertmanager. 
+- Falcosidekick for handling falco outputs. 
 
 ### Fixed
 

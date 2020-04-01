@@ -434,6 +434,20 @@ releases:
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/falco.yaml"
   {{ end }}
 
+{{ if eq (env "ENABLE_FALCO_ALERTS") "true" }}
+- name: falcosidekick
+  namespace: falco
+  labels:
+    app: falco
+  chart: ./charts/falcosidekick
+  version: 0.1.14
+  missingFileHandler: Error
+  values:
+  - values/falcosidekick.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/falcosidekick.yaml"
+  {{ end }}
+{{ end }}
 
 # Fluentd
 - name: fluentd-system

@@ -7,8 +7,14 @@ falco:
     # Should be removed when fixed. Probably in 1.0.0 https://github.com/falcosecurity/falco/milestone/3
     actions:
       - ignore
+{{ if eq (requiredEnv "ENABLE_FALCO_ALERTS") "true" }}
+  programOutput:
+    enabled: true
+    program: "curl -d @- falcosidekick:2801/"
+{{ end }}
 auditLog:
-  # Need to change api-server arguments for it to work.
+  # Need to change api-server arguments if enabled
+  # https://kubernetes.io/docs/tasks/debug-application-cluster/falco/#configure-kubernetes-audit
   enabled: false
 resources:
   limits:
