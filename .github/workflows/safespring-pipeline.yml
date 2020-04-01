@@ -29,6 +29,7 @@ jobs:
       env:
         CK8S_CONFIG_PATH: ./ck8s_pipeline_config
         CK8S_CLOUD_PROVIDER: safespring
+        CK8S_PGP_FP: 3EEFED60C2E86263117AC3F7792CF1BD81B69515
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
