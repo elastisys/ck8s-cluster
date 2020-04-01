@@ -42,14 +42,8 @@ config["ansible_hosts_wc"]="${state_path}/ansible_hosts_wc.ini"
 secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.env"
 secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
 
-secrets["rke_config_sc"]="${state_path}/rke_sc.yaml"
-secrets["rke_config_wc"]="${state_path}/rke_wc.yaml"
-
-secrets["rkestate_sc"]="${state_path}/rke_sc.rkestate"
-secrets["rkestate_wc"]="${state_path}/rke_wc.rkestate"
-
-secrets["kube_config_sc"]="${state_path}/kube_config_rke_sc.yaml"
-secrets["kube_config_wc"]="${state_path}/kube_config_rke_wc.yaml"
+secrets["kube_config_sc"]="${state_path}/kube_config_sc.yaml"
+secrets["kube_config_wc"]="${state_path}/kube_config_wc.yaml"
 
 secrets["ssh_priv_key_sc"]="${ssh_path}/id_rsa_sc"
 secrets["ssh_priv_key_wc"]="${ssh_path}/id_rsa_wc"

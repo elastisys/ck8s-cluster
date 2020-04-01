@@ -40,3 +40,4 @@
   controller. This also means that the DNS records now points to the EIP IP
   address instead of every worker.
 - Using BaseOS as VM image instead of plain ubuntu for all k8s nodes on Exoscale and Safespring.
+- Switch from RKE to kubeadm for k8s cluster management

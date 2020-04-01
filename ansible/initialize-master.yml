@@ -59,3 +59,18 @@
       register: master_node_status
       until: master_node_status.stdout == "True"
       retries: 30
+
+    - name: Copy kubeconfig to localhost
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ kubeconfig_path }}"
+        flat: yes
+
+    - name: Set public IP in local kubeconfig
+      become: no
+      run_once: yes
+      replace:
+        path: "{{ kubeconfig_path }}"
+        regexp: "https://{{ hostvars[groups.masters.0].private_ip }}"
+        replace: "https://{{ hostvars[groups.masters.0].ansible_host }}"
+      delegate_to: localhost

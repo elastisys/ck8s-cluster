@@ -42,6 +42,12 @@ infra_tf_run() {
     popd > /dev/null
 
     "${scripts_path}/gen-infra.sh" > "${config[infrastructure_file]}"
+
+    log_info "Generating ansible inventories"
+    pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
+    terraform output ansible_inventory_sc > "${config[ansible_hosts_sc]}"
+    terraform output ansible_inventory_wc > "${config[ansible_hosts_wc]}"
+    popd > /dev/null
 }
 
 infra_validate_ssh() {
@@ -64,11 +70,6 @@ infra_ansible_run() {
     if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
        [ "${CLOUD_PROVIDER}" = "citycloud" ]; then
         log_info "Running Ansible script for loadbalancers and extra volumes"
-
-        pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
-        terraform output ansible_inventory_sc > "${config[ansible_hosts_sc]}"
-        terraform output ansible_inventory_wc > "${config[ansible_hosts_wc]}"
-        popd > /dev/null
 
         (
             with_ssh_agent "${secrets[ssh_priv_key_sc]}" \
@@ -110,52 +111,31 @@ infra() {
 # K8S
 #
 
-k8s_init() {
-    log_info "Generating rke configs"
-
-    "${scripts_path}/gen-rke-conf-sc.sh" "${config[infrastructure_file]}" | \
-        sops_encrypt_stdin yaml "${secrets[rke_config_sc]}"
-    "${scripts_path}/gen-rke-conf-wc.sh" "${config[infrastructure_file]}" | \
-        sops_encrypt_stdin yaml "${secrets[rke_config_wc]}"
-}
-
-k8s_run_rke() {
-    rke_config="${1}"
-    rkestate="${2}"
-    kube_config="${3}"
-    ssh_key="${4}"
-
-    # The rkestate file does not exist on the first run, to be able to decrypt
-    # it we need to have something to encrypt. Yea, I know, it's ugly. :(
-    if [ ! -f "${rkestate}" ]; then
-        touch "${rkestate}"
-        sops_encrypt "${rkestate}"
-    fi
+k8s_run_kubeadm() {
+    ansible_inventory="${1}"
+    kube_config="${2}"
+    ssh_key="${3}"
 
     (
-        # We unfortunately can't use `sops exec-file` since rke does not allow
-        # you to specify where to store the rkestate and kubeconfig file.
-        # See: https://github.com/rancher/rke/issues/1040
-        sops_decrypt "${rke_config}"
-        sops_decrypt "${rkestate}"
-
-        with_ssh_agent "${ssh_key}" rke up --config "${rke_config}"
+        with_ssh_agent "${ssh_key}" \
+            ansible-playbook -i "${ansible_inventory}" \
+                --extra-vars=kubeconfig_path="${kube_config}" \
+                "${ansible_path}/deploy-kubernetes.yml"
     )
 
     sops_encrypt "${kube_config}"
 }
 
 k8s_run() {
-    log_info "Running rke up for service cluster"
+    log_info "Initializing/configuring Kubernetes for service cluster"
 
-    k8s_run_rke "${secrets[rke_config_sc]}" "${secrets[rkestate_sc]}" \
-                "${secrets[kube_config_sc]}" "${secrets[ssh_priv_key_sc]}"
+    k8s_run_kubeadm "${config[ansible_hosts_sc]}" "${secrets[kube_config_sc]}" \
+                "${secrets[ssh_priv_key_sc]}"
 
-    log_info "Running rke up for workload cluster"
+    log_info "Initializing/configuring Kubernetes for workload cluster"
 
-    k8s_run_rke "${secrets[rke_config_wc]}" "${secrets[rkestate_wc]}" \
-                "${secrets[kube_config_wc]}" "${secrets[ssh_priv_key_wc]}"
-
+    k8s_run_kubeadm "${config[ansible_hosts_wc]}" "${secrets[kube_config_wc]}" \
+                "${secrets[ssh_priv_key_wc]}"
 }
 
 k8s_validate() {
@@ -175,7 +155,6 @@ k8s() {
 
     mkdir -p "${state_path}"
 
-    k8s_init
     k8s_run
     k8s_validate
 
