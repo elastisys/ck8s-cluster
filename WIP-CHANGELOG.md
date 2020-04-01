@@ -67,4 +67,4 @@
 - Terraform backend now configured from a seperated file `backend_config.hcl`
 - Ignore `falco syscall event dropped` messages. These messages were spamming and thus being
   ignored anyway. (Should be enabled once falco reaches 1.0.0)
-  
+- Upgraded falco helm chart to v1.1.6 (falco v0.22.1)
