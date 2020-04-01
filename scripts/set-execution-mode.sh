@@ -19,8 +19,11 @@ WORKSPACE=safespring-demo-$CK8S_ENVIRONMENT_NAME
 elif [ $CLOUD_PROVIDER == "citycloud" ]
 then
 WORKSPACE=citycloud-$CK8S_ENVIRONMENT_NAME
+elif [ $CLOUD_PROVIDER == "aws" ]
+then
+WORKSPACE=aws-$CK8S_ENVIRONMENT_NAME
 else
-echo "Only exoscale, safespring, and citycloud is supported as CLOUD_PROVIDER"
+echo "Error: Unsupported cloud provider: ${CLOUD_PROVIDER}"
 exit 1
 fi
 RUN_REMOTE="false"

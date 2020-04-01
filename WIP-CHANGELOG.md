@@ -20,6 +20,7 @@
 - Ansible inventory generated directly in terraform for Exoscale, Safespring, and Citycloud
 - `metrics-server` is installed on kubeadm-installed clusters as well.
 - AWS: use network load balancer for `nginx-ingress`
+- Added AWS support to the `set-execution-mode.sh` script
 
 ### Fixed
 

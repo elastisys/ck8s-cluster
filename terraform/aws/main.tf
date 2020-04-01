@@ -4,7 +4,7 @@ terraform {
     organization = "elastisys"
 
     workspaces {
-      prefix = "aws-demo-"
+      prefix = "aws-"
     }
   }
 }
