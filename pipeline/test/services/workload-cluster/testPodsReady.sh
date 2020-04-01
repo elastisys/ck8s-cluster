@@ -9,7 +9,6 @@ DEPLOYMENTS=(
     "cert-manager cert-manager-webhook"
     "kube-system calico-kube-controllers"
     "kube-system coredns"
-    "kube-system coredns-autoscaler"
     "kube-system metrics-server"
     "nginx-ingress nginx-ingress-default-backend"
     "opa opa"

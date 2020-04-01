@@ -11,7 +11,6 @@ DEPLOYMENTS=(
     "elastic-system kibana-kb"
     "kube-system calico-kube-controllers"
     "kube-system coredns"
-    "kube-system coredns-autoscaler"
     "kube-system metrics-server"
     "nginx-ingress nginx-ingress-default-backend"
     "monitoring customer-grafana"
