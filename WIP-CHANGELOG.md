@@ -41,6 +41,7 @@
 - Added missing parameter to velero default volumesnapshotlocation
 - Alertmanager not getting installed in the WC even when 
 `ENABLE_CUSTOMER_ALERTMANAGER` is set to true
+- Falco getting installed even if `ENABLE_FALCO=false`
 
 ### Removed
 

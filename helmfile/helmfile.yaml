@@ -420,6 +420,7 @@ releases:
 
 # Workload cluster releases
 {{ if eq .Environment.Name "workload_cluster"  }}
+{{ if eq (env "ENABLE_FALCO") "true" }}
 # Falco
 - name: falco
   namespace: falco
@@ -433,6 +434,7 @@ releases:
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/falco.yaml"
   {{ end }}
+{{ end }}
 
 {{ if eq (env "ENABLE_FALCO_ALERTS") "true" }}
 - name: falcosidekick
