@@ -21,7 +21,10 @@ output "nfs_ip_address" {
 }
 
 output "dns_record_name" {
-  value = exoscale_domain_record.worker[*].hostname
+  value = [
+    for dns_record in exoscale_domain_record.ingress :
+    dns_record.hostname
+  ]
 }
 
 output "dns_suffix" {
@@ -39,6 +42,6 @@ output "dns_suffix" {
 #  value = "${exoscale_nic.nfs_internal.ip_address}"
 #}
 
-#output "elastic_ip_address" {
-#  value = "${exoscale_ipaddress.eip.ip_address}"
-#}
+output "ingress_controller_lb_ip_address" {
+  value = "${exoscale_ipaddress.ingress_controller_lb.ip_address}"
+}

@@ -196,13 +196,6 @@ To add or override the default configuration that is used for all the helm chart
 
 ## Issues and limitations
 
-### [Exoscale] EIP not reachable from loadbalancer pool
-
-Currently there is an issue where instances, that have been added to the EIP
-loadbalancer pool (i.e. when they are no longer seen as unhealthy by the
-healthchecks), can't reach the EIP.
-See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030138
-
 ### [Exoscale] EIP cleanup sometimes fail
 
 Sometimes EIPs are not possible to delete due to still being seen as having

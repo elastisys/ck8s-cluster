@@ -30,3 +30,6 @@
 - `SOPS_PGP_FP` is deprecated in favor of using a
   [SOPS config file](https://github.com/mozilla/sops/blob/master/README.rst#using-sops-yaml-conf-to-select-kms-pgp-for-new-files).
   Use `CK8S_PGP_UID` or `CK8S_PGP_FP` when initializing the CK8S config.
+- Exoscale EIP is reintroduced as loadbalancer for the nginx ingress
+  controller. This also means that the DNS records now points to the EIP IP
+  address instead of every worker.

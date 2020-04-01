@@ -60,6 +60,7 @@ resource "exoscale_compute" "master" {
   user_data = templatefile(
     "${path.module}/templates/master-cloud-init.tmpl",
     {
+      eip_ip_address               = exoscale_ipaddress.ingress_controller_lb.ip_address
       admission_control_config_b64 = filebase64("${path.module}/manifest/admission-control-config.yaml"),
       podnodeselector_config_b64   = filebase64("${path.module}/manifest/podnodeselector.yaml"),
       audit_policy_b64             = filebase64("${path.module}/manifest/audit-policy.yaml"),
@@ -95,6 +96,7 @@ resource "exoscale_compute" "worker" {
     {
       # TODO: Remove when managed virtual router/DHCP is working properly.
       # address = "${cidrhost(local.internal_cidr_prefix, local.worker_internal_host_num_start + count.index)}/${local.internal_cidr_prefix_length
+      eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
     }
   )
 }
@@ -131,6 +133,7 @@ resource "exoscale_compute" "nfs" {
 
       # TODO: Remove when managed virtual router/DHCP is working properly.
       # address = local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length,
+      eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
     }
   )
 }
@@ -268,33 +271,34 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
   }
 }
 
-#resource "exoscale_ipaddress" "eip" {
-#  zone                     = var.zone
-#  healthcheck_mode         = "http"
-#  healthcheck_port         = 10254
-#  healthcheck_path         = "/healthz"
-#  healthcheck_interval     = 10
-#  healthcheck_timeout      = 2
-#  healthcheck_strikes_ok   = 2
-#  healthcheck_strikes_fail = 3
-#}
-#
-#resource "exoscale_secondary_ipaddress" "eip_worker_association" {
-#  count = var.worker_count
-#
-#  compute_id = element(exoscale_compute.worker.*.id, count.index)
-#  ip_address = exoscale_ipaddress.eip.ip_address
-#}
+resource "exoscale_ipaddress" "ingress_controller_lb" {
+  zone                     = var.zone
+  healthcheck_mode         = "http"
+  healthcheck_port         = 80
+  healthcheck_path         = "/healthz"
+  healthcheck_interval     = 10
+  healthcheck_timeout      = 2
+  healthcheck_strikes_ok   = 2
+  healthcheck_strikes_fail = 3
+}
+
+resource "exoscale_secondary_ipaddress" "ingress_controller_lb" {
+  for_each = toset(var.worker_names)
+
+  compute_id = exoscale_compute.worker[each.value].id
+  ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
+}
 
 resource "exoscale_ssh_keypair" "ssh_key" {
   name       = "${var.prefix}-ssh-key"
   public_key = trimspace(file(pathexpand(var.ssh_pub_key_file)))
 }
 
-resource "exoscale_domain_record" "worker" {
-  count       = length(local.set)
+resource "exoscale_domain_record" "ingress" {
+  for_each = toset(var.dns_list)
+
   domain      = var.dns_suffix
-  name        = local.set[count.index][0]
+  name        = each.value
   record_type = "A"
-  content     = local.set[count.index][1]
+  content     = exoscale_ipaddress.ingress_controller_lb.ip_address
 }
