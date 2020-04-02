@@ -43,3 +43,4 @@
 - Using BaseOS as VM image instead of plain ubuntu for all k8s nodes on Exoscale and Safespring.
 - Switch from RKE to kubeadm for k8s cluster management
 - Switch CNI from Canal to Calico
+- Using Neutron instead of Nova network for security rules in Safespring.
