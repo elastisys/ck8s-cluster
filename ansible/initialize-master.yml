@@ -42,7 +42,7 @@
       until: result is not failed
 
     - name: Install network plugin
-      shell: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f https://docs.projectcalico.org/v3.11/manifests/calico.yaml
+      shell: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
       when: initialized is changed
       register: result
       retries: 15
