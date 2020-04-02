@@ -187,6 +187,15 @@ resource "exoscale_security_group_rules" "master_sg_rules" {
       exoscale_security_group.nfs_sg.name,
     ]
   }
+  ingress {
+    protocol = "IPIP"
+    ports    = ["0"]
+    user_security_group_list = [
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
+    ]
+  }
 }
 
 resource "exoscale_security_group" "worker_sg" {
@@ -225,6 +234,15 @@ resource "exoscale_security_group_rules" "worker_sg_rules" {
   ingress {
     protocol = "UDP"
     ports    = ["0-65535"]
+    user_security_group_list = [
+      exoscale_security_group.master_sg.name,
+      exoscale_security_group.worker_sg.name,
+      exoscale_security_group.nfs_sg.name,
+    ]
+  }
+  ingress {
+    protocol = "IPIP"
+    ports    = ["0"]
     user_security_group_list = [
       exoscale_security_group.master_sg.name,
       exoscale_security_group.worker_sg.name,
