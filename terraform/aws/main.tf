@@ -10,8 +10,8 @@ terraform {
 }
 
 provider "aws" {
-  version = "~> 2.50"
-  region  = var.region
+  version                 = "~> 2.50"
+  region                  = var.region
   shared_credentials_file = pathexpand(var.infra_credentials_file_path)
 }
 

@@ -17,7 +17,7 @@ resource "openstack_networking_subnet_v2" "subnet" {
 }
 
 resource "openstack_networking_router_v2" "router" {
-  name = "${var.prefix}_router"
+  name                = "${var.prefix}_router"
   external_network_id = var.public_v4_network
 }
 
@@ -127,11 +127,11 @@ resource "openstack_compute_secgroup_v2" "master_sg" {
 module "master" {
   source = "../vm"
 
-  prefix          = var.prefix
-  names           = var.master_names
-  name_flavor_map = var.master_name_flavor_map
-  image_id        = var.image_id
-  key_pair        = var.key_pair
+  prefix            = var.prefix
+  names             = var.master_names
+  name_flavor_map   = var.master_name_flavor_map
+  image_id          = var.image_id
+  key_pair          = var.key_pair
   public_v4_network = var.public_v4_network
 
   network_id = openstack_networking_network_v2.network.id
@@ -175,16 +175,16 @@ resource "openstack_compute_secgroup_v2" "worker_sg" {
 module "worker" {
   source = "../vm"
 
-  prefix          = var.prefix
-  names           = var.worker_names
-  name_flavor_map = var.worker_name_flavor_map
-  image_id        = var.image_id
-  key_pair        = var.key_pair
+  prefix            = var.prefix
+  names             = var.worker_names
+  name_flavor_map   = var.worker_name_flavor_map
+  image_id          = var.image_id
+  key_pair          = var.key_pair
   public_v4_network = var.public_v4_network
 
   network_id = openstack_networking_network_v2.network.id
   subnet_id  = openstack_networking_subnet_v2.subnet.id
-  
+
   security_group_ids = [
     openstack_compute_secgroup_v2.cluster_sg.id,
     openstack_compute_secgroup_v2.worker_sg.id,
@@ -209,56 +209,56 @@ resource "openstack_compute_volume_attach_v2" "worker_va" {
 #
 
 resource "openstack_lb_loadbalancer_v2" "loadbalancer" {
-  name = "${var.prefix}-k8s-loadbalancer-1"
+  name          = "${var.prefix}-k8s-loadbalancer-1"
   vip_subnet_id = openstack_networking_subnet_v2.subnet.id
 }
 
 resource "openstack_lb_listener_v2" "loadbalancer-80" {
-  name = "${var.prefix}-loadbalancer-80"
-  protocol = "HTTP"
-  protocol_port = 80
+  name            = "${var.prefix}-loadbalancer-80"
+  protocol        = "HTTP"
+  protocol_port   = 80
   loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer.id
   default_pool_id = openstack_lb_pool_v2.loadbalancer-http.id
 }
 
 resource "openstack_lb_listener_v2" "loadbalancer-443" {
-  name = "${var.prefix}-loadbalancer-443"
-  protocol = "HTTPS"
-  protocol_port = 443
+  name            = "${var.prefix}-loadbalancer-443"
+  protocol        = "HTTPS"
+  protocol_port   = 443
   loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer.id
   default_pool_id = openstack_lb_pool_v2.loadbalancer-https.id
 }
 
 resource "openstack_lb_pool_v2" "loadbalancer-http" {
-  name = "${var.prefix}-loadbalancer-80"
-  lb_method = "ROUND_ROBIN"
-  protocol = "HTTP"
+  name            = "${var.prefix}-loadbalancer-80"
+  lb_method       = "ROUND_ROBIN"
+  protocol        = "HTTP"
   loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer.id
 }
 
 resource "openstack_lb_pool_v2" "loadbalancer-https" {
-  name = "${var.prefix}-loadbalancer-443"
-  lb_method = "ROUND_ROBIN"
-  protocol = "HTTPS"
+  name            = "${var.prefix}-loadbalancer-443"
+  lb_method       = "ROUND_ROBIN"
+  protocol        = "HTTPS"
   loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer.id
 }
 
 resource "openstack_lb_member_v2" "loadbalancer-80" {
   for_each = module.worker.instance_ips
 
-  address = each.value.private_ip
-  pool_id = openstack_lb_pool_v2.loadbalancer-http.id
+  address       = each.value.private_ip
+  pool_id       = openstack_lb_pool_v2.loadbalancer-http.id
   protocol_port = 80
-  subnet_id = openstack_networking_subnet_v2.subnet.id
+  subnet_id     = openstack_networking_subnet_v2.subnet.id
 }
 
 resource "openstack_lb_member_v2" "loadbalancer-443" {
   for_each = module.worker.instance_ips
 
-  address = each.value.private_ip
-  pool_id = openstack_lb_pool_v2.loadbalancer-https.id
+  address       = each.value.private_ip
+  pool_id       = openstack_lb_pool_v2.loadbalancer-https.id
   protocol_port = 443
-  subnet_id = openstack_networking_subnet_v2.subnet.id
+  subnet_id     = openstack_networking_subnet_v2.subnet.id
 }
 
 data "openstack_networking_network_v2" "ext-net" {
@@ -271,7 +271,7 @@ resource "openstack_networking_floatingip_v2" "loadbalancer-lb-fip" {
 
 resource "openstack_networking_floatingip_associate_v2" "loadbalancer-lb-fip-assoc" {
   floating_ip = openstack_networking_floatingip_v2.loadbalancer-lb-fip.address
-  port_id = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
+  port_id     = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
   depends_on = [
     openstack_lb_loadbalancer_v2.loadbalancer,
     openstack_lb_listener_v2.loadbalancer-80,

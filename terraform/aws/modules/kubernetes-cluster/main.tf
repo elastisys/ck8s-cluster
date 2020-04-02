@@ -12,7 +12,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "${var.prefix}-vpc"
+    Name                                  = "${var.prefix}-vpc"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
@@ -25,7 +25,7 @@ resource "aws_subnet" "main_sn" {
   cidr_block = aws_vpc.main.cidr_block
 
   tags = {
-    Name = "${var.prefix}-main-sn"
+    Name                                  = "${var.prefix}-main-sn"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
@@ -36,7 +36,7 @@ resource "aws_subnet" "main_sn" {
 resource "aws_internet_gateway" "gateway" {
   vpc_id = aws_vpc.main.id
   tags = {
-    Name = "${var.prefix}-gateway"
+    Name                                  = "${var.prefix}-gateway"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
@@ -48,7 +48,7 @@ resource "aws_route_table" "rt" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${var.prefix}-rt"
+    Name                                  = "${var.prefix}-rt"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
@@ -175,7 +175,7 @@ resource "aws_security_group" "cluster_sg" {
   }
 
   tags = {
-    Name = "${var.prefix}-cluster-sg"
+    Name                                  = "${var.prefix}-cluster-sg"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
@@ -316,7 +316,7 @@ resource "aws_instance" "master" {
   depends_on = [aws_internet_gateway.gateway]
 
   tags = {
-    Name = "${var.prefix}-${each.key}"
+    Name                                  = "${var.prefix}-${each.key}"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }
@@ -351,7 +351,7 @@ resource "aws_instance" "worker" {
   depends_on = [aws_internet_gateway.gateway]
 
   tags = {
-    Name = "${var.prefix}-${each.key}"
+    Name                                  = "${var.prefix}-${each.key}"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
   }
 }

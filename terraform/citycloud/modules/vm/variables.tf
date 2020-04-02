@@ -17,6 +17,6 @@ variable "name_flavor_map" {
 
 variable "names" {
   description = "List of names for instances to be created."
-  type = list(string)
+  type        = list(string)
 }
 

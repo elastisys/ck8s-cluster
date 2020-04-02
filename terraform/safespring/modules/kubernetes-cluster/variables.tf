@@ -38,12 +38,12 @@ variable "master_names" {
 
 # Configuration of instance that should mount an extra volume
 variable "worker_extra_volume" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
 variable "worker_extra_volume_size" {
-  type = map
+  type    = map
   default = {}
 }
 
@@ -60,5 +60,5 @@ variable "loadbalancer_name_flavor_map" {
 }
 
 variable public_ingress_cidr_whitelist {
-  type    = string
+  type = string
 }

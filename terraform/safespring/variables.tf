@@ -41,16 +41,16 @@ variable worker_names_sc {
   description = "List of names for worker instances to create."
   type        = list(string)
 
-  default     = ["worker-0","worker-1"]
+  default = ["worker-0", "worker-1"]
 }
 
 variable worker_name_flavor_map_sc {
   description = "Map of instance name to openstack flavor."
   type        = map
 
-  default     = {
+  default = {
     "worker-0" : "fce2b54d-c0ef-4ad4-aa81-bcdcaa54f7cb",
-    "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"  
+    "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"
   }
 }
 
@@ -58,14 +58,14 @@ variable worker_names_wc {
   description = "List of names for worker instances to create."
   type        = list(string)
 
-  default     = ["worker-0","worker-1"]
+  default = ["worker-0", "worker-1"]
 }
 
 variable worker_name_flavor_map_wc {
   description = "Map of instance name to openstack flavor."
   type        = map
 
-  default     = {
+  default = {
     "worker-0" : "16d11558-62fe-4bce-b8de-f49a077dc881",
     "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"
   }
@@ -74,14 +74,14 @@ variable worker_name_flavor_map_wc {
 # For masters
 variable master_names_sc {
   description = "List of names for master instances to create."
-  type = list(string)
+  type        = list(string)
   default     = ["master-0"]
 }
 
 variable master_name_flavor_map_sc {
   description = "Map of instance name to openstack flavor."
   type        = map
-  default     = {
+  default = {
     "master-0" : "9d82d1ee-ca29-4928-a868-d56e224b92a1"
   }
 }
@@ -95,7 +95,7 @@ variable master_names_wc {
 variable master_name_flavor_map_wc {
   description = "Map of instance name to openstack flavor."
   type        = map
-  default     = {
+  default = {
     "master-0" : "9d82d1ee-ca29-4928-a868-d56e224b92a1"
   }
 }
@@ -134,7 +134,7 @@ variable loadbalancer_names_sc {
 variable loadbalancer_name_flavor_map_sc {
   description = "Map of instance name to openstack flavor."
   type        = map
-  default     = {
+  default = {
     "sc-lb-0" : "1493be98-d150-4f69-8154-4d59ea49681c"
   }
 }
@@ -149,11 +149,11 @@ variable loadbalancer_names_wc {
 variable loadbalancer_name_flavor_map_wc {
   description = "Map of instance name to openstack flavor."
   type        = map
-  default     = {
+  default = {
     "wc-lb-0" : "1493be98-d150-4f69-8154-4d59ea49681c"
   }
 }
 
 variable public_ingress_cidr_whitelist {
-  type    = string
+  type = string
 }

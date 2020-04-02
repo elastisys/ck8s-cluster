@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "openstack" {
-  use_octavia=true
+  use_octavia = true
 }
 
 data "openstack_images_image_v2" "ubuntu" {

@@ -1,6 +1,6 @@
 resource "openstack_networking_port_v2" "port" {
   for_each = toset(var.names)
-  
+
   name       = "${var.prefix}-${each.value}-port"
   network_id = var.network_id
 

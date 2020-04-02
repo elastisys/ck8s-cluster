@@ -1,6 +1,6 @@
 output "dns_record_name" {
   value = [
-    for dns in aws_route53_record.dns: dns.name
+    for dns in aws_route53_record.dns : dns.name
   ]
 }
 
@@ -29,7 +29,7 @@ output "loadbalancer_ips" {
 # For device paths
 output "worker_device_path" {
   value = {
-    for instance in var.worker_extra_volume:
+    for instance in var.worker_extra_volume :
     instance => openstack_compute_volume_attach_v2.worker_va[instance].device
   }
 }
