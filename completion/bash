@@ -1,0 +1,62 @@
+# Completion for bash
+_ck8s_complete(){
+    local cur prev
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    case "${prev}" in
+        ck8s)
+            local opts=()
+            opts+=("init")
+            opts+=("apply")
+            opts+=("dry-run")
+            opts+=("team")
+            opts+=("ops")
+            opts+=("ssh")
+            opts+=("s3cmd")
+            opts+=("completion")
+            COMPREPLY=($(compgen -W "${opts[*]}" -- ${cur}))
+            ;;
+        apply)
+            local apply_ops=()
+            apply_ops+=("all")
+            apply_ops+=("infra")
+            apply_ops+=("k8s")
+            apply_ops+=("apps")
+            COMPREPLY=( $(compgen -W "${apply_ops[*]}" -- ${cur}) )
+            return 0
+            ;;
+        team)
+            local team_ops=()
+            team_ops+=("add-pgp")
+            team_ops+=("remove-pgp")
+            COMPREPLY=( $(compgen -W "${team_ops[*]}" -- ${cur}) )
+            return 0
+            ;;
+        ops)
+            local ops_ops=()
+            ops_ops+=("kubectl")
+            ops_ops+=("helmfile")
+            COMPREPLY=( $(compgen -W "${ops_ops[*]}" -- ${cur}) )
+            return 0
+            ;;
+        ssh)
+            local ssh_ops=()
+            ssh_ops+=("wc")
+            ssh_ops+=("sc")
+            COMPREPLY=( $(compgen -W "${ssh_ops[*]}" -- ${cur}) )
+            return 0
+            ;;
+        completion)
+            local completion_ops=()
+            completion_ops+=("bash")
+            COMPREPLY=( $(compgen -W "${completion_ops[*]}" -- ${cur}) )
+            return 0
+            ;;
+        *)
+            ;;
+    esac
+    return 0
+}
+complete -F _ck8s_complete ck8s
