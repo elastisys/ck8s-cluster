@@ -10,6 +10,9 @@ nodeRegistration:
 {% if cloud_provider is defined %}
     cloud-provider: "{{ cloud_provider }}"
 {% endif %}
+{% if cloud_config is defined %}
+    cloud-config: "{{ cloud_config }}"
+{% endif %}
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
@@ -31,6 +34,11 @@ apiServer:
       mountPath: "/var/log/kube-audit"
       readOnly: false
       pathType: "Directory"
+{% if cloud_config is defined %}
+    - name: cloud
+      hostPath: "{{ cloud_config }}"
+      mountPath: "{{ cloud_config }}"
+{% endif %}
   extraArgs:
     authorization-mode: "Node,RBAC"
     oidc-issuer-url: "https://dex.{{ lookup('env','ECK_BASE_DOMAIN') }}"
@@ -49,6 +57,9 @@ apiServer:
 {% if cloud_provider is defined %}
     cloud-provider: "{{ cloud_provider }}"
 {% endif %}
+{% if cloud_config is defined %}
+    cloud-config: "{{ cloud_config }}"
+{% endif %}
   timeoutForControlPlane: 4m0s
 certificatesDir: /etc/kubernetes/pki
 clusterName: {{ cluster_name }}
@@ -59,6 +70,13 @@ controlPlaneEndpoint: "{{ control_plane_endpoint }}:6443"
 controllerManager:
   extraArgs:
     cloud-provider: "{{ cloud_provider }}"
+{% if cloud_config is defined %}
+    cloud-config: "{{ cloud_config }}"
+  extraVolumes:
+    - name: cloud
+      hostPath: "{{ cloud_config }}"
+      mountPath: "{{ cloud_config }}"
+{% endif %}
 {% else %}
 controllerManager: {}
 {% endif %}

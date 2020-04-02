@@ -66,7 +66,8 @@ EOF
 ${key} device_path=${openstack_compute_volume_attach_v2.worker_va[worker].device}
 %{endfor~}
 EOF
-    cluster_name  = var.prefix
-    k8s_version   = var.k8s_version
+    cloud_provider = "openstack"
+    cluster_name   = var.prefix
+    k8s_version    = var.k8s_version
   })
 }

@@ -10,6 +10,13 @@ discovery:
 nodeRegistration:
   kubeletExtraArgs:
     cloud-provider: "{{ cloud_provider }}"
+{% if cloud_config is defined %}
+    cloud-config: "{{ cloud_config }}"
+  extraVolumes:
+    - name: cloud
+      hostPath: "{{ cloud_config }}"
+      mountPath: "{{ cloud_config }}"
+{% endif %}
 {% endif %}
 controlPlane:
   localAPIEndpoint:
