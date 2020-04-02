@@ -491,36 +491,3 @@ resource "aws_iam_role_policy" "worker" {
   }
   EOF
 }
-
-# Ansible inventory
-
-data "template_file" "ansible_inventory" {
-  template = file("${path.module}/templates/inventory.tmpl")
-  vars = {
-    master_hosts           = <<-EOF
-%{for index, master in aws_instance.master~}
-${var.prefix}-${index} ansible_host=${master.public_ip} private_ip=${master.private_ip} ansible_ssh_private_key_file='${var.ssh_priv_key}'
-%{endfor~}
-EOF
-    masters                = <<-EOF
-%{for index, master in aws_instance.master~}
-${var.prefix}-${index}
-%{endfor~}
-EOF
-    worker_hosts           = <<-EOF
-%{for index, worker in aws_instance.worker~}
-${var.prefix}-${index} ansible_host=${worker.public_ip} private_ip=${worker.private_ip} ansible_ssh_private_key_file='${var.ssh_priv_key}'
-%{endfor~}
-EOF
-    workers                = <<-EOF
-%{for index, worker in aws_instance.worker~}
-${var.prefix}-${index}
-%{endfor~}
-EOF
-    control_plane_endpoint = aws_lb.master_lb_internal.dns_name
-    public_endpoint        = aws_lb.master_lb_external.dns_name
-    cluster_name           = var.prefix
-    cloud_provider         = "aws"
-    k8s_version            = var.k8s_version
-  }
-}
