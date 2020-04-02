@@ -72,8 +72,6 @@ terraform destroy \
     -var ssh_pub_key_wc="${config[ssh_pub_key_wc]}"
 popd > /dev/null
 
-rm -f "${secrets[rkestate_sc]}"
-rm -f "${secrets[rkestate_wc]}"
 rm -f "${secrets[kube_config_sc]}"
 rm -f "${secrets[kube_config_wc]}"
 
