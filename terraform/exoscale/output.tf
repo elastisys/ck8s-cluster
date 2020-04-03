@@ -47,35 +47,59 @@ output "wc_ingress_controller_lb_ip_address" {
 }
 
 output "ansible_inventory_sc" {
-  value = module.service_cluster.ansible_inventory
+  value = templatefile("${path.module}/../templates/inventory.tmpl", {
+    master_hosts   = <<-EOF
+%{for name, data in module.service_cluster.master_ip_addresses~}
+${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
+%{endfor~}
+EOF
+    masters        = <<-EOF
+%{for name, data in module.service_cluster.master_ip_addresses~}
+${name}
+%{endfor~}
+EOF
+    worker_hosts   = <<-EOF
+%{for name, data in module.service_cluster.worker_ip_addresses~}
+${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
+%{endfor~}
+EOF
+    workers        = <<-EOF
+%{for name, worker in module.service_cluster.worker_ip_addresses~}
+${name}
+%{endfor~}
+EOF
+    cluster_name   = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+    cloud_provider = ""
+    cloud_config   = ""
+    loadbalancers  = ""
+  })
 }
 
 output "ansible_inventory_wc" {
-  value = module.workload_cluster.ansible_inventory
+  value = templatefile("${path.module}/../templates/inventory.tmpl", {
+    master_hosts   = <<-EOF
+%{for name, data in module.workload_cluster.master_ip_addresses~}
+${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
+%{endfor~}
+EOF
+    masters        = <<-EOF
+%{for name, data in module.workload_cluster.master_ip_addresses~}
+${name}
+%{endfor~}
+EOF
+    worker_hosts   = <<-EOF
+%{for name, data in module.workload_cluster.worker_ip_addresses~}
+${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
+%{endfor~}
+EOF
+    workers        = <<-EOF
+%{for name, worker in module.workload_cluster.worker_ip_addresses~}
+${name}
+%{endfor~}
+EOF
+    cluster_name   = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
+    cloud_provider = ""
+    cloud_config   = ""
+    loadbalancers  = ""
+  })
 }
-
-# Unused variables for elastic-ip and internal ips.
-
-#output "ss_worker_internal_ip_addresses" {
-#  value = "${module.ss_cluster.worker_internal_ip_addresses}"
-#}
-
-#output "ss_nfs_internal_ip_address" {
-#  value = "${module.ss_cluster.nfs_internal_ip_address}"
-#}
-
-#output "c_master_internal_ip_address" {
-#  value = "${module.c_cluster.master_internal_ip_address}"
-#}
-
-#output "c_worker_internal_ip_addresses" {
-#  value = "${module.c_cluster.worker_internal_ip_addresses}"
-#}
-
-#output "c_nfs_internal_ip_address" {
-#  value = "${module.c_cluster.nfs_internal_ip_address}"
-#}
-
-#output "ss_master_internal_ip_address" {
-#  value = "${module.ss_cluster.master_internal_ip_address}"
-#}

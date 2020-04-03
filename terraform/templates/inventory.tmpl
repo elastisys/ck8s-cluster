@@ -2,7 +2,7 @@ ${master_hosts}
 ${worker_hosts}
 
 [all:vars]
-k8s_version=${k8s_version}
+k8s_version=1.15.11
 k8s_pod_cidr=192.168.0.0/16
 k8s_service_cidr=10.96.0.0/12
 
@@ -12,8 +12,12 @@ ansible_port=22
 ansible_python_interpreter=/usr/bin/python3
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
+%{ if cloud_provider != "" ~}
 cloud_provider='${cloud_provider}'
-cloud_config='/etc/kubernetes/cloud.conf'
+%{ endif ~}
+%{ if cloud_config != "" ~}
+cloud_config='${cloud_config}'
+%{ endif ~}
 cluster_name='${cluster_name}'
 
 [masters]
@@ -22,9 +26,10 @@ ${masters}
 [workers]
 ${workers}
 
+%{ if loadbalancers != "" ~}
 [loadbalancers]
 ${loadbalancers}
-
+%{ endif ~}
 
 [nodes]
 ${masters}
