@@ -27,7 +27,8 @@ module "service_cluster" {
   master_names         = var.master_names_sc
   master_name_size_map = var.master_name_size_map_sc
 
-  nfs_size = var.nfs_size
+  compute_instance_image = var.compute_instance_image
+  nfs_size               = var.nfs_size
 
   dns_suffix = "a1ck.io"
   dns_list = [
@@ -57,7 +58,8 @@ module "workload_cluster" {
   master_names         = var.master_names_wc
   master_name_size_map = var.master_name_size_map_wc
 
-  nfs_size = var.nfs_size
+  compute_instance_image = var.compute_instance_image
+  nfs_size               = var.nfs_size
 
   dns_suffix = "a1ck.io"
   dns_list = [

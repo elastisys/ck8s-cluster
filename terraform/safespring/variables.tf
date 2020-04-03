@@ -30,7 +30,7 @@ variable prefix_wc {
 
 variable "compute_instance_image" {
   description = "Base image used to provision master and worker instances"
-  default     = "CK8S-BaseOS-v0.0.4"
+  default     = "CK8S-BaseOS-v0.0.5"
 }
 
 # For workers

@@ -41,8 +41,8 @@ resource "exoscale_network" "net" {
 }
 
 data "exoscale_compute_template" "os_image" {
-  zone   = var.zone
-  name   = var.compute_instance_image
+  zone = var.zone
+  name = var.compute_instance_image
   # TODO: remove this when the image is publicly published
   filter = "mine"
 }

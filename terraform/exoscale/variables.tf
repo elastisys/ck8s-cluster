@@ -19,6 +19,10 @@ variable prefix_wc {
   default     = ""
 }
 
+variable "compute_instance_image" {
+  default = "CK8S BaseOS v0.0.5"
+}
+
 # For workers
 
 variable worker_names_sc {

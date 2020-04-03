@@ -32,9 +32,7 @@ variable "public_ingress_cidr_whitelist" {
   type = list(string)
 }
 
-variable "compute_instance_image" {
-  default = "CK8S BaseOS v0.0.4"
-}
+variable "compute_instance_image" {}
 
 ## DNS
 variable "dns_list" {

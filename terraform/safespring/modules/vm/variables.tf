@@ -18,7 +18,3 @@ variable "names" {
   description = "List of names for instances to be created."
   type        = list(string)
 }
-
-variable "user_data" {
-  default = ""
-}

@@ -162,11 +162,6 @@ module "worker" {
     openstack_networking_secgroup_v2.cluster.id,
     openstack_networking_secgroup_v2.worker.id,
   ]
-
-  user_data = templatefile(
-    "${path.module}/templates/worker-cloud-init.tmpl",
-    {}
-  )
 }
 
 module "loadbalancer" {
