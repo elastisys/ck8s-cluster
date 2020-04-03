@@ -59,11 +59,7 @@ credentials:
 deployRestic: true
 
 restic:
-{{ if eq (requiredEnv "CLOUD_PROVIDER") "exoscale" }}
-  podVolumePath: /opt/rke/var/lib/kubelet/pods
-{{ else if (requiredEnv "CLOUD_PROVIDER") "safespring" }}
   podVolumePath: /var/lib/kubelet/pods
-{{ end }}
   resources:
     limits:
       cpu: 200m
