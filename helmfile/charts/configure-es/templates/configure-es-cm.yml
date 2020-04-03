@@ -74,7 +74,50 @@ data:
     curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/other" \
       -H "Content-Type: application/json" \
      -d@/scripts/other_policy.json -k -u elastic:${ES_PW}
+
+    echo
+    echo "Creating initial indexes if nessecary"
+
+    curl -X GET "https://{{ .Values.es_endpoint }}/_cat/aliases/other?v" \
+      -k -u elastic:${ES_PW} \
+      | grep "true" \
+      || \
+      curl -X PUT "https://{{ .Values.es_endpoint }}/%3Cother-default-%7Bnow%2Fd%7D-000001%3E" \
+        -H 'Content-Type: application/json' \
+        -k -u elastic:${ES_PW} \
+        -d' {"aliases": {"other": {"is_write_index": true }}}'
+
+    curl -X GET "https://{{ .Values.es_endpoint }}/_cat/aliases/kubernetes?v" \
+      -k -u elastic:${ES_PW} \
+      | grep "true" \
+      || \
+      curl -X PUT "https://{{ .Values.es_endpoint }}/%3Ckubernetes-default-%7Bnow%2Fd%7D-000001%3E" \
+        -H 'Content-Type: application/json' \
+        -k -u elastic:${ES_PW} \
+        -d' {"aliases": {"kubernetes": {"is_write_index": true }}}'
+
+    curl -X GET "https://{{ .Values.es_endpoint }}/_cat/aliases/kubeaudit?v" \
+      -k -u elastic:${ES_PW} \
+      | grep "true" \
+      || \
+      curl -X PUT "https://{{ .Values.es_endpoint }}/%3Ckubeaudit-default-%7Bnow%2Fd%7D-000001%3E" \
+        -H 'Content-Type: application/json' \
+        -k -u elastic:${ES_PW} \
+        -d' {"aliases": {"kubeaudit": {"is_write_index": true }}}'
+
+    curl -X GET "https://{{ .Values.es_endpoint }}/_cat/aliases/kubecomponents?v" \
+      -k -u elastic:${ES_PW} \
+      | grep "true" \
+      || \
+      curl -X PUT "https://{{ .Values.es_endpoint }}/%3Ckubecomponents-default-%7Bnow%2Fd%7D-000001%3E" \
+        -H 'Content-Type: application/json' \
+        -k -u elastic:${ES_PW} \
+        -d' {"aliases": {"kubecomponents": {"is_write_index": true }}}'
+
+    echo "Done configuring elasticsearch"
+
   kibana-dashboards.ndjson: {{ .Files.Get "kibana-resources/kibana-resources.ndjson" | quote }}
+
   kubeaudit_template.json: |
     {
       "index_patterns": [
