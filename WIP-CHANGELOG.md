@@ -21,6 +21,9 @@
 - `metrics-server` is installed on kubeadm-installed clusters as well.
 - AWS: use network load balancer for `nginx-ingress`
 - Added AWS support to the `set-execution-mode.sh` script
+- AWS: EBS storage class support
+- AWS: Additional storage class for sensitive/important data that is
+  encrypted and retained
 
 ### Fixed
 
