@@ -41,12 +41,3 @@ output "ansible_inventory_sc" {
 output "ansible_inventory_wc" {
   value = module.workload_cluster.ansible_inventory
 }
-
-
-# The device paths for each instance.
-output "sc_worker_device_paths" {
-  value = module.service_cluster.worker_device_path
-}
-output "wc_worker_device_paths" {
-  value = module.workload_cluster.worker_device_path
-}

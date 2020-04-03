@@ -103,31 +103,6 @@ variable master_name_flavor_map_wc {
   }
 }
 
-# Worker instances that should have an extra volume mounted.
-variable worker_extra_volume_sc {
-  description = "List of worker instance names that should mount an extra volume"
-  type        = list(string)
-  default     = []
-}
-
-variable worker_extra_volume_wc {
-  description = "List of worker instance names that should mount an extra volume"
-  type        = list(string)
-  default     = []
-}
-
-variable worker_extra_volume_size_sc {
-  description = "Mapping from instance name to volume size for the extra volume."
-  type        = map
-  default     = {}
-}
-
-variable worker_extra_volume_size_wc {
-  description = "Mapping from instance name to volume size for the extra volume."
-  type        = map
-  default     = {}
-}
-
 variable loadbalancer_names_sc {
   description = "List of names for loadbalancer instances to create."
   type        = list(string)

@@ -26,14 +26,6 @@ output "loadbalancer_ips" {
   value = module.loadbalancer.instance_ips
 }
 
-# For device paths
-output "worker_device_path" {
-  value = {
-    for instance in var.worker_extra_volume :
-    instance => openstack_compute_volume_attach_v2.worker_va[instance].device
-  }
-}
-
 output "ansible_inventory" {
   value = templatefile("${path.module}/templates/inventory.tmpl", {
     master_hosts  = <<-EOF
@@ -59,11 +51,6 @@ EOF
     loadbalancers = <<-EOF
 %{for key, lb in module.loadbalancer.instance_ips~}
 ${key} ansible_host=${lb.public_ip} private_ip=${lb.private_ip}
-%{endfor~}
-EOF
-    extra_volume  = <<-EOF
-%{for key, worker in var.worker_extra_volume~}
-${key} device_path=${openstack_compute_volume_attach_v2.worker_va[worker].device}
 %{endfor~}
 EOF
     cloud_provider = "openstack"

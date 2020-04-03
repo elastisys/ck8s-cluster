@@ -169,19 +169,6 @@ module "worker" {
   )
 }
 
-resource "openstack_blockstorage_volume_v2" "worker_volume" {
-  # Cannot use simply use the default value '[""]' in the variable directly for some reason.
-  for_each = var.worker_extra_volume == [] ? toset([""]) : toset(var.worker_extra_volume)
-  name     = each.value
-  size     = var.worker_extra_volume_size[each.value]
-}
-
-resource "openstack_compute_volume_attach_v2" "worker_va" {
-  for_each    = var.worker_extra_volume == [] ? toset([""]) : toset(var.worker_extra_volume)
-  instance_id = module.worker.instance_ids[each.value]
-  volume_id   = openstack_blockstorage_volume_v2.worker_volume[each.value].id
-}
-
 module "loadbalancer" {
   source = "../vm"
 

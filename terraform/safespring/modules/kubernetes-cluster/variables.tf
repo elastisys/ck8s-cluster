@@ -41,17 +41,6 @@ variable "master_names" {
   type = list(string)
 }
 
-# Configuration of instance that should mount an extra volume
-variable "worker_extra_volume" {
-  type    = list(string)
-  default = []
-}
-
-variable "worker_extra_volume_size" {
-  type    = map
-  default = {}
-}
-
 variable "loadbalancer_names" {
   description = "List of names for loadbalancer instances to create."
   type        = list(string)

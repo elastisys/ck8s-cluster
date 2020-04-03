@@ -31,6 +31,7 @@
 - Documentation regarding operations.
 - Ansible parts that are no longer needed with BaseOS, such as installing docker
 - Old script for generating ansible inventory from infra.json
+- Support for attaching extra disks to Safespring workers
 
 ### Changed
 

@@ -37,11 +37,9 @@ module "service_cluster" {
 
   prefix = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
 
-  public_v4_network        = var.public_v4_network
-  worker_names             = var.worker_names_sc
-  worker_name_flavor_map   = var.worker_name_flavor_map_sc
-  worker_extra_volume      = var.worker_extra_volume_sc
-  worker_extra_volume_size = var.worker_extra_volume_size_sc
+  public_v4_network      = var.public_v4_network
+  worker_names           = var.worker_names_sc
+  worker_name_flavor_map = var.worker_name_flavor_map_sc
 
   master_names           = var.master_names_sc
   master_name_flavor_map = var.master_name_flavor_map_sc
@@ -71,11 +69,9 @@ module "workload_cluster" {
 
   prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
 
-  public_v4_network        = var.public_v4_network
-  worker_names             = var.worker_names_wc
-  worker_name_flavor_map   = var.worker_name_flavor_map_wc
-  worker_extra_volume      = var.worker_extra_volume_wc
-  worker_extra_volume_size = var.worker_extra_volume_size_wc
+  public_v4_network      = var.public_v4_network
+  worker_names           = var.worker_names_wc
+  worker_name_flavor_map = var.worker_name_flavor_map_wc
 
   image_id = data.openstack_images_image_v2.os_image.id
   key_pair = openstack_compute_keypair_v2.sshkey_wc.id

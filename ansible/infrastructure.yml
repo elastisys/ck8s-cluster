@@ -1,17 +1,3 @@
-- hosts: extra_volume
-  become: yes
-  become_user: root
-  tasks:
-
-    - name: Create mount directory
-      file: path=/mnt/disks state=directory owner=root group=root mode=0777
-
-    - name: Create filesystem
-      filesystem: dev={{ device_path }} fstype=ext4
-
-    - name: Configure mount point
-      mount: name=/mnt/disks/disk1 src={{ device_path }} fstype=ext4 state=mounted
-
 - hosts: loadbalancers
   become: yes
   become_user: root
