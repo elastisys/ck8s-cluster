@@ -15,6 +15,39 @@ source "${here}/common.bash"
 
 config_load
 
+delete_volumes() {
+    kube_config=${1}
+
+    # Get all namespaces with PVCs, sort and remove duplicates
+    volume_namespaces="$(with_kubeconfig "${kube_config}" \
+        'kubectl get pv -o jsonpath="{.items[*].spec.claimRef.namespace}" |
+            tr " " "\n" | sort -u | tr "\n" " "
+        ')"
+
+    with_kubeconfig "${kube_config}" \
+        "kubectl delete ns ${volume_namespaces}"
+    with_kubeconfig "${kube_config}" \
+        'kubectl delete pv --all --wait'
+
+    volumes_left="$(with_kubeconfig "${kube_config}" \
+        'kubectl get pv -o json |
+            jq ".items[] | {
+                pv_name: .metadata.name,
+                pvc_namespace: .spec.claimRef.namespace,
+                pvc_name: .spec.claimRef.name
+            }"')"
+
+    if [ "${volumes_left}" != "" ]; then
+        log_warning "WARNING: There seems to be volumes left in the"
+        log_warning "         cluster, this will result in volumes that"
+        log_warning "         needs to be cleaned up manually."
+        log_warning "Volumes left:"
+        log_warning "${volumes_left}"
+    else
+        log_info "All volumes where successfully cleaned up!"
+    fi
+}
+
 if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
    [ "${CLOUD_PROVIDER}" = "citycloud" ]; then
     log_info "Cleaning up volumes"
@@ -31,28 +64,10 @@ if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
     set +e
     (
         set -e
-        with_kubeconfig "${secrets[kube_config_sc]}" \
-            'kubectl delete ns elastic-system harbor monitoring fluentd influxdb-prometheus'
-        with_kubeconfig "${secrets[kube_config_sc]}" \
-            'kubectl delete pv --all --wait'
-
-        volumes_left="$(with_kubeconfig "${secrets[kube_config_sc]}" \
-            'kubectl get pv -o json |
-                jq ".items[] | {
-                    pv_name: .metadata.name,
-                    pvc_namespace: .spec.claimRef.namespace,
-                    pvc_name: .spec.claimRef.name
-                }"')"
-
-        if [ "${volumes_left}" != "" ]; then
-            log_warning "WARNING: There seems to be volumes left in the"
-            log_warning "         cluster, this will result in volumes that"
-            log_warning "         needs to be cleaned up manually."
-            log_warning "Volumes left:"
-            log_warning "${volumes_left}"
-        else
-            log_info "All volumes where successfully cleaned up!"
-        fi
+        log_info "Deleting volumes in the service cluster"
+        delete_volumes "${secrets[kube_config_sc]}"
+        log_info "Deleting volumes in the workload cluster"
+        delete_volumes "${secrets[kube_config_wc]}"
     )
     if [ "${?}" -ne 0 ]; then
         log_error \

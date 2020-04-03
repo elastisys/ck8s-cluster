@@ -44,3 +44,4 @@
 - Switch from RKE to kubeadm for k8s cluster management
 - Switch CNI from Canal to Calico
 - Using Neutron instead of Nova network for security rules in Safespring.
+- Clean up volumes also in the workload cluster for Safespring and Citycloud
