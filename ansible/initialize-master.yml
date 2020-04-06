@@ -4,6 +4,14 @@
   become_user: root
   tasks:
 
+    - name: Get Kubeadm version string
+      command: kubeadm version -o json
+      register: kubeadm
+
+    - name: Extract Kubernetes version
+      set_fact:
+        k8s_version: "{{ kubeadm.stdout | from_json | json_query('clientVersion.gitVersion') }}"
+
     - name: Render kubeadm config
       template:
         src: kubeadm-config.yaml.j2

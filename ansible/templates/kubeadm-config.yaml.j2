@@ -90,7 +90,7 @@ etcd:
   local:
     dataDir: "/var/lib/etcd"
 imageRepository: k8s.gcr.io
-kubernetesVersion: v{{ k8s_version }}
+kubernetesVersion: {{ k8s_version }}
 networking:
   # rke equivalent: service_cluster_ip_range
   serviceSubnet: {{ k8s_service_cidr }}

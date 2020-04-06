@@ -20,4 +20,3 @@ The most notable variables are documented here:
 - `cloud_provider`: Required for cloud provider integration. The name of the cloud provider (e.g. aws or openstack).
 - `cloud_config`: The path to the `cloud.conf` file on the node if the cloud provider integration requires it. Most commonly `/etc/kubernetes/cloud.conf`.
 - `cluster_name`: The name of the cluster in order to distinguish between different clusters.
-- `k8s_version`: This *must* match the version of kubeadm included in BaseOS, e.g. 1.15.11 (do not include the "v").
