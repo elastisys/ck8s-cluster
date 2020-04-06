@@ -9,7 +9,7 @@ data:
 
     echo "testing curl address {{ .Values.endpoint }}"
     # Set up initial state for harbor.
-    exists=$(curl -k -u admin:Harbor12345 {{ .Values.endpoint }}/projects/1 | jq '.code') || {
+    exists=$(curl -k {{ .Values.endpoint }}/projects/1 | jq '.code') || {
       echo "ERROR L.${LINENO} - Harbor url {{ .Values.endpoint }}/projects/1 cannot be reached."
       exit 1
     }
@@ -21,7 +21,7 @@ data:
     echo "Setting up initial harbor state"
     if [ "$exists" != "404" ]
     then
-        name=$(curl -k -X GET -u admin:Harbor12345 {{ .Values.endpoint }}/projects/1 | jq '.name')
+        name=$(curl -k -X GET {{ .Values.endpoint }}/projects/1 | jq '.name')
 
         if [ "$name" == "\"library\"" ]
         then

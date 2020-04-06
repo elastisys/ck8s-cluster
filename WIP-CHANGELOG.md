@@ -20,6 +20,7 @@
 
 - Index templates in elasticsearch not selecting the correct ilm policies.
 - New index patterns in Kibana that matches new inices.
+- Harbor init not completing in time for tests.
 
 ### Removed
 
