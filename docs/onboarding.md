@@ -9,7 +9,7 @@ We (Elastisys) need to ask the customer about the details of the environment (e.
 Later on, this could be automated and turned into an online form to fill in.
 
 - What **cloud provider** should this environment use?
-  For example Safespring or Exoscale.
+  For example Exoscale, Safespring, or Citycloud .
 - What **name** and **domain** should the environment have?
   For example, name `foo` with domain `foo.compliantk8s.com`.
 - What **identity provider** should be used for logging in?

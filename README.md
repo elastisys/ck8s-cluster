@@ -36,8 +36,8 @@ installation is done, each stage can be updated independently.
 
 ### Cloud providers
 
-Currently we support two cloud providers: Exoscale and Safespring.
-The main difference between them is in setting up the cloud infrastructure. We have one terraform folder for each provider. The rest of the setup is controlled by the environment variable `CLOUD_PROVIDER` which should be set to `exoscale` or `safespring`.
+Currently we support three cloud providers: Exoscale, Safespring, and Citycloud.
+The main difference between them is in setting up the cloud infrastructure. We have one terraform folder for each provider. The rest of the setup is controlled by the environment variable `CLOUD_PROVIDER` which should be set to `exoscale`, `safespring`, or `ciycloud`.
 
 ### Requirements
 
@@ -106,7 +106,7 @@ In order to setup a new Compliant Kubernetes cluster you will need to do the fol
    them as environment variables:
 
 ```bash
-export CK8S_CLOUD_PROVIDER=[exoscale|safespring]
+export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud]
 
 export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
 
@@ -160,10 +160,10 @@ default.
 
 The domain name will be automatically created with the name
 `${TF_VAR_dns_prefix}[.ops].a1ck.io` for Exoscale and
-`${TF_VAR_dns_prefix}[.ops].elastisys.se` for Safespring.
-In Exoscale we use Exoscale's own DNS features while for Safespring we use AWS.
+`${TF_VAR_dns_prefix}[.ops].elastisys.se` for Safespring and Citycloud.
+In Exoscale we use Exoscale's own DNS features while for Safespring and Citycloud we use AWS.
 
-For Safespring the domain can be changed by setting the Terraform variable
+For Safespring and Citycloud the domain can be changed by setting the Terraform variable
 `aws_dns_zone_id` to an id of another hosted zone in AWS Route 53.
 
 
