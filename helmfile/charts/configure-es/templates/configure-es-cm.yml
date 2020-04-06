@@ -50,9 +50,6 @@ data:
     curl -X PUT "https://{{ .Values.es_endpoint }}/_template/kubeaudit" \
       -H "Content-Type: application/json" \
       -d@/scripts/kubeaudit_template.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.es_endpoint }}/_template/kubecomponents" \
-      -H "Content-Type: application/json" \
-      -d@/scripts/kubecomponents_template.json -k -u elastic:${ES_PW}
     curl -X PUT "https://{{ .Values.es_endpoint }}/_template/kubernetes" \
       -H "Content-Type: application/json" \
       -d@/scripts/kubernetes_template.json -k -u elastic:${ES_PW}
@@ -65,9 +62,6 @@ data:
     curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/kubeaudit" \
       -H "Content-Type: application/json" \
      -d@/scripts/kubeaudit_policy.json -k -u elastic:${ES_PW}
-    curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/kubecomponents" \
-      -H "Content-Type: application/json" \
-     -d@/scripts/kubecomponents_policy.json -k -u elastic:${ES_PW}
     curl -X PUT "https://{{ .Values.es_endpoint }}/_ilm/policy/kubernetes" \
       -H "Content-Type: application/json" \
      -d@/scripts/kubernetes_policy.json -k -u elastic:${ES_PW}
@@ -105,15 +99,6 @@ data:
         -k -u elastic:${ES_PW} \
         -d' {"aliases": {"kubeaudit": {"is_write_index": true }}}'
 
-    curl -X GET "https://{{ .Values.es_endpoint }}/_cat/aliases/kubecomponents?v" \
-      -k -u elastic:${ES_PW} \
-      | grep "true" \
-      || \
-      curl -X PUT "https://{{ .Values.es_endpoint }}/%3Ckubecomponents-default-%7Bnow%2Fd%7D-000001%3E" \
-        -H 'Content-Type: application/json' \
-        -k -u elastic:${ES_PW} \
-        -d' {"aliases": {"kubecomponents": {"is_write_index": true }}}'
-
     echo "Done configuring elasticsearch"
 
   kibana-dashboards.ndjson: {{ .Files.Get "kibana-resources/kibana-resources.ndjson" | quote }}
@@ -127,18 +112,6 @@ data:
         "index.refresh_interval": "10s",
         "index.lifecycle.name": "kubeaudit",
         "index.lifecycle.rollover_alias": "kubeaudit",
-        "mapping.total_fields.limit": "1000"
-      }
-    }
-  kubecomponents_template.json: |
-    {
-      "index_patterns": [
-        "kubecomponents*"
-      ],
-      "settings": {
-        "index.refresh_interval": "10s",
-        "index.lifecycle.name": "kubecomponents",
-        "index.lifecycle.rollover_alias": "kubecomponents",
         "mapping.total_fields.limit": "1000"
       }
     }
@@ -167,21 +140,6 @@ data:
       }
     }
   kubeaudit_policy.json: |
-    {
-      "policy": {
-        "phases": {
-          "hot": {
-            "actions": {
-              "rollover": {
-                "max_size": "{{ .Values.ilm.rollover_size }}GB",
-                "max_age": "{{ .Values.ilm.rollover_age }}d"
-              }
-            }
-          }
-        }
-      }
-    }
-  kubecomponents_policy.json: |
     {
       "policy": {
         "phases": {
@@ -226,4 +184,3 @@ data:
         }
       }
     }
-

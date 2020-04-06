@@ -34,32 +34,7 @@ extraConfigMaps:
         format json
       </log>
     </system>
-  10-kube-components.conf: |-
-    <source>
-      @id kube-components
-      @type tail
-      path /var/lib/rancher/rke/log/*.log
-      pos_file /var/log/fluentd-kube-components.pos
-      tag kubecomponents.*
-      read_from_head true
-      <parse>
-        @type multi_format
-        <pattern>
-          format json
-          time_key time
-          time_format %Y-%m-%dT%H:%M:%S.%NZ
-        </pattern>
-      </parse>
-    </source>
-    <filter kubecomponents.**>
-      @type record_transformer
-      enable_ruby true
-      <record>
-        component ${tag_suffix[6].split("_")[0]}
-        container_id ${tag_suffix[6].split("_")[1]}
-      </record>
-    </filter>
-  20-kube-audit.conf: |-
+  10-kube-audit.conf: |-
     <source>
       @id kube-audit
       @type tail
@@ -186,15 +161,6 @@ extraConfigMaps:
         overflow_action block
       </buffer>
     </match>
-
-extraVolumes:
-  - name: rkelogs
-    hostPath:
-      path: /var/lib/rancher/rke/log
-extraVolumeMounts:
-  - name: rkelogs
-    mountPath: /var/lib/rancher/rke/log
-    readOnly: true
 
 tolerations:
 - effect: NoSchedule

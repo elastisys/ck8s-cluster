@@ -33,6 +33,7 @@
 - Old script for generating ansible inventory from infra.json
 - Support for attaching extra disks to Safespring and Citycloud workers
 - Rancher Kubernetes Engine (RKE)
+- Logs from the kubelet are no longer collected and forwarded to Elasticsearch.
 
 ### Changed
 
@@ -47,3 +48,4 @@
 - Switch CNI from Canal to Calico
 - Using Neutron instead of Nova network for security rules in Safespring and Citycloud.
 - Clean up volumes also in the workload cluster for Safespring and Citycloud
+- Control plane logs (not audit logs) now go to the `kubernetes` index instead of `kubecomponents`.

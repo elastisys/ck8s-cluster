@@ -54,32 +54,7 @@ extraConfigMaps:
         format json
       </log>
     </system>
-  10-kube-components.conf: |-
-    <source>
-      @id kube-components
-      @type tail
-      path /var/lib/rancher/rke/log/*.log
-      pos_file /var/log/fluentd-kube-components.pos
-      tag kubecomponents.*
-      read_from_head true
-      <parse>
-        @type multi_format
-        <pattern>
-          format json
-          time_key time
-          time_format %Y-%m-%dT%H:%M:%S.%NZ
-        </pattern>
-      </parse>
-    </source>
-    <filter kubecomponents.**>
-      @type record_transformer
-      enable_ruby true
-      <record>
-        component ${tag_suffix[6].split("_")[0]}
-        container_id ${tag_suffix[6].split("_")[1]}
-      </record>
-    </filter>
-  20-kube-audit.conf: |-
+  10-kube-audit.conf: |-
     <source>
       @id kube-audit
       @type tail
@@ -176,46 +151,6 @@ extraConfigMaps:
     </filter>
 
   output.conf: |-
-    <match kubecomponents.**>
-        @id elasticsearch_kubecomponents
-        @type elasticsearch
-        @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
-        include_tag_key true
-        type_name _doc
-        host "#{ENV['OUTPUT_HOST']}"
-        port "#{ENV['OUTPUT_PORT']}"
-        path "#{ENV['OUTPUT_PATH']}"
-        scheme "#{ENV['OUTPUT_SCHEME']}"
-        ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
-        ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
-        user "#{ENV['OUTPUT_USER']}"
-        password "#{ENV['OUTPUT_PASSWORD']}"
-        reconnect_on_error true
-        # Custom parameters --START--
-        reload_on_failure true
-        reload_connections false
-        # Rollover index configuration
-        include_timestamp true # defaults to false
-        index_name kubecomponents
-        rollover_index true
-        deflector_alias kubecomponents
-        index_prefix kubecomponents
-        index_date_pattern "now/d"
-        # Custom parameters --END--
-        <buffer>
-          @type file
-          path /var/log/fluentd-buffers/kubernetes.kubecomponents.system.buffer
-          flush_mode interval
-          retry_type exponential_backoff
-          flush_thread_count 2
-          flush_interval 5s
-          retry_forever
-          retry_max_interval 30
-          chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
-          queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
-          overflow_action block
-        </buffer>
-      </match>
     <match kubeaudit.**>
         @id elasticsearch_kubeaudit
         @type elasticsearch
@@ -336,17 +271,6 @@ extraConfigMaps:
           overflow_action block
         </buffer>
       </match>
-
-
-extraVolumes:
-  - name: rkelogs
-    hostPath:
-      path: /var/lib/rancher/rke/log
-
-extraVolumeMounts:
-  - name: rkelogs
-    mountPath: /var/lib/rancher/rke/log
-    readOnly: true
 
 tolerations:
 - effect: NoSchedule
