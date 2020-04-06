@@ -12,6 +12,9 @@ ansible_port=22
 ansible_python_interpreter=/usr/bin/python3
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
+%{ if public_endpoint != "" ~}
+public_endpoint='${public_endpoint}'
+%{ endif ~}
 %{ if cloud_provider != "" ~}
 cloud_provider='${cloud_provider}'
 %{ endif ~}

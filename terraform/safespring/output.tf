@@ -36,66 +36,70 @@ output "domain_name" {
 
 output "ansible_inventory_sc" {
   value = templatefile("${path.module}/../templates/inventory.tmpl", {
-    master_hosts   = <<-EOF
+    master_hosts    = <<-EOF
 %{for key, master in module.service_cluster.master_ips~}
 ${key} ansible_host=${master.public_ip} private_ip=${master.private_ip}
 %{endfor~}
 EOF
-    masters        = <<-EOF
+    masters         = <<-EOF
 %{for key, master in module.service_cluster.master_ips~}
 ${key}
 %{endfor~}
 EOF
-    worker_hosts   = <<-EOF
+    worker_hosts    = <<-EOF
 %{for key, worker in module.service_cluster.worker_ips~}
 ${key} ansible_host=${worker.public_ip} private_ip=${worker.private_ip}
 %{endfor~}
 EOF
-    workers        = <<-EOF
+    workers         = <<-EOF
 %{for key, worker in module.service_cluster.worker_ips~}
 ${key}
 %{endfor~}
 EOF
-    loadbalancers  = <<-EOF
+    loadbalancers   = <<-EOF
 %{for key, lb in module.service_cluster.loadbalancer_ips~}
 ${key} ansible_host=${lb.public_ip} private_ip=${lb.private_ip}
 %{endfor~}
 EOF
-    cloud_provider = "openstack"
-    cloud_config   = "/etc/kubernetes/cloud.conf"
-    cluster_name   = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+    cluster_name    = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+    cloud_provider  = "openstack"
+    cloud_config    = "/etc/kubernetes/cloud.conf"
+    loadbalancers   = ""
+    public_endpoint = values(module.service_cluster.master_ips)[0].public_ip
   })
 }
 
 output "ansible_inventory_wc" {
   value = templatefile("${path.module}/../templates/inventory.tmpl", {
-    master_hosts   = <<-EOF
+    master_hosts    = <<-EOF
 %{for key, master in module.workload_cluster.master_ips~}
 ${key} ansible_host=${master.public_ip} private_ip=${master.private_ip}
 %{endfor~}
 EOF
-    masters        = <<-EOF
+    masters         = <<-EOF
 %{for key, master in module.workload_cluster.master_ips~}
 ${key}
 %{endfor~}
 EOF
-    worker_hosts   = <<-EOF
+    worker_hosts    = <<-EOF
 %{for key, worker in module.workload_cluster.worker_ips~}
 ${key} ansible_host=${worker.public_ip} private_ip=${worker.private_ip}
 %{endfor~}
 EOF
-    workers        = <<-EOF
+    workers         = <<-EOF
 %{for key, worker in module.workload_cluster.worker_ips~}
 ${key}
 %{endfor~}
 EOF
-    loadbalancers  = <<-EOF
+    loadbalancers   = <<-EOF
 %{for key, lb in module.workload_cluster.loadbalancer_ips~}
 ${key} ansible_host=${lb.public_ip} private_ip=${lb.private_ip}
 %{endfor~}
 EOF
-    cloud_provider = "openstack"
-    cloud_config   = "/etc/kubernetes/cloud.conf"
-    cluster_name   = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
+    cluster_name    = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
+    cloud_provider  = "openstack"
+    cloud_config    = "/etc/kubernetes/cloud.conf"
+    loadbalancers   = ""
+    public_endpoint = values(module.workload_cluster.master_ips)[0].public_ip
   })
 }

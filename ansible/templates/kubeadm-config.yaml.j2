@@ -18,8 +18,12 @@ nodeRegistration:
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 apiServer:
+{% if public_endpoint is defined or control_plane_endpoint is defined %}
   certSANs:
-    - "{{ public_endpoint | default(ansible_host) }}"
+{% endif %}
+{% if public_endpoint is defined %}
+    - "{{ public_endpoint }}"
+{% endif %}
 {% if control_plane_endpoint is defined %}
     - "{{ control_plane_endpoint }}"
 {% endif %}
