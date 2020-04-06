@@ -58,6 +58,9 @@ Installs Ansible and the requirements using the playbook get-requirements.yaml
 sudo apt-get install ansible=2.5.1+dfsg-1ubuntu0.1 -y && ansible-playbook --connection=local --inventory=127.0.0.1 --limit 127.0.0.1 get-requirements.yaml
 ```
 
+Note that you will need a [BaseOS](https://github.com/elastisys/ck8s-base-vm) VM template available at your cloud provider of choice!
+See the [releases](https://github.com/elastisys/ck8s-base-vm/releases) for available VM images that can be uploaded to the cloud provider.
+
 ### Terraform Cloud
 
 The Terraform state is stored in the
