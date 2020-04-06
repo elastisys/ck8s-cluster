@@ -8,6 +8,18 @@
 
 - [ ] Added relevant notes to [WIP-CHANGELOG.md](https://github.com/elastisys/ck8s/blob/master/WIP-CHANGELOG.md)
 - [ ] Proper commit message prefix on all commits
+- Is this changeset backwards compatible for existing clusters? Applying:
+    - [ ] is completely transparent, will not impact the workload in any way.
+    - [ ] requires running a migration script.
+    - [ ] will create noticeable cluster degradation.
+          E.g. logs or metrics are not being collected or Kubernetes API server
+          will not be responding while upgrading.
+    - [ ] requires draining and/or replacing nodes.
+    - [ ] will change any APIs.
+          E.g. removes or changes any CK8S config options or Kubernetes APIs.
+    - [ ] will break the cluster.
+          I.e. full cluster migration is required.
+
 
 <!--
 Here are the commit prefixes and comments on when to use them:
