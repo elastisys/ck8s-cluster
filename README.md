@@ -27,7 +27,7 @@ following services:
 ## Setup
 
 The management of the ck8s platform is separated into different stages,
-Exoscale cloud infrastructure (terraform), Kubernetes cluster (rke) and
+Exoscale cloud infrastructure (terraform), Kubernetes cluster (kubeadm) and
 Kubernetes resources (helm, kubectl).
 
 When first setting up the environment each stage needs to be done in
@@ -42,7 +42,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 ### Requirements
 
 - [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.19)
-- [RKE](https://github.com/rancher/rke/releases) (tested with 1.0.0)
+- [BaseOS](https://github.com/elastisys/ck8s-base-vm) (tested with 0.0.5)
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
 - [helm](https://github.com/helm/helm/releases) (tested with 2.14.3)
 - [helmfile](https://github.com/roboll/helmfile) (tested with v0.99.0)

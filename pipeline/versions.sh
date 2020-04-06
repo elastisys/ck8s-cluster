@@ -8,10 +8,10 @@ source "${here}/common.bash"
 
 sops_pgp_setup
 
-sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_rke_wc.yaml" \
+sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml" \
     'KUBECONFIG={} ${GITHUB_WORKSPACE}/release/get-versions.sh'
 
-sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_rke_sc.yaml" \
+sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml" \
     'KUBECONFIG={} ${GITHUB_WORKSPACE}/release/get-versions.sh'
 
 cat release/version.json > "${GITHUB_WORKSPACE}/version.json"

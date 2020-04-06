@@ -8,11 +8,6 @@ RUN wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linu
 RUN unzip terraform_0.12.19_linux_amd64.zip && \
     mv terraform /usr/local/bin/terraform
 
-# RKE
-RUN wget https://github.com/rancher/rke/releases/download/v1.0.0/rke_linux-amd64 && \
-    chmod 755 rke_linux-amd64 && \
-    mv rke_linux-amd64 /usr/local/bin/rke
-
 # Kubectl
 RUN wget https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \

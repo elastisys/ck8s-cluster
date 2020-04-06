@@ -8,9 +8,6 @@ export S3_ES_BACKUP_BUCKET_NAME="${CK8S_ENVIRONMENT_NAME}-es-backup"
 export S3_INFLUX_BUCKET_NAME="${CK8S_ENVIRONMENT_NAME}-influxdb"
 export S3_SC_FLUENTD_BUCKET_NAME="${CK8S_ENVIRONMENT_NAME}-sc-logs"
 
-# Rancher Kubernetes image to use.
-export KUBERNETES_VERSION="v1.15.6-rancher1-2"
-
 export ENABLE_HARBOR="true"
 export ENABLE_FALCO="true"
 export ENABLE_PSP="true"

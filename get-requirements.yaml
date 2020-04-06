@@ -4,7 +4,6 @@
       install_path: /usr/local/bin
       install_user: "{{ lookup('env','USER') }}"
       terraform_version: "0.12.19"
-      rancher_version: "1.0.0"
       kubectl_version: "1.15.2"
       helm_version: "2.14.3"
       helmfile_version: "0.99.0"
@@ -23,11 +22,6 @@
         src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip
         dest: "{{ install_path }}"
         remote_src: yes
-    - name: "Get Rancher"
-      get_url:
-        url: https://github.com/rancher/rke/releases/download/v{{ rancher_version }}/rke_linux-amd64
-        dest: "{{ install_path }}/rke"
-        mode: 0775
     - name: "Get Kubectl"
       unarchive:
         src: https://dl.k8s.io/v{{ kubectl_version }}/kubernetes-client-linux-amd64.tar.gz

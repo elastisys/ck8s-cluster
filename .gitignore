@@ -6,13 +6,9 @@ certs
 **/terraform.tfstate
 **/terraform.tfstate.*
 **/cluster.yaml
-**/cluster.rkestate
 **/.terraform
 **/*.tfstate
 **/*.state
-**/*.rkestate
-env.sh
-hosts.ini
 clusters
 **/*.coverage
 **/__pycache__
