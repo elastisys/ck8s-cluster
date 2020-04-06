@@ -1,5 +1,5 @@
 locals {
-  internal_cidr_prefix = "172.16.0.0/16"
+  vpc_cidr_prefix      = "172.16.0.0/16"
   subnet_cidr_prefix   = "172.16.1.0/24"
 }
 
@@ -10,7 +10,7 @@ provider "template" {
 # VPC
 
 resource "aws_vpc" "main" {
-  cidr_block = local.internal_cidr_prefix
+  cidr_block = local.vpc_cidr_prefix
 
   enable_dns_support   = true
   enable_dns_hostnames = true
