@@ -10,22 +10,25 @@ set -e
 : "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
 : "${CK8S_ENVIRONMENT_NAME:?Missing CK8S_ENVIRONMENT_NAME}"
 
-if [ $CLOUD_PROVIDER == "exoscale" ]
-then
-WORKSPACE=a1-demo-$CK8S_ENVIRONMENT_NAME
-elif [ $CLOUD_PROVIDER == "safespring" ]
-then
-WORKSPACE=safespring-demo-$CK8S_ENVIRONMENT_NAME
-elif [ $CLOUD_PROVIDER == "citycloud" ]
-then
-WORKSPACE=citycloud-$CK8S_ENVIRONMENT_NAME
-elif [ $CLOUD_PROVIDER == "aws" ]
-then
-WORKSPACE=aws-$CK8S_ENVIRONMENT_NAME
-else
-echo "Error: Unsupported cloud provider: ${CLOUD_PROVIDER}"
-exit 1
-fi
+case $CLOUD_PROVIDER in
+  exoscale)
+    WORKSPACE=a1-demo-$CK8S_ENVIRONMENT_NAME
+    ;;
+  safespring)
+    WORKSPACE=safespring-demo-$CK8S_ENVIRONMENT_NAME
+    ;;
+  citycloud)
+    WORKSPACE=citycloud-$CK8S_ENVIRONMENT_NAME
+    ;;
+  aws)
+    WORKSPACE=aws-$CK8S_ENVIRONMENT_NAME
+    ;;
+  *)
+    echo "Error: Unsupported cloud provider: ${CLOUD_PROVIDER}"
+    exit 1
+    ;;
+esac
+
 RUN_REMOTE="false"
 
 if [[ "$1" == "true" ]];then
