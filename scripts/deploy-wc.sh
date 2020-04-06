@@ -44,6 +44,7 @@ case $CLOUD_PROVIDER in
     ;;
 esac
 
+export CLUSTER_NAME="${ENVIRONMENT_NAME}_${CLOUD_PROVIDER}"
 export CUSTOMER_NAMESPACES_COMMASEPARATED=$(echo "$CUSTOMER_NAMESPACES" | tr ' ' ,)
 export CUSTOMER_ADMIN_USERS_COMMASEPARATED=$(echo "$CUSTOMER_ADMIN_USERS" | tr ' ' ,)
 
@@ -217,10 +218,10 @@ if [ -f "${CUSTOMER_KUBECONFIG}" ]; then
     sops --config "${CONFIG_PATH}/.sops.yaml" -d -i "${CUSTOMER_KUBECONFIG}"
 fi
 
-kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-cluster compliantk8s \
+kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-cluster ${CLUSTER_NAME} \
     --server=${CUSTOMER_SERVER} \
     --certificate-authority=${CUSTOMER_CERTIFICATE_AUTHORITY} --embed-certs=true
-kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-credentials user \
+kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-credentials user@${CLUSTER_NAME} \
     --exec-command=kubectl \
     --exec-api-version=client.authentication.k8s.io/v1beta1 \
     --exec-arg=oidc-login \
@@ -237,10 +238,10 @@ set -- ${CUSTOMER_NAMESPACES}
 # Pick the first namespace
 CONTEXT_NAMESPACE=$1
 kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config set-context \
-    user@compliantk8s \
-    --user user --cluster=compliantk8s --namespace=${CONTEXT_NAMESPACE}
+    ${CLUSTER_NAME} \
+    --user user@${CLUSTER_NAME} --cluster=${CLUSTER_NAME} --namespace=${CONTEXT_NAMESPACE}
 kubectl --kubeconfig=${CUSTOMER_KUBECONFIG} config use-context \
-    user@compliantk8s
+    ${CLUSTER_NAME}
 
 sops --config "${CONFIG_PATH}/.sops.yaml" -e -i "${CUSTOMER_KUBECONFIG}"
 
