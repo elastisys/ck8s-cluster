@@ -2,6 +2,7 @@ variable "prefix" {}
 variable "image_id" {}
 variable "key_pair" {}
 variable public_v4_network {}
+
 ## DNS
 
 #variable "dns_name" {}
@@ -36,13 +37,6 @@ variable "master_names" {
   type = list(string)
 }
 
-# Configuration of instance that should mount an extra volume
-variable "worker_extra_volume" {
-  type    = list(string)
-  default = []
-}
-
-variable "worker_extra_volume_size" {
-  type    = map
-  default = {}
+variable public_ingress_cidr_whitelist {
+  type = string
 }

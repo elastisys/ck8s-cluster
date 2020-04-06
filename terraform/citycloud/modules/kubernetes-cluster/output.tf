@@ -25,11 +25,3 @@ output "worker_ips" {
 output "lb_ip" {
   value = openstack_networking_floatingip_v2.loadbalancer-lb-fip.address
 }
-
-# For device paths
-output "worker_device_path" {
-  value = {
-    for instance in var.worker_extra_volume :
-    instance => openstack_compute_volume_attach_v2.worker_va[instance].device
-  }
-}

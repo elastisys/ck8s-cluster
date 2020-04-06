@@ -17,7 +17,7 @@
   encrypted s3cmd config file.
 - Auto-completion for the cli
 - S3 support for the AWS cloud provider
-- Ansible inventory generated directly in terraform for Exoscale and Safespring
+- Ansible inventory generated directly in terraform for Exoscale, Safespring, and Citycloud
 - `metrics-server` is installed on kubeadm-installed clusters as well.
 
 ### Fixed
@@ -31,7 +31,7 @@
 - Documentation regarding operations.
 - Ansible parts that are no longer needed with BaseOS, such as installing docker
 - Old script for generating ansible inventory from infra.json
-- Support for attaching extra disks to Safespring workers
+- Support for attaching extra disks to Safespring and Citycloud workers
 - Rancher Kubernetes Engine (RKE)
 
 ### Changed
@@ -42,8 +42,8 @@
 - Exoscale EIP is reintroduced as loadbalancer for the nginx ingress
   controller. This also means that the DNS records now points to the EIP IP
   address instead of every worker.
-- Using BaseOS as VM image instead of plain ubuntu for all k8s nodes on Exoscale and Safespring.
+- Using BaseOS as VM image instead of plain ubuntu for all k8s nodes on Exoscale, Safespring, and Citycloud.
 - Switch from RKE to kubeadm for k8s cluster management
 - Switch CNI from Canal to Calico
-- Using Neutron instead of Nova network for security rules in Safespring.
+- Using Neutron instead of Nova network for security rules in Safespring and Citycloud.
 - Clean up volumes also in the workload cluster for Safespring and Citycloud

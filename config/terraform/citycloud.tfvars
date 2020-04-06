@@ -35,13 +35,5 @@ master_name_flavor_map_wc = {
   "master-0" : "89afeed0-9e41-4091-af73-727298a5d959" #2core 4gb mem 50gb storage
 }
 
-worker_extra_volume_sc = []
-
-worker_extra_volume_wc = []
-
-worker_extra_volume_size_sc = {}
-
-worker_extra_volume_size_wc = {}
-
 # TODO: Remove Elastisys range before making repository public
 public_ingress_cidr_whitelist = "194.132.164.168/32" # Elastisys office
