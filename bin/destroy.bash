@@ -89,6 +89,7 @@ popd > /dev/null
 
 rm -f "${secrets[kube_config_sc]}"
 rm -f "${secrets[kube_config_wc]}"
+rm -r "${CK8S_CONFIG_PATH}/customer/kubeconfig.yaml"
 
 log_info "Aborting multipart uploads to S3 buckets"
 with_s3cfg "${secrets[s3cfg_file]}" \
