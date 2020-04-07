@@ -1,43 +1,6 @@
-locals {
-  internal_cidr_prefix  = "172.16.0.0/24"
-  internal_network_size = 100
-
-  # TODO: Remove when managed virtual router/DHCP is working properly.
-  master_internal_cidr_host_num  = 1
-  nfs_internal_host_num          = 2
-  worker_internal_host_num_start = 3
-  internal_cidr_prefix_length = element(
-    split("/", local.internal_cidr_prefix),
-    1
-  )
-  master_internal_ip_address = cidrhost(
-    local.internal_cidr_prefix,
-    local.master_internal_cidr_host_num
-  )
-  nfs_internal_ip_address = cidrhost(
-    local.internal_cidr_prefix,
-    local.nfs_internal_host_num
-  )
-
-  workers_ip = [
-    for k, v in exoscale_compute.worker : exoscale_compute.worker[k].ip_address
-  ]
-  set = setproduct(var.dns_list, local.workers_ip)
-}
-
 data "exoscale_compute_template" "ubuntu" {
   zone = var.zone
   name = "Linux Ubuntu 18.04 LTS 64-bit"
-}
-
-resource "exoscale_network" "net" {
-  zone = var.zone
-  name = "${var.prefix}-network"
-  #network_offering = "PrivNet"
-
-  start_ip = cidrhost(local.internal_cidr_prefix, 1)
-  end_ip   = cidrhost(local.internal_cidr_prefix, local.internal_network_size)
-  netmask  = cidrnetmask(local.internal_cidr_prefix)
 }
 
 data "exoscale_compute_template" "os_image" {
@@ -62,21 +25,10 @@ resource "exoscale_compute" "master" {
   user_data = templatefile(
     "${path.module}/templates/master-cloud-init.tmpl",
     {
-      eip_ip_address               = exoscale_ipaddress.ingress_controller_lb.ip_address
-
-      # TODO: Remove when managed virtual router/DHCP is working properly.
-      # address = "${local.master_internal_ip_address}/${local.internal_cidr_prefix_length}",
+      eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
     }
   )
 }
-
-#resource "exoscale_nic" "master_internal" {
-#  compute_id = exoscale_compute.master.id
-#  network_id = exoscale_network.net.id
-#
-#  # TODO: Remove when managed virtual router/DHCP is working properly.
-#  ip_address = local.master_internal_ip_address
-#}
 
 resource "exoscale_compute" "worker" {
   for_each = toset(var.worker_names)
@@ -93,25 +45,10 @@ resource "exoscale_compute" "worker" {
   user_data = templatefile(
     "${path.module}/templates/worker-cloud-init.tmpl",
     {
-      # TODO: Remove when managed virtual router/DHCP is working properly.
-      # address = "${cidrhost(local.internal_cidr_prefix, local.worker_internal_host_num_start + count.index)}/${local.internal_cidr_prefix_length
       eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
     }
   )
 }
-
-#resource "exoscale_nic" "worker_internal" {
-#  count = var.worker_count
-#
-#  compute_id = element(exoscale_compute.worker.*.id, count.index)
-#  network_id = exoscale_network.net.id
-#
-#  # TODO: Remove when managed virtual router/DHCP is working properly.
-#  ip_address = cidrhost(
-#    local.internal_cidr_prefix,
-#    local.worker_internal_host_num_start + count.index
-#  )
-#}
 
 resource "exoscale_compute" "nfs" {
   display_name    = "${var.prefix}-nfs"
@@ -126,24 +63,15 @@ resource "exoscale_compute" "nfs" {
   user_data = templatefile(
     "${path.module}/templates/nfs-cloud-init.tmpl",
     {
-      #worker_ips = exoscale_compute.worker[*].ip_address
-      worker_ips = local.workers_ip
-      # internal_cidr_prefix = local.internal_cidr_prefix
+      worker_ips = [
+        for k, v in exoscale_compute.worker :
+        exoscale_compute.worker[k].ip_address
+      ]
 
-      # TODO: Remove when managed virtual router/DHCP is working properly.
-      # address = local.nfs_internal_ip_address}/${local.internal_cidr_prefix_length,
       eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
     }
   )
 }
-
-#resource "exoscale_nic" "nfs_internal" {
-#  compute_id = exoscale_compute.nfs.id
-#  network_id = exoscale_network.net.id
-#
-#  # TODO: Remove when managed virtual router/DHCP is working properly.
-#  ip_address = local.nfs_internal_ip_address
-#}
 
 resource "exoscale_security_group" "master_sg" {
   name        = "${var.prefix}-master-sg"
@@ -167,8 +95,6 @@ resource "exoscale_security_group_rules" "master_sg_rules" {
     ports     = ["6443"]
   }
 
-  # TODO: This should not be required when using private networks but some
-  #       stuff are still using eth0 for some reason.
   ingress {
     protocol = "TCP"
     ports    = ["0-65535"]
@@ -220,8 +146,6 @@ resource "exoscale_security_group_rules" "worker_sg_rules" {
     ports     = ["80", "443"]
   }
 
-  # TODO: This should not be required when using private networks but some
-  #       stuff are still using eth0 for some reason.
   ingress {
     protocol = "TCP"
     ports    = ["0-65535"]
@@ -266,8 +190,6 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
     ports     = ["22"]
   }
 
-  # TODO: This should not be required when using private networks but some
-  #       stuff are still using eth0 for some reason.
   ingress {
     protocol = "TCP"
     ports    = ["0-65535"]
