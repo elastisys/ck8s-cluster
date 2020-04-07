@@ -33,7 +33,7 @@ infra_tf_run() {
     log_info "Applying Terraform config"
 
     pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
-    echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init
+    echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init -backend-config="${config[backend_config]}"
     terraform workspace select "${ENVIRONMENT_NAME}"
     terraform apply \
         -var-file="${config[tfvars_file]}" \

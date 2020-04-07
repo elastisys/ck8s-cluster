@@ -1,12 +1,5 @@
 terraform {
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "elastisys"
-
-    workspaces {
-      prefix = "a1-demo-"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "exoscale" {

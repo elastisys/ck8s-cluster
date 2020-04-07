@@ -118,7 +118,7 @@ fi
 log_info "Destroying Terraform infrastructure"
 
 pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
-echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init
+echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init -backend-config="${config[backend_config]}"
 terraform workspace select "${ENVIRONMENT_NAME}"
 terraform destroy \
     -var-file="${config[tfvars_file]}" \

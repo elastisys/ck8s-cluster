@@ -12,6 +12,7 @@ bin_path="${here}/../bin"
 terraform_path="${here}/../terraform"
 
 source "${here}/common.bash"
+source "${bin_path}/common.bash"
 
 sops_pgp_setup
 
@@ -54,7 +55,7 @@ echo "Deleting Terraform workspace" >&2
 source "${CK8S_CONFIG_PATH}/config.sh"
 
 pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
-echo '1' | TF_WORKSPACE=pipeline terraform init
+echo '1' | TF_WORKSPACE=pipeline terraform init -backend-config="${config[backend_config]}"
 terraform workspace select "${ENVIRONMENT_NAME}"
 terraform workspace select pipeline
 terraform workspace delete "${ENVIRONMENT_NAME}"

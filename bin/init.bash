@@ -46,19 +46,6 @@ else
 fi
 
 #
-# Terraform
-#
-
-log_info "Initializing Terraform remote workspace"
-
-pushd "${terraform_path}/${CK8S_CLOUD_PROVIDER}" > /dev/null
-echo '1' | TF_WORKSPACE="${CK8S_ENVIRONMENT_NAME}" terraform init
-terraform workspace select "${CK8S_ENVIRONMENT_NAME}" || \
-    terraform workspace new "${CK8S_ENVIRONMENT_NAME}"
-popd > /dev/null
-CLOUD_PROVIDER="${CK8S_CLOUD_PROVIDER}" ${scripts_path}/set-execution-mode.sh
-
-#
 # Config
 #
 
@@ -109,12 +96,45 @@ else
 fi
 
 if [ -f "${config[tfvars_file]}" ]; then
-    log_info "${config[tfvars_file]} already exists, not overwriting " \
+    log_info "${config[tfvars_file]} already exists, not overwriting" \
              "Terraform config"
 else
     cp "${config_defaults_path}/terraform/${CK8S_CLOUD_PROVIDER}.tfvars" \
         "${config[tfvars_file]}"
 fi
+
+if [ -f "${config[backend_config]}" ]; then
+    log_info "${config[backend_config]} already exists, not overwriting" \
+             "Terraform config"
+else
+    if [ "${CK8S_CLOUD_PROVIDER}" == "exoscale" ]; then
+        export TERRAFORM_PREFIX="a1-demo-"
+    elif [ "${CK8S_CLOUD_PROVIDER}" == "safespring" ]; then
+        export TERRAFORM_PREFIX="safespring-demo-"
+    elif [ "${CK8S_CLOUD_PROVIDER}" == "citycloud" ]; then
+        export TERRAFORM_PREFIX="citycloud-"
+    elif [ "${CK8S_CLOUD_PROVIDER}" == "aws" ]; then
+        export TERRAFORM_PREFIX="aws-"
+    else
+        echo "ERROR: invalid name of CK8S_CLOUD_PROVIDER=${CK8S_CLOUD_PROVIDER}"
+        exit 1
+    fi
+    cat "${config_defaults_path}/terraform/backend_config.hcl" \
+        | envsubst > "${config[backend_config]}"
+fi
+
+#
+# Terraform
+#
+
+log_info "Initializing Terraform remote workspace"
+
+pushd "${terraform_path}/${CK8S_CLOUD_PROVIDER}" > /dev/null
+echo '1' | TF_WORKSPACE="${CK8S_ENVIRONMENT_NAME}" terraform init -backend-config="${config[backend_config]}"
+terraform workspace select "${CK8S_ENVIRONMENT_NAME}" || \
+    terraform workspace new "${CK8S_ENVIRONMENT_NAME}"
+popd > /dev/null
+CLOUD_PROVIDER="${CK8S_CLOUD_PROVIDER}" ${scripts_path}/set-execution-mode.sh
 
 log_info "Config initialized"
 
@@ -122,3 +142,4 @@ log_info "Time to edit the following files:"
 log_info "${config[config_file]}"
 log_info "${secrets[secrets_file]}"
 log_info "${config[tfvars_file]}"
+log_info "${config[backend_config]}"

@@ -1,12 +1,5 @@
 terraform {
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "elastisys"
-
-    workspaces {
-      prefix = "citycloud-"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "openstack" {

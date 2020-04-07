@@ -1,12 +1,5 @@
 terraform {
-  backend "remote" {
-    hostname     = "app.terraform.io"
-    organization = "elastisys"
-
-    workspaces {
-      prefix = "safespring-demo-"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "openstack" {

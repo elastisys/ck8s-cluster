@@ -22,7 +22,7 @@ config_load
 #
 
 pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
-terraform init
+terraform init -backend-config="${config[backend_config]}"
 terraform workspace select "${ENVIRONMENT_NAME}"
 terraform plan \
     -var-file="${config[tfvars_file]}" \
