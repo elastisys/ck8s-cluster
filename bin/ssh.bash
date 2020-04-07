@@ -22,11 +22,13 @@ case "${1}" in
         cluster=service_cluster
         hostname+="-service-cluster"
         ssh_key="${secrets[ssh_priv_key_sc]}"
+        user=ubuntu
     ;;
     wc)
         cluster=workload_cluster
         hostname+="-workload-cluster"
         ssh_key="${secrets[ssh_priv_key_wc]}"
+        user=ubuntu
     ;;
     *) usage ;;
 esac
@@ -47,17 +49,6 @@ case "${2}" in
     *) usage ;;
 esac
 
-case "${2}" in
-    master-+([0-9])) ;&
-    worker-+([0-9]))
-        case "${CLOUD_PROVIDER}" in
-            exoscale) user=rancher ;;
-            safespring) user=ubuntu ;;
-            citycloud) user=ubuntu ;;
-        esac
-    ;;
-    nfs) user=ubuntu ;;
-esac
 shopt -u extglob
 
 shift 2
