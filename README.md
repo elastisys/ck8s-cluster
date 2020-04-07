@@ -52,6 +52,7 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [sops](https://github.com/mozilla/sops) (tested with 3.5.0)
 - [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)
 - [yq](https://github.com/mikefarah/yq) (tested with 3.2.1)
+- [JMESPath](https://github.com/jmespath/jmespath.py) (tested with 0.9.3-1ubuntu1)
 
 Installs Ansible and the requirements using the playbook get-requirements.yaml
 ```
