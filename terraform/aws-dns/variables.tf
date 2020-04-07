@@ -2,8 +2,14 @@ variable "region" {
   default = "us-east-1"
 }
 
-variable "dns_credentials_file_path" {
-  description = "Path to credentials file, passed to pathexpand"
+variable dns_access_key {
+  description = "AWS API access key for DNS"
+  type        = string
+}
+
+variable dns_secret_key {
+  description = "AWS API secret key for DNS"
+  type        = string
 }
 
 variable dns_prefix {

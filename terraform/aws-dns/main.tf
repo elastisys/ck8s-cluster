@@ -1,7 +1,8 @@
 provider "aws" {
   version                 = "~> 2.50"
   region                  = var.region
-  shared_credentials_file = pathexpand(var.dns_credentials_file_path)
+  access_key = var.dns_access_key
+  secret_key = var.dns_secret_key
   assume_role {
     role_arn = var.role_arn
   }
