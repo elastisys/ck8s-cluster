@@ -73,3 +73,5 @@
 - Ignore `falco syscall event dropped` messages. These messages were spamming and thus being
   ignored anyway. (Should be enabled once falco reaches 1.0.0)
 - Upgraded falco helm chart to v1.1.6 (falco v0.22.1)
+- Falco now also runs on masters.
+- Falco now alerts on ssh to nodes.
