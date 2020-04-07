@@ -13,6 +13,7 @@
       s3cmd_version: "2.0.1-2"
       sops_version: "3.5.0"
       yq_version: "3.2.1"
+      jmespath_version: "0.9.3-1ubuntu1"
     connection: local
     become: yes
     become_user: root
@@ -77,3 +78,6 @@
         url: https://github.com/mikefarah/yq/releases/download/{{ yq_version }}/yq_linux_amd64
         dest: "{{ install_path }}/yq"
         mode: 0775
+    - name: install jmespath
+      apt:
+        name: python-jmespath={{ jmespath_version }}
