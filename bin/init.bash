@@ -18,8 +18,6 @@ source "${here}/common.bash"
 
 validate_cloud "${CK8S_CLOUD_PROVIDER}"
 
-mkdir -p "${CK8S_CONFIG_PATH}"
-
 #
 # SOPS config
 #

@@ -11,7 +11,8 @@ if [ "${SOPS_PGP_FP+x}" != "" ]; then
     exit 1
 fi
 
-# Make CK8S_CONFIG_PATH absolute
+# Create CK8S_CONFIG_PATH if it does not exist and make it absolute
+mkdir -p "${CK8S_CONFIG_PATH}"
 export CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
 
 here="$(dirname "$(readlink -f "$BASH_SOURCE")")"
