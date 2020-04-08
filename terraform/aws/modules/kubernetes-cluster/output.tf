@@ -37,7 +37,7 @@ output "master_external_loadbalancer_fqdn" {
 }
 
 output "ansible_inventory" {
-  value = templatefile("${path.module}/templates/inventory.tmpl", {
+  value = templatefile("${path.module}/../../../templates/inventory.tmpl", {
     master_hosts           = <<-EOF
 %{for index, master in aws_instance.master~}
 ${var.prefix}-${index} ansible_host=${master.public_ip} private_ip=${master.private_ip}
@@ -62,5 +62,7 @@ EOF
     public_endpoint        = aws_elb.master_lb_ext.dns_name
     cluster_name           = var.prefix
     cloud_provider         = "aws"
+    cloud_config           = ""
+    loadbalancers          = ""
   })
 }
