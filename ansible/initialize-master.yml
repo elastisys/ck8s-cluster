@@ -75,5 +75,5 @@
       replace:
         path: "{{ kubeconfig_path }}"
         regexp: "https://{{ hostvars[groups.masters.0].private_ip }}"
-        replace: "https://{{ hostvars[groups.masters.0].ansible_host }}"
+        replace: "https://{{ public_endpoint | default(hostvars[groups.masters.0].ansible_host) }}"
       delegate_to: localhost
