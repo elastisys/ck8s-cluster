@@ -3,43 +3,45 @@
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
-DEPLOYMENTS=(
+echo
+echo
+echo "Testing deployments"
+echo "==================="
+
+deployments=(
     "cert-manager cert-manager"
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
-    "kube-system calico-kube-controllers"
     "kube-system coredns"
     "kube-system metrics-server"
+    "kube-system calico-kube-controllers"
     "nginx-ingress nginx-ingress-default-backend"
     "opa opa"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
 )
-if [ $CLOUD_PROVIDER == "exoscale" ]
-then
-    DEPLOYMENTS+=("kube-system nfs-client-provisioner")
+if [ $CLOUD_PROVIDER == "exoscale" ]; then
+    deployments+=("kube-system nfs-client-provisioner")
 fi
 if [ "$ENABLE_CK8SDASH_WC" == true ]; then
-    DEPLOYMENTS+=("ck8sdash ck8sdash")
+    deployments+=("ck8sdash ck8sdash")
 fi
 
-echo
-echo
-echo "Testing deployments"
-echo "==================="
-
-for DEPLOYMENT in "${DEPLOYMENTS[@]}"
+resourceKind="Deployment"
+# Get json data in a smaller dataset
+simpleData="$(getStatus $resourceKind)"
+for deployment in "${deployments[@]}"
 do
-    arguments=($DEPLOYMENT)
-    echo -n -e "\n${arguments[1]}\t"
-    if testResourceExistence deployment $DEPLOYMENT
-    then
-        testDeploymentStatus $DEPLOYMENT
-    fi
+    testResourceExistenceFast ${resourceKind} $deployment "${simpleData}"
 done
 
-DAEMONSETS=(
+echo
+echo
+echo "Testing daemonsets"
+echo "=================="
+
+daemonsets=(
     "falco falco"
     "fluentd fluentd-fluentd-elasticsearch"
     "kube-system calico-node"
@@ -50,42 +52,33 @@ DAEMONSETS=(
     "velero restic"
 )
 
-echo
-echo
-echo "Testing daemonsets"
-echo "=================="
-
-for DAEMONSET in "${DAEMONSETS[@]}"
-do
-    arguments=($DAEMONSET)
-    echo -n -e "\n${arguments[1]}\t"
-    if testResourceExistence daemonset $DAEMONSET
-    then
-        testDaemonsetStatus $DAEMONSET
-    fi
+resourceKind="DaemonSet"
+# Get json data in a smaller dataset
+simpleData="$(getStatus $resourceKind)"
+for daemonset in "${daemonsets[@]}"
+do 
+    testResourceExistenceFast ${resourceKind} $daemonset "${simpleData}"
 done
-
-STATEFULSETS=(
-    "monitoring prometheus-prometheus-operator-prometheus"
-)
-set -- ${CUSTOMER_NAMESPACES}
-CONTEXT_NAMESPACE=$1
-if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
-then
-    STATEFULSETS+=("$CONTEXT_NAMESPACE alertmanager-alertmanager")
-fi
 
 echo
 echo
 echo "Testing statefulsets"
 echo "===================="
 
-for STATEFULSET in "${STATEFULSETS[@]}"
+statefulsets=(
+    "monitoring prometheus-prometheus-operator-prometheus"
+)
+set -- ${CUSTOMER_NAMESPACES}
+CONTEXT_NAMESPACE=$1
+if [[ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]]
+then
+    statefulsets+=("$CONTEXT_NAMESPACE alertmanager-alertmanager")
+fi
+
+resourceKind="StatefulSet"
+# Get json data in a smaller dataset
+simpleData="$(getStatus $resourceKind)"
+for statefulset in "${statefulsets[@]}"
 do
-    arguments=($STATEFULSET)
-    echo -n -e "\n${arguments[1]}\t"
-    if testResourceExistence statefulset $STATEFULSET
-    then
-        testStatefulsetStatus $STATEFULSET
-    fi
+    testResourceExistenceFast ${resourceKind} $statefulset "${simpleData}"
 done

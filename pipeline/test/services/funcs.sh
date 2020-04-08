@@ -13,47 +13,95 @@ function testResourceExistence {
     fi
 }
 
+# Makes dataset smaller for optimization
 #Args:
-#   1. namespace
-#   2. name of deployment
-function testDeploymentStatus {
-    kubectl rollout status deployment -n $1 $2 --timeout=1m > /dev/null
-    if [ $? == 0 ]
-    then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-    else
-        echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
-        DEBUG_OUTPUT+=$(kubectl get deployment -n $1 $2 -o json)
-    fi
+#   1. kind
+function getStatus() {
+    kind="${1}"
+    jsonData=$(kubectl get ${kind} --all-namespaces -o json)
+    lessData=$(echo ${jsonData} | 
+        jq '.items[] | 
+            {kind: .kind , name: .metadata.name , namespace: .metadata.namespace , 
+            status: .status.readyReplicas , replicas: .status.replicas , 
+            numberReady: .status.numberReady , desiredNumberScheduled: .status.desiredNumberScheduled}')
+    echo "${lessData}"
 }
 
 #Args:
-#   1. namespace
-#   2. name of daemonset
-function testDaemonsetStatus {
-    DESIRED=$(kubectl get ds -n $1 $2 -o jsonpath="{.status.desiredNumberScheduled}")
-    for _ in {1..10}; do
-        READY=$(kubectl get ds -n $1 $2 -o jsonpath="{.status.numberReady}")
-        if [[ $DESIRED -eq $READY ]]; then
-            echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-            return
+#   1. kind
+#   2. namespace
+#   3. name of resource
+function testResourceExistenceFast {
+    kind="${1}"
+    namespace="${2}"
+    currentResource="${3}"
+    simpleData="${4}"
+    activeResourceStatus=$(echo "${simpleData}" | 
+        jq -r --arg name "${currentResource}" --arg namespace "${namespace}" --arg kind "${kind}" '. | 
+            select(.name==$name and .namespace==$namespace and .kind==$kind) | 
+            .status')
+
+    echo -n "${currentResource}"
+    if [[ -z "${activeResourceStatus}" ]]; then
+        echo -n -e "\texists ❌"; FAILURES=$((FAILURES+1))
+        echo -e "\tready ❌"; FAILURES=$((FAILURES+1))
+    else
+        echo -n -e "\texists ✔"
+        resourceReplicaCompare "${kind}" "${namespace}" "${currentResource}" "${simpleData}"
+    fi
+}
+
+# This function checks if the amount of replicas for a deployment, daemonset or statefulset are correct
+#Args:
+#   1. kind
+#   2. namespace
+#   3. name of resource
+#   4. jsonData
+function resourceReplicaCompare() {
+    kind="${1}"
+    namespace="${2}"
+    resourceName="${3}"
+    simpleData="${4}"
+    retriesLeft=5
+    while [[ "${retriesLeft}" -gt 0 ]]; do
+        if [[ "${kind}" == "Deployment" || "${kind}" == "StatefulSet" ]]; then
+            activeResourceStatus=$(echo "${simpleData}" | 
+                jq -r --arg name "${resourceName}" --arg kind "${kind}" '. | 
+                    select(.kind==$kind and .name==$name) | 
+                    .status')
+
+            desiredResourceStatus=$(echo "${simpleData}" | 
+                jq -r --arg name "${resourceName}" --arg kind "${kind}" '. | 
+                    select(.kind==$kind and .name==$name) | 
+                    .replicas')
+        # JSON data structure for daemonsets is different from deployments and statefulsets, 
+        # can not check amount of replicas in the exact same way
+        elif [[ "${kind}" == "DaemonSet" ]]; then
+            activeResourceStatus=$(echo "${simpleData}" | 
+                jq -r --arg name "${resourceName}" --arg kind "${kind}" '. | 
+                    select(.kind==$kind and .name==$name) | 
+                    .numberReady')
+
+            desiredResourceStatus=$(echo "${simpleData}" | 
+                jq -r --arg name "${resourceName}" --arg kind "${kind}" '. | 
+                    select(.kind==$kind and .name==$name) | 
+                    .desiredNumberScheduled')
         fi
-        sleep 6 # timeout ~60s
-    done
-    echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
-    DEBUG_OUTPUT+=$(kubectl get ds -n $1 $2 -o json)
-}
 
-#Args:
-#   1. namespace
-#   2. name of statefulset
-function testStatefulsetStatus {
-    kubectl rollout status statefulset -n $1 $2 --timeout=1m > /dev/null
-    if [ $? == 0 ]
-    then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-    else
-        echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
-        DEBUG_OUTPUT+=($(kubectl get statefulset -n $1 $2 -o json))
-    fi
+        if [[ "${activeResourceStatus}" == "${desiredResourceStatus}" ]]; then
+            echo -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+            return
+        else
+            # retry for 30s
+            sleep 6
+            retriesLeft=$((retriesLeft-1))
+            # refresh jsonData
+            simpleData="$(getStatus ${kind})"
+        fi
+    done
+
+    echo -e "\tready ❌"; FAILURES=$((FAILURES+1))
+    DEBUG_OUTPUT+=$(kubectl get ${kind} -n ${namespace} ${resourceName} -o json)
 }
 
 # This function is required for statefulsets with update strategy OnDelete

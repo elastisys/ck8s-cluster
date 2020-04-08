@@ -3,7 +3,12 @@
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source ${INNER_SCRIPTS_PATH}/../funcs.sh
 
-DEPLOYMENTS=(
+echo
+echo
+echo "Testing deployments"
+echo "==================="
+
+deployments=(
     "dex dex"
     "cert-manager cert-manager"
     "cert-manager cert-manager-cainjector"
@@ -23,10 +28,10 @@ DEPLOYMENTS=(
 )
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
-    DEPLOYMENTS+=("kube-system nfs-client-provisioner")
+    deployments+=("kube-system nfs-client-provisioner")
 fi
 if [ "$ENABLE_HARBOR" == true ]; then
-    DEPLOYMENTS+=(
+    deployments+=(
         "harbor harbor-harbor-chartmuseum"
         "harbor harbor-harbor-clair"
         "harbor harbor-harbor-core"
@@ -38,25 +43,23 @@ if [ "$ENABLE_HARBOR" == true ]; then
     )
 fi
 if [ "$ENABLE_CK8SDASH_SC" == true ]; then
-    DEPLOYMENTS+=("ck8sdash ck8sdash")
+    deployments+=("ck8sdash ck8sdash")
 fi
 
-echo
-echo
-echo "Testing deployments"
-echo "==================="
-
-for DEPLOYMENT in "${DEPLOYMENTS[@]}"
+resourceKind="Deployment"
+# Get json data in a smaller dataset
+simpleData="$(getStatus $resourceKind)"
+for deployment in "${deployments[@]}"
 do
-    arguments=($DEPLOYMENT)
-    echo -n -e "\n${arguments[1]}\t"
-    if testResourceExistence deployment $DEPLOYMENT
-    then
-        testDeploymentStatus $DEPLOYMENT
-    fi
+    testResourceExistenceFast ${resourceKind} $deployment "${simpleData}"
 done
 
-DAEMONSETS=(
+echo
+echo
+echo "Testing daemonsets"
+echo "=================="
+
+daemonsets=(
     "kube-system calico-node"
     "kube-system node-local-dns"
     "nginx-ingress nginx-ingress-controller"
@@ -65,22 +68,20 @@ DAEMONSETS=(
     "velero restic"
 )
 
-echo
-echo
-echo "Testing daemonsets"
-echo "=================="
-
-for DAEMONSET in "${DAEMONSETS[@]}"
+resourceKind="DaemonSet"
+# Get json data in a smaller dataset
+simpleData="$(getStatus $resourceKind)"
+for daemonset in "${daemonsets[@]}"
 do
-    arguments=($DAEMONSET)
-    echo -n -e "\n${arguments[1]}\t"
-    if testResourceExistence daemonset $DAEMONSET
-    then
-        testDaemonsetStatus $DAEMONSET
-    fi
+    testResourceExistenceFast ${resourceKind} $daemonset "${simpleData}"
 done
 
-STATEFULSETS=(
+echo
+echo
+echo "Testing statefulsets"
+echo "===================="
+
+statefulsets=(
     "monitoring prometheus-prometheus-operator-prometheus"
     "monitoring prometheus-wc-scraper-prometheus-instance"
     "monitoring alertmanager-prometheus-operator-alertmanager"
@@ -88,25 +89,18 @@ STATEFULSETS=(
     "influxdb-prometheus influxdb"
 )
 if [ "$ENABLE_HARBOR" == true ]; then
-    STATEFULSETS+=(
+    statefulsets+=(
         "harbor harbor-harbor-database"
         "harbor harbor-harbor-redis"
     )
 fi
 
-echo
-echo
-echo "Testing statefulsets"
-echo "===================="
-
-for STATEFULSET in "${STATEFULSETS[@]}"
+resourceKind="StatefulSet"
+# Get json data in a smaller dataset
+simpleData="$(getStatus $resourceKind)"
+for statefulset in "${statefulsets[@]}"
 do
-    arguments=($STATEFULSET)
-    echo -n -e "\n${arguments[1]}\t"
-    if testResourceExistence statefulset $STATEFULSET
-    then
-        testStatefulsetStatus $STATEFULSET
-    fi
+    testResourceExistenceFast ${resourceKind} $statefulset "${simpleData}"
 done
 
 # elasticsearch-es-nodes has update strategy OnDelete.
