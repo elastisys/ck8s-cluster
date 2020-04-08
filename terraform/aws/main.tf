@@ -22,6 +22,8 @@ module "service_cluster" {
   prefix = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
 
   aws_region  = var.region
+  master_ami  = var.aws_amis["sc_master"]
+  worker_ami  = var.aws_amis["sc_worker"]
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
@@ -37,6 +39,8 @@ module "workload_cluster" {
   prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
 
   aws_region  = var.region
+  master_ami  = var.aws_amis["wc_master"]
+  worker_ami  = var.aws_amis["wc_worker"]
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
