@@ -2,8 +2,8 @@
 # https://github.com/elastisys/hakube-installer
 
 locals {
-  vpc_cidr_prefix      = "172.16.0.0/16"
-  subnet_cidr_prefix   = "172.16.1.0/24"
+  vpc_cidr_prefix    = "172.16.0.0/16"
+  subnet_cidr_prefix = "172.16.1.0/24"
 }
 
 provider "template" {
@@ -82,16 +82,16 @@ resource "aws_security_group" "master-lb-ext-sg" {
 
   # outgoing traffic from LB allowed to go anywhere
   egress {
-    from_port         = "0"
-    to_port           = "0"
-    protocol          = "-1"
-    cidr_blocks       = ["0.0.0.0/0"]
+    from_port   = "0"
+    to_port     = "0"
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = "6443"
-    to_port = "6443"
-    protocol = "tcp"
+    from_port   = "6443"
+    to_port     = "6443"
+    protocol    = "tcp"
     cidr_blocks = var.public_ingress_cidr_whitelist
   }
 
@@ -102,21 +102,21 @@ resource "aws_security_group" "master-lb-ext-sg" {
 
 # public (internet-facing) master network loadbalancer
 resource "aws_elb" "master_lb_ext" {
-  subnets = [aws_subnet.main_sn.id]
-  internal = false
+  subnets         = [aws_subnet.main_sn.id]
+  internal        = false
   security_groups = [aws_security_group.master-lb-ext-sg.id]
 
   listener {
-    instance_port = 6443
+    instance_port     = 6443
     instance_protocol = "tcp"
-    lb_port = 6443
-    lb_protocol = "tcp"
+    lb_port           = 6443
+    lb_protocol       = "tcp"
   }
 
   # connection idle timeout in seconds
-  idle_timeout    = 300
-  cross_zone_load_balancing = true
-  connection_draining = false
+  idle_timeout                = 300
+  cross_zone_load_balancing   = true
+  connection_draining         = false
   connection_draining_timeout = 300
 
   health_check {
@@ -148,18 +148,18 @@ resource "aws_security_group" "master_lb_int_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port       = 6443
-    to_port         = 6443
-    protocol        = "tcp"
-    cidr_blocks     = [aws_vpc.main.cidr_block]
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
   }
 
   # outgoing traffic from LB allowed to go anywhere
   egress {
-    from_port         = "0"
-    to_port           = "0"
-    protocol          = "-1"
-    cidr_blocks       = ["0.0.0.0/0"]
+    from_port   = "0"
+    to_port     = "0"
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -170,8 +170,8 @@ resource "aws_security_group" "master_lb_int_sg" {
 # internal apiserver loadbalancer that will be used internally by
 # kubernetes nodes
 resource "aws_elb" "master_lb_int" {
-  subnets            = [aws_subnet.main_sn.id]
-  internal           = true
+  subnets         = [aws_subnet.main_sn.id]
+  internal        = true
   security_groups = [aws_security_group.master_lb_int_sg.id]
 
   listener {
@@ -182,9 +182,9 @@ resource "aws_elb" "master_lb_int" {
   }
 
   # connection idle timeout in seconds
-  idle_timeout    = 300
-  cross_zone_load_balancing = true
-  connection_draining = false
+  idle_timeout                = 300
+  cross_zone_load_balancing   = true
+  connection_draining         = false
   connection_draining_timeout = 300
 
   health_check {
