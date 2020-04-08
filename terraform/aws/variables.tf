@@ -2,8 +2,14 @@ variable region {
   default = "us-west-1"
 }
 
-variable infra_credentials_file_path {
-  description = "Path to credentials file, passed to pathexpand"
+variable aws_access_key {
+  description = "AWS API access key"
+  type        = string
+}
+
+variable aws_secret_key {
+  description = "AWS API secret key"
+  type        = string
 }
 
 variable public_ingress_cidr_whitelist {
