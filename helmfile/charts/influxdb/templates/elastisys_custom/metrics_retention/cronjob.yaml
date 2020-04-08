@@ -1,3 +1,4 @@
+{{- if .Values.elastisys_custom.retention.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -62,3 +63,4 @@ spec:
                 - name: python-script
                   mountPath: /app
               resources: {{ toYaml .Values.elastisys_custom.retention.resources | nindent 16 }}
+{{- end }}

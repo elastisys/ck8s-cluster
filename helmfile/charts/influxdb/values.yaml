@@ -27,10 +27,12 @@ elastisys_custom:
         cpu: 250m
         memory: 300Mi
   metrics:
+    enabled: true
     # The schedule for running the metrics exporter.
     # Every 5th minute from 0 through 59 (one minute ahead of the retention cronjob)
     schedule: "0-59/5 * * * *"
   retention:
+    enabled: true
     # The schedule for running the retention script.
     # Every 5th minute from 1 through 59 (one minute after the metrics exporter)
     schedule: "1-59/5 * * * *"

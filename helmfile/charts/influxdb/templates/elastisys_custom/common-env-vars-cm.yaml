@@ -1,3 +1,4 @@
+{{- if .Values.elastisys_custom.retention.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -5,3 +6,4 @@ metadata:
 data:
   influxdb-retention-database: service_cluster
   prometheus-influxdb-retention-metric-name: influxdb_service_cluster_size
+{{- end }}
