@@ -62,6 +62,5 @@ EOF
     public_endpoint        = aws_elb.master_lb_ext.dns_name
     cluster_name           = var.prefix
     cloud_provider         = "aws"
-    k8s_version            = var.k8s_version
   })
 }

@@ -348,7 +348,6 @@ resource "aws_instance" "master" {
   associate_public_ip_address = true
 
   instance_type          = each.value
-  ami                    = lookup(var.aws_amis, "${var.aws_region}_${var.k8s_version}")
   vpc_security_group_ids = [aws_security_group.master_sg.id, aws_security_group.cluster_sg.id]
   subnet_id              = aws_subnet.main_sn.id
   iam_instance_profile   = aws_iam_instance_profile.master.name
@@ -383,7 +382,6 @@ resource "aws_instance" "worker" {
   associate_public_ip_address = true
 
   instance_type          = each.value
-  ami                    = lookup(var.aws_amis, "${var.aws_region}_${var.k8s_version}")
   vpc_security_group_ids = [aws_security_group.worker_sg.id, aws_security_group.cluster_sg.id]
   subnet_id              = aws_subnet.main_sn.id
   iam_instance_profile   = aws_iam_instance_profile.worker.name

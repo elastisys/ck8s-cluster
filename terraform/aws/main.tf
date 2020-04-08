@@ -22,7 +22,6 @@ module "service_cluster" {
   prefix = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
 
   aws_region  = var.region
-  k8s_version = var.k8s_version
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 
@@ -38,7 +37,6 @@ module "workload_cluster" {
   prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
 
   aws_region  = var.region
-  k8s_version = var.k8s_version
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
 

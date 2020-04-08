@@ -32,7 +32,3 @@ variable master_nodes {
   description = "Map of instance name to EC2 instance type."
   type        = map
 }
-
-variable k8s_version {
-  description = "Kubernetes version. Valid versions: 1.15.10, 1.17.2"
-}
