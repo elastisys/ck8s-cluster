@@ -166,6 +166,13 @@ k8s() {
 #
 
 apps_init() {
+    # Get helm major version
+    helm_version=$(helm version -c --short | tr -d 'Client: v' | head -c 1)
+    if [ "${helm_version}" != "3" ]; then
+        log_error "Only helm 3 is supported"
+        exit 1
+    fi
+
     # TODO: We should try to get rid of the post-infra-common script.
 
     log_info "Running post infra script"
@@ -177,12 +184,6 @@ apps_run() {
     log_info "Applying applications in service cluster"
 
     (
-        # TODO: Remove when Helm 3 is in place
-        certs="${certs_path}/service_cluster/kube-system/certs"
-        sops_decrypt "${certs}/ca-key.pem"
-        sops_decrypt "${certs}/helm-key.pem"
-        sops_decrypt "${certs}/tiller-key.pem"
-
         with_kubeconfig "${secrets[kube_config_sc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-sc.sh"
     )
@@ -190,12 +191,6 @@ apps_run() {
     log_info "Applying applications in workload cluster"
 
     (
-        # TODO: Remove when Helm 3 is in place
-        certs="${certs_path}/workload_cluster/kube-system/certs"
-        sops_decrypt "${certs}/ca-key.pem"
-        sops_decrypt "${certs}/helm-key.pem"
-        sops_decrypt "${certs}/tiller-key.pem"
-
         with_kubeconfig "${secrets[kube_config_wc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-wc.sh"
     )

@@ -106,7 +106,6 @@ then
 
     # Deploy common roles and rolebindings.
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/kube-system-role-psp.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/tiller-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nfs-client-provisioner-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/cert-manager-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-restricted-psp.yaml
@@ -121,15 +120,7 @@ then
     then
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/service_cluster/
     fi
-
 fi
-
-
-echo "Initializing helm" >&2
-"${SCRIPTS_PATH}/initialize-tiller.sh" kube-system \
-    "${CONFIG_PATH}/certs/service_cluster/kube-system/certs" ""
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/service_cluster/kube-system/certs "helm"
-
 
 echo "Preparing cert manager and creating Issuers" >&2
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
@@ -172,6 +163,11 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0
 
 echo "Creating elasticsearch-operator CRD" >&2
 kubectl apply -f "${SCRIPTS_PATH}/../manifests/elasticsearch-operator/crds.yaml"
+
+echo "Creating Velero CRD" >&2
+kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/backupstoragelocations.yaml
+kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/volumesnapshotlocations.yaml
+kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/schedules.yaml
 
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile

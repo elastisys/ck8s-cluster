@@ -54,9 +54,6 @@ ops_helmfile() {
 
     source "${scripts_path}/set-storage-class.sh"
 
-    # TODO: Delete this when Helm 3 is in place.
-    sops_decrypt "${certs_path}/${cluster}/kube-system/certs/helm-key.pem"
-
     with_kubeconfig "${kubeconfig}" \
         helmfile -f "${here}/../helmfile/helmfile.yaml" -e ${cluster} ${@}
 }

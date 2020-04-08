@@ -68,5 +68,3 @@ esac
 
 chmod 644 "${CK8S_CONFIG_PATH}/ssh/id_rsa_sc"
 chmod 644 "${CK8S_CONFIG_PATH}/ssh/id_rsa_wc"
-chmod 644 "${CK8S_CONFIG_PATH}"/certs/service_cluster/kube-system/certs/*-key.pem
-chmod 644 "${CK8S_CONFIG_PATH}"/certs/workload_cluster/kube-system/certs/*-key.pem

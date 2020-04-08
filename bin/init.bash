@@ -2,8 +2,7 @@
 
 # This script takes care of initializing a CK8S configuration path. It first
 # initializes and configures the Terraform remote workspace and then generates
-# SSH keys, Helm certificates and writes the default configuration files to the
-# config path.
+# SSH keys and writes the default configuration files to the config path.
 # It's not to be executed on its own but rather via `ck8s init`.
 
 set -eu -o pipefail
@@ -88,21 +87,6 @@ ssh_gen "${secrets[ssh_priv_key_wc]}"
 #       for generating customer configurations and not store it as a part of
 #       the ck8s configuration.
 mkdir -p "${CK8S_CONFIG_PATH}/customer"
-
-# TODO: Remove when we have migrated to Helm 3.
-mkdir -p "${certs_path}"
-gen_helm_certs() {
-    certs="${certs_path}/${1}/kube-system/certs"
-
-    log_info "Initializing Helm certificates for ${1}"
-
-    ${scripts_path}/generate-certs.sh "${certs}" helm
-    sops_encrypt "${certs}/ca-key.pem"
-    sops_encrypt "${certs}/helm-key.pem"
-    sops_encrypt "${certs}/tiller-key.pem"
-}
-gen_helm_certs service_cluster
-gen_helm_certs workload_cluster
 
 if [ -f "${config[config_file]}" ]; then
     log_info "${config[config_file]} already exists, not overwriting config"

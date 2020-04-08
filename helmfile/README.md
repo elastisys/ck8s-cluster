@@ -1,15 +1,14 @@
-## Helmfile 
+## Helmfile
 
 https://github.com/roboll/helmfile
 
 Some notes
 
+* Helm 3 is used to deploy all charts so helm 3 needs to be installed
+
 * Currently only one helm state file is used containing the states for the helm releases for both the workload_cluster and service_cluster clusters. `Environments` are used to differentiate between the two. It should be investigated what the best practices are, like use sub-helmfiles etc.
 
-* In `helmfile.yaml` the certificates used to communicate with tiller is set to `../certs/<cluster-type>/kube-system/certs/helm.*`. Could be specifed using env variables in the future, or ignored if the nessecary helm env variables already have been set.  
-
 * The values that the charts are using are found in the `values` folder.
-
 
 ### Getting started
 - Get `helmfile`.
@@ -22,7 +21,7 @@ chmod +x helmfile
 - Get `helm-diff` plugin if not already installed.
 
 ```
-helm plugin install https://github.com/databus23/helm-diff --version 2.11.0+5
+helm plugin install https://github.com/databus23/helm-diff --version 3.1.1
 ```
 ### Environment variables
 The following environment variables are used and needs to be set in order to install all available helm charts.

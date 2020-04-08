@@ -44,9 +44,9 @@ The main difference between them is in setting up the cloud infrastructure. We h
 - [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.19)
 - [BaseOS](https://github.com/elastisys/ck8s-base-vm) (tested with 0.0.5)
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
-- [helm](https://github.com/helm/helm/releases) (tested with 2.14.3)
+- [helm](https://github.com/helm/helm/releases) (tested with 3.1.1)
 - [helmfile](https://github.com/roboll/helmfile) (tested with v0.99.0)
-- [helm-diff](https://github.com/databus23/helm-diff) (tested with 2.11.0+5)
+- [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.1.1)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.5-1-a5b5cbe)
 - htpasswd available directly in ubuntus repositories
 - [sops](https://github.com/mozilla/sops) (tested with 3.5.0)

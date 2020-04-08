@@ -53,3 +53,4 @@
 - Control plane logs (not audit logs) now go to the `kubernetes` index instead of `kubecomponents`.
 - AWS: The DNS terraform module is now to be used standalone instead of by the infrastructure module.
 - Storage class for Elasticsearch Nodes is now configurable. Local storage is now used by default in the Exoscale environment. It is provisioned by [sig-storage-local-static-provisioner](https://github.com/kubernetes-sigs/sig-storage-local-static-provisioner).
+- Upgraded helm to v3

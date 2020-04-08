@@ -15,25 +15,9 @@ repositories:
   url: https://helm.goharbor.io
 {{ end }}
 
-# Defults settings to use with helm and tiller.
+# Defult settings to use with helm.
 helmDefaults:
-  tillerNamespace: kube-system  #dedicated default key for tiller-namespace
-  tls: true
   timeout: 600
-  wait: false
-
-  # TODO: Use env or Env.values instead of fixed paths for certs.
-  {{ if eq .Environment.Name "service_cluster" }}
-  tlsCACert: "{{ requiredEnv "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/ca.pem"
-  tlsCert: "{{ requiredEnv "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/helm.pem"
-  tlsKey: "{{ requiredEnv "CONFIG_PATH" }}/certs/service_cluster/kube-system/certs/helm-key.pem"
-  {{ end }}
-  {{ if eq .Environment.Name "workload_cluster" }}
-  tlsCACert: "{{ requiredEnv "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/ca.pem"
-  tlsCert: "{{ requiredEnv "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/helm.pem"
-  tlsKey: "{{ requiredEnv "CONFIG_PATH" }}/certs/workload_cluster/kube-system/certs/helm-key.pem"
-  {{ end }}
-
 
 # Environments
 environments:
@@ -114,7 +98,9 @@ releases:
 {{ end }}
 {{ if eq .Environment.Name "workload_cluster" }}
   - values/prometheus-operator-wc.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-operator-wc.yaml"
+  {{ end }}
 {{ end }}
 
 

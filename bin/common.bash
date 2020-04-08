@@ -28,8 +28,6 @@ sops_config="${CK8S_CONFIG_PATH}/.sops.yaml"
 state_path="${CK8S_CONFIG_PATH}/.state"
 ssh_path="${CK8S_CONFIG_PATH}/ssh"
 ssh_auth_sock="${ssh_path}/ssh_auth_sock"
-# TODO: Remove when Helm 3 is in place
-certs_path="${CK8S_CONFIG_PATH}/certs"
 
 declare -A config
 declare -A secrets
