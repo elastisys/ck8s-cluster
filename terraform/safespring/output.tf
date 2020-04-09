@@ -64,7 +64,6 @@ EOF
     cluster_name    = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
     cloud_provider  = "openstack"
     cloud_config    = "/etc/kubernetes/cloud.conf"
-    loadbalancers   = ""
     public_endpoint = values(module.service_cluster.master_ips)[0].public_ip
   })
 }
@@ -99,7 +98,6 @@ EOF
     cluster_name    = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
     cloud_provider  = "openstack"
     cloud_config    = "/etc/kubernetes/cloud.conf"
-    loadbalancers   = ""
     public_endpoint = values(module.workload_cluster.master_ips)[0].public_ip
   })
 }
