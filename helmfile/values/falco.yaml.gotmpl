@@ -44,3 +44,26 @@ customRules:
         Outbound SSH connection (user=%user.name server_ip=%fd.sip server_port=%fd.sport client_ip=%fd.cip)
       priority: WARNING
       tags: [network]
+  overwrites.yaml: |-
+    - macro: k8s_containers
+      condition: >
+        (container.image.repository in (gcr.io/google_containers/hyperkube-amd64,
+        gcr.io/google_containers/kube2sky, sysdig/agent, sysdig/falco,
+        sysdig/sysdig, falcosecurity/falco, elastisys/ck8sdash-nginx, quay.io/fluentd_elasticsearch/fluentd) or (k8s.ns.name = "kube-system"))
+    - list: falco_privileged_images
+      items: [
+        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
+        gcr.io/google_containers/kube-proxy, docker.io/calico/node, quay.io/calico/node,
+        docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/mesosphere/mesos-slave,
+        docker.io/docker/ucp-agent, sematext_images, k8s.gcr.io/kube-proxy, calico/node,falcosecurity/falco, k8s.gcr.io/k8s-dns-node-cache
+    ]
+    - list: falco_sensitive_mount_images
+      items: [
+        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,falcosecurity/falco,
+        gcr.io/google_containers/hyperkube,
+        gcr.io/google_containers/kube-proxy, docker.io/calico/node,
+        docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/consul,
+        docker.io/datadog/docker-dd-agent, docker.io/datadog/agent, docker.io/docker/ucp-agent, docker.io/gliderlabs/logspout,
+        docker.io/netdata/netdata, docker.io/google/cadvisor, docker.io/prom/node-exporter,
+        amazon/amazon-ecs-agent, quay.io/prometheus/node-exporter
+        ]
