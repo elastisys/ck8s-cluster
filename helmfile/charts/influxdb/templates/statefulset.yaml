@@ -5,7 +5,7 @@ metadata:
   labels:
     app: "{{ template "influxdb.fullname" . }}"
     chart: "{{ template "influxdb.chart" . }}"
-    release: "prometheus-operator"
+    release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
 spec:
   replicas: 1
@@ -91,6 +91,7 @@ spec:
         - name: init
           mountPath: /docker-entrypoint-initdb.d
         {{- end }}
+      {{- if .Values.elastisys_custom.metrics.enabled }}
       - name: influxdb-node-exporter
         image: prom/node-exporter:v0.18.1
         args: ["--collector.textfile.directory=/textfile-collector", "--no-collector.arp", "--no-collector.bcache", "--no-collector.bonding", "--no-collector.conntrack", "--no-collector.cpu", "--no-collector.cpufreq", "--no-collector.diskstats", "--no-collector.edac", "--no-collector.entropy", "--no-collector.filefd", "--no-collector.filesystem", "--no-collector.hwmon", "--no-collector.infiniband", "--no-collector.ipvs", "--no-collector.loadavg", "--no-collector.mdadm", "--no-collector.meminfo", "--no-collector.netclass", "--no-collector.netdev", "--no-collector.nfs", "--no-collector.nfsd", "--no-collector.netstat", "--no-collector.pressure", "--no-collector.stat", "--no-collector.sockstat", "--no-collector.timex", "--no-collector.vmstat", "--no-collector.xfs", "--no-collector.zfs"]
@@ -114,6 +115,7 @@ spec:
             mountPath: /etc/cron.d/
           - name: config-volume
             mountPath: /etc/config
+      {{- end }}
       volumes:
       - name: config
         configMap:
@@ -127,6 +129,7 @@ spec:
       - name: {{ template "influxdb.fullname" . }}-data
         emptyDir: {}
       {{- end }}
+      {{- if .Values.elastisys_custom.metrics.enabled }}
       - name: textfile-collector-dir
         emptyDir: {}
       - name: scripts
@@ -143,6 +146,7 @@ spec:
             path: influxdb-retention-database
           - key: prometheus-influxdb-retention-metric-name
             path: prometheus-influxdb-retention-metric-name
+      {{- end }}
     {{- if .Values.schedulerName }}
       schedulerName: "{{ .Values.schedulerName }}"
     {{- end }}
