@@ -52,16 +52,7 @@ ops_helmfile() {
     source "${scripts_path}/post-infra-common.sh" \
         "${config[infrastructure_file]}"
 
-    # TODO: We really need make this unnecessary. Currently duplicates logic in
-    #       the deploy scripts.
-    case "${CLOUD_PROVIDER}" in
-        safespring|citycloud) export STORAGE_CLASS=cinder-storage ;;
-        exoscale) export STORAGE_CLASS=nfs-client ;;
-        *)
-            log_error "Unknown CLOUD_PROVIDER [${CLOUD_PROVIDER}] in config."
-            exit 1
-        ;;
-    esac
+    source "${scripts_path}/set-storage-class.sh"
 
     # TODO: Delete this when Helm 3 is in place.
     sops_decrypt "${certs_path}/${cluster}/kube-system/certs/helm-key.pem"
