@@ -1,3 +1,4 @@
+{{- if .Values.elastisys_custom.metrics.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,3 +12,4 @@ data:
 
     echo ${PROMETHEUS_INFLUXDB_METRIC} $(du -s /var/lib/influxdb/data/${INFLUXDB_DATABASE} | cut -f 1) > /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom.$$
     mv /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom.$$ /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom
+{{- end }}

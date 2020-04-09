@@ -1,3 +1,4 @@
+{{- if .Values.elastisys_custom.metrics.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -16,3 +17,4 @@ spec:
     endpoints:
     - port: web
       path: /metrics
+{{- end }}
