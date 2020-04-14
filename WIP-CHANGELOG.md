@@ -1,3 +1,9 @@
+### Breaking changes
+- Terraform now uses new a required config file for configuring the remote backend.
+
+### Release notes
+- To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
+
 ### Added
 
 - Allow disabling the `ck8sdash` deployment
