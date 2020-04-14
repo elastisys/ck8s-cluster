@@ -60,7 +60,6 @@ then
 
     # Deploy common roles and rolebindings.
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/kube-system-role-psp.yaml
-    kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/tiller-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/nfs-client-provisioner-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/cert-manager-psp.yaml
     kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/common/default-restricted-psp.yaml
@@ -79,12 +78,6 @@ then
     fi
 fi
 
-echo "Initializing helm" >&2
-"${SCRIPTS_PATH}/initialize-tiller.sh" kube-system \
-    "${CONFIG_PATH}/certs/workload_cluster/kube-system/certs" ""
-source ${SCRIPTS_PATH}/helm-env.sh kube-system ${CONFIG_PATH}/certs/workload_cluster/kube-system/certs "helm"
-
-
 echo "Preparing cert-manager and issuers" >&2
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
@@ -98,13 +91,17 @@ do
     kubectl -n ${ns} apply -f ${SCRIPTS_PATH}/../manifests/issuers/letsencrypt-staging.yaml
 done
 
-
 echo "Creating prometheus CRDs" >&2
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/alertmanager.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheus.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheusrule.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/servicemonitor.crd.yaml
 kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
+
+echo "Creating Velero CRD" >&2
+kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/backupstoragelocations.yaml
+kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/volumesnapshotlocations.yaml
+kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/schedules.yaml
 
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile

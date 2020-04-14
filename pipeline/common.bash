@@ -3,9 +3,9 @@
 # Make CK8S_CONFIG_PATH absolute
 export CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
 
-# This is the home folder when the container is built but not when it is
-# executed in GitHub actions
-export HELM_HOME=/root/.helm
+# We need to use this variable to override the default data path for helm
+# TODO Change when this is closed https://github.com/helm/helm/issues/7919
+export XDG_DATA_HOME="/root/.config"
 
 export TF_IN_AUTOMATION="true"
 

@@ -5,7 +5,7 @@
       install_user: "{{ lookup('env','USER') }}"
       terraform_version: "0.12.19"
       kubectl_version: "1.15.2"
-      helm_version: "2.14.3"
+      helm_version: "3.1.2"
       helmfile_version: "0.99.0"
       helmdiff_version: "2.11.0+5"
       jq_version: "1.5+dfsg-2"
@@ -45,12 +45,6 @@
       stat:
         path: "/home/{{ install_user }}/.helm"
       register: helm_home_exists
-    - name: "Init helm client side"
-      become: yes
-      become_user: "{{ install_user }}"
-      command: "helm init -c"
-      register: "output"
-      when: not helm_home_exists.stat.exists
     - name: Check if helm-diff plugin exists'
       stat:
         path: "/home/{{ install_user }}/.helm/plugins/helm-diff"
