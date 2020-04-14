@@ -9,6 +9,11 @@ terraform {
   }
 }
 
+locals {
+  prefix_sc = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+  prefix_wc = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
+}
+
 provider "aws" {
   version    = "~> 2.50"
   region     = var.region
@@ -19,7 +24,7 @@ provider "aws" {
 module "service_cluster" {
   source = "./modules/kubernetes-cluster"
 
-  prefix = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+  prefix = local.prefix_sc
 
   aws_region = var.region
   master_ami = var.aws_amis["sc_master"]
@@ -36,7 +41,7 @@ module "service_cluster" {
 module "workload_cluster" {
   source = "./modules/kubernetes-cluster"
 
-  prefix = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
+  prefix = local.prefix_wc
 
   aws_region = var.region
   master_ami = var.aws_amis["wc_master"]
