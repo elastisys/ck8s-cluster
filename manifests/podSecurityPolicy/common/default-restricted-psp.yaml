@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: default:restricted-psp
+  name: default:restricted
 rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - restricted-psp
+  - restricted
   resources:
   - podsecuritypolicies
   verbs:
@@ -15,10 +15,10 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: default:restricted-psp
+  name: default:restricted
 roleRef:
   kind: ClusterRole
-  name: default:restricted-psp
+  name: default:restricted
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: Group

@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: opa:default-psp
+  name: opa:privileged
   namespace: opa
 rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - default-psp
+  - privileged
   resources:
   - podsecuritypolicies
   verbs:
@@ -16,12 +16,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: opa:default-psp
+  name: opa:privileged
   namespace: opa
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: opa:default-psp
+  name: opa:privileged
 subjects:
 - kind: ServiceAccount
   name: opa

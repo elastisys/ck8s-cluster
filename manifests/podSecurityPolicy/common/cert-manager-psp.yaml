@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: cert-manager:default-psp
+  name: cert-manager:privileged
   namespace: cert-manager
 rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - default-psp
+  - privileged
   resources:
   - podsecuritypolicies
   verbs:
@@ -16,12 +16,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: cert-manager:default-psp
+  name: cert-manager:privileged
   namespace: cert-manager
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: cert-manager:default-psp
+  name: cert-manager:privileged
 subjects:
 - kind: ServiceAccount
   name: cert-manager-cainjector
@@ -35,12 +35,12 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: cert-manager:default-psp
+  name: cert-manager:privileged
 rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - default-psp
+  - privileged
   resources:
   - podsecuritypolicies
   verbs:
@@ -49,11 +49,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: cert-manager:default-psp
+  name: cert-manager:privileged
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cert-manager:default-psp
+  name: cert-manager:privileged
 subjects:
 - kind: ServiceAccount
   name: cert-manager

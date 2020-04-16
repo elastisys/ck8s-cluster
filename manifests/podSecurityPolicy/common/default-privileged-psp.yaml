@@ -2,7 +2,7 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: default-psp
+  name: privileged
   annotations:
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
 spec:
@@ -37,7 +37,7 @@ rules:
 - apiGroups:
   - policy
   resourceNames:
-  - default-psp
+  - privileged
   resources:
   - podsecuritypolicies
   verbs:

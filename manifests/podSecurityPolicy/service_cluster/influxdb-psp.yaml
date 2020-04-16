@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: influxdb-prometheus:default-psp
+  name: influxdb-prometheus:privileged
   namespace: influxdb-prometheus
 rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - default-psp
+  - privileged
   resources:
   - podsecuritypolicies
   verbs:
@@ -16,12 +16,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: influxdb-prometheus:default-psp
+  name: influxdb-prometheus:privileged
   namespace: influxdb-prometheus
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: influxdb-prometheus:default-psp
+  name: influxdb-prometheus:privileged
 subjects:
 - kind: ServiceAccount
   name: default

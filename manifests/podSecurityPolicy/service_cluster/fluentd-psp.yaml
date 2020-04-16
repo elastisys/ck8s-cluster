@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - extensions
   resourceNames:
-  - default-psp
+  - privileged
   resources:
   - podsecuritypolicies
   verbs:
