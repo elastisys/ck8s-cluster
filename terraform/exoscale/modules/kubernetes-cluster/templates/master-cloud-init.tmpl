@@ -1,8 +1,0 @@
-#cloud-config
-runcmd:
-  # TODO: When a VM is seen as healthy and is added to the EIP loadbalancer
-  #       pool it no longer can send traffic back to itself via the EIP IP
-  #       address.
-  #       Remove this if it ever gets solved.
-  # https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030138
-  - sudo iptables -t nat -A PREROUTING -d ${eip_ip_address} -j DNAT --to 127.0.0.1

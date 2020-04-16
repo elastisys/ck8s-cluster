@@ -21,13 +21,6 @@ resource "exoscale_compute" "master" {
   state           = "Running"
   zone            = var.zone
   security_groups = [exoscale_security_group.master_sg.name]
-
-  user_data = templatefile(
-    "${path.module}/templates/master-cloud-init.tmpl",
-    {
-      eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
-    }
-  )
 }
 
 resource "exoscale_compute" "worker" {
@@ -45,7 +38,7 @@ resource "exoscale_compute" "worker" {
   user_data = templatefile(
     "${path.module}/templates/worker-cloud-init.tmpl",
     {
-      eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
+      eip_ip_address            = exoscale_ipaddress.ingress_controller_lb.ip_address
       es_local_storage_capacity = var.es_local_storage_capacity_map[each.value]
     }
   )
@@ -227,6 +220,23 @@ resource "exoscale_secondary_ipaddress" "ingress_controller_lb" {
 
   compute_id = exoscale_compute.worker[each.value].id
   ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
+}
+
+resource "exoscale_ipaddress" "control_plane_lb" {
+  zone                     = var.zone
+  healthcheck_mode         = "tcp"
+  healthcheck_port         = 6443
+  healthcheck_interval     = 10
+  healthcheck_timeout      = 2
+  healthcheck_strikes_ok   = 2
+  healthcheck_strikes_fail = 3
+}
+
+resource "exoscale_secondary_ipaddress" "control_plane_lb" {
+  for_each = toset(var.master_names)
+
+  compute_id = exoscale_compute.master[each.value].id
+  ip_address = exoscale_ipaddress.control_plane_lb.ip_address
 }
 
 resource "exoscale_ssh_keypair" "ssh_key" {

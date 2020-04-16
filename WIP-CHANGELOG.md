@@ -42,6 +42,7 @@
   encrypted and retained
 - Support to configure falco alerts for slack and alertmanager.
 - Falcosidekick for handling falco outputs.
+- EIP for control plane on Exoscale
 
 ### Fixed
 

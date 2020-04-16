@@ -34,3 +34,7 @@ output "dns_suffix" {
 output "ingress_controller_lb_ip_address" {
   value = "${exoscale_ipaddress.ingress_controller_lb.ip_address}"
 }
+
+output "control_plane_lb_ip_address" {
+  value = "${exoscale_ipaddress.control_plane_lb.ip_address}"
+}

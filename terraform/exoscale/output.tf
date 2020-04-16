@@ -69,7 +69,7 @@ ${name}
 %{endfor~}
 EOF
     cluster_name           = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
-    public_endpoint        = values(module.service_cluster.master_ip_addresses)[0].public_ip
+    public_endpoint        = module.service_cluster.control_plane_lb_ip_address
     cloud_provider         = ""
     cloud_config           = ""
     loadbalancers          = ""
@@ -101,7 +101,7 @@ ${name}
 %{endfor~}
 EOF
     cluster_name           = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
-    public_endpoint        = values(module.workload_cluster.master_ip_addresses)[0].public_ip
+    public_endpoint        = module.workload_cluster.control_plane_lb_ip_address
     cloud_provider         = ""
     cloud_config           = ""
     loadbalancers          = ""
