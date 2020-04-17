@@ -34,8 +34,7 @@ infra_tf_run() {
 
     pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
     echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init -backend-config="${config[backend_config]}"
-    terraform workspace select "${ENVIRONMENT_NAME}"
-    terraform apply \
+    TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform apply \
         -var-file="${config[tfvars_file]}" \
         -var ssh_pub_key_sc="${config[ssh_pub_key_sc]}" \
         -var ssh_pub_key_wc="${config[ssh_pub_key_wc]}"
@@ -45,8 +44,8 @@ infra_tf_run() {
 
     log_info "Generating ansible inventories"
     pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
-    terraform output ansible_inventory_sc > "${config[ansible_hosts_sc]}"
-    terraform output ansible_inventory_wc > "${config[ansible_hosts_wc]}"
+    TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform output ansible_inventory_sc > "${config[ansible_hosts_sc]}"
+    TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform output ansible_inventory_wc > "${config[ansible_hosts_wc]}"
     popd > /dev/null
 }
 
@@ -186,8 +185,7 @@ aws_dns() {
 
     pushd "${terraform_path}/aws-dns" > /dev/null
     echo '1' | TF_WORKSPACE="${workspace}" terraform init
-    terraform workspace select "${workspace}"
-    terraform apply \
+    TF_WORKSPACE="${workspace}" terraform apply \
         -var dns_record_sc="${sc_lb}" \
         -var dns_record_wc="${wc_lb}"
     popd > /dev/null

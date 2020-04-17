@@ -9,7 +9,7 @@ set -e
 SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 pushd "${SCRIPTS_PATH}/../terraform/${CLOUD_PROVIDER}/" > /dev/null
-tf_out=$(terraform output -json)
+tf_out=$(TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform output -json)
 popd > /dev/null
 
 # Makes into cleaner infra format than terraform output

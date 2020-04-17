@@ -97,8 +97,7 @@ if [ "$CLOUD_PROVIDER" = "aws" ]; then
 
         pushd "${terraform_path}/aws-dns" > /dev/null
         echo '1' | TF_WORKSPACE="${workspace}" terraform init
-        terraform workspace select "${workspace}"
-        terraform destroy \
+        TF_WORKSPACE="${workspace}" terraform destroy \
             -var dns_record_sc="${sc_lb}" \
             -var dns_record_wc="${wc_lb}"
         popd > /dev/null
@@ -119,8 +118,7 @@ log_info "Destroying Terraform infrastructure"
 
 pushd "${terraform_path}/${CLOUD_PROVIDER}" > /dev/null
 echo '1' | TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform init -backend-config="${config[backend_config]}"
-terraform workspace select "${ENVIRONMENT_NAME}"
-terraform destroy \
+TF_WORKSPACE="${ENVIRONMENT_NAME}" terraform destroy \
     -var-file="${config[tfvars_file]}" \
     -var ssh_pub_key_sc="${config[ssh_pub_key_sc]}" \
     -var ssh_pub_key_wc="${config[ssh_pub_key_wc]}"
