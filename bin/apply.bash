@@ -199,7 +199,7 @@ aws_dns() {
 
 apps_init() {
     # Get helm major version
-    helm_version=$(helm version -c --short | tr -d 'Client: v' | head -c 1)
+    helm_version=$(KUBECONFIG="" helm version -c --short | tr -d 'Client: v' | head -c 1)
     if [ "${helm_version}" != "3" ]; then
         log_error "Only helm 3 is supported"
         exit 1
