@@ -17,7 +17,7 @@ spec:
       s3.client.default.endpoint: {{ .Values.elasticsearch.s3.endpoint }}
       s3.client.default.protocol: https
       s3.client.default.path_style_access: true
-      action.auto_create_index: ".watches,.triggered_watches,.watcher-history-*"
+      action.auto_create_index: ".watches,.triggered_watches,.watcher-history-*,.monitoring-*"
       xpack.security.authc.realms.native.native1.order: 0
     podTemplate:
       spec:

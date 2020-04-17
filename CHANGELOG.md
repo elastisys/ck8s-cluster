@@ -1,10 +1,19 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.2.3](#v023---2020-04-17)
 - [v0.2.2](#v022---2020-04-09)
 - [v0.2.1](#v021---2020-04-03)
 - [v0.2.0](#v020---2020-03-26)
 - [v0.1.0](#v010---2020-03-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.2.3 - 2020-04-17
+
+### Added
+
+- Option to disable namespace creation in customer-rbac.
+- Auto create capability for system monitoring indices in elasticsearch.
 
 -------------------------------------------------
 ## v0.2.2 - 2020-04-09
