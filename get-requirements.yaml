@@ -7,7 +7,7 @@
       kubectl_version: "1.15.2"
       helm_version: "3.1.2"
       helmfile_version: "0.99.0"
-      helmdiff_version: "2.11.0+5"
+      helmdiff_version: "3.1.1"
       jq_version: "1.5+dfsg-2"
       apache2utils_version: "2.4.29-1ubuntu4.13"
       s3cmd_version: "2.0.1-2"
