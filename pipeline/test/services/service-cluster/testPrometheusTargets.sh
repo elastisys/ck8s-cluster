@@ -6,8 +6,10 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 source $INNER_SCRIPTS_PATH/../prometheus-common.sh
 
 # Get amount of nodes in cluster
-totalNodes=$(kubectl get nodes -o json | jq '.items[] | .metadata.name' | wc -l)
-workerNodes=$(kubectl get nodes -l node-role.kubernetes.io/worker -o json | jq '.items[] | .metadata.name' | wc -l)
+totalNodes=$(kubectl get nodes --no-headers | wc -l)
+masterNodes=$(kubectl get nodes -l node-role.kubernetes.io/master --no-headers | wc -l)
+# Note: workers are simply non-masters, so we select all that do NOT have the master label
+workerNodes=$(kubectl get nodes -l node-role.kubernetes.io/master!= --no-headers | wc -l)
 
 echo
 echo
@@ -34,13 +36,13 @@ scTargets=(
     "monitoring/blackbox-exporter-kibana/0 1"
     "monitoring/influxdb-du-monitoring-service-monitor/0 1"
     "monitoring/prometheus-operator-alertmanager/0 1"
-    "monitoring/prometheus-operator-apiserver/0 1"
-    "monitoring/prometheus-operator-coredns/0 1"
+    "monitoring/prometheus-operator-apiserver/0 ${masterNodes}"
+    "monitoring/prometheus-operator-coredns/0 2"
     "monitoring/prometheus-operator-grafana/0 1"
     "monitoring/prometheus-operator-kube-state-metrics/0 1"
     "monitoring/prometheus-operator-kubelet/0 ${totalNodes}"
     "monitoring/prometheus-operator-kubelet/1 ${totalNodes}"
-    "monitoring/prometheus-operator-node-exporter/0 ${workerNodes}"
+    "monitoring/prometheus-operator-node-exporter/0 ${totalNodes}"
     "monitoring/prometheus-operator-operator/0 1"
     "monitoring/prometheus-operator-prometheus/0 1"
 )
