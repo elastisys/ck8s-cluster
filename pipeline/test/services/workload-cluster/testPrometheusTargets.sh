@@ -23,12 +23,6 @@ sleep 3
 simplifyData
 } &> /dev/null
 
-# Reset variables for second prometheus
-HEALTHY=0
-UNHEALTHY=0
-FOUND=0
-MISSING=0
-
 # Not using these targets atm
 # TODO: add elements to the list when they start being used.
 # "monitoring/prometheus-operator-kube-etcd/0 1"
@@ -49,7 +43,6 @@ for wcTarget in "${wcTargets[@]}"
 do
     check_instances $wcTarget
 done
-count_healthy
 
 kill "${PF_PID}"
 wait "${PF_PID}" 2>/dev/null

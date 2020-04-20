@@ -51,8 +51,6 @@ do
     check_instances $scTarget
 done
 
-count_healthy
-
 kill "${PF_PID}"
 wait "${PF_PID}" 2>/dev/null
 
@@ -90,8 +88,6 @@ for scraperTarget in "${scraperTargets[@]}"
 do
     check_instances $scraperTarget ${jsonData}
 done
-
-count_healthy
 
 kill "${PF_PID}"
 wait "${PF_PID}" 2>/dev/null

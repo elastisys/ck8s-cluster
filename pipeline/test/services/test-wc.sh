@@ -6,6 +6,7 @@ SUCCESSES=0
 FAILURES=0
 DEBUG_OUTPUT=("")
 DEBUG_LOGS=("")
+DEBUG_PROMETHEUS_TARGETS=("")
 
 source ${SCRIPTS_PATH}/workload-cluster/testPodsReady.sh
 source ${SCRIPTS_PATH}/workload-cluster/testEndpoints.sh
@@ -28,6 +29,12 @@ then
     echo "===================================="
     echo
     echo "${DEBUG_OUTPUT[@]}" | jq .
+    echo
+    echo "Unhealthy/missing prometheus targets"
+    echo "===================================="
+    echo
+    echo "${DEBUG_PROMETHEUS_TARGETS[@]}"
+    echo
     exit 1
 fi
 
