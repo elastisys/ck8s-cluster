@@ -1,7 +1,6 @@
+#Leaving these blank will generate a default prefix
 prefix_sc = ""
 prefix_wc = ""
-
-public_v4_network = "71b10496-2617-47ae-abbc-36239f0863bb"
 
 worker_names_sc = [
   "worker-0",
@@ -39,5 +38,27 @@ master_name_flavor_map_wc = {
   "master-0" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
 
+loadbalancer_names_sc=[
+  "loadbalancer-0"
+]
+
+loadbalancer_name_flavor_map_sc={
+    "loadbalancer-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
+}
+
+loadbalancer_names_wc=[
+  "loadbalancer-0"
+]
+
+loadbalancer_name_flavor_map_wc={
+    "loadbalancer-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
+}
+
 # TODO: Remove Elastisys range before making repository public
 public_ingress_cidr_whitelist = "194.132.164.168/32" # Elastisys office
+
+aws_dns_zone_id="Z2STJRQSJO5PZ0" # elastisys.se
+aws_dns_role_arn="arn:aws:iam::248119176842:role/a1-pipeline"
+
+external_network_id="71b10496-2617-47ae-abbc-36239f0863bb"
+external_network_name="public-v4"

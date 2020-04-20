@@ -1,8 +1,10 @@
 ### Breaking changes
 - Terraform now uses new a required config file for configuring the remote backend.
+- Terraform for safespring and citycloud have been restructured with new modules. 
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
+- No migration script is available for the terraform changes to safespring and citycloud. Manual migration might be possible.
 
 ### Added
 
@@ -75,3 +77,4 @@
 - Upgraded falco helm chart to v1.1.6 (falco v0.22.1)
 - Falco now also runs on masters.
 - Falco now alerts on ssh to nodes.
+- Safespring and citycloud now uses common openstack modules in terraform.

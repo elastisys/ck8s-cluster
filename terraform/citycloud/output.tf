@@ -2,6 +2,12 @@
 output "sc_dns_name" {
   value = module.service_cluster.dns_record_name
 }
+output "wc_dns_name" {
+  value = module.workload_cluster.dns_record_name
+}
+output "domain_name" {
+  value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
+}
 
 # The ips by each instance name
 output "sc_worker_ips" {
@@ -10,6 +16,9 @@ output "sc_worker_ips" {
 output "sc_master_ips" {
   value = module.service_cluster.master_ips
 }
+output "sc_loadbalancer_ips" {
+  value = module.service_cluster.loadbalancer_ips
+}
 
 output "wc_worker_ips" {
   value = module.workload_cluster.worker_ips
@@ -17,21 +26,8 @@ output "wc_worker_ips" {
 output "wc_master_ips" {
   value = module.workload_cluster.master_ips
 }
-
-output "wc_dns_name" {
-  value = module.workload_cluster.dns_record_name
-}
-
-output "domain_name" {
-  value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
-}
-
 output "wc_loadbalancer_ips" {
-  value = module.workload_cluster.lb_ip
-}
-
-output "sc_loadbalancer_ips" {
-  value = module.service_cluster.lb_ip
+  value = module.workload_cluster.loadbalancer_ips
 }
 
 output "ansible_inventory_sc" {

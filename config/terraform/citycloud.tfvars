@@ -1,3 +1,4 @@
+#Leaving these blank will generate a default prefix
 prefix_sc = ""
 prefix_wc = ""
 
@@ -35,5 +36,14 @@ master_name_flavor_map_wc = {
   "master-0" : "89afeed0-9e41-4091-af73-727298a5d959" #2core 4gb mem 50gb storage
 }
 
+octavia_names_sc=["loadbalancer-0"]
+octavia_names_wc=["loadbalancer-0"]
+
 # TODO: Remove Elastisys range before making repository public
 public_ingress_cidr_whitelist = "194.132.164.168/32" # Elastisys office
+
+aws_dns_zone_id="Z2STJRQSJO5PZ0" # elastisys.se
+aws_dns_role_arn="arn:aws:iam::248119176842:role/a1-pipeline"
+
+external_network_id="2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c"
+external_network_name="ext-net"

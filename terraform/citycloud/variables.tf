@@ -13,6 +13,16 @@ variable dns_prefix {
   type        = string
 }
 
+variable aws_dns_zone_id {
+  description = "Id for the AWS DNS zone"
+  type        = string
+}
+
+variable aws_dns_role_arn {
+  description = "AWS role to asume while creating DNS entries"
+  type        = string
+}
+
 variable prefix_sc {
   description = "Prefix for resource names"
   default     = ""
@@ -21,11 +31,6 @@ variable prefix_sc {
 variable prefix_wc {
   description = "Prefix for resource names"
   default     = ""
-}
-
-variable "compute_instance_image" {
-  description = "Base image used to provision master and worker instances"
-  default     = "CK8S-BaseOS-v0.0.5"
 }
 
 # For workers
@@ -95,6 +100,30 @@ variable master_name_flavor_map_wc {
   }
 }
 
+variable octavia_names_sc {
+  description = "List of names for octavia loadbalancers to create."
+  type        = list(string)
+  default     = ["loadbalancer-0"]
+}
+
+variable octavia_names_wc {
+  description = "List of names for octavia loadbalancers to create."
+  type        = list(string)
+  default     = ["loadbalancer-0"]
+}
+
 variable public_ingress_cidr_whitelist {
   type = string
+}
+
+variable external_network_id {
+  description = "the id of the external network"
+  type        = string
+  default     = "2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c"
+}
+
+variable external_network_name {
+  description = "the name of the external network"
+  type        = string
+  default     = "ext-net"
 }

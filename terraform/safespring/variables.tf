@@ -13,9 +13,14 @@ variable dns_prefix {
   type        = string
 }
 
-variable public_v4_network {
-  description = "the id of the public-v4 network"
-  default     = "71b10496-2617-47ae-abbc-36239f0863bb"
+variable aws_dns_zone_id {
+  description = "Id for the AWS DNS zone"
+  type        = string
+}
+
+variable aws_dns_role_arn {
+  description = "AWS role to asume while creating DNS entries"
+  type        = string
 }
 
 variable prefix_sc {
@@ -26,11 +31,6 @@ variable prefix_sc {
 variable prefix_wc {
   description = "Prefix for resource names"
   default     = ""
-}
-
-variable "compute_instance_image" {
-  description = "Base image used to provision master and worker instances"
-  default     = "CK8S-BaseOS-v0.0.5"
 }
 
 # For workers
@@ -106,32 +106,43 @@ variable master_name_flavor_map_wc {
 variable loadbalancer_names_sc {
   description = "List of names for loadbalancer instances to create."
   type        = list(string)
-  default     = ["sc-lb-0"]
+  default     = ["loadbalancer-0"]
 }
 
 variable loadbalancer_name_flavor_map_sc {
   description = "Map of instance name to openstack flavor."
   type        = map
   default = {
-    "sc-lb-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
+    "loadbalancer-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
   }
 }
-
 
 variable loadbalancer_names_wc {
   description = "List of names for loadbalancer instances to create."
   type        = list(string)
-  default     = ["wc-lb-0"]
+  default     = ["loadbalancer-0"]
 }
 
 variable loadbalancer_name_flavor_map_wc {
   description = "Map of instance name to openstack flavor."
   type        = map
   default = {
-    "wc-lb-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
+    "loadbalancer-0" : "51d480b8-2517-4ba8-bfe0-c649ac93eb61"
   }
 }
 
 variable public_ingress_cidr_whitelist {
   type = string
+}
+
+variable external_network_id {
+  description = "the id of the external network"
+  type        = string
+  default     = "71b10496-2617-47ae-abbc-36239f0863bb"
+}
+
+variable external_network_name {
+  description = "the name of the external network"
+  type        = string
+  default     = "public-v4"
 }

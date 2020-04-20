@@ -29,7 +29,7 @@ resource "openstack_compute_instance_v2" "instance" {
 resource "openstack_compute_floatingip_v2" "fip" {
   for_each = toset(var.names)
 
-  pool = "public-v4"
+  pool = var.external_network_name
 }
 
 resource "openstack_compute_floatingip_associate_v2" "fip_assoc" {

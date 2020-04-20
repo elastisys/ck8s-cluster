@@ -2,6 +2,12 @@
 output "sc_dns_name" {
   value = module.service_cluster.dns_record_name
 }
+output "wc_dns_name" {
+  value = module.workload_cluster.dns_record_name
+}
+output "domain_name" {
+  value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
+}
 
 # The ips by each instance name
 output "sc_worker_ips" {
@@ -10,7 +16,6 @@ output "sc_worker_ips" {
 output "sc_master_ips" {
   value = module.service_cluster.master_ips
 }
-
 output "sc_loadbalancer_ips" {
   value = module.service_cluster.loadbalancer_ips
 }
@@ -21,17 +26,8 @@ output "wc_worker_ips" {
 output "wc_master_ips" {
   value = module.workload_cluster.master_ips
 }
-
 output "wc_loadbalancer_ips" {
   value = module.workload_cluster.loadbalancer_ips
-}
-
-output "wc_dns_name" {
-  value = module.workload_cluster.dns_record_name
-}
-
-output "domain_name" {
-  value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
 }
 
 output "ansible_inventory_sc" {
@@ -61,7 +57,7 @@ EOF
 ${key} ansible_host=${lb.public_ip} private_ip=${lb.private_ip}
 %{endfor~}
 EOF
-    cluster_name    = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+    cluster_name    = var.prefix_sc == "" ? "${terraform.workspace}_service_cluster" : var.prefix_sc
     cloud_provider  = "openstack"
     cloud_config    = "/etc/kubernetes/cloud.conf"
     public_endpoint = values(module.service_cluster.master_ips)[0].public_ip
@@ -95,7 +91,7 @@ EOF
 ${key} ansible_host=${lb.public_ip} private_ip=${lb.private_ip}
 %{endfor~}
 EOF
-    cluster_name    = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
+    cluster_name    = var.prefix_wc == "" ? "${terraform.workspace}_workload_cluster" : var.prefix_wc
     cloud_provider  = "openstack"
     cloud_config    = "/etc/kubernetes/cloud.conf"
     public_endpoint = values(module.workload_cluster.master_ips)[0].public_ip
