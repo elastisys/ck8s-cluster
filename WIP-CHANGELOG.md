@@ -56,6 +56,7 @@
 `ENABLE_CUSTOMER_ALERTMANAGER` is set to true
 - Falco getting installed even if `ENABLE_FALCO=false`
 - Kube-proxy metrics endpoint fixed.
+- Etcd metrics endpoint fixed.
 
 ### Removed
 

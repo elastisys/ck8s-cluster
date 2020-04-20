@@ -29,6 +29,10 @@ kubeApiServer:
       - action: keep
         sourceLabels: [__name__]
         regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
+kubeEtcd:
+  service:
+    port: 4001
+    targetPort: 4001
 
 prometheus:
   ingress:

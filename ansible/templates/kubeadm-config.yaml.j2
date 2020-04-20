@@ -87,6 +87,8 @@ dns:
 etcd:
   local:
     dataDir: "/var/lib/etcd"
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:4001"
 imageRepository: k8s.gcr.io
 kubernetesVersion: {{ k8s_version }}
 networking:

@@ -17,6 +17,14 @@ kubeApiServer:
   - targetLabel: cluster
     replacement: service_cluster
 
+kubeEtcd:
+  relabelings:
+  - targetLabel: cluster
+    replacement: service_cluster
+  service:
+    port: 4001
+    targetPort: 4001
+    
 alertmanager:
   config:
     # See https://prometheus.io/docs/alerting/configuration/
