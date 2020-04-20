@@ -36,6 +36,11 @@ configuration:
       region: {{ requiredEnv "S3_REGION" }}
       s3ForcePathStyle: "true"
       s3Url: {{ requiredEnv "S3_REGION_ENDPOINT" }}
+  # Parameters for the `default` VolumeSnapshotLocation. See
+  # https://velero.io/docs/v1.0.0/api-types/volumesnapshotlocation/
+  volumeSnapshotLocation:
+    config:
+      region: {{ requiredEnv "S3_REGION" }}
 
 # Info about the secret to be used by the Velero deployment, which
 # should contain credentials for the cloud provider IAM account you've
