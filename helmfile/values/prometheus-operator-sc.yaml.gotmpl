@@ -237,13 +237,17 @@ defaultRules:
 
 prometheus:
   prometheusSpec:
+    image:
+      tag: v2.17.2
+    externalLabels:
+      cluster: service_cluster
     resources:
       requests:
         memory: 1Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
         cpu: "300m" # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
       limits:
         memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
-        cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+        cpu: "1" # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
     remoteRead:
     - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=admin&p={{ requiredEnv "INFLUXDB_PWD" }}
     remoteWrite:
@@ -276,7 +280,6 @@ prometheus:
           resources:
             requests:
               storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_SC" }}
-        selector: {}
 
     {{ if eq (env "STORAGE_CLASS") "nfs-client"  }}
     additionalScrapeConfigs:

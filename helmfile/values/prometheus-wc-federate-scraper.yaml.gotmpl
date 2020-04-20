@@ -1,4 +1,5 @@
 prometheusSpec:
+  version: "v2.17.2"
   alerting:
     # Use the default alertmanager that comes with prometheus-operator
     alertmanagers:
@@ -33,7 +34,7 @@ prometheusSpec:
         resources:
           requests:
             storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
-            
+
   enableAdminAPI: false
   logFormat: logfmt
   logLevel: info

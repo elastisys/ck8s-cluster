@@ -55,6 +55,8 @@ prometheus:
       - prometheus.{{ requiredEnv "ECK_BASE_DOMAIN"}}
 
   prometheusSpec:
+    image:
+      tag: v2.17.2
     externalLabels:
       cluster: workload_cluster
 
@@ -91,7 +93,7 @@ prometheus:
         cpu: "300m" # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
       limits:
         memory: 2Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
-        cpu: 1 # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
+        cpu: "1" # Total will be 200m more, acounting for prometheus-config-reloader & prometheus-rulefiles
 
     ## How long to retain metrics
     ##
@@ -112,7 +114,6 @@ prometheus:
           resources:
             requests:
               storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
-        selector: {}
 
     {{ if eq (env "STORAGE_CLASS") "nfs-client"  }}
     additionalScrapeConfigs:
