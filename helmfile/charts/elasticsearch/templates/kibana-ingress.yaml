@@ -5,7 +5,7 @@ metadata:
   annotations:
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    certmanager.k8s.io/issuer: {{ .Values.kibana.ingress.issuer }}
+    cert-manager.io/issuer: {{ .Values.kibana.ingress.issuer }}
 {{- if .Values.kibana.ingress.extraAnnotations }}
 {{ toYaml .Values.kibana.ingress.extraAnnotations | indent 4 }}
 {{- end }}

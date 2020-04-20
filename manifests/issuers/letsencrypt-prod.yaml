@@ -1,4 +1,4 @@
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
   name: letsencrypt-prod
@@ -8,9 +8,6 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-prod
     server: https://acme-v02.api.letsencrypt.org/directory
-    # Old syntax
-    http01: {}
-    # New syntax
     solvers:
     # An empty selector will 'match' all Certificate resources that
     # reference this Issuer.

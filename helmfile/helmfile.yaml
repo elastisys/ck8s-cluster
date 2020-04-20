@@ -72,7 +72,7 @@ releases:
   labels:
     app: cert-manager
   chart: jetstack/cert-manager
-  version: v0.10.0
+  version: v0.14.1
   missingFileHandler: Error
   wait: true
   {{ if env "CK8S_ADDITIONAL_VALUES" }}

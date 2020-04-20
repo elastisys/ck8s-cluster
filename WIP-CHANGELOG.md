@@ -1,10 +1,15 @@
 ### Breaking changes
 - Terraform now uses new a required config file for configuring the remote backend.
-- Terraform for safespring and citycloud have been restructured with new modules. 
+- Terraform for safespring and citycloud have been restructured with new modules.
+- Upgraded cert-manager to v0.14.1 which breaks the user facing API.
+  Please look at the [upgrade guide](https://cert-manager.io/docs/installation/upgrading/)
+  for steps that might be needed for services running in CK8S.
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
 - No migration script is available for the terraform changes to safespring and citycloud. Manual migration might be possible.
+- No migration script is available for cert-manager. A new cluster is required.
+
 
 ### Added
 
@@ -32,8 +37,8 @@
 - AWS: EBS storage class support
 - AWS: Additional storage class for sensitive/important data that is
   encrypted and retained
-- Support to configure falco alerts for slack and alertmanager. 
-- Falcosidekick for handling falco outputs. 
+- Support to configure falco alerts for slack and alertmanager.
+- Falcosidekick for handling falco outputs.
 
 ### Fixed
 
@@ -41,7 +46,7 @@
 - New index patterns in Kibana that matches new inices.
 - Harbor init not completing in time for tests.
 - Added missing parameter to velero default volumesnapshotlocation
-- Alertmanager not getting installed in the WC even when 
+- Alertmanager not getting installed in the WC even when
 `ENABLE_CUSTOMER_ALERTMANAGER` is set to true
 - Falco getting installed even if `ENABLE_FALCO=false`
 
@@ -78,3 +83,4 @@
 - Falco now also runs on masters.
 - Falco now alerts on ssh to nodes.
 - Safespring and citycloud now uses common openstack modules in terraform.
+- Cert-manager upgraded to version 0.14.1

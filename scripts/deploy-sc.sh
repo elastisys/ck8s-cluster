@@ -123,7 +123,7 @@ then
 fi
 
 echo "Preparing cert manager and creating Issuers" >&2
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.8/deploy/manifests/00-crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.14/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
 
@@ -178,17 +178,6 @@ helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE ap
 source ${SCRIPTS_PATH}/install-storage-class-provider.sh
 install_storage_class_provider "${STORAGE_CLASS}" service_cluster
 install_storage_class_provider "${ES_STORAGE_CLASS}" service_cluster
-
-# Get status of the cert-manager webhook api.
-STATUS=$(kubectl get apiservice v1beta1.webhook.certmanager.k8s.io -o yaml -o=jsonpath='{.status.conditions[0].type}')
-
-# Just want to see if this ever happens.
-if [ $STATUS != "Available" ]
-then
-   echo -e  "Waiting for cert-manager webhook to become ready" >&2
-   kubectl wait --for=condition=Available --timeout=300s \
-       apiservice v1beta1.webhook.certmanager.k8s.io
-fi
 
 echo "Installing Dex" >&2
 helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff

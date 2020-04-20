@@ -6,7 +6,7 @@ testFramework:
 ingress:
   enabled: true
   annotations:
-    certmanager.k8s.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
+    cert-manager.io/issuer: letsencrypt-{{ requiredEnv "CERT_TYPE" }}
     {{ if (env "CUSTOMER_GRAFANA_WHITELIST_SOURCE_RANGE") }}
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ env "CUSTOMER_GRAFANA_WHITELIST_SOURCE_RANGE" }}
     {{ end }}
