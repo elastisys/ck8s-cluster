@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # This script is for adding the new terraform config file to your config repo.
 set -e
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
