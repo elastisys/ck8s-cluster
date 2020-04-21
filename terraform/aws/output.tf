@@ -58,6 +58,7 @@ EOF
     cloud_provider         = "aws"
     cloud_config           = ""
     loadbalancers          = ""
+    control_plane_port     = ""
   })
 }
 
@@ -89,5 +90,6 @@ EOF
     cloud_provider         = "aws"
     cloud_config           = ""
     loadbalancers          = ""
+    control_plane_port     = ""
   })
 }

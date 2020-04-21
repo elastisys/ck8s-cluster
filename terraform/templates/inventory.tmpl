@@ -11,6 +11,12 @@ ansible_port=22
 ansible_python_interpreter=/usr/bin/python3
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
+%{ if control_plane_endpoint != "" ~}
+control_plane_endpoint='${control_plane_endpoint}'
+%{ endif ~}
+%{ if control_plane_port != "" ~}
+control_plane_port='${control_plane_port}'
+%{ endif ~}
 %{ if public_endpoint != "" ~}
 public_endpoint='${public_endpoint}'
 %{ endif ~}
