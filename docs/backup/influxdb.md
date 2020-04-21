@@ -3,40 +3,101 @@
 In the cluster there is a CronJob that is once per day performing full backups of all databases.
 This document describes the procedure to perform, not manual, but on-demand backups.
 
-To perform an on-demand backup to S3 compatible storage deploy the manifest `manifests/backup/backup-influx.yaml`.
-The manifest contains a pod template with one init-container and one container.
-The init-container runs the `influxdb` image and it connects to the influxdb instance, performs the backup, and saves it at the path `/backup`.
-The backup will be named `backup_$(date +%Y%m%d_%H%M%S)`.
-Once the init-container is finished the main conatiner, which runs Atlassians `pipelines-awscli` image, streams the backup to an S3 compatible storage.
+To perform an on-demand backup to S3 compatible storage run the following command:
 
-Before the manifest can be deployed the following environment variables needs to to be set
-
-    INFLUX_ADDR -> The address, including the rpc port, from which influxdb can be reached from within the Kubernetes cluster, e.g. influxdb.influxdb-prometheus.svc:8088
-    S3_INFLUX_BUCKET_NAME -> The name of the bucket where you want the backup to be stored, e.g. `influxdb-backups` 
-
-    S3_REGION -> The region in which the bucket is located, e.g. `ch-gva-2`
-    S3_REGION_ENDPOINT -> The endpoint to reach the bucket, e.g. `https://sos-ch-gva-2.exo.io`
-    S3_ACCESS_KEY -> The access key part of the required credentials to access the storage service.
-    S3_SECRET_KEY -> The secret key part of the required credentials to access the storage service.
-
-Once the environment variables have been assigned, execute the following command to substitute the variables in the manifest and deploy it
-
-    envsubst < manifests/backup/backup-influx.yaml | kubectl -n influxdb-prometheus apply -f -
+```
+kubectl -n influxdb-prometheus create job <job-name> --from=cronjob/influxdb-backup
+```
 
 A backup will be deployed in the cluster named `influxdb-backup`. It will run until completetion but it will not restart if any container fails!
 
+When the backup is completed, to find out the name of the directory that was used. Run this command:
+
+```
+kubectl logs -n influxdb-prometheus -l job-name=<job-name> | grep -oP "$S3_INFLUX_BUCKET_NAME/backup_[0-9_]+" | tail -n 1 | cut -d '/' -f 2
+```
 
 ## Restore procedure
 
 To restore InfluxDB from a desired backup begin be setting the backup's name as a variable.
 
-    INFLUX_BACKUP_NAME -> The name of the backup (the directory), e.g. `backup_20191009_054238`
+```
+export INFLUX_BACKUP_NAME="backup_xxxxxxxx_xxxxxx"  # Name of the backup (the directory)
+```
 
-The restore procedure also requires the same variables as in the backup procedure!
+Then you can use the configuration file of the cluster.
+
+```
+source $CK8S_CONFIG_PATH/config.sh
+```
+
+And use the secrets file to load the rest.
+
+```
+sops exec-env $CK8S_CONFIG_PATH/secrets.env 'envsubst < manifests/restore/restore-influx.yaml' | kubectl apply -n influxdb-prometheus -f -
+```
+
+If you manually want to add all the values these are the variables that are used
+
+```
+export INFLUX_BACKUP_NAME="backup_xxxxxxxx_xxxxxx"  # Name of the backup (the directory)
+
+export S3_REGION="ch-gva-2"                                 # Name of the s3 region
+export S3_REGION_ENDPOINT="https://sos-ch-gva-2.exo.io"     # S3 endpoint
+export S3_INFLUX_BUCKET_NAME="cluster-name-influxdb"        # Name of the S3 bucket
+export INFLUX_ADDR="influxdb.influxdb-prometheus.svc:8088"  # Address (internal) to influx
+
+export S3_ACCESS_KEY="s3_access_key"  # The access key to S3
+export S3_SECRET_KEY="s3_secret_key"  # The secret key to S3
+```
 
 With all variables in place execute
 
-    envsubst < manifests/restore/restore-influx.yaml | kubectl -n influxdb-prometheus apply -f -
+```
+envsubst < manifests/restore/restore-influx.yaml | kubectl -n influxdb-prometheus apply -f -
+```
+
+## Migration
+
+The migration process is much like backup and restore only that the restore is not on the same cluster.
+
+The steps that are needed to be taken are:
+
+* Take a backup from the old cluster
+* Restore the backup in the new cluster using the migration manifest *(`manifests/restore/migration-influx.yaml`)*
+
+With kubectl pointing to the new cluster and `CK8S_CONFIG_PATH` pointing to the old cluster and `INFLUX_BACKUP_NAME`
+being set to the latest backup that was made in the old cluster. Run the following command:
+
+**NOTE:** This will drop the database and restore with the backup. So all data old will be lost. If you want
+to merge the data follow
+[this](https://docs.influxdata.com/influxdb/v1.8/administration/backup_and_restore/#restore-examples) procedure *(This
+requires **ALOT** of memory and time and do not complete successfully every time)*.
+
+```
+export INFLUX_BACKUP_NAME="backup_xxxxxxxx_xxxxxx"  # Name of the backup (the directory)
+```
+
+Then you can use the configuration file of the old cluster.
+
+```
+source $CK8S_CONFIG_PATH/config.sh
+```
+
+And use the secrets file to load the rest.
+
+**NOTE:** Make sure you have `KUBECONFIG` set to the new cluster.
+
+```
+sops exec-env $CK8S_CONFIG_PATH/secrets.env 'envsubst < manifests/restore/migrate-influx.yaml' | kubectl -n influxdb-prometheus apply -f -
+```
+
+If you manually want to add all the values these are the variable that are used in addition to the once in the
+[restore section](#restore-procedure).
+
+```
+export INFLUXDB_PWD="supersecret" # The password for the influxDB
+```
 
 ## Limitations
 

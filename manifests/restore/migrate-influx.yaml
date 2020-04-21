@@ -55,7 +55,14 @@ spec:
     args:
     - '-c'
     - |
-      influxd restore -portable -host $INFLUX_ADDR /backups/$INFLUX_BACKUP_NAME/
+      echo "Dropping SC"
+      influx -host $(echo "$INFLUX_ADDR" | cut -d':' -f1) -username admin -password $INFLUXDB_PWD -execute 'DROP DATABASE service_cluster'
+      echo "Restore SC"
+      influxd restore -portable -db service_cluster -host $INFLUX_ADDR /backups/$INFLUX_BACKUP_NAME/
+      echo "Dropping WC"
+      influx -host $(echo "$INFLUX_ADDR" | cut -d':' -f1) -username admin -password $INFLUXDB_PWD -execute 'DROP DATABASE workload_cluster'
+      echo "Restore WC"
+      influxd restore -portable -db workload_cluster -host $INFLUX_ADDR /backups/$INFLUX_BACKUP_NAME/
     resources:
       requests:
         cpu: 50m
