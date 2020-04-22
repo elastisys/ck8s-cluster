@@ -26,6 +26,11 @@ env:
   LIVENESS_THRESHOLD_SECONDS: 900
   STUCK_THRESHOLD_SECONDS: 1200
 
+serviceMonitor:
+  enabled: true
+  interval: 20s
+  port: 24231
+
 extraConfigMaps:
   system.conf: |-
     <system>
@@ -130,6 +135,20 @@ extraConfigMaps:
       </parse>
     </filter>
 
+    # count number of incoming records per tag
+    <filter **>
+      @type prometheus
+      <metric>
+        name fluentd_input_status_num_records_total
+        type counter
+        desc The total number of incoming records
+        <labels>
+          tag ${tag}
+          hostname ${hostname}
+        </labels>
+      </metric>
+    </filter>
+
   output.conf: |-
     <match **>
       @id output-forwarding
@@ -161,7 +180,19 @@ extraConfigMaps:
         overflow_action block
       </buffer>
     </match>
-
+    <match **>
+      @type prometheus
+      <metric>
+        name fluentd_output_status_num_records_total
+        type counter
+        desc The total number of outgoing records
+        <labels>
+          tag ${tag}
+          hostname ${hostname}
+        </labels>
+      </metric>
+    </match>
+    
 tolerations:
 - effect: NoSchedule
   key: "node-role.kubernetes.io/master"

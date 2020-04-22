@@ -46,6 +46,11 @@ additionalPlugins:
 - name: elasticsearch-xpack
   version: 7.4
 
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  port: 24231
+
 extraConfigMaps:
   system.conf: |-
     <system>
@@ -150,6 +155,20 @@ extraConfigMaps:
       </parse>
     </filter>
 
+    # count number of incoming records per tag
+    <filter **>
+      @type prometheus
+      <metric>
+        name fluentd_input_status_num_records_total
+        type counter
+        desc The total number of incoming records
+        <labels>
+          tag ${tag}
+          hostname ${hostname}
+        </labels>
+      </metric>
+    </filter>
+
   output.conf: |-
     <match kubeaudit.**>
         @id elasticsearch_kubeaudit
@@ -190,7 +209,7 @@ extraConfigMaps:
           queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
           overflow_action block
         </buffer>
-      </match>
+    </match>
     <match kubernetes.**>
         @id elasticsearch_kubernetes
         @type elasticsearch
@@ -230,7 +249,7 @@ extraConfigMaps:
           queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
           overflow_action block
         </buffer>
-      </match>
+    </match>
     <match **>
         @id elasticsearch
         @type elasticsearch
@@ -270,7 +289,20 @@ extraConfigMaps:
           queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
           overflow_action block
         </buffer>
-      </match>
+    </match>
+
+    <match **>
+        @type prometheus
+        <metric>
+          name fluentd_output_status_num_records_total
+          type counter
+          desc The total number of outgoing records
+          <labels>
+            tag ${tag}
+            hostname ${hostname}
+          </labels>
+        </metric>
+    </match>
 
 tolerations:
 - effect: NoSchedule
