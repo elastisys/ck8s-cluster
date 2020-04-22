@@ -248,7 +248,7 @@ resource "exoscale_domain_record" "ingress" {
   for_each = toset(var.dns_list)
 
   domain      = var.dns_suffix
-  name        = each.value
+  name        = "${each.value}.${var.dns_prefix}"
   record_type = "A"
   content     = exoscale_ipaddress.ingress_controller_lb.ip_address
 }

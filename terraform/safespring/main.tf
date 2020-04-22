@@ -43,13 +43,14 @@ module "service_cluster" {
   loadbalancer_names           = var.loadbalancer_names_sc
   loadbalancer_name_flavor_map = var.loadbalancer_name_flavor_map_sc
 
+  dns_prefix = var.dns_prefix
   dns_list = [
-    "*.ops.${var.dns_prefix}",
-    "grafana.${var.dns_prefix}",
-    "harbor.${var.dns_prefix}",
-    "dex.${var.dns_prefix}",
-    "kibana.${var.dns_prefix}",
-    "notary.harbor.${var.dns_prefix}"
+    "*.ops",
+    "grafana",
+    "harbor",
+    "dex",
+    "kibana",
+    "notary.harbor"
   ]
   aws_dns_zone_id  = var.aws_dns_zone_id
   aws_dns_role_arn = var.aws_dns_role_arn
@@ -79,9 +80,10 @@ module "workload_cluster" {
   loadbalancer_names           = var.loadbalancer_names_wc
   loadbalancer_name_flavor_map = var.loadbalancer_name_flavor_map_wc
 
+  dns_prefix = var.dns_prefix
   dns_list = [
-    "*.${var.dns_prefix}",
-    "prometheus.ops.${var.dns_prefix}"
+    "*",
+    "prometheus.ops"
   ]
   aws_dns_zone_id  = var.aws_dns_zone_id
   aws_dns_role_arn = var.aws_dns_role_arn

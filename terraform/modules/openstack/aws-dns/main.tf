@@ -13,7 +13,7 @@ data "aws_route53_zone" "zone" {
 resource "aws_route53_record" "dns" {
   for_each = toset(var.dns_list)
   zone_id  = var.aws_dns_zone_id
-  name     = "${each.value}.${data.aws_route53_zone.zone.name}"
+  name     = "${each.value}.${var.dns_prefix}.${data.aws_route53_zone.zone.name}"
   type     = "A"
   ttl      = "300"
   records  = var.record_ips

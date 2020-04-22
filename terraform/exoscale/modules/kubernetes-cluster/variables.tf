@@ -41,6 +41,8 @@ variable "dns_list" {
 
 variable "dns_suffix" {}
 
+variable "dns_prefix" {}
+
 variable "aws_dns_zone_id" {
   default = "Z2STJRQSJO5PZ0" # elastisys.com
 }
