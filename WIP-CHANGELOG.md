@@ -7,12 +7,13 @@
 - Upgraded the BaseOS image on Exoscale, Citycloud, Safespring and AWS to contain the
   Kubernetes control plane container images. This will require full
   reinstallation of Kubernetes and apps.
+- Exoscale now uses a stable EIP as public endpoint for the control plane.
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
 - No migration script is available for the terraform changes to safespring and citycloud. Manual migration might be possible.
 - No migration script is available for cert-manager. A new cluster is required.
-
+- No migration path is available for the control plane EIP on Exoscale. The clusters must be recreated.
 
 ### Added
 
@@ -43,6 +44,7 @@
 - Support to configure falco alerts for slack and alertmanager.
 - Falcosidekick for handling falco outputs.
 - EIP for control plane on Exoscale
+- Exoscale: support HA control plane
 
 ### Fixed
 

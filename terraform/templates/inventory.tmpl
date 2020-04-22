@@ -39,6 +39,11 @@ ${workers}
 ${loadbalancers}
 %{ endif ~}
 
-[nodes]
-${masters}
-${workers}
+%{ if internal_lb_children != "" ~}
+[internal_lb:children]
+${internal_lb_children}
+%{ endif ~}
+
+[nodes:children]
+masters
+workers

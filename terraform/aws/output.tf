@@ -59,6 +59,7 @@ EOF
     cloud_config           = ""
     loadbalancers          = ""
     control_plane_port     = ""
+    internal_lb_children   = ""
   })
 }
 
@@ -91,5 +92,6 @@ EOF
     cloud_config           = ""
     loadbalancers          = ""
     control_plane_port     = ""
+    internal_lb_children   = ""
   })
 }

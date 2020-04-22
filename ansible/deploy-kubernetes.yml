@@ -3,6 +3,4 @@
 - import_playbook: initialize-master.yml
   vars:
     kubeconfig_path: "{{ kubeconfig_path | default('kubeconfig.yaml') }}"
-- import_playbook: ha-control-plane.yml
-  when: groups.masters | count > 1
 - import_playbook: join-cluster.yml

@@ -2,7 +2,7 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: JoinConfiguration
 discovery:
   bootstrapToken:
-    apiServerEndpoint: "{{ control_plane_endpoint | default(hostvars[groups.masters.0].private_ip) }}:6443"
+    apiServerEndpoint: "{{ control_plane_endpoint | default(hostvars[groups.masters.0].private_ip) }}:{{ control_plane_port | default(6443) }}"
     token: "{{ hostvars[groups.masters.0].join_token }}"
     caCertHashes:
     - "sha256:{{ hostvars[groups.masters.0].ca_key_hash }}"

@@ -63,6 +63,7 @@ EOF
     public_endpoint        = values(module.service_cluster.master_ips)[0].public_ip
     control_plane_endpoint = ""
     control_plane_port     = ""
+    internal_lb_children   = ""
   })
 }
 
@@ -99,5 +100,6 @@ EOF
     public_endpoint        = values(module.workload_cluster.master_ips)[0].public_ip
     control_plane_endpoint = ""
     control_plane_port     = ""
+    internal_lb_children   = ""
   })
 }

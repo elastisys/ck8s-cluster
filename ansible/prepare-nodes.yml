@@ -2,36 +2,29 @@
 - hosts: nodes
   become: yes
   become_user: root
-  tasks:
+  roles:
+    - k8s_node
 
-    - name: Create directories for kubeadm and kubernetes
-      file:
-        path: "{{ item }}"
-        state: directory
-      loop:
-        - /etc/kubeadm
-        - /etc/kubernetes
-
-    - name: Render cloud.conf
-      when: cloud_config is defined
-      template:
-        src: cloud.conf.j2
-        dest: "{{ cloud_config }}"
+- hosts: internal_lb
+  become: yes
+  become_user: root
+  gather_facts: false
+  roles:
+    - internal_lb
 
 - hosts: masters
   become: yes
   become_user: root
+  gather_facts: false
   tasks:
 
-    - name: Create conf directory for kubernetes
+    - name: Create directories for kubernetes and audit logs
       file:
-        path: /etc/kubernetes/conf
+        path: "{{ item }}"
         state: directory
-
-    - name: Create audit log directory
-      file:
-        path: /var/log/kube-audit
-        state: directory
+      loop:
+        - /etc/kubernetes/conf
+        - /var/log/kube-audit
 
     - name: Add audit policy
       copy:

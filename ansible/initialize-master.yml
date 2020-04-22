@@ -50,7 +50,7 @@
       until: result is not failed
 
     - name: Install network plugin
-      shell: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
       when: initialized is changed
       register: result
       retries: 15
@@ -74,6 +74,6 @@
       run_once: yes
       replace:
         path: "{{ kubeconfig_path }}"
-        regexp: "https://{{ hostvars[groups.masters.0].private_ip }}"
-        replace: "https://{{ public_endpoint | default(hostvars[groups.masters.0].ansible_host) }}"
+        regexp: "https://{{ control_plane_endpoint | default(hostvars[groups.masters.0].private_ip) }}:{{ control_plane_port | default(6443) }}"
+        replace: "https://{{ public_endpoint | default(hostvars[groups.masters.0].ansible_host) }}:6443"
       delegate_to: localhost

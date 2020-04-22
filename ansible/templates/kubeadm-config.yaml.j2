@@ -67,9 +67,7 @@ apiServer:
   timeoutForControlPlane: 4m0s
 certificatesDir: /etc/kubernetes/pki
 clusterName: {{ cluster_name }}
-{% if control_plane_endpoint is defined %}
-controlPlaneEndpoint: "{{ control_plane_endpoint }}:6443"
-{% endif %}
+controlPlaneEndpoint: "{{ control_plane_endpoint | default(hostvars[groups.masters.0].private_ip) }}:{{ control_plane_port | default(6443) }}"
 {% if cloud_provider is defined %}
 controllerManager:
   extraArgs:
@@ -92,14 +90,7 @@ etcd:
 imageRepository: k8s.gcr.io
 kubernetesVersion: {{ k8s_version }}
 networking:
-  # rke equivalent: service_cluster_ip_range
   serviceSubnet: {{ k8s_service_cidr }}
-  # rke equivalent: cluster_cidr
   podSubnet: {{ k8s_pod_cidr }}
   dnsDomain: "cluster.local"
 scheduler: {}
-# @todo:
-# private_registries:
-#     - url: harbor.test-gadr.a1ck.io
-#       user: admin
-#       password: BKjLJOz4S64PPaNxamyf

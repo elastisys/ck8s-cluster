@@ -2,7 +2,9 @@
 - hosts: masters[0]
   become: yes
   become_user: root
+  gather_facts: false
   tasks:
+
     - name: Get join token
       command: kubeadm token create
       register: string_result
@@ -19,9 +21,37 @@
       set_fact:
         ca_key_hash: "{{ string_result.stdout }}"
 
+    - name: Upload certificates
+      when: groups.masters | count > 1
+      command: kubeadm init phase upload-certs --config=/etc/kubeadm/kubeadm-config.yaml --upload-certs
+      register: cert_upload
+
+    - name: Store certificate key
+      when: groups.masters | count > 1
+      set_fact:
+        cert_key: "{{ cert_upload.stdout_lines | last }}"
+
+- hosts: masters[1:]
+  become: yes
+  become_user: root
+  gather_facts: false
+  serial: 1
+  tasks:
+
+    - name: Render kubeadm join config
+      template:
+        src: kubeadm-join-master.yaml.j2
+        dest: /etc/kubeadm/kubeadm-join-master.yaml
+
+    - name: Join the cluster
+      command: "kubeadm join --config /etc/kubeadm/kubeadm-join-master.yaml"
+      args:
+        creates: /etc/kubernetes/kubelet.conf
+
 - hosts: workers
   become: yes
   become_user: root
+  gather_facts: false
   tasks:
 
     - name: Render kubeadm join config

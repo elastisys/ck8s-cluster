@@ -70,11 +70,12 @@ ${name}
 EOF
     cluster_name           = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
     public_endpoint        = module.service_cluster.control_plane_lb_ip_address
+    control_plane_endpoint = "127.0.0.1"
+    control_plane_port     = "7443"
+    internal_lb_children   = "nodes"
     cloud_provider         = ""
     cloud_config           = ""
     loadbalancers          = ""
-    control_plane_endpoint = ""
-    control_plane_port     = ""
   })
 }
 
@@ -102,10 +103,11 @@ ${name}
 EOF
     cluster_name           = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
     public_endpoint        = module.workload_cluster.control_plane_lb_ip_address
+    control_plane_endpoint = "127.0.0.1"
+    control_plane_port     = "7443"
+    internal_lb_children   = "nodes"
     cloud_provider         = ""
     cloud_config           = ""
     loadbalancers          = ""
-    control_plane_endpoint = ""
-    control_plane_port     = ""
   })
 }
