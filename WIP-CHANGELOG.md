@@ -46,6 +46,7 @@
 - Falcosidekick for handling falco outputs.
 - EIP for control plane on Exoscale
 - Exoscale: support HA control plane
+- End-user roles for Kibana are now created automatically during deployment.
 
 ### Fixed
 

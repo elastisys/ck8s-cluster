@@ -36,12 +36,9 @@ In this step we (Elastisys) create infrastructure, configuration, credentials, e
 Give customer access to Kibana and Elasticsearch:
 
 1. Log in to Kibana as the elastic user
-2. Go to *Management > Roles*
-3. Create a role called `kubernetes-log-reader` with `read` privilege for indices `kubernetes-*` and `kubeaudit-*`.
-4. Create a role called `backup-exporter` with cluster privileges `cluster:monitor/state` and `cluster:monitor/health`; index privileges `monitor` for `*` and `read` for `kubernetes-*` and `kubeaudit-*`.
-5. Go to *Management > Users*
-6. Create a user for the customer with roles `kibana_user`, `kubernetes-log-reader` and `backup-exporter`.
-7. Give credentials to the customer (and encourage them to change the password).
+2. Go to *Management > Users*
+3. Create a user for the customer with roles `kibana_user`, `kubernetes-log-reader` and `backup-exporter`.
+4. Give credentials to the customer (and encourage them to change the password).
 
 ## Step 3 - Handover
 

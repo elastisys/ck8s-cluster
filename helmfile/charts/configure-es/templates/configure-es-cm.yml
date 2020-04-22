@@ -99,6 +99,18 @@ data:
         -k -u elastic:${ES_PW} \
         -d' {"aliases": {"kubeaudit": {"is_write_index": true }}}'
 
+    echo
+    echo "Creating role definitions"
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_security/role/kubernetes-log-reader" \
+      -H 'Content-Type: application/json' \
+      -k -u elastic:${ES_PW} \
+      -d' { "indices": [{ "names": ["kubernetes", "kubeaudit"], "privileges": ["read"]}]}'
+
+    curl -X PUT "https://{{ .Values.es_endpoint }}/_security/role/backup-exporter" \
+      -H 'Content-Type: application/json' \
+      -k -u elastic:${ES_PW} \
+      -d' { "cluster": ["cluster:monitor/state", "cluster:monitor/health"], "indices": [{"names": ["all"],"privileges": ["monitor"]},{"names": ["kubernetes", "kubeaudit"],"privileges":["read"]}]}'
+
     echo "Done configuring elasticsearch"
 
   kibana-dashboards.ndjson: {{ .Files.Get "kibana-resources/kibana-resources.ndjson" | quote }}
