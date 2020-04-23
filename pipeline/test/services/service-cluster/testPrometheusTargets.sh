@@ -73,13 +73,6 @@ sleep 3
 simplifyData
 } &> /dev/null
 
-# Reset variables for second prometheus
-HEALTHY=0
-UNHEALTHY=0
-FOUND=0
-MISSING=0
-unset failedTargets
-
 scraperTargets=(
     "federate-kubelet 1"
     "federate-others 1"
@@ -88,7 +81,7 @@ scraperTargets=(
 # Call functions from prometheus-common
 for scraperTarget in "${scraperTargets[@]}"
 do
-    check_instances $scraperTarget ${jsonData}
+    check_instances $scraperTarget
 done
 
 kill "${PF_PID}"
