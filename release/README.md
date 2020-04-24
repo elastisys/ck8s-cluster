@@ -3,13 +3,21 @@
 The releases will follow semantic versioning and be handled with git tags.
 https://semver.org/
 
-## Major releases
-When ready to cut a new major release create a release branch `release-x`. The rest
-of the workflow will be handled by a pipeline see [Trigger a release](#trigger-a-release)
+## Tracked releases
+
+When ready to cut a new major or minor release create a release branch
+`release-x.y` from the last minor release tag. For example:
+```bash
+git checkout v0.2.0
+git checkout -b release-0.3
+git push -u origin release-0.3
+```
+The rest of the workflow will be handled by a pipeline see
+[Trigger a release](#trigger-a-release).
 
 ## Minor and Patch releases
 For minor and patch releases pull in the desired changes to the existing release branch.
-Minor changes can be pulled from feature branches and add new features while a patch 
+Minor changes can be pulled from feature branches and add new features while a patch
 should only include hotfixes that does not require any downtime to be pulled in.
 
 ## Trigger a release
@@ -33,7 +41,7 @@ When this is done review the new PR and merge it to finalize the release.
 
 When a feature or change is developed on a branch fill out some human readable
 bullet points in the `WIP-CHANGELOG.md` this will make it easier to track the changes.
-Once the release is done this will be appended to the main changelog. 
+Once the release is done this will be appended to the main changelog.
 
 ## Structure
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Only usable from within pipeline
-# Usage ./release.sh patch|minor|major 
+# Usage ./release.sh patch|minor|major
 # This script will bump then patch, minor or major version in version.json and
 # add the WIP-CHANGELOG ontop of the existing CHANGELOG.md
 
@@ -36,7 +36,7 @@ if [[ ! $(check_version ${prev_version}) ]]; then
 fi
 
 ### Calculating new version and updating version.json ###
-a=( ${prev_version//./ } ) 
+a=( ${prev_version//./ } )
 if [[ "$arg" == "patch" ]]; then
     echo "bumping patching version"
     ((++a[2]))
@@ -59,7 +59,7 @@ else
     else
         echo "ERROR: Invalid argument. must be according to semantic versioning"
         echo "example: $0 1.2.4"
-        exit 1 
+        exit 1
     fi
 fi
 short_version="${new_version//./}"
@@ -99,6 +99,6 @@ git push "${remote_repo}" HEAD:${GITHUB_REF}
 
 # Sets output to github actions
 v=( ${new_version//./ } )
-merge_branch="release-${v[0]}"
+merge_branch="release-${v[0]}.${v[1]}"
 echo ::set-output name=MERGE_BRANCH::${merge_branch}
 echo ::set-output name=RELEASE_VERSION::${new_version}
