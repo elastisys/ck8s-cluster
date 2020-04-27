@@ -15,12 +15,8 @@ git push -u origin release-0.3
 The rest of the workflow will be handled by a pipeline see
 [Trigger a release](#trigger-a-release).
 
-## Minor and Patch releases
-For minor and patch releases pull in the desired changes to the existing release branch.
-Minor changes can be pulled from feature branches and add new features while a patch
-should only include hotfixes that does not require any downtime to be pulled in.
-
 ## Trigger a release
+
 To trigger the release pipeline make sure you have the correct release branch checked out. Then create another branch called `pre-release-<patch|minor|major|version>`.
 If the suffix is `patch`, `minor` or `major` then the version in `version.json` will be bumped. Otherwise the suffix must be a version following the semver standard.
 
@@ -30,12 +26,30 @@ When this pre-release branch is pushed a pipeline will be triggered which:
 2. Increase the CK8S version in `version.json`
 3. Append what ever is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
 4. Clear `WIP-CHANGELOG.md`
-4. Create a git commit with message `release version vx.x.x`
-5. Create a tag named `vx.x.x`
-6. Creates a pr to the `release-x` branch.
+4. Create a git commit with message `release version vx.y.z`
+5. Create a tag named `vx.y.z`
+6. Creates a pr to the `release-x.y` branch.
 
 When this is done review the new PR and merge it to finalize the release.
 
+## Patch releases
+
+To create a patch release, do the following:
+
+1. Create a new branch based on a release branch, e.g. `patch/x.y`.
+2. Create another branch (e.g. `my-fix`), also based on the release branch and
+   commit the fixes to it.
+3. Request a code review for `my-fix` and merge it to `patch/x.y`.
+4. Repeat step 2 and 3 if more than one change set should be included in the
+   patch release.
+5. Once all fixes are merged to the `patch/x.y` branch. Create a
+   `pre-release-patch` branch from it and push it to the remote. The normal
+   release process described above then applies.
+6. *Optional* Create a new patch branch (based on a different release branch)
+   and rebase the commits in `patch/x.y` onto it if the fix should be released
+   on multiple tracked releases.
+7. *Optional* Merge back the patch release to master if the fix applies for the
+   next version as well.
 
 ## While developing
 
