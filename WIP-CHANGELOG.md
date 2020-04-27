@@ -14,6 +14,7 @@
 - No migration script is available for the terraform changes to safespring and citycloud. Manual migration might be possible.
 - No migration script is available for cert-manager. A new cluster is required.
 - No migration path is available for the control plane EIP on Exoscale. The clusters must be recreated.
+- To apply grafana dashboard improvements to existing clusters run `./migration/v0.2.x-v0.3.0/migrate-grafana-dashboards.bash`
 
 ### Added
 
