@@ -72,13 +72,15 @@ infra_ansible_run() {
 
         (
             with_ssh_agent "${secrets[ssh_priv_key_sc]}" \
-                ansible-playbook -i "${config[ansible_hosts_sc]}" \
+                ANSIBLE_CONFIG="${ansible_path}/ansible.cfg" ansible-playbook \
+                    -i "${config[ansible_hosts_sc]}" \
                     "${ansible_path}/infrastructure.yml"
         )
 
         (
             with_ssh_agent "${secrets[ssh_priv_key_wc]}" \
-                ansible-playbook -i "${config[ansible_hosts_wc]}" \
+                ANSIBLE_CONFIG="${ansible_path}/ansible.cfg" ansible-playbook \
+                    -i "${config[ansible_hosts_wc]}" \
                     "${ansible_path}/infrastructure.yml"
         )
     fi
@@ -117,7 +119,8 @@ k8s_run_kubeadm() {
 
     (
         with_ssh_agent "${ssh_key}" \
-            ansible-playbook -i "${ansible_inventory}" \
+            ANSIBLE_CONFIG="${ansible_path}/ansible.cfg" ansible-playbook \
+                -i "${ansible_inventory}" \
                 --extra-vars=kubeconfig_path="${kube_config}" \
                 "${ansible_path}/deploy-kubernetes.yml"
     )
