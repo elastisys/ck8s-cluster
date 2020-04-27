@@ -11,11 +11,33 @@ set -eu -o pipefail
 : "${CK8S_ENVIRONMENT_NAME:?Missing CK8S_ENVIRONMENT_NAME}"
 # TODO: Remove when Terraform remote execution mode can be set without curling
 : "${TF_TOKEN:?Missing TF_TOKEN}"
+# Make sure flavor is set
+CK8S_FLAVOR="${CK8S_FLAVOR:-default}"
 
 here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 validate_cloud "${CK8S_CLOUD_PROVIDER}"
+
+# Validate the flavor
+if [ "${CK8S_FLAVOR}" != "default" ] &&
+   [ "${CK8S_FLAVOR}" != "ha" ]; then
+    log_error "ERROR: Unsupported flavor: ${CK8S_FLAVOR}"
+    exit 1
+fi
+if [ "${CK8S_FLAVOR}" == "ha" ] && [ "${CK8S_CLOUD_PROVIDER}" != "exoscale"]; then
+    log_error "ERROR: Unsupported flavor: ${CK8S_FLAVOR}"
+    log_error "for cloud provider: ${CK8S_CLOUD_PROVIDER}"
+    exit 1
+fi
+
+tfvars_flavor() {
+    if [ "${CK8S_FLAVOR}" == "default" ]; then
+        echo "${CK8S_CLOUD_PROVIDER}.tfvars"
+    else
+        echo "${CK8S_CLOUD_PROVIDER}-${CK8S_FLAVOR}.tfvars"
+    fi
+}
 
 #
 # SOPS config
@@ -99,7 +121,7 @@ if [ -f "${config[tfvars_file]}" ]; then
     log_info "${config[tfvars_file]} already exists, not overwriting" \
              "Terraform config"
 else
-    cp "${config_defaults_path}/terraform/${CK8S_CLOUD_PROVIDER}.tfvars" \
+    cp "${config_defaults_path}/terraform/$(tfvars_flavor)" \
         "${config[tfvars_file]}"
 fi
 
