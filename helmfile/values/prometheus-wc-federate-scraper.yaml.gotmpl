@@ -8,33 +8,32 @@ prometheusSpec:
       port: web
   resources:
     requests:
-      memory: 1Gi
-      cpu: 0.3
+      memory: "1Gi"
+      cpu: "0.3"
     limits:
-      memory: 2Gi
-      cpu: 1
+      memory: "2Gi"
+      cpu: "1"
 
     ## How long to retain metrics
     ##
-    retention: {{ requiredEnv "PROMETHEUS_RETENTION_WC" }}
+  retention: {{ requiredEnv "PROMETHEUS_RETENTION_WC" }}
 
-    ## Maximum size of metrics
-    ##
-    retentionSize: {{ requiredEnv "PROMETHEUS_RETENTION_SIZE_WC" }}
+  ## Maximum size of metrics
+  ##
+  retentionSize: {{ requiredEnv "PROMETHEUS_RETENTION_SIZE_WC" }}
 
-    ## Prometheus StorageSpec for persistent data
-    ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
-    ##
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: {{ requiredEnv "STORAGE_CLASS" }}
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
-        selector: {}
-
+  ## Prometheus StorageSpec for persistent data
+  ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
+  ##
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: {{ requiredEnv "STORAGE_CLASS" }}
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ requiredEnv "PROMETHEUS_STORAGE_SIZE_WC" }}
+            
   enableAdminAPI: false
   logFormat: logfmt
   logLevel: info
