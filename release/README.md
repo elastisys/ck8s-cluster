@@ -65,6 +65,8 @@ Changelogs are for humans, not machines. Keep messages in human readable form ra
 than commits or code. Commits or pull requests can off course be linked. Add messages
 as bullet points under one of theese categories:
 
+* Breaking changes
+* Release notes
 * Added
 * Changed
 * Deprecated
@@ -81,6 +83,14 @@ by just writing that commits short hash or full hash.
 # Example changelog
 
 ## v0.1.2 - 2020-01-14  (OBS! this line is automatically added by script)
+
+### Breaking changes
+
+* The API endpoint xxxx has been removed.
+
+### Release notes
+
+* To migrate the resources depending on yyyy you have to run [this script](..).
 
 ### Added
 
