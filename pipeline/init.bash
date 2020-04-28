@@ -11,7 +11,8 @@ sops_pgp_setup
 
 terraform_setup
 
-export CK8S_ENVIRONMENT_NAME="pipeline-${GITHUB_RUN_ID}"
+export CK8S_FLAVOR="${CI_CK8S_FLAVOR:-default}"
+export CK8S_ENVIRONMENT_NAME="pipeline-${CK8S_CLOUD_PROVIDER}-${CK8S_FLAVOR}-${GITHUB_RUN_ID}"
 
 # Initialize ck8s repository
 

@@ -1,4 +1,4 @@
-name: Safespring-pipeline
+name: Matrix-pipeline
 
 on:
   schedule:
@@ -17,77 +17,77 @@ jobs:
         image_tag: ${{ github.sha }}
         context: pipeline
 
-  init:
+  test-matrix:
     needs: build-image
     runs-on: ubuntu-latest
     container:
       image: elastisys/ck8s-ops:${{ github.sha }}
+    strategy:
+      fail-fast: false
+      # max-parallel: 1
+      matrix:
+        cloud: ["exoscale", "safespring"]
+        # cloud: ["safespring", "exoscale", "aws", "citycloud"]
+        flavor: ["default", "ha"]
+        ## In addition to the matrix, add this
+        # include:
+        #   - cloud: aws
+        #     flavor: "default"
+        ## Remove the following from the matrix
+        exclude:
+          - cloud: safespring
+            flavor: ha
+          - cloud: exoscale
+            flavor: default
     steps:
     - uses: actions/checkout@v1
-    - run: ./pipeline/init.bash
+    - name: Initialize ck8s
+      run: ./pipeline/init.bash
       shell: bash
       env:
         CK8S_CONFIG_PATH: ./ck8s_pipeline_config
-        CK8S_CLOUD_PROVIDER: safespring
+        CK8S_CLOUD_PROVIDER: ${{ matrix.cloud }}
         CK8S_PGP_FP: 3EEFED60C2E86263117AC3F7792CF1BD81B69515
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
         # Prefixed with CI to prevent confusing people they are used from env
         # and not from secrets.env.
+        # Safespring
         CI_OS_USERNAME: ${{ secrets.SAFESPRING_OS_USERNAME }}
         CI_OS_PASSWORD: ${{ secrets.SAFESPRING_OS_PASSWORD }}
         CI_S3_ACCESS_KEY: ${{ secrets.SAFESPRING_S3_ACCESS_KEY }}
         CI_S3_SECRET_KEY: ${{ secrets.SAFESPRING_S3_SECRET_KEY }}
         CI_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         CI_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    - name: Upload config
+        # Exoscale
+        CI_EXOSCALE_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        CI_EXOSCALE_SECRET: ${{ secrets.EXOSCALE_SECRET_KEY }}
+        # The flavor to use
+        CI_CK8S_FLAVOR: ${{ matrix.flavor }}
+    - name: Upload config pre-apply
       if: always()
       uses: actions/upload-artifact@v1
       with:
-        name: ck8s-config
+        name: ck8s-config-${{ matrix.cloud }}-${{ matrix.flavor }}
         path: ./ck8s_pipeline_config
-
-  apply:
-    needs: init
-    runs-on: ubuntu-latest
-    container:
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download config
-      uses: actions/download-artifact@v1
-      with:
-        name: ck8s-config
-        path: ./ck8s_pipeline_config
-    - run: ./pipeline/apply.bash
+    - name: Apply all
+      run: ./pipeline/apply.bash
       shell: bash
       env:
         CK8S_CONFIG_PATH: ./ck8s_pipeline_config
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
-    - name: Upload config
+    - name: Upload config post-apply
       if: always()
       uses: actions/upload-artifact@v1
       with:
-        name: ck8s-config
+        name: ck8s-config-${{ matrix.cloud }}-${{ matrix.flavor }}
         path: ./ck8s_pipeline_config
-
-  cleanup:
-    needs: apply
-    if: always()
-    runs-on: ubuntu-latest
-    container:
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download config
-      uses: actions/download-artifact@v1
-      with:
-        name: ck8s-config
-        path: ./ck8s_pipeline_config
-    - run: ./pipeline/cleanup.bash
+    - name: Cleanup
+      if: always()
+      run: ./pipeline/cleanup.bash
       shell: bash
       env:
         CK8S_CONFIG_PATH: ./ck8s_pipeline_config

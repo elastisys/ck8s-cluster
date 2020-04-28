@@ -34,7 +34,7 @@ sops_pgp_setup() {
 
 terraform_setup() {
     if [ -f ~/.terraformrc ]; then
-        log "~/.terraformrc already exists. Skipping."
+        echo "~/.terraformrc already exists. Skipping."
     else
         echo 'credentials "app.terraform.io" {
           token = "'"${TF_TOKEN}"'"
