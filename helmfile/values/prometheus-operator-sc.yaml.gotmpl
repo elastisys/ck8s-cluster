@@ -247,8 +247,6 @@ prometheus:
   prometheusSpec:
     image:
       tag: v2.17.2
-    externalLabels:
-      cluster: service_cluster
     resources:
       requests:
         memory: 1Gi # Total will be 50Mi more, acounting for prometheus-config-reloader & prometheus-rulefiles
@@ -311,10 +309,14 @@ kubelet:
 
   serviceMonitor:
     cAdvisorRelabelings:
+    - sourceLabels: [__metrics_path__]
+      targetLabel: metrics_path
     - targetLabel: cluster
       replacement: service_cluster
 
     relabelings:
+    - sourceLabels: [__metrics_path__]
+      targetLabel: metrics_path
     - targetLabel: cluster
       replacement: service_cluster
 
