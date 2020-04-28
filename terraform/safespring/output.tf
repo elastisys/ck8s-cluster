@@ -60,6 +60,7 @@ EOF
     cluster_name           = var.prefix_sc == "" ? "${terraform.workspace}_service_cluster" : var.prefix_sc
     cloud_provider         = "openstack"
     cloud_config           = "/etc/kubernetes/cloud.conf"
+    calico_mtu             = "1480"
     public_endpoint        = values(module.service_cluster.master_ips)[0].public_ip
     control_plane_endpoint = ""
     control_plane_port     = ""
@@ -97,6 +98,7 @@ EOF
     cluster_name           = var.prefix_wc == "" ? "${terraform.workspace}_workload_cluster" : var.prefix_wc
     cloud_provider         = "openstack"
     cloud_config           = "/etc/kubernetes/cloud.conf"
+    calico_mtu             = "1480"
     public_endpoint        = values(module.workload_cluster.master_ips)[0].public_ip
     control_plane_endpoint = ""
     control_plane_port     = ""

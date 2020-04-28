@@ -49,13 +49,31 @@
       delay: 5
       until: result is not failed
 
-    - name: Install network plugin
-      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
+    - name: Download calico manifests
+      get_url:
+        url: https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
+        dest: /etc/kubeadm/calico.yaml
+        force: "yes"
       when: initialized is changed
+
+    - name: Configure calico mtu
+      replace:
+        path: /etc/kubeadm/calico.yaml
+        regexp: 'veth_mtu:\s"\d+"'
+        replace: 'veth_mtu: "{{ calico_mtu }}"'
+      when: initialized is changed
+
+    - name: Validate calico file
+      shell: 'grep "veth_mtu: \"{{ calico_mtu }}\"" /etc/kubeadm/calico.yaml'
+      when: initialized is changed
+
+    - name: Apply calico
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /etc/kubeadm/calico.yaml
       register: result
       retries: 15
       delay: 5
       until: result is not failed
+      when: initialized is changed
 
     - name: Wait for master to become ready
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}'

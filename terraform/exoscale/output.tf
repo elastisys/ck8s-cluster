@@ -75,6 +75,7 @@ EOF
     internal_lb_children   = "nodes"
     cloud_provider         = ""
     cloud_config           = ""
+    calico_mtu             = "1480"
     loadbalancers          = ""
   })
 }
@@ -108,6 +109,7 @@ EOF
     internal_lb_children   = "nodes"
     cloud_provider         = ""
     cloud_config           = ""
+    calico_mtu             = "1480"
     loadbalancers          = ""
   })
 }
