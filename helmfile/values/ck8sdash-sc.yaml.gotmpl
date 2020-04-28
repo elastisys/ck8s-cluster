@@ -9,6 +9,6 @@ grafana:
   url: "https://grafana.{{ requiredEnv "ECK_OPS_DOMAIN" }}"
   password: "{{ requiredEnv "GRAFANA_PWD" }}"
   apiKeyName: "ck8sdash-sc"
-  datasource: "prometheus-ss"
+  datasource: "prometheus-sc"
 elastic:
   apiKeyName: "ck8sdash-key-sc"

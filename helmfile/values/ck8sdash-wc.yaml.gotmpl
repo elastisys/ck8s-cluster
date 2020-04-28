@@ -9,6 +9,6 @@ grafana:
   url: "https://grafana.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
   password: {{ requiredEnv "CUSTOMER_GRAFANA_PWD" }}
   apiKeyName: "ck8sdash-wc"
-  datasource: "k8s-metrics"
+  datasource: "ck8s-metrics"
 elastic:
   apiKeyName: "ck8sdash-key-wc"

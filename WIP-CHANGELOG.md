@@ -60,6 +60,7 @@
 - Kube-proxy metrics endpoint fixed.
 - Etcd metrics endpoint fixed.
 - Configure-es does not complete within activeDeadlineSeconds
+- Ck8s-dash config for datasources now matches the new datasource names 
 
 ### Removed
 
