@@ -89,3 +89,4 @@
 - Cert-manager upgraded to version 0.14.1
 - BaseOS image on Exoscale, Citycloud, Safespring and AWS contains Kubernetes controlplane
   container images.
+- Customer admin now has view access to the falco namespace.
