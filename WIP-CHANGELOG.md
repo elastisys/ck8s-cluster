@@ -4,8 +4,9 @@
 - Upgraded cert-manager to v0.14.1 which breaks the user facing API.
   Please look at the [upgrade guide](https://cert-manager.io/docs/installation/upgrading/)
   for steps that might be needed for services running in CK8S.
-- Upgraded the BaseOS image on Exoscale to contain the Kubernetes control plane
-  container images. This will require full reinstallation of Kubernetes and apps.
+- Upgraded the BaseOS image on Exoscale, Citycloud and AWS to contain the
+  Kubernetes control plane container images. This will require full
+  reinstallation of Kubernetes and apps.
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
@@ -86,4 +87,5 @@
 - Falco now alerts on ssh to nodes.
 - Safespring and citycloud now uses common openstack modules in terraform.
 - Cert-manager upgraded to version 0.14.1
-- BaseOS image on Exoscale contains Kubernetes controlplane container images.
+- BaseOS image on Exoscale, Citycloud and AWS contains Kubernetes controlplane
+  container images.

@@ -8,7 +8,7 @@ provider "openstack" {
 
 locals {
   # Base image used to provision master and worker instances
-  compute_instance_image = "CK8S-BaseOS-v0.0.5"
+  compute_instance_image = "CK8S-BaseOS-v0.0.6"
 }
 
 data "openstack_images_image_v2" "cluster_image" {
