@@ -68,16 +68,14 @@ variable master_nodes_wc {
   }
 }
 
-# BaseOS
-# us-west-1_1.17.2  = ami-08f7e448df967347b
-# us-west-1_1.15.10 = ami-0791b6074a5a010ee
+# BaseOS 0.0.6, US West 1, k8s 1.15.11
+# ami-025fd2f1456a0e2e5
 variable aws_amis {
   type = map
   default = {
-    # us-west-1, kubernetes v1.15.10
-    "sc_master" = "ami-0791b6074a5a010ee"
-    "sc_worker" = "ami-0791b6074a5a010ee"
-    "wc_master" = "ami-0791b6074a5a010ee"
-    "wc_worker" = "ami-0791b6074a5a010ee"
+    "sc_master" = "ami-025fd2f1456a0e2e5"
+    "sc_worker" = "ami-025fd2f1456a0e2e5"
+    "wc_master" = "ami-025fd2f1456a0e2e5"
+    "wc_worker" = "ami-025fd2f1456a0e2e5"
   }
 }
