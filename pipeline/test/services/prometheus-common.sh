@@ -2,42 +2,112 @@
 
 # Script that test if prometheus targets exist and are healthy
 
-# Makes dataset smaller before testing it for each target
-function simplifyData() {
-    {
-    jsonData=$(curl 'http://localhost:9090/api/v1/targets')
-    lessInstance=$(echo ${jsonData} |
+# Fetch the data set
+function getData() {
+    jsonData=$(curl --silent 'http://localhost:9090/api/v1/targets')
+    # Simplify the data by filtering out parts we do not need
+    echo ${jsonData} |
         jq '.data.activeTargets[] |
-            {job: .discoveredLabels.job , health: .health, instance: .labels.instance}')
-    } &> /dev/null
+            {job: .discoveredLabels.job , health: .health, instance: .labels.instance}'
 }
 
-# Compares current amount of found instances to amount of desired instances
+# Get the current count of healthy instances.
+# Exit code 1 if the current count does not match the desired.
 #Args:
-#   1. target name
+#   1. data from prometheus
+#   2. target name
 #   2. expected target instances
-function check_instances() {
-    targetName="${1}"
-    desiredInstanceAmount="${2}"
+function check_target() {
+    data="${1}"
+    targetName="${2}"
+    desiredInstanceAmount="${3}"
 
-    # Not sending lessInstance through as an argument to optimize runtime
     # Stores the value value of the "instance" key where the
     # "job" key matches the value of the current target being tested
-    activeInstance=$(echo ${lessInstance} |
+    # The number of healthy instances
+    currentInstanceAmount=$(echo ${data} |
         jq -r --arg target "${targetName}" '. |
             select(.job==$target and .health=="up") |
-            .instance')
+            .instance' | wc -w)
 
-    # Counts how many instances were found for that target
-    currentInstanceAmount=$(echo ${activeInstance} | wc -w)
-
-    echo -n -e "${targetName} \t(${currentInstanceAmount}/${desiredInstanceAmount})"
-    # Compares the amount of current instances to the amount of desired instances to see if they match
+    echo "${currentInstanceAmount}"
     if [[ ${currentInstanceAmount} == ${desiredInstanceAmount} ]];
     then
-        echo -e "\t✔"; SUCCESSES=$((SUCCESSES+1))
+        return 0
     else
-        echo -e "\t❌"; FAILURES=$((FAILURES+1))
+        return 1
+    fi
+}
+
+# Check if the target is healthy and increment SUCCESSES or FAILURES accordingly
+#Args:
+#   1. data from prometheus
+#   2. target name
+#   2. expected target instances
+function test_target() {
+    data="${1}"
+    targetName="${2}"
+    desiredHealthy="${3}"
+
+    if check_target "${data}" "${targetName}" "${desiredHealthy}" &> /dev/null
+    then
+        echo -e "${targetName}\t✔"; SUCCESSES=$((SUCCESSES+1))
+    else
+        echo -e "${targetName}\t❌"; FAILURES=$((FAILURES+1))
         DEBUG_PROMETHEUS_TARGETS+=("${targetName}")
     fi
+}
+
+function test_targets_retry() {
+    prometheusEndpoint="${1}"
+    shift
+    targets=("${@}")
+
+    {
+        # Run port-forward instance as a background process
+        kubectl port-forward -n monitoring "${prometheusEndpoint}" 9090 &
+        PF_PID=$!
+        sleep 3
+    } &> /dev/null
+
+    # TODO: Why is this not working?
+    # trap 'kill "${PF_PID}"; wait "${PF_PID}" 2>/dev/null' RETURN
+
+    echo -n "Checking targets up to 5 times to avoid flakes..."
+    for i in {1..5}
+    do
+        # Get data from prometheus
+        jsonData=$(getData)
+
+        # Print progress
+        echo -n " ${i}"
+
+        # Check all targets
+        # If there are failures we need to retry
+        failure=0
+        for target in "${targets[@]}"
+        do
+            if ! check_target "${jsonData}" $target &> /dev/null
+            then
+                failure=1
+                break
+            fi
+        done
+
+        # If no failures, we are ready to move on
+        if [ ${failure} -eq 0 ]
+        then
+            break
+        fi
+        sleep 10
+    done
+
+    kill "${PF_PID}"; wait "${PF_PID}" 2>/dev/null
+
+    echo -e "\nRunning tests..."
+    # Test all targets
+    for target in "${targets[@]}"
+    do
+        test_target "${jsonData}" $target
+    done
 }

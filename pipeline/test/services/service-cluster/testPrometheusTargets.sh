@@ -15,14 +15,6 @@ echo
 echo
 echo "Testing service cluster prometheus"
 echo "=================================="
-{
-# Run port-forward instance as a background process
-kubectl port-forward -n monitoring svc/prometheus-operator-prometheus 9090 &
-PF_PID=$!
-sleep 3
-# Call simplifyData function in prometheus-common, reduces the dataset
-simplifyData
-} &> /dev/null
 
 # Not using these targets atm
 # TODO: add elements to the list when they start being used.
@@ -47,15 +39,7 @@ scTargets=(
     "monitoring/prometheus-operator-prometheus/0 1"
 )
 
-# Call functions from prometheus-common
-for scTarget in "${scTargets[@]}"
-do
-    check_instances $scTarget
-done
-
-kill "${PF_PID}"
-wait "${PF_PID}" 2>/dev/null
-
+test_targets_retry "svc/prometheus-operator-prometheus" "${scTargets[@]}"
 
 # wc-scraper-prometheus
 # Set variables and array adapted for the service cluster (wc-scraper-prometheus service) and call functions in prometheus-common
@@ -64,25 +48,9 @@ echo
 echo "Testing wc scraper prometheus"
 echo "============================="
 
-{
-# Run port-forward instance as a background process
-kubectl port-forward -n monitoring svc/wc-scraper-prometheus-instance 9090 &
-PF_PID=$!
-sleep 3
-# Call simplifyData function in prometheus-common, reduces the dataset
-simplifyData
-} &> /dev/null
-
 scraperTargets=(
     "federate-kubelet 1"
     "federate-others 1"
 )
 
-# Call functions from prometheus-common
-for scraperTarget in "${scraperTargets[@]}"
-do
-    check_instances $scraperTarget
-done
-
-kill "${PF_PID}"
-wait "${PF_PID}" 2>/dev/null
+test_targets_retry "svc/wc-scraper-prometheus-instance" "${scraperTargets[@]}"
