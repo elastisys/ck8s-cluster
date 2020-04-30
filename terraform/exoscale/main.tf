@@ -38,6 +38,7 @@ module "service_cluster" {
   ssh_pub_key = var.ssh_pub_key_sc
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
+  api_server_whitelist          = var.api_server_whitelist
 
   es_local_storage_capacity_map = var.es_local_storage_capacity_map_sc
 }
@@ -66,6 +67,7 @@ module "workload_cluster" {
   ssh_pub_key = var.ssh_pub_key_wc
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
+  api_server_whitelist          = var.api_server_whitelist
 
   es_local_storage_capacity_map = var.es_local_storage_capacity_map_wc
 }

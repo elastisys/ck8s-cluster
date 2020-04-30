@@ -85,7 +85,7 @@ resource "exoscale_security_group_rules" "master_sg_rules" {
   # Kubernetes API
   ingress {
     protocol  = "TCP"
-    cidr_list = ["0.0.0.0/0"]
+    cidr_list = var.api_server_whitelist
     ports     = ["6443"]
   }
 

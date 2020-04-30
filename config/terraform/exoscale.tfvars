@@ -45,3 +45,10 @@ public_ingress_cidr_whitelist = [
   # A1 office
   "193.187.219.4/32",
 ]
+api_server_whitelist = [
+  # Elastisys office
+  "194.132.164.168/32",
+  "194.132.164.169/32",
+  # A1 office
+  "193.187.219.4/32",
+]

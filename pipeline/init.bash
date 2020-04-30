@@ -46,6 +46,9 @@ case "${CK8S_CLOUD_PROVIDER}" in
     # No whitelisting
     sed -i ':a;N;$!ba;s/public_ingress_cidr_whitelist = \[[^]]*\]/public_ingress_cidr_whitelist = \["0.0.0.0\/0"\]/g' \
         "${CK8S_CONFIG_PATH}/config.tfvars"
+
+    sed -i ':a;N;$!ba;s/api_server_whitelist = \[[^]]*\]/api_server_whitelist = \["0.0.0.0\/0"\]/g' \
+        "${CK8S_CONFIG_PATH}/config.tfvars"
     ;;
     "safespring")
     config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.elastisys.se"
@@ -75,6 +78,8 @@ case "${CK8S_CLOUD_PROVIDER}" in
 
     # No whitelisting
     sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = "0.0.0.0\/0"/' \
+        "${CK8S_CONFIG_PATH}/config.tfvars"
+    sed -i 's/api_server_whitelist = .*/api_server_whitelist = "0.0.0.0\/0"/' \
         "${CK8S_CONFIG_PATH}/config.tfvars"
     ;;
 esac

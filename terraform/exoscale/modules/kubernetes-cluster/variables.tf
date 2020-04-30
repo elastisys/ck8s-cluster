@@ -32,6 +32,10 @@ variable "public_ingress_cidr_whitelist" {
   type = list(string)
 }
 
+variable "api_server_whitelist" {
+  type = list(string)
+}
+
 variable "compute_instance_image" {}
 
 ## DNS
