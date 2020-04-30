@@ -47,6 +47,7 @@
 - EIP for control plane on Exoscale
 - Exoscale: support HA control plane
 - End-user roles for Kibana are now created automatically during deployment.
+- CRDs, with the exemption of project calico, are now vendored in the /crds folder and deployed using ansible during the k8s apply step.
 
 ### Fixed
 

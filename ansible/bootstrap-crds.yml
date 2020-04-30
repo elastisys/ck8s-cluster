@@ -1,0 +1,16 @@
+---
+- hosts: masters[0]
+  become: yes
+  become_user: root
+  tasks:
+      - name: Upload CRDs
+        copy:
+          src: "../crds/{{ item }}"
+          dest: /etc/kubeadm/{{ item }}
+        with_lines: cat {{crd_file_path}} 
+      
+      - name: Bootstrap CRDs
+        command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f {{ item }}
+        args:
+          chdir: '/etc/kubeadm'
+        with_lines: cat {{crd_file_path}}

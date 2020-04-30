@@ -123,7 +123,6 @@ then
 fi
 
 echo "Preparing cert manager and creating Issuers" >&2
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.14/deploy/manifests/00-crds.yaml
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true --overwrite
 
 
@@ -153,21 +152,6 @@ then
         --clusterrole=psp:privileged --serviceaccount=harbor:default \
         --dry-run -o yaml | kubectl apply -f -
 fi
-
-echo "Creating Prometheus CRD" >&2
-kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/alertmanager.crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheus.crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/prometheusrule.crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/servicemonitor.crd.yaml
-kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.33.0/example/prometheus-operator-crd/podmonitor.crd.yaml
-
-echo "Creating elasticsearch-operator CRD" >&2
-kubectl apply -f "${SCRIPTS_PATH}/../manifests/elasticsearch-operator/crds.yaml"
-
-echo "Creating Velero CRD" >&2
-kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/backupstoragelocations.yaml
-kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/volumesnapshotlocations.yaml
-kubectl apply -f https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/schedules.yaml
 
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
