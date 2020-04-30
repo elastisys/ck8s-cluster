@@ -43,7 +43,7 @@ resource "openstack_networking_secgroup_rule_v2" "kubernetes_api" {
   protocol         = "tcp"
   port_range_min   = 6443
   port_range_max   = 6443
-  remote_ip_prefix = "0.0.0.0/0"
+  remote_ip_prefix = var.api_server_whitelist
 }
 
 resource "openstack_networking_secgroup_v2" "worker" {
@@ -92,5 +92,5 @@ resource "openstack_networking_secgroup_rule_v2" "nodeports" {
   protocol         = "tcp"
   port_range_min   = 30000
   port_range_max   = 32767
-  remote_ip_prefix = "0.0.0.0/0"
+  remote_ip_prefix = var.api_server_whitelist
 }
