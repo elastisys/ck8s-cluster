@@ -8,12 +8,13 @@
   Kubernetes control plane container images. This will require full
   reinstallation of Kubernetes and apps.
 - Exoscale now uses a stable EIP as public endpoint for the control plane.
+- Safespring now uses a HAProxy as public endpoint for the control plane.
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
 - No migration script is available for the terraform changes to safespring and citycloud. Manual migration might be possible.
 - No migration script is available for cert-manager. A new cluster is required.
-- No migration path is available for the control plane EIP on Exoscale. The clusters must be recreated.
+- No migration path is available for the control plane public endpoint change on Exoscale and Safespring. The clusters must be recreated.
 - To apply grafana dashboard improvements to existing clusters run `./migration/v0.2.x-v0.3.0/migrate-grafana-dashboards.bash`
 
 ### Added
@@ -45,7 +46,7 @@
 - Support to configure falco alerts for slack and alertmanager.
 - Falcosidekick for handling falco outputs.
 - EIP for control plane on Exoscale
-- Exoscale: support HA control plane
+- Support for HA control plane on Exoscale and Safespring
 - End-user roles for Kibana are now created automatically during deployment.
 
 ### Fixed
@@ -60,7 +61,7 @@
 - Kube-proxy metrics endpoint fixed.
 - Etcd metrics endpoint fixed.
 - Configure-es does not complete within activeDeadlineSeconds
-- Ck8s-dash config for datasources now matches the new datasource names 
+- Ck8s-dash config for datasources now matches the new datasource names
 
 ### Removed
 

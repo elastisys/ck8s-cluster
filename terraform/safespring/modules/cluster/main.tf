@@ -75,6 +75,7 @@ module "haproxy_lb" {
 
   security_group_ids = [
     module.secgroups.cluster_secgroup,
+    module.secgroups.master_secgroup,
     module.secgroups.worker_secgroup,
   ]
 }

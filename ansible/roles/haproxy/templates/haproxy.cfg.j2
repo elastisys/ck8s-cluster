@@ -68,6 +68,12 @@ frontend https-frontend
   bind 0.0.0.0:443
   default_backend https-backend
 
+frontend k8s-frontend
+  mode tcp
+  option tcplog
+  bind 0.0.0.0:6443
+  default_backend k8s-backend
+
 backend http-backend
   mode tcp
   balance roundrobin
@@ -90,4 +96,16 @@ backend https-backend
   default-server inter 2s fall 2 rise 3
   {% for worker in groups.workers -%}
   server {{ worker }} {{ hostvars[worker].private_ip }}:443 check on-marked-down shutdown-sessions send-proxy
+  {% endfor %}
+
+backend k8s-backend
+  mode tcp
+  balance roundrobin
+  option tcplog
+  option tcp-check
+  #option log-health-checks
+  # health checks every 2s, 2 fails => DOWN, 3 success => UP
+  default-server inter 2s fall 2 rise 3
+  {% for master in groups.masters -%}
+  server {{ master }} {{ hostvars[master].private_ip }}:6443 check on-marked-down shutdown-sessions
   {% endfor %}
