@@ -1,6 +1,12 @@
 Elastisys Compliant Kubernetes
 ==============================
 
+## Build status
+
+![Exoscale-pipeline](https://github.com/elastisys/ck8s/workflows/Exoscale-pipeline/badge.svg)
+![AWS-pipeline](https://github.com/elastisys/ck8s/workflows/AWS-pipeline/badge.svg)
+![Matrix-pipeline](https://github.com/elastisys/ck8s/workflows/Matrix-pipeline/badge.svg)
+
 ## Overview
 
 The Elastisys Compliant Kubernetes (ck8s) platform runs two Kubernetes
