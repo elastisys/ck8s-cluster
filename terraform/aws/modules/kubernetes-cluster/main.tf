@@ -92,7 +92,7 @@ resource "aws_security_group" "master-lb-ext-sg" {
     from_port   = "6443"
     to_port     = "6443"
     protocol    = "tcp"
-    cidr_blocks = var.public_ingress_cidr_whitelist
+    cidr_blocks = var.api_server_whitelist
   }
 
   tags = {
@@ -322,7 +322,7 @@ resource "aws_security_group_rule" "nodeport" {
   from_port         = 30000
   to_port           = 32767
   protocol          = "tcp"
-  cidr_blocks       = var.public_ingress_cidr_whitelist
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.worker_sg.id
 }
 

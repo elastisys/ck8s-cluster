@@ -6,6 +6,10 @@ variable public_ingress_cidr_whitelist {
   type = list(string)
 }
 
+variable api_server_whitelist {
+  type = list(string)
+}
+
 variable aws_region {
   description = "AWS region"
   type        = string
