@@ -12,4 +12,6 @@ spec:
     # An empty selector will 'match' all Certificate resources that
     # reference this Issuer.
     - selector: {}
-      http01: {}
+      http01:
+        ingress:
+          class: nginx
