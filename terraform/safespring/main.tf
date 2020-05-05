@@ -4,7 +4,7 @@ terraform {
 
 locals {
   # Base image used to provision master and worker instances
-  cluster_image     = "CK8S-BaseOS-v0.0.6"
+  cluster_image = "CK8S-BaseOS-v0.0.6"
   # Base image used to provision loadbalancer instances
   loadbalancer_image = "ubuntu-18.04-server-cloudimg-amd64-20190212.1"
 }

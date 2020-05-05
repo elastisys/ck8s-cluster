@@ -18,7 +18,7 @@
         dest: /etc/kubeadm/kubeadm-config.yaml
 
     - name: Initialize master
-      command: kubeadm init --config=/etc/kubeadm/kubeadm-config.yaml
+      command: kubeadm init --config=/etc/kubeadm/kubeadm-config.yaml {{ kubeadm_init_extra_args }}
       args:
         creates: /etc/kubernetes/admin.conf
       register: initialized

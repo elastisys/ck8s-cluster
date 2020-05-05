@@ -48,68 +48,70 @@ output "wc_ingress_controller_lb_ip_address" {
 
 output "ansible_inventory_sc" {
   value = templatefile("${path.module}/../templates/inventory.tmpl", {
-    master_hosts           = <<-EOF
+    master_hosts            = <<-EOF
 %{for name, data in module.service_cluster.master_ip_addresses~}
 ${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
 %{endfor~}
 EOF
-    masters                = <<-EOF
+    masters                 = <<-EOF
 %{for name, data in module.service_cluster.master_ip_addresses~}
 ${name}
 %{endfor~}
 EOF
-    worker_hosts           = <<-EOF
+    worker_hosts            = <<-EOF
 %{for name, data in module.service_cluster.worker_ip_addresses~}
 ${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
 %{endfor~}
 EOF
-    workers                = <<-EOF
+    workers                 = <<-EOF
 %{for name, worker in module.service_cluster.worker_ip_addresses~}
 ${name}
 %{endfor~}
 EOF
-    cluster_name           = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
-    public_endpoint        = module.service_cluster.control_plane_lb_ip_address
-    control_plane_endpoint = "127.0.0.1"
-    control_plane_port     = "7443"
-    internal_lb_children   = "nodes"
-    cloud_provider         = ""
-    cloud_config           = ""
-    calico_mtu             = "1480"
-    loadbalancers          = ""
+    cluster_name            = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
+    public_endpoint         = module.service_cluster.control_plane_lb_ip_address
+    control_plane_endpoint  = "127.0.0.1"
+    control_plane_port      = "7443"
+    internal_lb_children    = "nodes"
+    cloud_provider          = ""
+    cloud_config            = ""
+    calico_mtu              = "1480"
+    loadbalancers           = ""
+    kubeadm_init_extra_args = ""
   })
 }
 
 output "ansible_inventory_wc" {
   value = templatefile("${path.module}/../templates/inventory.tmpl", {
-    master_hosts           = <<-EOF
+    master_hosts            = <<-EOF
 %{for name, data in module.workload_cluster.master_ip_addresses~}
 ${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
 %{endfor~}
 EOF
-    masters                = <<-EOF
+    masters                 = <<-EOF
 %{for name, data in module.workload_cluster.master_ip_addresses~}
 ${name}
 %{endfor~}
 EOF
-    worker_hosts           = <<-EOF
+    worker_hosts            = <<-EOF
 %{for name, data in module.workload_cluster.worker_ip_addresses~}
 ${name} ansible_host=${data.public_ip} private_ip=${data.public_ip}
 %{endfor~}
 EOF
-    workers                = <<-EOF
+    workers                 = <<-EOF
 %{for name, worker in module.workload_cluster.worker_ip_addresses~}
 ${name}
 %{endfor~}
 EOF
-    cluster_name           = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
-    public_endpoint        = module.workload_cluster.control_plane_lb_ip_address
-    control_plane_endpoint = "127.0.0.1"
-    control_plane_port     = "7443"
-    internal_lb_children   = "nodes"
-    cloud_provider         = ""
-    cloud_config           = ""
-    calico_mtu             = "1480"
-    loadbalancers          = ""
+    cluster_name            = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
+    public_endpoint         = module.workload_cluster.control_plane_lb_ip_address
+    control_plane_endpoint  = "127.0.0.1"
+    control_plane_port      = "7443"
+    internal_lb_children    = "nodes"
+    cloud_provider          = ""
+    cloud_config            = ""
+    calico_mtu              = "1480"
+    loadbalancers           = ""
+    kubeadm_init_extra_args = ""
   })
 }
