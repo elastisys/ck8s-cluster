@@ -4,6 +4,8 @@ resource "openstack_networking_secgroup_v2" "cluster" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "ssh" {
+  for_each = toset(var.public_ingress_cidr_whitelist)
+
   security_group_id = openstack_networking_secgroup_v2.cluster.id
 
   direction        = "ingress"
@@ -11,7 +13,7 @@ resource "openstack_networking_secgroup_rule_v2" "ssh" {
   protocol         = "tcp"
   port_range_min   = 22
   port_range_max   = 22
-  remote_ip_prefix = var.public_ingress_cidr_whitelist
+  remote_ip_prefix = each.value
 }
 
 # TODO: Currently allows all protocols for internal traffic to allow IP-in-IP
@@ -34,7 +36,6 @@ resource "openstack_networking_secgroup_v2" "master" {
   description = "Elastisys Compliant Kubernetes master security group"
 }
 
-# TODO: Whitelist.
 resource "openstack_networking_secgroup_rule_v2" "kubernetes_api" {
   for_each = toset(var.api_server_whitelist)
   security_group_id = openstack_networking_secgroup_v2.master.id
@@ -83,7 +84,6 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
 # We allow the default NodePort range
 # https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
 resource "openstack_networking_secgroup_rule_v2" "nodeports" {
-  for_each = toset(var.api_server_whitelist)
 
   # https://github.com/terraform-providers/terraform-provider-openstack/issues/879
   depends_on = [openstack_networking_secgroup_rule_v2.https]
@@ -95,5 +95,5 @@ resource "openstack_networking_secgroup_rule_v2" "nodeports" {
   protocol         = "tcp"
   port_range_min   = 30000
   port_range_max   = 32767
-  remote_ip_prefix = each.value
+  remote_ip_prefix = "0.0.0.0/0"
 }

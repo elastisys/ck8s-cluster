@@ -11,6 +11,7 @@
 - Safespring now uses a HAProxy as public endpoint for the control plane.
 - Citycloud now uses an Octavia LB and floating IP as endpoint for the control plane.
 - Api change: `api_server_whitelist` now required in `config.tfvars`
+- Api change: `public_ingress_cidr_whitelist` is now required to be a list in `config.tfvars`
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
@@ -121,3 +122,4 @@
   * only allowing images from our harbor,
   * requiring networkpolicies for all pods,
   * and requiring resource requests on all pods.
+- `public_ingress_cidr_whitelist` is now a list on openstack providers

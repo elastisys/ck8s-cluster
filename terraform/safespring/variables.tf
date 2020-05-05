@@ -132,7 +132,7 @@ variable loadbalancer_name_flavor_map_wc {
 }
 
 variable public_ingress_cidr_whitelist {
-  type = string
+  type = list
 }
 
 variable api_server_whitelist {

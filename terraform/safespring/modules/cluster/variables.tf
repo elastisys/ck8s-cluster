@@ -18,7 +18,7 @@ variable "loadbalancer_image" {
 }
 
 variable public_ingress_cidr_whitelist {
-  type = string
+  type = list
 }
 
 variable api_server_whitelist {
