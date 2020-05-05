@@ -17,7 +17,7 @@ variable public_ingress_cidr_whitelist {
 }
 
 variable api_server_whitelist {
-  type = string
+  type = list
 }
 
 variable external_network_id {

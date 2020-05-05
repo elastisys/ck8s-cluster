@@ -7,5 +7,5 @@ variable public_ingress_cidr_whitelist {
 }
 
 variable api_server_whitelist {
-  type = string
+  type = list
 }

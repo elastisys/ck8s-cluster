@@ -10,6 +10,7 @@
 - Exoscale now uses a stable EIP as public endpoint for the control plane.
 - Safespring now uses a HAProxy as public endpoint for the control plane.
 - Citycloud now uses an Octavia LB and floating IP as endpoint for the control plane.
+- Api change: `api_server_whitelist` now required in `config.tfvars`
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
@@ -56,6 +57,7 @@
 - Fluentd-prometheus exporter for SC and WC
 - Custom alert chart (based on prometheus-operator alerts) to make it easier to tweak, enable/disable alerts as needed.
 - Documentation regarding cluster migration
+- Api server whitelisting on all providers
 
 ### Fixed
 

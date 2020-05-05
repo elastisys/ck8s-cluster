@@ -36,6 +36,7 @@ resource "openstack_networking_secgroup_v2" "master" {
 
 # TODO: Whitelist.
 resource "openstack_networking_secgroup_rule_v2" "kubernetes_api" {
+  for_each = toset(var.api_server_whitelist)
   security_group_id = openstack_networking_secgroup_v2.master.id
 
   direction        = "ingress"
@@ -43,7 +44,7 @@ resource "openstack_networking_secgroup_rule_v2" "kubernetes_api" {
   protocol         = "tcp"
   port_range_min   = 6443
   port_range_max   = 6443
-  remote_ip_prefix = var.api_server_whitelist
+  remote_ip_prefix = each.value
 }
 
 resource "openstack_networking_secgroup_v2" "worker" {
@@ -82,6 +83,8 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
 # We allow the default NodePort range
 # https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
 resource "openstack_networking_secgroup_rule_v2" "nodeports" {
+  for_each = toset(var.api_server_whitelist)
+
   # https://github.com/terraform-providers/terraform-provider-openstack/issues/879
   depends_on = [openstack_networking_secgroup_rule_v2.https]
 
@@ -92,5 +95,5 @@ resource "openstack_networking_secgroup_rule_v2" "nodeports" {
   protocol         = "tcp"
   port_range_min   = 30000
   port_range_max   = 32767
-  remote_ip_prefix = var.api_server_whitelist
+  remote_ip_prefix = each.value
 }

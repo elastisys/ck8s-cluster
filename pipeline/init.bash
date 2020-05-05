@@ -77,9 +77,9 @@ case "${CK8S_CLOUD_PROVIDER}" in
     secrets_update AWS_SECRET_ACCESS_KEY "${CI_AWS_SECRET_ACCESS_KEY}"
 
     # No whitelisting
-    sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = "0.0.0.0\/0"/' \
+    sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = ["0.0.0.0\/0"]/' \
         "${CK8S_CONFIG_PATH}/config.tfvars"
-    sed -i 's/api_server_whitelist = .*/api_server_whitelist = "0.0.0.0\/0"/' \
+    sed -i 's/api_server_whitelist = .*/api_server_whitelist = ["0.0.0.0\/0"]/' \
         "${CK8S_CONFIG_PATH}/config.tfvars"
     ;;
 esac

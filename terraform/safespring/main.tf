@@ -1,5 +1,8 @@
 terraform {
   backend "remote" {}
+  required_providers {
+    openstack = ">= 1.28.0"
+  }
 }
 
 locals {
@@ -30,7 +33,7 @@ module "service_cluster" {
   loadbalancer_image = data.openstack_images_image_v2.loadbalancer_image.id
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
-  api_server_whitelist = var.api_server_whitelist
+  api_server_whitelist          = var.api_server_whitelist
 
   external_network_id   = var.external_network_id
   external_network_name = var.external_network_name
@@ -68,7 +71,7 @@ module "workload_cluster" {
   loadbalancer_image = data.openstack_images_image_v2.loadbalancer_image.id
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
-  api_server_whitelist = var.api_server_whitelist
+  api_server_whitelist          = var.api_server_whitelist
 
   external_network_id   = var.external_network_id
   external_network_name = var.external_network_name
