@@ -29,7 +29,8 @@ RUN go get go.mozilla.org/sops/v3 && \
 # Terraform
 RUN wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
 RUN unzip terraform_0.12.19_linux_amd64.zip && \
-    mv terraform /usr/local/bin/terraform
+    mv terraform /usr/local/bin/terraform && \
+    rm terraform_0.12.19_linux_amd64.zip
 
 # Kubectl
 RUN wget https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl && \
@@ -62,7 +63,9 @@ RUN wget https://github.com/s3tools/s3cmd/releases/download/v2.0.2/s3cmd-2.0.2.t
     tar -zxvf s3cmd-2.0.2.tar.gz && \
     pip3 install setuptools==45.2.0 && \
     cd s3cmd-2.0.2 && \
-    python3 setup.py install
+    python3 setup.py install && \
+    cd ../ && \
+    rm s3cmd-2.0.2.tar.gz
 
 # yq
 RUN wget https://github.com/mikefarah/yq/releases/download/3.2.1/yq_linux_amd64 && \
