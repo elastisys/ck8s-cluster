@@ -37,11 +37,14 @@ RUN wget https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/l
     mv ./kubectl /usr/local/bin/kubectl
 
 # Helm
-RUN wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz && \
-    tar -zxvf helm-v3.1.2-linux-amd64.tar.gz && \
-    mv linux-amd64/helm /usr/local/bin/helm
+ENV HELM_VERSION "v3.2.0"
+RUN wget "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
+    tar -zxvf "helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
+    mv linux-amd64/helm /usr/local/bin/helm && \
+    rm -rf linux-amd64/ "helm-${HELM_VERSION}-linux-amd64.tar.gz"
 # We need to use this variable to override the default data path for helm
 # TODO Change when this is closed https://github.com/helm/helm/issues/7919
+# Should come with v3.3.0, see https://github.com/helm/helm/pull/7983
 ENV XDG_DATA_HOME=/root/.config
 RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.1
 
