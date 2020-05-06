@@ -10,7 +10,7 @@ ingress:
 nginx:
   image:
     repository: elastisys/ck8sdash-nginx
-    tag: 0.1.1
+    tag: v0.2.1
     pullPolicy: Always
   resources:
     requests:
@@ -24,7 +24,7 @@ nginx:
 server:
   image:
     repository: elastisys/ck8sdash-server
-    tag: 0.1.1
+    tag: v0.2.1
     pullPolicy: Always
   resources:
     requests:

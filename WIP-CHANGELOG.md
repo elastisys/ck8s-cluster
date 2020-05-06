@@ -100,3 +100,4 @@
   container images.
 - Customer admin now has view access to the falco namespace.
 - Upgraded prometheus operator to version 8.13.2 and Prometheus to v2.17.2
+- Ck8s-dash upgraded to version 0.2.1
