@@ -7,7 +7,7 @@ kind: Job
 metadata:
   name: {{ .Release.Name }}-job
 spec:
-  activeDeadlineSeconds: 300
+  activeDeadlineSeconds: 600
   template:
     metadata:
       labels:

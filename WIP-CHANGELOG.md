@@ -59,6 +59,7 @@
 - Falco getting installed even if `ENABLE_FALCO=false`
 - Kube-proxy metrics endpoint fixed.
 - Etcd metrics endpoint fixed.
+- Configure-es does not complete within activeDeadlineSeconds
 
 ### Removed
 
