@@ -16,3 +16,4 @@ restores.yaml
 schedules.yaml
 serverstatusrequests.yaml
 volumesnapshotlocations.yaml
+gatekeeper.yaml

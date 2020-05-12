@@ -20,8 +20,18 @@ jobs:
         image_tag: ${{ github.sha }}
         context: pipeline
 
-  init:
+  unit-tests:
     needs: build-image
+    runs-on: ubuntu-latest
+    container:
+      image: elastisys/ck8s-ops:${{ github.sha }}
+    steps:
+    - uses: actions/checkout@v1
+    - run: ./pipeline/test/services/unit-tests/test-opa.sh
+      shell: bash
+
+  init:
+    needs: unit-tests
     runs-on: ubuntu-latest
     container:
       image: elastisys/ck8s-ops:${{ github.sha }}

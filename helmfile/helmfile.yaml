@@ -514,36 +514,53 @@ releases:
   {{ end }}
 
 
-# opa
-- name: opa
-  namespace: opa
+{{ if eq (env "ENABLE_OPA") "true" }}
+# gatekeeper-operator
+- name: gatekeeper-operator
+  namespace: gatekeeper-system
   labels:
-    app: opa
-  chart: stable/opa
+    app: gatekeeper-operator
+  chart: ./charts/gatekeeper-operator
+  version: 1.6.0
+  missingFileHandler: Error
+  wait: true
+  values:
+  - values/gatekeeper-operator.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/gatekeeper-operator.yaml"
+  {{ end }}
+
+
+# gatekeeper-templates
+- name: gatekeeper-templates
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper-templates
+  chart: ./charts/gatekeeper-templates
   version: 1.6.0
   missingFileHandler: Error
   values:
-  - values/opa.yaml.gotmpl
+  - values/gatekeeper-templates.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
-  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/opa.yaml"
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/gatekeeper-templates.yaml"
   {{ end }}
 
 
-# opa policies
-{{ if eq (env "ENABLE_OPA") "true" }}
-- name: opa-policies
-  namespace: opa
+# gatekeeper-constraints
+- name: gatekeeper-constraints
+  namespace: gatekeeper-system
   labels:
-    app: opa
-  chart: ./charts/opa-policies
-  version: 0.1.0
+    app: gatekeeper-constraints
+  chart: ./charts/gatekeeper-constraints
+  version: 1.6.0
   missingFileHandler: Error
   values:
-  - values/opa-policies.yaml.gotmpl
+  - values/gatekeeper-constraints.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
-  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/opa-policies.yaml"
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/gatekeeper-constraints.yaml"
   {{ end }}
 {{ end }}
+
 
 # Velero
 - name: velero

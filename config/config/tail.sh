@@ -46,7 +46,13 @@ export FALCO_ALERTS_PRIORITY="notice"
 export FALCO_ALERTS_ALERTMANAGER_HOSTPORT="http://prometheus-operator-alertmanager.monitoring:9093"
 # If FALCO_ALERTS_TYPE="slack"
 # make sure FALCO_ALERTS_SLACK_WEBHOOK is set in secrets file"
- 
+
+# The following can be set to "dryrun" or "deny"
+# With "dryrun" the OPA policies will only show warnings in audits, but not deny any request
+# With "deny" the OPA policies will deny new requests in customer namespaces that violates any policy
+export OPA_ENFORCEMENT_IMAGE_REGISTRY="dryrun"
+export OPA_ENFORCEMENT_NETWORKPOLICIES="dryrun"
+export OPA_ENFORCEMENT_RESOURCE_REQUESTS="dryrun"
 
 # If set to "true", set nginx-ingress external traffic policy to "Local".
 # Must be "true" for IP whitelisting to work.

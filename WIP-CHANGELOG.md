@@ -110,3 +110,10 @@
 - Upgraded prometheus operator to version 8.13.2 and Prometheus to v2.17.2
 - Ck8s-dash upgraded to version 0.2.1
 - NFS server whitelisting has been removed from Exoscale
+- OPA is now managed using Gatekeeper
+- By default the OPA policies will be audited in the customer namespaces.
+  There is an option to instead deny requests that violate any policy.
+- The following three OPA policies are now added:
+  * only allowing images from our harbor,
+  * requiring networkpolicies for all pods,
+  * and requiring resource requests on all pods.

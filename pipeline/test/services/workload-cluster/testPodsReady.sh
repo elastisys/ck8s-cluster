@@ -16,7 +16,6 @@ deployments=(
     "kube-system metrics-server"
     "kube-system calico-kube-controllers"
     "nginx-ingress nginx-ingress-default-backend"
-    "opa opa"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
@@ -27,6 +26,9 @@ if [ $CLOUD_PROVIDER == "exoscale" ]; then
 fi
 if [ "$ENABLE_CK8SDASH_WC" == true ]; then
     deployments+=("ck8sdash ck8sdash")
+fi
+if [ "$ENABLE_OPA" == true ]; then
+    deployments+=("gatekeeper-system gatekeeper-controller-manager")
 fi
 
 resourceKind="Deployment"

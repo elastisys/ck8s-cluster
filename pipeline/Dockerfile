@@ -80,3 +80,9 @@ ENV YQ_VERSION "3.2.1"
 RUN wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
     chmod +x yq_linux_amd64 && \
     mv yq_linux_amd64 /usr/local/bin/yq
+
+# opa
+ENV OPA_VERSION "v0.17.2"
+RUN wget "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
+    chmod +x opa_linux_amd64 && \
+    mv opa_linux_amd64 /usr/local/bin/opa

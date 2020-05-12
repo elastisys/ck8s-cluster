@@ -45,7 +45,7 @@ echo "Creating namespaces" >&2
 NAMESPACES="cert-manager fluentd kube-node-lease kube-public kube-system monitoring nginx-ingress velero"
 [ "$ENABLE_CK8SDASH_WC" == "true" ] && NAMESPACES+=" ck8sdash"
 [ "$ENABLE_FALCO" == "true" ] && NAMESPACES+=" falco"
-[ "$ENABLE_OPA" == "true" ] && NAMESPACES+=" opa"
+[ "$ENABLE_OPA" == "true" ] && NAMESPACES+=" gatekeeper gatekeeper-system"
 
 for namespace in ${NAMESPACES}
 do
@@ -71,11 +71,6 @@ then
     then
         kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/falco-psp.yaml
     fi
-
-    if [[ $ENABLE_OPA == "true" ]]
-    then
-        kubectl apply -f ${SCRIPTS_PATH}/../manifests/podSecurityPolicy/workload_cluster/opa-psp.yaml
-    fi
 fi
 
 echo "Preparing cert-manager and issuers" >&2
@@ -99,8 +94,8 @@ helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE a
 source ${SCRIPTS_PATH}/install-storage-class-provider.sh
 install_storage_class_provider "${STORAGE_CLASS}" workload_cluster
 
-charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator"
-[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=opa"
+charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=gatekeeper-constraints"
+[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-operator,app!=gatekeeper-templates"
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
 [[ $ENABLE_CK8SDASH_WC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
 
@@ -145,6 +140,13 @@ kubectl -n fluentd create secret generic elasticsearch \
 
 echo "Installing fluentd" >&2
 helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply --suppress-diff
+
+if [[ $ENABLE_OPA == "true" ]]
+then
+    echo "Installing gatekeeper constraints" >&2
+    #This must be installed after gatekeeper templates
+    helmfile -f helmfile.yaml -e workload_cluster -l app=gatekeeper-constraints $INTERACTIVE apply --suppress-diff
+fi
 
 # TODO: Move this to separate command
 echo "Creating kubeconfig for the customer" >&2

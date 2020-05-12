@@ -41,3 +41,9 @@ sed -i 's/spec:/spec:\n  scope: Namespaced/' offlinesessionses.yaml
 sed -i 's/spec:/spec:\n  scope: Namespaced/' passwords.yaml
 sed -i 's/spec:/spec:\n  scope: Namespaced/' refreshtokens.yaml
 sed -i 's/spec:/spec:\n  scope: Namespaced/' signingkeies.yaml
+echo gatekeeper
+curl 'https://raw.githubusercontent.com/open-policy-agent/gatekeeper/v3.1.0-beta.8/chart/gatekeeper-operator/templates/gatekeeper.yaml' -o gatekeeper-tmp.yaml
+yq r -d1 gatekeeper-tmp.yaml | yq d - metadata.labels.app | yq d - metadata.labels.chart | yq d - metadata.labels.heritage | yq d - metadata.labels.release > gatekeeper.yaml
+echo "---" >> gatekeeper.yaml
+yq r -d2 gatekeeper-tmp.yaml | yq d - metadata.labels.app | yq d - metadata.labels.chart | yq d - metadata.labels.heritage | yq d - metadata.labels.release >> gatekeeper.yaml
+rm gatekeeper-tmp.yaml
