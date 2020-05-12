@@ -16,6 +16,8 @@
 - No migration script is available for cert-manager. A new cluster is required.
 - No migration path is available for the control plane public endpoint change on Exoscale and Safespring. The clusters must be recreated.
 - To apply grafana dashboard improvements to existing clusters run `./migration/v0.2.x-v0.3.0/migrate-grafana-dashboards.bash`
+- The NFS servers need to be rebooted to apply the removal of the whitelisting
+  after the change has been applied.
 
 ### Added
 
@@ -103,3 +105,4 @@
 - Customer admin now has view access to the falco namespace.
 - Upgraded prometheus operator to version 8.13.2 and Prometheus to v2.17.2
 - Ck8s-dash upgraded to version 0.2.1
+- NFS server whitelisting has been removed from Exoscale
