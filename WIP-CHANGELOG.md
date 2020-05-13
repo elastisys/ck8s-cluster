@@ -52,6 +52,7 @@
 - End-user roles for Kibana are now created automatically during deployment.
 - CRDs, with the exemption of project calico, are now vendored in the /crds folder and deployed using ansible during the k8s apply step.
 - Fluentd-prometheus exporter for SC and WC
+- Custom alert chart (based on prometheus-operator alerts) to make it easier to tweak, enable/disable alerts as needed.
 
 ### Fixed
 

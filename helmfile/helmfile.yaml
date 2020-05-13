@@ -80,7 +80,6 @@ releases:
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/cert-manager.yaml"
   {{ end }}
 
-
 # Prometheus-operator
 - name: prometheus-operator
   namespace: monitoring
@@ -184,6 +183,40 @@ releases:
   - values/prometheus-wc-federate-scraper.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-wc-federate-scraper.yaml"
+  {{ end }}
+
+# prometheus wc-scraper alerts
+- name: wc-scraper-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+    prometheus: wc-scraper
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+{{ if eq .Environment.Name "service_cluster" }}
+  # Note: we want to have alerts for WC since this is wc-scraper, even if it is
+  # running in SC.
+  - values/prometheus-alerts-wc.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-alerts-wc.yaml"
+  {{ end }}
+{{ end }}
+
+# prometheus sc-alerts
+- name: sc-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+    prometheus: sc
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Info
+  values:
+  - values/prometheus-alerts-sc.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-alerts-sc.yaml"
   {{ end }}
 
 
@@ -526,6 +559,22 @@ releases:
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/velero-wc.yaml"
   {{ end }}
 
+# TODO: Make this optional! Customers may not want any alerts by default.
+# It should also be separate from the alerts we use. Customers should not need
+# to care about system components that they cannot touch anyway.
+# prometheus customer-alerts
+- name: ck8s-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Info
+  values:
+  - values/prometheus-alerts-wc.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-alerts-wc.yaml"
+  {{ end }}
 
 # Customer RBAC
 - name: customer-rbac

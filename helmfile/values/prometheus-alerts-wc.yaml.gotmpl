@@ -1,0 +1,12 @@
+noEsNodes: {{ requiredEnv "ES_NODE_COUNT" }}
+alertmanagerJob: prometheus-operator-alertmanager
+alertmanagerNamespace: monitoring
+prometheusJob: prometheus-operator-prometheus
+operatorJob: prometheus-operator-operator
+prometheusNamespace: monitoring
+defaultRules:
+  labels:
+    cluster: workload
+  rules:
+    elasticsearch: false
+    alertmanager: {{ requiredEnv "ENABLE_CUSTOMER_ALERTMANAGER" }}
