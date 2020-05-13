@@ -1,5 +1,22 @@
 ---
-- hosts: masters[0]
+- hosts: masters
+  gather_facts: false
+  tasks:
+
+    - name: Check if master is active
+      stat:
+        path: /etc/kubernetes/admin.conf
+      register: kubeconfig
+
+    - name: Create master groups based on status
+      group_by: key="{{ 'masters_active' if kubeconfig.stat.exists else 'masters_joining' }}"
+
+    - name: Fail if no active hosts are available
+      fail:
+        msg: No active hosts available
+      when: groups.masters_active is not defined
+
+- hosts: masters_active[0]
   become: yes
   become_user: root
   gather_facts: false
@@ -31,7 +48,7 @@
       set_fact:
         cert_key: "{{ cert_upload.stdout_lines | last }}"
 
-- hosts: masters[1:]
+- hosts: masters_joining
   become: yes
   become_user: root
   gather_facts: false
