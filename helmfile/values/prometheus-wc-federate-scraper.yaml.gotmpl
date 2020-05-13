@@ -55,8 +55,7 @@ prometheusSpec:
   ruleNamespaceSelector: {}
   ruleSelector:
     matchLabels:
-      app: prometheus-operator
-      release: prometheus-operator
+      cluster: workload
 
   externalLabels:
     scraper: wc-scraper

@@ -75,6 +75,7 @@
 - Support for attaching extra disks to Safespring and Citycloud workers
 - Rancher Kubernetes Engine (RKE)
 - Logs from the kubelet are no longer collected and forwarded to Elasticsearch.
+- Prometheus-operator built-in alerts
 
 ### Changed
 

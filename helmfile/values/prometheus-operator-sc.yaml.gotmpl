@@ -240,8 +240,7 @@ prometheusOperator:
       replacement: service_cluster
 
 defaultRules:
-  labels:
-    role: operator
+  create: false
 
 prometheus:
   prometheusSpec:
@@ -270,7 +269,7 @@ prometheus:
 
     ruleSelector:
       matchLabels:
-        role: operator
+        cluster: service
 
     ## How long to retain metrics
     ##
