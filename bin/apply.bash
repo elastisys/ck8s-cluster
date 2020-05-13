@@ -116,13 +116,15 @@ k8s_run_kubeadm() {
     ansible_inventory="${1}"
     kube_config="${2}"
     ssh_key="${3}"
+    crd_file="${4}"
 
     (
         with_ssh_agent "${ssh_key}" \
             ANSIBLE_CONFIG="${ansible_path}/ansible.cfg" ansible-playbook \
                 -i "${ansible_inventory}" \
                 --extra-vars=kubeconfig_path="${kube_config}" \
-                "${ansible_path}/deploy-kubernetes.yml"
+                "${ansible_path}/deploy-kubernetes.yml" \
+		--extra-vars "crd_file_path=${ansible_path}/../crds/${crd_file}"
     )
 
     sops_encrypt "${kube_config}"
@@ -132,12 +134,12 @@ k8s_run() {
     log_info "Initializing/configuring Kubernetes for service cluster"
 
     k8s_run_kubeadm "${config[ansible_hosts_sc]}" "${secrets[kube_config_sc]}" \
-                "${secrets[ssh_priv_key_sc]}"
+                "${secrets[ssh_priv_key_sc]}" "crds-sc.txt"
 
     log_info "Initializing/configuring Kubernetes for workload cluster"
 
     k8s_run_kubeadm "${config[ansible_hosts_wc]}" "${secrets[kube_config_wc]}" \
-                "${secrets[ssh_priv_key_wc]}"
+                "${secrets[ssh_priv_key_wc]}" "crds-wc.txt"
 }
 
 k8s_validate() {
