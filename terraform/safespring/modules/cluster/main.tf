@@ -84,6 +84,7 @@ module "dns" {
   source = "../../../modules/openstack/aws-dns"
 
   dns_list = var.dns_list
+  dns_prefix = var.dns_prefix
 
   aws_dns_zone_id  = var.aws_dns_zone_id
   aws_dns_role_arn = var.aws_dns_role_arn
