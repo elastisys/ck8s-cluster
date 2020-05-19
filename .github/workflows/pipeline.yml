@@ -141,5 +141,16 @@ jobs:
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
+
+  cleanup-docker-image:
+    needs: cleanup
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Cleanup-docker-image
+      run: ./pipeline/cleanup-docker-image.bash
+      shell: bash
+      env:
         DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
