@@ -44,11 +44,6 @@ variable "worker_name_flavor_map" {
   type = map
 }
 
-# For loadbalancers
-variable "octavia_names" {
-  type = list(string)
-}
-
 # For DNS
 variable "dns_list" {
   type = list(string)

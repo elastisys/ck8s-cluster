@@ -1,17 +1,16 @@
-
 output "floating_ips" {
   description = "List of floating ips."
 
-  value = values(openstack_networking_floatingip_v2.loadbalancer_lb_fip)[*].address
+  value = [openstack_networking_floatingip_v2.loadbalancer_lb_fip.address]
 }
 
 output "instance_ips" {
-  description = "The floating (public) ip addresses per instance."
+  description = "The private and public floating ip addresses of the loadbalancer."
 
   value = {
-    for key, name in var.names :
-    name => {
-      "public_ip" = openstack_networking_floatingip_v2.loadbalancer_lb_fip[key].address
+    (local.lb_name) = {
+      "public_ip"  = openstack_networking_floatingip_v2.loadbalancer_lb_fip.address
+      "private_ip" = openstack_lb_loadbalancer_v2.loadbalancer.vip_address
     }
   }
 }

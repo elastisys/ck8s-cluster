@@ -100,18 +100,6 @@ variable master_name_flavor_map_wc {
   }
 }
 
-variable octavia_names_sc {
-  description = "List of names for octavia loadbalancers to create."
-  type        = list(string)
-  default     = ["loadbalancer-0"]
-}
-
-variable octavia_names_wc {
-  description = "List of names for octavia loadbalancers to create."
-  type        = list(string)
-  default     = ["loadbalancer-0"]
-}
-
 variable public_ingress_cidr_whitelist {
   type = string
 }

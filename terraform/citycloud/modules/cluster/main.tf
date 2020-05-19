@@ -63,9 +63,30 @@ module "octavia_lb" {
   source = "../../../modules/openstack/octavia-lb"
 
   external_network_name = var.external_network_name
+  prefix                = var.prefix
 
-  names      = var.octavia_names
-  worker_ips = module.worker.instance_ips
+  loadbalancer_targets = {
+    http = {
+      port               = 80
+      protocol           = "HTTP"
+      target_ips         = module.worker.instance_ips
+      health_path        = "/healthz"
+      health_codes       = "200"
+      health_delay       = 20
+      health_timeout     = 10
+      health_max_retries = 5
+    }
+    https = {
+      port               = 443
+      protocol           = "HTTPS"
+      target_ips         = module.worker.instance_ips
+      health_path        = "/healthz"
+      health_codes       = "200"
+      health_delay       = 20
+      health_timeout     = 10
+      health_max_retries = 5
+    }
+  }
 
   subnet_id = module.network.subnet_id
 }
@@ -73,7 +94,7 @@ module "octavia_lb" {
 module "dns" {
   source = "../../../modules/openstack/aws-dns"
 
-  dns_list = var.dns_list
+  dns_list   = var.dns_list
   dns_prefix = var.dns_prefix
 
   aws_dns_zone_id  = var.aws_dns_zone_id

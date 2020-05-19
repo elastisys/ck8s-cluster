@@ -36,9 +36,6 @@ master_name_flavor_map_wc = {
   "master-0" : "89afeed0-9e41-4091-af73-727298a5d959" #2core 4gb mem 50gb storage
 }
 
-octavia_names_sc=["loadbalancer-0"]
-octavia_names_wc=["loadbalancer-0"]
-
 # TODO: Remove Elastisys range before making repository public
 public_ingress_cidr_whitelist = "194.132.164.168/32" # Elastisys office
 

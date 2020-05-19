@@ -36,8 +36,6 @@ module "service_cluster" {
   worker_names           = var.worker_names_sc
   worker_name_flavor_map = var.worker_name_flavor_map_sc
 
-  octavia_names = var.octavia_names_sc
-
   dns_prefix = var.dns_prefix
   dns_list = [
     "*.ops",
@@ -70,8 +68,6 @@ module "workload_cluster" {
 
   worker_names           = var.worker_names_wc
   worker_name_flavor_map = var.worker_name_flavor_map_wc
-
-  octavia_names = var.octavia_names_wc
 
   dns_prefix = var.dns_prefix
   dns_list = [

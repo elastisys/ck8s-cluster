@@ -1,115 +1,98 @@
 locals {
-  instance_ips = [for key, value in var.worker_ips : { instance_name = key, instance_ip = value.private_ip }]
-  octavia_matrix = [
-    for pair in setproduct(var.names, local.instance_ips) : {
-      octavia_name  = pair[0]
-      instance_name = pair[1].instance_name
-      instance_ip   = pair[1].instance_ip
+
+  lb_name = var.prefix
+
+  # Flatten loadbalancer_targets to get a list of all individual members.
+  members = flatten([
+    for name, pool in var.loadbalancer_targets : [
+      for key, value in pool.target_ips : {
+        key           = name
+        port          = pool.port
+        protocol      = pool.protocol
+        instance_name = key
+        instance_ip   = value.private_ip
+      }
+    ]
+  ])
+
+  # Create a map with unique keys for all pool members.
+  # The key will be <loadbalancer-name>.<instance-name>.<protocol>, e.g.
+  # "loadbalancer-0.worker-0.http".
+  pool_members = {
+    for member in local.members : "${local.lb_name}.${member.instance_name}.${member.protocol}" => {
+      protocol    = member.protocol
+      port        = member.port
+      instance_ip = member.instance_ip
+      pool_name   = "${local.lb_name}.${member.key}"
     }
-  ]
+  }
+
+  # Create a map with unique keys for all loadbalancer pools.
+  # The key will be <loadbalancer-name>.<loadbalancer_target.key>, e.g.
+  # "loadbalancer-0.http" or "loadbalancer-0.https".
+  # This can be used directly with for_each.
+  loadbalancer_pools = {
+    for key, value in var.loadbalancer_targets : "${local.lb_name}.${key}" => {
+      target = value
+    }
+  }
 }
 
 resource "openstack_lb_loadbalancer_v2" "loadbalancer" {
-  for_each      = var.names
-  name          = each.value
+  name          = var.prefix
   vip_subnet_id = var.subnet_id
 }
 
-resource "openstack_lb_listener_v2" "loadbalancer_80" {
-  for_each        = var.names
-  name            = "${each.value}-80"
-  protocol        = "HTTP"
-  protocol_port   = 80
-  loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer[each.value].id
-  default_pool_id = openstack_lb_pool_v2.loadbalancer_http[each.value].id
-}
-
-resource "openstack_lb_listener_v2" "loadbalancer_443" {
-  for_each        = var.names
-  name            = "${each.value}-443"
-  protocol        = "HTTPS"
-  protocol_port   = 443
-  loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer[each.value].id
-  default_pool_id = openstack_lb_pool_v2.loadbalancer_https[each.value].id
-}
-
-resource "openstack_lb_pool_v2" "loadbalancer_http" {
-  for_each        = var.names
-  name            = "${each.value}-80"
+resource "openstack_lb_pool_v2" "loadbalancer_pool" {
+  for_each        = local.loadbalancer_pools
+  name            = each.key
   lb_method       = "ROUND_ROBIN"
-  protocol        = "HTTP"
-  loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer[each.value].id
+  protocol        = each.value.target.protocol
+  loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer.id
 }
 
-resource "openstack_lb_pool_v2" "loadbalancer_https" {
-  for_each        = var.names
-  name            = "${each.value}-443"
-  lb_method       = "ROUND_ROBIN"
-  protocol        = "HTTPS"
-  loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer[each.value].id
+resource "openstack_lb_listener_v2" "loadbalancer_listener" {
+  for_each        = local.loadbalancer_pools
+  name            = each.key
+  protocol        = each.value.target.protocol
+  protocol_port   = each.value.target.port
+  loadbalancer_id = openstack_lb_loadbalancer_v2.loadbalancer.id
+  default_pool_id = openstack_lb_pool_v2.loadbalancer_pool[each.key].id
 }
 
-
-resource "openstack_lb_member_v2" "loadbalancer_80" {
-  for_each = {
-    for pair in local.octavia_matrix : "${pair.octavia_name}.${pair.instance_name}" => pair
-  }
+resource "openstack_lb_member_v2" "pool_member" {
+  for_each = local.pool_members
+  pool_id  = openstack_lb_pool_v2.loadbalancer_pool[each.value.pool_name].id
 
   address       = each.value.instance_ip
-  pool_id       = openstack_lb_pool_v2.loadbalancer_http[each.value.octavia_name].id
-  protocol_port = 80
-  subnet_id     = var.subnet_id
-}
-
-resource "openstack_lb_member_v2" "loadbalancer_443" {
-  for_each = {
-    for pair in local.octavia_matrix : "${pair.octavia_name}.${pair.instance_name}" => pair
-  }
-
-  address       = each.value.instance_ip
-  pool_id       = openstack_lb_pool_v2.loadbalancer_https[each.value.octavia_name].id
-  protocol_port = 443
+  protocol_port = each.value.port
   subnet_id     = var.subnet_id
 }
 
 resource "openstack_networking_floatingip_v2" "loadbalancer_lb_fip" {
-  for_each = var.names
-  pool     = var.external_network_name
+  pool        = var.external_network_name
+  description = "IP for LB ${local.lb_name}"
 }
 
 resource "openstack_networking_floatingip_associate_v2" "loadbalancer_lb_fip_assoc" {
-  for_each    = var.names
-  floating_ip = openstack_networking_floatingip_v2.loadbalancer_lb_fip[each.value].address
-  port_id     = openstack_lb_loadbalancer_v2.loadbalancer[each.value].vip_port_id
+  floating_ip = openstack_networking_floatingip_v2.loadbalancer_lb_fip.address
+  port_id     = openstack_lb_loadbalancer_v2.loadbalancer.vip_port_id
   depends_on = [
     openstack_lb_loadbalancer_v2.loadbalancer,
-    openstack_lb_listener_v2.loadbalancer_80,
-    openstack_lb_listener_v2.loadbalancer_443
+    openstack_lb_listener_v2.loadbalancer_listener
   ]
 }
 
 # Health Monitor
 
-resource "openstack_lb_monitor_v2" "loadbalancer_80" {
-  for_each       = var.names
-  name           = "${each.value}-80"
-  pool_id        = openstack_lb_pool_v2.loadbalancer_http[each.value].id
-  type           = "HTTP"
-  url_path       = "/healthz"
-  expected_codes = "200"
-  delay          = 20
-  timeout        = 10
-  max_retries    = 5
-}
-
-resource "openstack_lb_monitor_v2" "loadbalancer_443" {
-  for_each       = var.names
-  name           = "${each.value}-443"
-  pool_id        = openstack_lb_pool_v2.loadbalancer_https[each.value].id
-  type           = "HTTPS"
-  url_path       = "/healthz"
-  expected_codes = "200"
-  delay          = 20
-  timeout        = 10
-  max_retries    = 5
+resource "openstack_lb_monitor_v2" "loadbalancer_monitor" {
+  for_each       = local.loadbalancer_pools
+  name           = each.key
+  pool_id        = openstack_lb_pool_v2.loadbalancer_pool[each.key].id
+  type           = each.value.target.protocol
+  url_path       = each.value.target.health_path != "ignore" ? each.value.target.health_path : null
+  expected_codes = each.value.target.health_codes != "ignore" ? each.value.target.health_codes : null
+  delay          = each.value.target.health_delay
+  timeout        = each.value.target.health_timeout
+  max_retries    = each.value.target.health_max_retries
 }
