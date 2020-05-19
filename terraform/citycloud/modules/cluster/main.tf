@@ -86,6 +86,16 @@ module "octavia_lb" {
       health_timeout     = 10
       health_max_retries = 5
     }
+    kube_api = {
+      port               = 6443
+      protocol           = "TCP"
+      target_ips         = module.master.instance_ips
+      health_path        = "ignore"
+      health_codes       = "ignore"
+      health_delay       = 20
+      health_timeout     = 10
+      health_max_retries = 5
+    }
   }
 
   subnet_id = module.network.subnet_id

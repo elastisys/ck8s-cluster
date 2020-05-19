@@ -9,12 +9,13 @@
   reinstallation of Kubernetes and apps.
 - Exoscale now uses a stable EIP as public endpoint for the control plane.
 - Safespring now uses a HAProxy as public endpoint for the control plane.
+- Citycloud now uses an Octavia LB and floating IP as endpoint for the control plane.
 
 ### Release notes
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
 - No migration script is available for the terraform changes to safespring and citycloud. Manual migration might be possible.
 - No migration script is available for cert-manager. A new cluster is required.
-- No migration path is available for the control plane public endpoint change on Exoscale and Safespring. The clusters must be recreated.
+- No migration path is available for the control plane public endpoint change on Exoscale, Safespring and Citycloud. The clusters must be recreated.
 - To apply grafana dashboard improvements to existing clusters run `./migration/v0.2.x-v0.3.0/migrate-grafana-dashboards.bash`
 - The NFS servers need to be rebooted to apply the removal of the whitelisting
   after the change has been applied.
@@ -48,7 +49,8 @@
 - Support to configure falco alerts for slack and alertmanager.
 - Falcosidekick for handling falco outputs.
 - EIP for control plane on Exoscale
-- Support for HA control plane on Exoscale and Safespring
+- Octavia LB for control plane on Citycloud.
+- Support for HA control plane on Exoscale, Safespring and Citycloud.
 - End-user roles for Kibana are now created automatically during deployment.
 - CRDs, with the exemption of project calico, are now vendored in the /crds folder and deployed using ansible during the k8s apply step.
 - Fluentd-prometheus exporter for SC and WC

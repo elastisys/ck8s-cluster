@@ -57,8 +57,8 @@ EOF
     cloud_config            = "/etc/kubernetes/cloud.conf"
     calico_mtu              = "1480"
     loadbalancers           = ""
-    public_endpoint         = values(module.service_cluster.master_ips)[0].public_ip
-    control_plane_endpoint  = ""
+    public_endpoint         = values(module.service_cluster.loadbalancer_ips)[0].public_ip
+    control_plane_endpoint  = values(module.service_cluster.loadbalancer_ips)[0].private_ip
     control_plane_port      = ""
     internal_lb_children    = ""
     kubeadm_init_extra_args = ""
@@ -92,8 +92,8 @@ EOF
     cloud_config            = "/etc/kubernetes/cloud.conf"
     calico_mtu              = "1480"
     loadbalancers           = ""
-    public_endpoint         = values(module.workload_cluster.master_ips)[0].public_ip
-    control_plane_endpoint  = ""
+    public_endpoint         = values(module.workload_cluster.loadbalancer_ips)[0].public_ip
+    control_plane_endpoint  = values(module.workload_cluster.loadbalancer_ips)[0].private_ip
     control_plane_port      = ""
     internal_lb_children    = ""
     kubeadm_init_extra_args = ""
