@@ -20,18 +20,7 @@ export CK8S_ENVIRONMENT_NAME="pipeline-${CK8S_CLOUD_PROVIDER}-${CK8S_FLAVOR}-${G
 
 # Update ck8s configuration
 
-config_update() {
-    sed -i 's/'"${1}"'=".*"/'"${1}"'="'"${2}"'"/g' \
-        "${CK8S_CONFIG_PATH}/config.sh"
-}
-
-secrets_update() {
-    secrets_env="${CK8S_CONFIG_PATH}/secrets.env"
-    sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -d -i "${secrets_env}"
-    sed -i 's/'"${1}"'=.*/'"${1}"'='"${2}"'/g' "${secrets_env}"
-    sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -e -i "${secrets_env}"
-
-}
+my_ip=$(curl ifconfig.me 2>/dev/null)
 
 case "${CK8S_CLOUD_PROVIDER}" in
     "exoscale")
@@ -44,11 +33,8 @@ case "${CK8S_CLOUD_PROVIDER}" in
     secrets_update S3_SECRET_KEY "${CI_EXOSCALE_SECRET}"
 
     # No whitelisting
-    sed -i ':a;N;$!ba;s/public_ingress_cidr_whitelist = \[[^]]*\]/public_ingress_cidr_whitelist = \["0.0.0.0\/0"\]/g' \
-        "${CK8S_CONFIG_PATH}/config.tfvars"
-
-    sed -i ':a;N;$!ba;s/api_server_whitelist = \[[^]]*\]/api_server_whitelist = \["0.0.0.0\/0"\]/g' \
-        "${CK8S_CONFIG_PATH}/config.tfvars"
+    whitelist_update "public_ingress_cidr_whitelist" $my_ip 
+    whitelist_update "api_server_whitelist" $my_ip
     ;;
     "safespring")
     config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.elastisys.se"
@@ -77,10 +63,8 @@ case "${CK8S_CLOUD_PROVIDER}" in
     secrets_update AWS_SECRET_ACCESS_KEY "${CI_AWS_SECRET_ACCESS_KEY}"
 
     # No whitelisting
-    sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = ["0.0.0.0\/0"]/' \
-        "${CK8S_CONFIG_PATH}/config.tfvars"
-    sed -i 's/api_server_whitelist = .*/api_server_whitelist = ["0.0.0.0\/0"]/' \
-        "${CK8S_CONFIG_PATH}/config.tfvars"
+    whitelist_update "public_ingress_cidr_whitelist" $my_ip 
+    whitelist_update "api_server_whitelist" $my_ip
     ;;
 esac
 

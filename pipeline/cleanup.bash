@@ -10,6 +10,7 @@ set -eu -o pipefail
 here="$(dirname "$(readlink -f "$0")")"
 bin_path="${here}/../bin"
 terraform_path="${here}/../terraform"
+ck8s="${here}/../bin/ck8s"
 
 source "${here}/common.bash"
 source "${bin_path}/common.bash"
@@ -19,6 +20,11 @@ sops_pgp_setup
 terraform_setup
 
 # Delete infrastructure
+my_ip=$(curl ifconfig.me 2>/dev/null)
+whitelist_update "public_ingress_cidr_whitelist" $my_ip 
+whitelist_update "api_server_whitelist" $my_ip
+
+TF_CLI_ARGS_apply="-auto-approve" "${ck8s}" apply infra
 
 TF_CLI_ARGS_destroy="-auto-approve" \
     sops exec-env "${CK8S_CONFIG_PATH}/secrets.env" "${bin_path}/destroy.bash"

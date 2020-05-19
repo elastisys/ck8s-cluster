@@ -1,12 +1,14 @@
 FROM ubuntu:18.04
 
 ENV ANSIBLE_VERSION "2.5.1+dfsg-1ubuntu0.1"
+
 RUN  apt-get update && \
      apt-get install -y \
          python3-pip make git wget \
          unzip ssh gettext-base \
          jq curl python3.7 apache2-utils \
-         ansible="${ANSIBLE_VERSION}" && \
+         ansible="${ANSIBLE_VERSION}" \
+         net-tools iputils-ping && \
      rm -rf /var/lib/apt/lists/*
 
 # sops
