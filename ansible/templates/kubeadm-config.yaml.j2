@@ -6,12 +6,13 @@ localAPIEndpoint:
 nodeRegistration:
   criSocket: /var/run/dockershim.sock
   kubeletExtraArgs:
+    node-ip: "{{ private_ip }}"
     cgroup-driver: "systemd"
 {% if cloud_provider is defined %}
     cloud-provider: "{{ cloud_provider }}"
-{% endif %}
 {% if cloud_config is defined %}
     cloud-config: "{{ cloud_config }}"
+{% endif %}
 {% endif %}
 
 ---

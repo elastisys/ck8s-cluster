@@ -124,3 +124,4 @@
   * requiring networkpolicies for all pods,
   * and requiring resource requests on all pods.
 - `public_ingress_cidr_whitelist` is now a list on openstack providers
+- Exoscale clusters to now use private network for internal communication

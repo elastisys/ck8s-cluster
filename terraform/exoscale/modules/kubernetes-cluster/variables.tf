@@ -36,6 +36,10 @@ variable "api_server_whitelist" {
   type = list(string)
 }
 
+variable "private_network_cidr" {
+  default = "172.0.10.0/24"
+}
+
 variable "compute_instance_image" {}
 
 ## DNS

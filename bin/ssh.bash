@@ -55,7 +55,7 @@ case "${2}" in
         shift 3
     ;;
     nfs)
-        json_path=".${cluster}.nfs_ip_addresses"
+        json_path=".${cluster}.nfs_ip_addresses[\"nfs\"].public_ip"
         shift 2
     ;;
     *) usage ;;

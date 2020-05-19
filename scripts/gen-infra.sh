@@ -24,7 +24,8 @@ service=$(echo $tf_out | jq '{
     "dns_name": .sc_dns_name.value,
     "domain_name": .domain_name.value,
     "worker_count": .sc_worker_ips.value | length,
-    "master_count": .sc_master_ips.value | length}
+    "master_count": .sc_master_ips.value | length,
+    "nfs_count": .sc_nfs_ips.value | length}
     | {"service_cluster": values}')
 
 workload=$(echo $tf_out | jq '{
@@ -37,7 +38,8 @@ workload=$(echo $tf_out | jq '{
     "dns_name": .wc_dns_name.value,
     "domain_name": .domain_name.value,
     "worker_count": .wc_worker_ips.value | length,
-    "master_count": .wc_master_ips.value | length}
+    "master_count": .wc_master_ips.value | length,
+    "nfs_count": .sc_nfs_ips.value | length}
     | {"workload_cluster": values}')
 
 echo $workload $service | jq -s add

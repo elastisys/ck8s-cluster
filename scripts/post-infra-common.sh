@@ -14,8 +14,8 @@ infra="$1"
 # Common environment variables needed for deploy-*.sh
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
-    export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_ip_addresses')
-    export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_ip_addresses')
+    export NFS_SC_SERVER_IP=$(cat $infra | jq -r '.service_cluster.nfs_ip_addresses.nfs.private_ip')
+    export NFS_WC_SERVER_IP=$(cat $infra | jq -r '.workload_cluster.nfs_ip_addresses.nfs.private_ip')
 fi
 
 export MASTER_WC_SERVER_IP=$(cat $infra | jq -r 'first(.workload_cluster.master_ip_addresses[].public_ip)')

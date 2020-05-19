@@ -19,6 +19,9 @@ control_plane_port='${control_plane_port}'
 %{ if public_endpoint != "" ~}
 public_endpoint='${public_endpoint}'
 %{ endif ~}
+%{ if private_network_cidr != "" ~}
+private_network_cidr='${private_network_cidr}'
+%{ endif ~}
 %{ if cloud_provider != "" ~}
 cloud_provider='${cloud_provider}'
 %{ endif ~}

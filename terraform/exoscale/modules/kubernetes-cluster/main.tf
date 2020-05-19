@@ -10,6 +10,42 @@ data "exoscale_compute_template" "os_image" {
   filter = "mine"
 }
 
+data "exoscale_compute" "master_nodes" {
+  for_each = exoscale_compute.master
+
+  id = each.value.id
+
+  # Since private IP address is not assigned until the nics are created we need this
+  depends_on = [ exoscale_nic.master_private_network_nic ]
+}
+
+data "exoscale_compute" "worker_nodes" {
+  for_each = exoscale_compute.worker
+
+  id = each.value.id
+
+  # Since private IP address is not assigned until the nics are created we need this
+  depends_on = [ exoscale_nic.worker_private_network_nic ]
+}
+
+data "exoscale_compute" "nfs_node" {
+  id = exoscale_compute.nfs.id
+
+  # Since private IP address is not assigned until the nics are created we need this
+  depends_on = [ exoscale_nic.nfs_private_network_nic ]
+}
+
+resource "exoscale_network" "private_network" {
+  zone  = var.zone
+  name  = "${var.prefix}-network"
+
+  start_ip = cidrhost(var.private_network_cidr, 1)
+  # cidr -1 = Broadcast address
+  # cidr -2 = DHCP server address (exoscale specific)
+  end_ip   = cidrhost(var.private_network_cidr, -3)
+  netmask  = cidrnetmask(var.private_network_cidr)
+}
+
 resource "exoscale_compute" "master" {
   for_each = toset(var.master_names)
 
@@ -21,6 +57,8 @@ resource "exoscale_compute" "master" {
   state           = "Running"
   zone            = var.zone
   security_groups = [exoscale_security_group.master_sg.name]
+
+  user_data = file("${path.module}/templates/master-cloud-init.yaml")
 }
 
 resource "exoscale_compute" "worker" {
@@ -57,14 +95,28 @@ resource "exoscale_compute" "nfs" {
   user_data = templatefile(
     "${path.module}/templates/nfs-cloud-init.tmpl",
     {
-      worker_ips = [
-        for k, v in exoscale_compute.worker :
-        exoscale_compute.worker[k].ip_address
-      ]
-
-      eip_ip_address = exoscale_ipaddress.ingress_controller_lb.ip_address
+      private_network_cidr = var.private_network_cidr
     }
   )
+}
+
+resource "exoscale_nic" "master_private_network_nic" {
+  for_each = exoscale_compute.master
+
+  compute_id = each.value.id
+  network_id = exoscale_network.private_network.id
+}
+
+resource "exoscale_nic" "worker_private_network_nic" {
+  for_each = exoscale_compute.worker
+
+  compute_id = each.value.id
+  network_id = exoscale_network.private_network.id
+}
+
+resource "exoscale_nic" "nfs_private_network_nic" {
+  compute_id = exoscale_compute.nfs.id
+  network_id = exoscale_network.private_network.id
 }
 
 resource "exoscale_security_group" "master_sg" {
@@ -87,34 +139,6 @@ resource "exoscale_security_group_rules" "master_sg_rules" {
     protocol  = "TCP"
     cidr_list = var.api_server_whitelist
     ports     = ["6443"]
-  }
-
-  ingress {
-    protocol = "TCP"
-    ports    = ["0-65535"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
-  }
-  ingress {
-    protocol = "UDP"
-    ports    = ["0-65535"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
-  }
-  ingress {
-    protocol = "IPIP"
-    ports    = ["0"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
   }
 }
 
@@ -139,34 +163,6 @@ resource "exoscale_security_group_rules" "worker_sg_rules" {
     cidr_list = ["0.0.0.0/0"]
     ports     = ["80", "443"]
   }
-
-  ingress {
-    protocol = "TCP"
-    ports    = ["0-65535"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
-  }
-  ingress {
-    protocol = "UDP"
-    ports    = ["0-65535"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
-  }
-  ingress {
-    protocol = "IPIP"
-    ports    = ["0"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
-  }
 }
 
 resource "exoscale_security_group" "nfs_sg" {
@@ -182,25 +178,6 @@ resource "exoscale_security_group_rules" "nfs_sg_rules" {
     protocol  = "TCP"
     cidr_list = var.public_ingress_cidr_whitelist
     ports     = ["22"]
-  }
-
-  ingress {
-    protocol = "TCP"
-    ports    = ["0-65535"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
-  }
-  ingress {
-    protocol = "UDP"
-    ports    = ["0-65535"]
-    user_security_group_list = [
-      exoscale_security_group.master_sg.name,
-      exoscale_security_group.worker_sg.name,
-      exoscale_security_group.nfs_sg.name,
-    ]
   }
 }
 

@@ -2,6 +2,7 @@ output "master_ip_addresses" {
   value = {
     for key, instance in exoscale_compute.master :
     instance.name => {
+      "private_ip" = contains(keys(data.exoscale_compute.master_nodes), key) ? data.exoscale_compute.master_nodes[key].private_network_ip_addresses[0] : ""
       "public_ip" = exoscale_compute.master[key].ip_address
     }
   }
@@ -11,13 +12,23 @@ output "worker_ip_addresses" {
   value = {
     for key, instance in exoscale_compute.worker :
     instance.name => {
+      "private_ip" = contains(keys(data.exoscale_compute.worker_nodes), key) ? data.exoscale_compute.worker_nodes[key].private_network_ip_addresses[0] : ""
       "public_ip" = exoscale_compute.worker[key].ip_address
     }
   }
 }
 
 output "nfs_ip_address" {
-  value = "${exoscale_compute.nfs.ip_address}"
+  value = {
+    "nfs" = {
+      "private_ip" = data.exoscale_compute.nfs_node.private_network_ip_addresses[0]
+      "public_ip" = exoscale_compute.nfs.ip_address
+    }
+  }
+}
+
+output "cluster_private_network_cidr" {
+  value = var.private_network_cidr
 }
 
 output "dns_record_name" {

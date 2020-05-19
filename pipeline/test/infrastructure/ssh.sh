@@ -20,18 +20,13 @@ function check_hosts () {
 
     user="ubuntu"
 
-    if [ "$type" == "worker" ] || [ "$type" == "master" ]
+    nr_hosts=$(jq -r ".${prefix}.${type}_count" < $infra)
+    host_addresses=( $(jq -r ".${prefix}.${type}_ip_addresses[].public_ip" < $infra) )
+
+    if [ "$type" == "nfs" ] && [ "$host_addresses" == "null" ]
     then
-        nr_hosts=$(cat $infra | jq -r ".${prefix}.${type}_count" )
-        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses[].public_ip" ))
-    elif [ "$type" == "nfs" ]
-    then
-        nr_hosts=1
-        host_addresses=($(cat $infra | jq -r ".${prefix}.${type}_ip_addresses" ))
-        if [ "$host_addresses" == "null" ]; then
-            echo "no nfs used"
-            exit 0
-        fi
+        echo "no nfs used"
+        return 0
     fi
 
     # Check that the list of host ip addresses is equal to the number of desired workers.

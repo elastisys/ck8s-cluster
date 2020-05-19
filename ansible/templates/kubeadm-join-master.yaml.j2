@@ -6,9 +6,10 @@ discovery:
     token: "{{ hostvars[groups.masters_active.0].join_token }}"
     caCertHashes:
     - "sha256:{{ hostvars[groups.masters_active.0].ca_key_hash }}"
-{% if cloud_provider is defined %}
 nodeRegistration:
   kubeletExtraArgs:
+    node-ip: "{{ private_ip }}"
+{% if cloud_provider is defined %}
     cloud-provider: "{{ cloud_provider }}"
 {% if cloud_config is defined %}
     cloud-config: "{{ cloud_config }}"

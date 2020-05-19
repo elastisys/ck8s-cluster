@@ -1,5 +1,12 @@
 #cloud-config
 write_files:
+  - path: /etc/netplan/eth1.yaml
+    content: |
+      network:
+        version: 2
+        ethernets:
+          eth1:
+            dhcp4: true
   - content: |
         [Unit]
         Description=Node Exporter
@@ -18,12 +25,11 @@ write_files:
     permissions: '0644'
     path: /etc/systemd/system/node_exporter.service
 runcmd:
+  - netplan apply
   # Install and configre the NFS server
   - sudo apt-get install nfs-kernel-server -y
   - sudo mkdir -p /nfs && sudo chown nobody:nogroup /nfs
-  # TODO: This currently allows all. We should whitelist the private network
-  #       when/if that gets implemented.
-  - echo "/nfs *(rw,sync,no_subtree_check,no_root_squash)" > /etc/exports
+  - echo "/nfs ${private_network_cidr}(rw,sync,no_subtree_check,no_root_squash)" > /etc/exports
   - sudo exportfs -rav
   - sudo ufw allow 2049
 

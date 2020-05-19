@@ -1,5 +1,14 @@
 #cloud-config
+write_files:
+  - path: /etc/netplan/ens6.yaml
+    content: |
+      network:
+        version: 2
+        ethernets:
+          ens6:
+            dhcp4: true
 runcmd:
+  - netplan apply
   # TODO: When a VM is seen as healthy and is added to the EIP loadbalancer
   #       pool it no longer can send traffic back to itself via the EIP IP
   #       address.
