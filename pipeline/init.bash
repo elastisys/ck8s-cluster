@@ -62,6 +62,21 @@ case "${CK8S_CLOUD_PROVIDER}" in
     sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = "0.0.0.0\/0"/' \
         "${CK8S_CONFIG_PATH}/config.tfvars"
     ;;
+    "citycloud")
+    config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.elastisys.se"
+    config_update ECK_OPS_DOMAIN "ops.${CK8S_ENVIRONMENT_NAME}.elastisys.se"
+
+    secrets_update OS_USERNAME "${CITYCLOUD_OS_USERNAME}"
+    secrets_update OS_PASSWORD "${CITYCLOUD_OS_PASSWORD}"
+    secrets_update S3_ACCESS_KEY "${CITYCLOUD_S3_ACCESS_KEY}"
+    secrets_update S3_SECRET_KEY "${CITYCLOUD_S3_SECRET_KEY}"
+    secrets_update AWS_ACCESS_KEY_ID "${CI_AWS_ACCESS_KEY_ID}"
+    secrets_update AWS_SECRET_ACCESS_KEY "${CI_AWS_SECRET_ACCESS_KEY}"
+
+    # No whitelisting
+    sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = "0.0.0.0\/0"/' \
+        "${CK8S_CONFIG_PATH}/config.tfvars"
+    ;;
 esac
 
 # Add additional config changes here
