@@ -59,6 +59,7 @@
 - Custom alert chart (based on prometheus-operator alerts) to make it easier to tweak, enable/disable alerts as needed.
 - Documentation regarding cluster migration
 - Api server whitelisting on all providers
+- Pipeline now uses and tests whitelisting
 
 ### Fixed
 

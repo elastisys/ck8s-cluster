@@ -46,14 +46,13 @@ function check_hosts () {
     do
         echo "Checking host: $host"
         success="false"
-        wait_time=0
+        SECONDS=0
 
-        while [[ "$success" != "true" ]] && [[ $wait_time -lt 240 ]]
+        while [[ "$success" != "true" ]] && [[ $SECONDS -lt 240 ]]
         do
             echo "Retrying host: $host"
             success="true"
             ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1 || success="false"
-            wait_time=$((wait_time + 5))
             sleep 5
         done
 
