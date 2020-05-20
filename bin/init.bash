@@ -27,7 +27,8 @@ if [ "${CK8S_FLAVOR}" != "default" ] &&
 fi
 if [ "${CK8S_FLAVOR}" == "ha" ] &&
     ([ "${CK8S_CLOUD_PROVIDER}" != "exoscale" ] &&
-    [ "${CK8S_CLOUD_PROVIDER}" != "safespring" ]); then
+    [ "${CK8S_CLOUD_PROVIDER}" != "safespring" ] &&
+    [ "${CK8S_CLOUD_PROVIDER}" != "citycloud" ]); then
     log_error "ERROR: Unsupported flavor: ${CK8S_FLAVOR}"
     log_error "for cloud provider: ${CK8S_CLOUD_PROVIDER}"
     exit 1
