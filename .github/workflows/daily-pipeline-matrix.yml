@@ -2,7 +2,7 @@ name: Matrix-pipeline
 
 on:
   schedule:
-    - cron: "0 5 * * *"
+    - cron: "0 3 * * *"
 
 jobs:
   build-image:
