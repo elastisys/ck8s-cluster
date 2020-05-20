@@ -24,7 +24,8 @@ my_ip=$(curl ifconfig.me 2>/dev/null)
 whitelist_update "public_ingress_cidr_whitelist" $my_ip 
 whitelist_update "api_server_whitelist" $my_ip
 
-TF_CLI_ARGS_apply="-auto-approve" "${ck8s}" apply infra
+TF_CLI_ARGS_apply="-auto-approve" \
+    sops exec-env "${CK8S_CONFIG_PATH}/secrets.env" "${bin_path}/apply.bash infra tf"
 
 TF_CLI_ARGS_destroy="-auto-approve" \
     sops exec-env "${CK8S_CONFIG_PATH}/secrets.env" "${bin_path}/destroy.bash"

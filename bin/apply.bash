@@ -259,19 +259,26 @@ apps() {
 #
 
 config_load
-
-if [ "${1}" = "infra" ]; then
-    infra
-elif [ "${1}" = "k8s" ]; then
+if [ $# -le 2 ] && [ "${1}" = "infra" ]; then
+    if [ $# -eq 1 ]; then
+        infra
+    elif [ "${2}" = "tf" ]; then
+        infra_tf_run
+    else
+        echo "ERROR: ${2} is not a valid argument to infra"
+        echo "Usage: ck8s apply infra [tf]"
+        exit 1
+    fi
+elif [ $# -eq 1 ] && [ "${1}" = "k8s" ]; then
     k8s
-elif [ "${1}" = "apps" ]; then
+elif [ $# -eq 1 ] && [ "${1}" = "apps" ]; then
     apps
-elif [ "${1}" = "all" ]; then
+elif [ $# -eq 1 ] && [ "${1}" = "all" ]; then
     infra
     k8s
     apps
 else
-    echo "ERROR: ${1} is not a valid argument"
+    echo "ERROR: [$@] is not a valid argument"
     echo "Usage: ${0} <infra|k8s|apps|all>"
     exit 1
 fi
