@@ -38,19 +38,19 @@ jobs:
       matrix:
         cloud: ["exoscale", "safespring", "citycloud"]
         # cloud: ["safespring", "exoscale", "aws", "citycloud"]
-        flavor: ["default", "ha"]
+        flavor: ["ha"]
         ## In addition to the matrix, add this
         # include:
         #   - cloud: aws
         #     flavor: "default"
         ## Remove the following from the matrix
-        exclude:
-          - cloud: safespring
-            flavor: ha
-          - cloud: exoscale
-            flavor: default
-          - cloud: citycloud
-            flavor: default
+        # exclude:
+        #   - cloud: safespring
+        #     flavor: ha
+        #   - cloud: exoscale
+        #     flavor: default
+        #   - cloud: citycloud
+        #     flavor: default
     steps:
     - uses: actions/checkout@v1
     - name: Initialize ck8s
