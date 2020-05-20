@@ -51,10 +51,10 @@ case "${CK8S_CLOUD_PROVIDER}" in
     config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.elastisys.se"
     config_update ECK_OPS_DOMAIN "ops.${CK8S_ENVIRONMENT_NAME}.elastisys.se"
 
-    secrets_update OS_USERNAME "${CI_OS_USERNAME}"
-    secrets_update OS_PASSWORD "${CI_OS_PASSWORD}"
-    secrets_update S3_ACCESS_KEY "${CI_S3_ACCESS_KEY}"
-    secrets_update S3_SECRET_KEY "${CI_S3_SECRET_KEY}"
+    secrets_update OS_USERNAME "${SAFESPRING_OS_USERNAME}"
+    secrets_update OS_PASSWORD "${SAFESPRING_OS_PASSWORD}"
+    secrets_update S3_ACCESS_KEY "${SAFESPRING_S3_ACCESS_KEY}"
+    secrets_update S3_SECRET_KEY "${SAFESPRING_S3_SECRET_KEY}"
     secrets_update AWS_ACCESS_KEY_ID "${CI_AWS_ACCESS_KEY_ID}"
     secrets_update AWS_SECRET_ACCESS_KEY "${CI_AWS_SECRET_ACCESS_KEY}"
 
@@ -65,7 +65,7 @@ case "${CK8S_CLOUD_PROVIDER}" in
 esac
 
 # Add additional config changes here
-config_update ENABLE_FALCO_ALERTS "true" 
+config_update ENABLE_FALCO_ALERTS "true"
 
 # TODO: The GitHub Actions runner does not run as root. Chmodding for now.
 #       Would be nice to find a cleaner solution.
