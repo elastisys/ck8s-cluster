@@ -30,7 +30,7 @@ jobs:
     - run: ./pipeline/test/services/unit-tests/test-opa.sh
       shell: bash
 
-  init:
+  apply:
     needs: unit-tests
     runs-on: ubuntu-latest
     container:
@@ -50,25 +50,6 @@ jobs:
         # and not from secrets.env.
         CI_EXOSCALE_KEY: ${{ secrets.EXOSCALE_API_KEY }}
         CI_EXOSCALE_SECRET: ${{ secrets.EXOSCALE_SECRET_KEY }}
-    - name: Upload config
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: ck8s-config
-        path: ./ck8s_pipeline_config
-
-  apply:
-    needs: init
-    runs-on: ubuntu-latest
-    container:
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download config
-      uses: actions/download-artifact@v1
-      with:
-        name: ck8s-config
-        path: ./ck8s_pipeline_config
     - run: ./pipeline/apply.bash
       shell: bash
       env:
