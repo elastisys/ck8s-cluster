@@ -7,7 +7,7 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    echo "Usage: <sc|wc> <master-#|worker-#|nfs> [cmd]" >&2
+    echo "Usage: <sc|wc> <<master|worker> MACHINE_NAME|nfs> [cmd]" >&2
     exit 1
 }
 
@@ -15,18 +15,25 @@ usage() {
 
 config_load
 
-hostname="${ENVIRONMENT_NAME}"
+prefix=$(cat ${config[tfvars_file]} | grep prefix_${1} | awk '{print $3}')
+if [ "${prefix}" = '""' ]; then
+    hostname="${ENVIRONMENT_NAME}"
+    case "${1}" in
+        sc) hostname+="-service-cluster" ;;
+        wc) hostname+="-workload-cluster" ;;
+    esac
+else
+    hostname=${prefix//\"/}
+fi
 
 case "${1}" in
     sc)
         cluster=service_cluster
-        hostname+="-service-cluster"
         ssh_key="${secrets[ssh_priv_key_sc]}"
         user=ubuntu
     ;;
     wc)
         cluster=workload_cluster
-        hostname+="-workload-cluster"
         ssh_key="${secrets[ssh_priv_key_wc]}"
         user=ubuntu
     ;;
@@ -35,23 +42,27 @@ esac
 
 shopt -s extglob
 case "${2}" in
-    master-+([0-9]))
-        hostname+="-${2}"
+    master)
+        [ ${#} -lt 3 ] && usage
+        hostname+="-${3}"
         json_path=".${cluster}.master_ip_addresses[\"${hostname}\"].public_ip"
+        shift 3
     ;;
-    worker-+([0-9]))
-        hostname+="-${2}"
+    worker)
+        [ ${#} -lt 3 ] && usage
+        hostname+="-${3}"
         json_path=".${cluster}.worker_ip_addresses[\"${hostname}\"].public_ip"
+        shift 3
     ;;
     nfs)
         json_path=".${cluster}.nfs_ip_addresses"
+        shift 2
     ;;
     *) usage ;;
 esac
 
 shopt -u extglob
 
-shift 2
 
 ip=$(cat ${config[infrastructure_file]} | jq -r "${json_path}")
 

@@ -24,7 +24,7 @@ usage() {
     #       confident that the apply command and migrations are good enough
     #       that direct Helmfile access is not necessary.
     echo "  ops helmfile <wc|sc>                        run helmfile as cluster admin" 1>&2
-    echo "  ssh <wc|sc> <master-#|worker-#|nfs> [cmd]   open an SSH session or execute a remote command on a machine" 1>&2
+    echo "  ssh <wc|sc> <<master|worker> NAME>|nfs> [cmd]   open an SSH session or execute a remote command on a machine" 1>&2
     echo "  s3cmd [cmd]                                 run s3cmd" 1>&2
     echo "  completion bash                             output shell completion code for bash" 1>&2
     exit 1
@@ -67,7 +67,7 @@ case "${1}" in
     ;;
     ssh)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        [[ "${3}" =~ ^(worker-[0-9]+|master-[0-9]+|nfs)$ ]] || usage
+        [[ "${3}" =~ ^(worker|master|nfs)$ ]] || usage
         shift
         # TODO: The only reason config secrets are required here is because
         #       config_load validates options in secrets.env as well.

@@ -51,6 +51,20 @@ _ck8s_command_ck8s_ssh() {
     COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
 }
 
+_ck8s_command_ck8s_ssh_sc() {
+    opts+=("master")
+    opts+=("worker")
+    opts+=("nfs")
+    COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
+}
+
+_ck8s_command_ck8s_ssh_wc() {
+    opts+=("master")
+    opts+=("worker")
+    opts+=("nfs")
+    COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
+}
+
 _ck8s_command_ck8s_completion() {
     ops+=("bash")
     COMPREPLY=( $(compgen -W "${ops[*]}" -- ${cur}) )
