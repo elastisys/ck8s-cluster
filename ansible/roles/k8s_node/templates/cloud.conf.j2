@@ -4,3 +4,15 @@ password={{cloud_provider_config.password}}
 auth-url={{cloud_provider_config.auth_url}}
 tenant-id={{cloud_provider_config.tenant_id}}
 domain-name={{cloud_provider_config.domain_name}}
+
+{% if cloud_provider_config.lb_enabled | default(False) == True %}
+[LoadBalancer]
+use-octavia={{"true" if cloud_provider_config.use_octavia | default(false) else "false"}}
+subnet-id={{cloud_provider_config.lb_subnet_id}}
+floating-network-id={{cloud_provider_config.lb_external_network_id}}
+; TODO: Currently we allow traffic to all NodePorts so it is not necessary to
+; modify the security groups when new loadbalancers are added. In the future
+; this will probably change and then we will need to let k8s manage the groups.
+; manage-security-groups=true
+; node-security-group=<id-of-security-group>
+{% endif %}

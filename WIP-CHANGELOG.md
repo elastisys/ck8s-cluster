@@ -21,6 +21,7 @@
 - To apply grafana dashboard improvements to existing clusters run `./migration/v0.2.x-v0.3.0/migrate-grafana-dashboards.bash`
 - The NFS servers need to be rebooted to apply the removal of the whitelisting
   after the change has been applied.
+- No migration path as available for adding support for LoadBalancers on Citycloud. A new cluster is required.
 
 ### Added
 
@@ -62,6 +63,7 @@
 - Pipeline now uses and tests whitelisting
 - Documentation regarding licenses used in ck8s
 - Ability to set `maxconn` and `server/client timeout` in HAproxy configuration for safespring.
+- Citycloud: support Services of type LoadBalancer
 
 ### Fixed
 

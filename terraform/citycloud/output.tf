@@ -55,6 +55,12 @@ EOF
     cluster_name            = var.prefix_sc == "" ? "${terraform.workspace}-service-cluster" : var.prefix_sc
     cloud_provider          = "openstack"
     cloud_config            = "/etc/kubernetes/cloud.conf"
+    cloud_provider_vars = {
+      lb_enabled   = true
+      lb_subnet_id = module.service_cluster.subnet_id
+      lb_external_network_id = var.external_network_id
+      use_octavia  = true
+    }
     calico_mtu              = "1480"
     loadbalancers           = ""
     public_endpoint         = values(module.service_cluster.loadbalancer_ips)[0].public_ip
@@ -91,6 +97,12 @@ EOF
     cluster_name            = var.prefix_wc == "" ? "${terraform.workspace}-workload-cluster" : var.prefix_wc
     cloud_provider          = "openstack"
     cloud_config            = "/etc/kubernetes/cloud.conf"
+    cloud_provider_vars = {
+      lb_enabled   = true
+      lb_subnet_id = module.workload_cluster.subnet_id
+      lb_external_network_id = var.external_network_id
+      use_octavia  = true
+    }
     calico_mtu              = "1480"
     loadbalancers           = ""
     public_endpoint         = values(module.workload_cluster.loadbalancer_ips)[0].public_ip

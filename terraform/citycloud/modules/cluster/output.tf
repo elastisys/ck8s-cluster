@@ -18,3 +18,7 @@ output "dns_record_name" {
 output "dns_suffix" {
   value = module.dns.dns_suffix
 }
+
+output subnet_id {
+  value = module.network.subnet_id
+}

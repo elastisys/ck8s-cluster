@@ -58,6 +58,7 @@ EOF
     cluster_name            = local.prefix_sc
     cloud_provider          = "aws"
     cloud_config            = ""
+    cloud_provider_vars     = ""
     calico_mtu              = "1480"
     loadbalancers           = ""
     control_plane_port      = ""
@@ -94,6 +95,7 @@ EOF
     cluster_name            = local.prefix_wc
     cloud_provider          = "aws"
     cloud_config            = ""
+    cloud_provider_vars     = ""
     calico_mtu              = "1480"
     loadbalancers           = ""
     control_plane_port      = ""

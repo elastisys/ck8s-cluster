@@ -28,6 +28,11 @@ cloud_provider='${cloud_provider}'
 %{ if cloud_config != "" ~}
 cloud_config='${cloud_config}'
 %{ endif ~}
+%{ if cloud_provider_vars != "" ~}
+cloud_provider_vars='${jsonencode(
+  { for key, value in cloud_provider_vars : key => value }
+)}'
+%{ endif ~}
 cluster_name='${cluster_name}'
 
 calico_mtu='${calico_mtu}'
