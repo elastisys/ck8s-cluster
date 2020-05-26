@@ -1,3 +1,10 @@
+FROM golang:1.14.2-alpine3.11 as builder
+
+RUN apk add --no-cache make git
+WORKDIR /ck8s
+COPY . /ck8s
+RUN make build
+
 FROM ubuntu:18.04
 
 ENV ANSIBLE_VERSION "2.5.1+dfsg-1ubuntu0.1"
