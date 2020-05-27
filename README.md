@@ -206,12 +206,6 @@ To add or override the default configuration that is used for all the helm chart
 
 ## Issues and limitations
 
-### [Exoscale] EIP cleanup sometimes fail
-
-Sometimes EIPs are not possible to delete due to still being seen as having
-attached instances.
-See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030112
-
 ### Unable to change default password for Elasticsearch user
 
 As of yet it is not possible to change the default password of the **elastic** user that the elasticsearch operator creates.
