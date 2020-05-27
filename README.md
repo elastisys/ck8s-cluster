@@ -212,11 +212,6 @@ Sometimes EIPs are not possible to delete due to still being seen as having
 attached instances.
 See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030112
 
-### RancherOS multiple interfaces cloud-init issue
-
-Currently cloud-init in RancherOS does not correctly handle when running with multiple network interfaces e.g. `eth0` and `eth1` - (privnet).
-See: https://portal.exoscale.com/u/a1di-security-elastisys-dev/tickets/1030849
-
 ### Unable to change default password for Elasticsearch user
 
 As of yet it is not possible to change the default password of the **elastic** user that the elasticsearch operator creates.
