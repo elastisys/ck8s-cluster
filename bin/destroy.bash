@@ -6,7 +6,7 @@
 #       upon with things like cleaning up loadbalancer, volumes etc.
 
 # To run it, execute the following:
-# sops exec-env [config-path/secrets.env] ./destroy.bash
+# sops exec-env ${CK8S_CONFIG_PATH}/secrets.env ./bin/destroy.bash
 
 set -eu -o pipefail
 
@@ -47,6 +47,68 @@ delete_volumes() {
         log_info "All volumes where successfully cleaned up!"
     fi
 }
+
+delete_loadbalancers() {
+    kube_config=${1}
+
+    # Get all namespaces with LB Services, remove duplicates
+    lb_namespaces="$(with_kubeconfig "${kube_config}" \
+        'kubectl get svc --all-namespaces \
+            -o jsonpath="{.items[?(@.spec.type==\"LoadBalancer\")].metadata.namespace}" |
+            tr " " "\n" | sort -u | tr "\n" " "
+        ')"
+
+    # Delete all LB Services from the namespaces
+    for ns in ${lb_namespaces}
+    do
+        # Continue if there are no namespaces
+        [[ "${ns}" != "" ]] || continue
+
+        lb_services="$(with_kubeconfig "${kube_config}" \
+            'kubectl -n '"${ns}"' get svc \
+                -o jsonpath="{.items[?(@.spec.type==\"LoadBalancer\")].metadata.name}"')"
+        with_kubeconfig "${kube_config}" \
+            "kubectl -n ${ns} delete svc ${lb_services}"
+    done
+
+    lbs_left="$(with_kubeconfig "${kube_config}" \
+        'kubectl get svc --all-namespaces \
+            -o jsonpath="{.items[?(@.spec.type==\"LoadBalancer\")]['"'"'metadata.name'"'"', '"'"'metadata.namespace'"'"']}"
+        ')"
+
+    if [ "${lbs_left}" != "" ]; then
+        log_warning "WARNING: There seems to be LoadBalancers left in the"
+        log_warning "         cluster, this will result in LoadBalancer that"
+        log_warning "         needs to be cleaned up manually."
+        log_warning "LoadBalancer left:"
+        log_warning "${lbs_left}"
+    else
+        log_info "All LoadBalancers where successfully cleaned up!"
+    fi
+}
+
+if [ "${CLOUD_PROVIDER}" = "aws" ] || \
+   [ "${CLOUD_PROVIDER}" = "citycloud" ]; then
+    log_info "Cleaning up LoadBalancers"
+
+    # We want to tear down the infrastructure even if LB cleanup fails.
+    # This could happen, for example, when the kubeconfig file hasn't been
+    # created yet due to some error during the Kubernetes deployment.
+    set +e
+    (
+        set -e
+        log_info "Deleting LoadBalancers in the service cluster"
+        delete_loadbalancers "${secrets[kube_config_sc]}"
+        log_info "Deleting LoadBalancers in the workload cluster"
+        delete_loadbalancers "${secrets[kube_config_wc]}"
+    )
+    if [ "${?}" -ne 0 ]; then
+        log_error \
+            "ERROR: LoadBalancer cleanup failed. \
+            Manual cleanup might be required."
+    fi
+    set -e
+fi
 
 if [ "${CLOUD_PROVIDER}" = "safespring" ] || \
    [ "${CLOUD_PROVIDER}" = "aws" ] || \
