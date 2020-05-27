@@ -1,11 +1,27 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.2.4](#v024---2020-04-29)
 - [v0.2.3](#v023---2020-04-17)
 - [v0.2.2](#v022---2020-04-09)
 - [v0.2.1](#v021---2020-04-03)
 - [v0.2.0](#v020---2020-03-26)
 - [v0.1.0](#v010---2020-03-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.2.4 - 2020-04-29
+
+### Release notes
+
+- If you already have upgraded to 0.2.x you might have to manually clean up
+  indices with errors as well as re-trigger the configure-es job to apply the
+  updates to the index templates.
+
+### Fixed
+
+- Index templates in elasticsearch not selecting the correct ilm policies.
+- Harbor init not completing in time for tests.
+
 
 -------------------------------------------------
 ## v0.2.3 - 2020-04-17
