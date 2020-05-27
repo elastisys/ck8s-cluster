@@ -62,6 +62,9 @@
       until: result is not failed
       when: initialized is changed
 
+    - name: Force calico to use correct interface
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf patch daemonsets. -n kube-system calico-node --patch "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"calico-node\",\"env\":[{\"name\":\"IP_AUTODETECTION_METHOD\",\"value\":\"can-reach={{ private_network_cidr | ipaddr(-2) | ipaddr('address') }}\"}]}]}}}}"
+
     - name: Wait for master to become ready
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}'
       register: master_node_status
