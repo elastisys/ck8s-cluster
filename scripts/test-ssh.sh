@@ -3,9 +3,9 @@
 set -e
 
 # Check that cluster type argument is set and valid.
-if [ "$#" -ne 2 -o "$1" != "service_cluster" -a "$1" != "workload_cluster" ]
+if [ "$#" -ne 2 ] || [ "$1" != "service_cluster" ] && [ "$1" != "workload_cluster" ]
 then
-    >&2 echo "Usage: ssh.sh <service_cluster | workload_cluster> path-to-infra-file"
+    echo "Usage: $0 <service_cluster | workload_cluster> path-to-infra-file" >&2
     exit 1
 fi
 
@@ -39,16 +39,16 @@ function check_hosts () {
     # Check that all hosts are reachable via ssh. Retrying for 1 minute.
     for host in "${host_addresses[@]}"
     do
-        echo "Checking host: $host"
+        MESSAGE="Checking host: $host"
         success="false"
         SECONDS=0
 
         while [[ "$success" != "true" ]] && [[ $SECONDS -lt 240 ]]
         do
-            echo "Retrying host: $host"
-            success="true"
-            ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' >/dev/null 2>&1 || success="false"
+            echo $MESSAGE
+            ssh "$host" -l "$user" -T -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" 'ls' &>/dev/null && success="true"
             sleep 5
+            MESSAGE="Retrying host: $host"
         done
 
         if [[ "$success" == "false" ]]

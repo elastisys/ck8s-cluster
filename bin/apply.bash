@@ -54,13 +54,13 @@ infra_validate_ssh() {
 
     (
         with_ssh_agent "${secrets[ssh_priv_key_sc]}" \
-            "${pipeline_path}/test/infrastructure/ssh.sh" service_cluster \
+            "${scripts_path}/test-ssh.sh" service_cluster \
                 "${config[infrastructure_file]}"
     )
 
     (
         with_ssh_agent "${secrets[ssh_priv_key_wc]}" \
-            "${pipeline_path}/test/infrastructure/ssh.sh" workload_cluster \
+            "${scripts_path}/test-ssh.sh" workload_cluster \
                 "${config[infrastructure_file]}"
     )
 }
