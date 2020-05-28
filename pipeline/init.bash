@@ -32,7 +32,6 @@ case "${CK8S_CLOUD_PROVIDER}" in
     secrets_update S3_ACCESS_KEY "${CI_EXOSCALE_KEY}"
     secrets_update S3_SECRET_KEY "${CI_EXOSCALE_SECRET}"
 
-    # No whitelisting
     whitelist_update "public_ingress_cidr_whitelist" $my_ip 
     whitelist_update "api_server_whitelist" $my_ip
     ;;
@@ -47,9 +46,8 @@ case "${CK8S_CLOUD_PROVIDER}" in
     secrets_update AWS_ACCESS_KEY_ID "${CI_AWS_ACCESS_KEY_ID}"
     secrets_update AWS_SECRET_ACCESS_KEY "${CI_AWS_SECRET_ACCESS_KEY}"
 
-    # No whitelisting
-    sed -i 's/public_ingress_cidr_whitelist = .*/public_ingress_cidr_whitelist = "0.0.0.0\/0"/' \
-        "${CK8S_CONFIG_PATH}/config.tfvars"
+    whitelist_update "public_ingress_cidr_whitelist" $my_ip 
+    whitelist_update "api_server_whitelist" $my_ip
     ;;
     "citycloud")
     config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.elastisys.se"
@@ -62,7 +60,6 @@ case "${CK8S_CLOUD_PROVIDER}" in
     secrets_update AWS_ACCESS_KEY_ID "${CI_AWS_ACCESS_KEY_ID}"
     secrets_update AWS_SECRET_ACCESS_KEY "${CI_AWS_SECRET_ACCESS_KEY}"
 
-    # No whitelisting
     whitelist_update "public_ingress_cidr_whitelist" $my_ip 
     whitelist_update "api_server_whitelist" $my_ip
     ;;
