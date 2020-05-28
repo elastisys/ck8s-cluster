@@ -206,11 +206,6 @@ To add or override the default configuration that is used for all the helm chart
 
 ## Issues and limitations
 
-### Unable to change default password for Elasticsearch user
-
-As of yet it is not possible to change the default password of the **elastic** user that the elasticsearch operator creates.
-See https://github.com/elastic/cloud-on-k8s/issues/967
-
 ### SOPS exec-[file|env] subcommands does not propagate exit code
 
 SOPS is used to encrypt and decrypt secrets in the CK8S configuration.
