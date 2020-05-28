@@ -204,7 +204,7 @@ in to that user. For more information how to use it see
 
 To add or override the default configuration that is used for all the helm charts that are installed through helmfile, one can set the environement variable `CK8S_ADDITIONAL_VALUES` that should point to a path containing the `{release-name-to-add-or-override}.yaml` files.
 
-## Issues and limitations
+## Known issues
 
 ### SOPS exec-[file|env] subcommands does not propagate exit code
 
