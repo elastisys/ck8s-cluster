@@ -22,3 +22,7 @@ output "dns_suffix" {
 output subnet_id {
   value = module.network.subnet_id
 }
+
+output cluster_secgroup_id {
+  value = module.secgroups.cluster_secgroup
+}

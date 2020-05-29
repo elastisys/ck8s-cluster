@@ -60,6 +60,7 @@ EOF
       lb_subnet_id = module.service_cluster.subnet_id
       lb_external_network_id = var.external_network_id
       use_octavia  = true
+      secgroup_id = module.service_cluster.cluster_secgroup_id
     }
     calico_mtu              = "1480"
     loadbalancers           = ""
@@ -102,6 +103,7 @@ EOF
       lb_subnet_id = module.workload_cluster.subnet_id
       lb_external_network_id = var.external_network_id
       use_octavia  = true
+      secgroup_id = module.workload_cluster.cluster_secgroup_id
     }
     calico_mtu              = "1480"
     loadbalancers           = ""
