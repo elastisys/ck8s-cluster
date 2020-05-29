@@ -60,6 +60,7 @@
 - Documentation regarding cluster migration
 - Api server whitelisting on all providers
 - Pipeline now uses and tests whitelisting
+- Documentation regarding licenses used in ck8s
 
 ### Fixed
 
