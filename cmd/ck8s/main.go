@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -150,7 +151,10 @@ func setupClusterClient() error {
 		return err
 	}
 
-	codeRootPath := viper.GetString(codePathFlag)
+	codeRootPath, err := filepath.Abs(viper.GetString(codePathFlag))
+	if err != nil {
+		return err
+	}
 
 	configPath := api.NewConfigPath(configRootPath, clusterType)
 	codePath := api.NewCodePath(codeRootPath, clusterType)
