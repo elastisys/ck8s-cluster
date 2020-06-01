@@ -99,6 +99,12 @@ module "octavia_lb" {
     }
   }
 
+  security_group_ids = [
+    module.secgroups.cluster_secgroup,
+    module.secgroups.master_secgroup,
+    module.secgroups.worker_secgroup,
+  ]
+
   subnet_id = module.network.subnet_id
 }
 

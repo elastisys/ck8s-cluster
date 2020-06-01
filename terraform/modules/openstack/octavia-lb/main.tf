@@ -39,8 +39,10 @@ locals {
 }
 
 resource "openstack_lb_loadbalancer_v2" "loadbalancer" {
-  name          = var.prefix
-  vip_subnet_id = var.subnet_id
+  name               = var.prefix
+  vip_subnet_id      = var.subnet_id
+  security_group_ids = var.security_group_ids
+
 }
 
 resource "openstack_lb_pool_v2" "loadbalancer_pool" {

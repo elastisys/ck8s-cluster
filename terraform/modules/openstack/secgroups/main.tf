@@ -37,7 +37,7 @@ resource "openstack_networking_secgroup_v2" "master" {
 }
 
 resource "openstack_networking_secgroup_rule_v2" "kubernetes_api" {
-  for_each = toset(var.api_server_whitelist)
+  for_each          = toset(var.api_server_whitelist)
   security_group_id = openstack_networking_secgroup_v2.master.id
 
   direction        = "ingress"

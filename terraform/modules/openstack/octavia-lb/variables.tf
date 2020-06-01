@@ -52,3 +52,7 @@ variable external_network_name {
   description = "the name of the external network"
   type        = string
 }
+
+variable "security_group_ids" {
+  type = list(string)
+}
