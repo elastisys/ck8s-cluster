@@ -58,6 +58,7 @@ EOF
     calico_mtu              = "1480"
     loadbalancers           = ""
     public_endpoint         = values(module.service_cluster.loadbalancer_ips)[0].public_ip
+    private_network_cidr    = ""
     control_plane_endpoint  = values(module.service_cluster.loadbalancer_ips)[0].private_ip
     control_plane_port      = ""
     internal_lb_children    = ""
@@ -93,6 +94,7 @@ EOF
     calico_mtu              = "1480"
     loadbalancers           = ""
     public_endpoint         = values(module.workload_cluster.loadbalancer_ips)[0].public_ip
+    private_network_cidr    = ""
     control_plane_endpoint  = values(module.workload_cluster.loadbalancer_ips)[0].private_ip
     control_plane_port      = ""
     internal_lb_children    = ""

@@ -54,6 +54,7 @@ ${local.prefix_sc}-${index}
 EOF
     control_plane_endpoint  = module.service_cluster.master_internal_loadbalancer_fqdn
     public_endpoint         = module.service_cluster.master_external_loadbalancer_fqdn
+    private_network_cidr    = ""
     cluster_name            = local.prefix_sc
     cloud_provider          = "aws"
     cloud_config            = ""
@@ -89,6 +90,7 @@ ${local.prefix_wc}-${index}
 EOF
     control_plane_endpoint  = module.workload_cluster.master_internal_loadbalancer_fqdn
     public_endpoint         = module.workload_cluster.master_external_loadbalancer_fqdn
+    private_network_cidr    = ""
     cluster_name            = local.prefix_wc
     cloud_provider          = "aws"
     cloud_config            = ""
