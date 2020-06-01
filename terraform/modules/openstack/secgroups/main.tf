@@ -6,6 +6,7 @@ resource "openstack_networking_secgroup_v2" "cluster" {
 resource "openstack_networking_secgroup_rule_v2" "ssh" {
   for_each = toset(var.public_ingress_cidr_whitelist)
 
+  # TODO: We should have a separate security group for ssh to keep things clean
   security_group_id = openstack_networking_secgroup_v2.cluster.id
 
   direction        = "ingress"
@@ -29,6 +30,23 @@ resource "openstack_networking_secgroup_rule_v2" "internal_any" {
   direction       = "ingress"
   ethertype       = "IPv4"
   remote_group_id = openstack_networking_secgroup_v2.cluster.id
+}
+
+# TODO: We should try to limit this better. Currently it is not possible to
+# just allow traffic internally in the security group because of this:
+# https://ask.openstack.org/en/question/122858/octavia-health-check-ip-and-security-group/
+# TL;DR: Adding the security group to the LB only allows traffic from its VIP
+# private IP, but requests are actually coming from another private IP.
+# To work around this we allow traffic from the entire subnet.
+resource "openstack_networking_secgroup_rule_v2" "internal_subnet" {
+  # https://github.com/terraform-providers/terraform-provider-openstack/issues/879
+  depends_on = [openstack_networking_secgroup_rule_v2.internal_any]
+
+  security_group_id = openstack_networking_secgroup_v2.cluster.id
+
+  direction        = "ingress"
+  ethertype        = "IPv4"
+  remote_ip_prefix = "172.16.0.0/24"
 }
 
 resource "openstack_networking_secgroup_v2" "master" {

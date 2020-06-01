@@ -34,6 +34,7 @@ module "master" {
   network_id = module.network.network_id
   subnet_id  = module.network.subnet_id
 
+  # TODO: External traffic comes through the LB and shouldn't be allowed here
   security_group_ids = [
     module.secgroups.cluster_secgroup,
     module.secgroups.master_secgroup,
@@ -54,6 +55,7 @@ module "worker" {
   network_id = module.network.network_id
   subnet_id  = module.network.subnet_id
 
+  # TODO: External traffic comes through the LB and shouldn't be allowed here
   security_group_ids = [
     module.secgroups.cluster_secgroup,
     module.secgroups.worker_secgroup,
