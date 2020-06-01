@@ -91,11 +91,17 @@ cd ${SCRIPTS_PATH}/../helmfile
 echo "Installing cert-manager" >&2
 helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
 
+if [[ $ENABLE_OPA == "true" ]]
+then
+    echo "Installing gatekeeper operator" >&2
+    helmfile -f helmfile.yaml -e workload_cluster -l app=gatekeeper-operator $INTERACTIVE apply --suppress-diff
+fi
+
 source ${SCRIPTS_PATH}/install-storage-class-provider.sh
 install_storage_class_provider "${STORAGE_CLASS}" workload_cluster
 
-charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=gatekeeper-constraints"
-[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-operator,app!=gatekeeper-templates"
+charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=gatekeeper-operator,app!=gatekeeper-constraints"
+[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-templates"
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
 [[ $ENABLE_CK8SDASH_WC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
 
