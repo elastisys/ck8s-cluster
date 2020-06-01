@@ -42,8 +42,8 @@ func testState(
 
 func TestTerraformOutputControlPlanePublicIP(t *testing.T) {
 	testCases := map[api.ClusterType]string{
-		api.ServiceCluster:  "159.100.243.37",
-		api.WorkloadCluster: "159.100.242.135",
+		api.ServiceCluster:  "89.145.167.47",
+		api.WorkloadCluster: "89.145.166.90",
 	}
 
 	for clusterType, want := range testCases {
@@ -64,29 +64,29 @@ func TestTerraformOutputMachines(t *testing.T) {
 		api.ServiceCluster: {{
 			NodeType:  api.Master,
 			Name:      "master-0",
-			PublicIP:  "159.100.240.12",
-			PrivateIP: "159.100.240.12",
+			PublicIP:  "159.100.242.187",
+			PrivateIP: "172.0.10.205",
 		}, {
 			NodeType:  api.Worker,
 			Name:      "worker-0",
-			PublicIP:  "159.100.242.99",
-			PrivateIP: "159.100.242.99",
+			PublicIP:  "159.100.242.78",
+			PrivateIP: "172.0.10.59",
 		}, {
 			NodeType:  api.Worker,
 			Name:      "worker-1",
-			PublicIP:  "159.100.242.114",
-			PrivateIP: "159.100.242.114",
+			PublicIP:  "89.145.167.81",
+			PrivateIP: "172.0.10.72",
 		}},
 		api.WorkloadCluster: {{
 			NodeType:  api.Master,
 			Name:      "master-0",
-			PublicIP:  "159.100.242.190",
-			PrivateIP: "159.100.242.190",
+			PublicIP:  "159.100.244.19",
+			PrivateIP: "172.0.10.132",
 		}, {
 			NodeType:  api.Worker,
 			Name:      "worker-0",
-			PublicIP:  "159.100.242.217",
-			PrivateIP: "159.100.242.217",
+			PublicIP:  "89.145.167.114",
+			PrivateIP: "172.0.10.72",
 		}},
 	}
 

@@ -106,6 +106,9 @@ control_plane_port='{{ .ControlPlanePort }}'
 {{ if ControlPlanePublicIP -}}
 public_endpoint='{{ ControlPlanePublicIP }}'
 {{ end -}}
+{{ if .PrivateNetworkCIDR -}}
+private_network_cidr='{{ .PrivateNetworkCIDR }}'
+{{ end -}}
 {{ if .KubeadmInitCloudProvider -}}
 cloud_provider='{{ .KubeadmInitCloudProvider }}'
 {{ end -}}

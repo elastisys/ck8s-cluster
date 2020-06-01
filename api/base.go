@@ -16,6 +16,8 @@ type BaseConfig struct {
 
 	ControlPlanePort int `validate:"required"`
 
+	PrivateNetworkCIDR string
+
 	// KubeadmInitCloudProvider and KubeadmInitCloudConfigPath only needs to
 	// be set if cloud provider specific config is to be used in the
 	// Kubernetes cluster.

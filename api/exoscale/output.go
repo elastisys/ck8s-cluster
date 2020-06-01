@@ -9,10 +9,11 @@ import (
 )
 
 type tfOutputPublicIPsValue struct {
-	PublicIP string `json:"public_ip"`
+	PublicIP  string `json:"public_ip"`
+	PrivateIP string `json:"private_ip"`
 }
 
-type tfOutputPublicIPsObject struct {
+type tfOutputIPsObject struct {
 	Value map[string]tfOutputPublicIPsValue `json:"value"`
 }
 
@@ -24,10 +25,10 @@ type terraformOutput struct {
 	ClusterType api.ClusterType
 	ClusterName string
 
-	SCMasterIPs tfOutputPublicIPsObject `json:"sc_master_ips"`
-	SCWorkerIPs tfOutputPublicIPsObject `json:"sc_worker_ips"`
-	WCMasterIPs tfOutputPublicIPsObject `json:"wc_master_ips"`
-	WCWorkerIPs tfOutputPublicIPsObject `json:"wc_worker_ips"`
+	SCMasterIPs tfOutputIPsObject `json:"sc_master_ips"`
+	SCWorkerIPs tfOutputIPsObject `json:"sc_worker_ips"`
+	WCMasterIPs tfOutputIPsObject `json:"wc_master_ips"`
+	WCWorkerIPs tfOutputIPsObject `json:"wc_worker_ips"`
 
 	SCControlPlaneLBIP tfOutputValue `json:"sc_control_plane_lb_ip_address"`
 	WCControlPlaneLBIP tfOutputValue `json:"wc_control_plane_lb_ip_address"`
@@ -95,14 +96,14 @@ func (e *terraformOutput) Machine(
 
 func (e *terraformOutput) machines(
 	nodeType api.NodeType,
-	publicIPs tfOutputPublicIPsObject,
+	ips tfOutputIPsObject,
 ) (machines []api.MachineState) {
-	for name, publicIP := range publicIPs.Value {
+	for name, ips := range ips.Value {
 		machines = append(machines, api.MachineState{
 			NodeType:  nodeType,
 			Name:      strings.TrimPrefix(name, e.ClusterName+"-"),
-			PublicIP:  publicIP.PublicIP,
-			PrivateIP: publicIP.PublicIP, // TODO: private ip
+			PublicIP:  ips.PublicIP,
+			PrivateIP: ips.PrivateIP,
 		})
 	}
 	return
