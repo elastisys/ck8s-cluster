@@ -9,6 +9,7 @@
 
 ### Added
 - The master and worker VMs in openstack can now, optionally, have anti-affinity or soft anti-affinity. Soft anti-affinity is not available in Safespring.
+- Documentation describing which api extensions that are used by ck8s.
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
