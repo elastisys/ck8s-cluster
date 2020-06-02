@@ -61,6 +61,7 @@
 - Api server whitelisting on all providers
 - Pipeline now uses and tests whitelisting
 - Documentation regarding licenses used in ck8s
+- Ability to set `maxconn` and `server/client timeout` in HAproxy configuration for safespring.
 
 ### Fixed
 
