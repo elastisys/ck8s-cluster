@@ -191,16 +191,7 @@ func setupClusterClient() error {
 		tfTarget = "module.workload_cluster"
 	}
 
-	tfEnv := cluster.TerraformEnv(
-		api.NewConfigPath(
-			configRootPath,
-			api.ServiceCluster,
-		)[api.SSHPublicKeyFile].Path,
-		api.NewConfigPath(
-			configRootPath,
-			api.WorkloadCluster,
-		)[api.SSHPublicKeyFile].Path,
-	)
+	tfEnv := cluster.TerraformEnv(configPath[api.SSHPublicKeyFile].Path)
 
 	tfConfig := &runner.TerraformConfig{
 		Path:              tfPath.Path,

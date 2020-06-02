@@ -48,11 +48,8 @@ func (e *ExoscaleCluster) Name() string {
 	return e.BaseConfig.Name()
 }
 
-func (e *ExoscaleCluster) TerraformEnv(
-	sshPublicKeySC string,
-	sshPublicKeyWC string,
-) map[string]string {
-	env := e.BaseConfig.TerraformEnv(sshPublicKeySC, sshPublicKeyWC)
+func (e *ExoscaleCluster) TerraformEnv(sshPublicKey string) map[string]string {
+	env := e.BaseConfig.TerraformEnv(sshPublicKey)
 	env["TF_VAR_exoscale_api_key"] = e.APIKey
 	env["TF_VAR_exoscale_secret_key"] = e.SecretKey
 	return env

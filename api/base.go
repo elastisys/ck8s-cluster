@@ -67,15 +67,21 @@ func (b *BaseConfig) CloudProvider() CloudProviderType {
 	return b.CloudProviderType
 }
 
-func (b *BaseConfig) TerraformEnv(
-	sshPublicKeySC string,
-	sshPublicKeyWC string,
-) map[string]string {
+func (b *BaseConfig) TerraformEnv(sshPublicKey string) map[string]string {
+	var currentSSHPublicKeyTFVar, otherSSHPublicKeyTFVar string
+	switch b.ClusterType {
+	case ServiceCluster:
+		currentSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_sc"
+		otherSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_wc"
+	case WorkloadCluster:
+		currentSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_wc"
+		otherSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_sc"
+	}
 	return map[string]string{
 		"TF_VAR_dns_prefix": b.DNSPrefix,
 
-		"TF_VAR_ssh_pub_key_sc": sshPublicKeySC,
-		"TF_VAR_ssh_pub_key_wc": sshPublicKeyWC,
+		currentSSHPublicKeyTFVar: sshPublicKey,
+		otherSSHPublicKeyTFVar:   "",
 	}
 }
 

@@ -26,10 +26,7 @@ type Cluster interface {
 	RemoveMachine(NodeType, string) error
 
 	// TODO: We should try to get rid of this.
-	TerraformEnv(
-		sshPublicKeySC string,
-		sshPublicKeyWC string,
-	) map[string]string
+	TerraformEnv(sshPublicKey string) map[string]string
 
 	TFVars() interface{}
 
