@@ -37,3 +37,22 @@ func (e *MachineStateNotFoundError) Error() string {
 		e.NodeType, e.Name,
 	)
 }
+
+type UnsupportedClusterFlavorError struct {
+	CloudProvider CloudProviderType
+	ClusterFlavor ClusterFlavor
+}
+
+func NewUnsupportedClusterFlavorError(
+	c CloudProviderType,
+	f ClusterFlavor,
+) *UnsupportedClusterFlavorError {
+	return &UnsupportedClusterFlavorError{c, f}
+}
+
+func (e *UnsupportedClusterFlavorError) Error() string {
+	return fmt.Sprintf(
+		"unsupported cluster flavor for cloud provider '%s': %s",
+		e.CloudProvider, e.ClusterFlavor,
+	)
+}

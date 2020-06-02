@@ -4,6 +4,11 @@ import (
 	"github.com/elastisys/ck8s/api"
 )
 
+const (
+	FlavorMinimum api.ClusterFlavor = "minimum"
+	FlavorHA      api.ClusterFlavor = "ha"
+)
+
 func Empty(clusterType api.ClusterType) *Cluster {
 	return &Cluster{
 		ExoscaleConfig: ExoscaleConfig{
@@ -16,8 +21,12 @@ func Empty(clusterType api.ClusterType) *Cluster {
 	}
 }
 
-func Default(clusterType api.ClusterType) *Cluster {
+func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 	cluster := Empty(clusterType)
+
+	cluster.CloudProviderType = api.Exoscale
+
+	cluster.EnvironmentName = clusterName
 
 	cluster.ControlPlaneEndpoint = "127.0.0.1"
 	cluster.ControlPlanePort = 7443
@@ -27,6 +36,22 @@ func Default(clusterType api.ClusterType) *Cluster {
 	cluster.PrivateNetworkCIDR = "172.0.10.0/24"
 	cluster.CalicoMTU = 1480
 	cluster.InternalLoadBalancerAnsibleGroups = []string{"nodes"}
+
+	return cluster
+}
+
+func Minimum(clusterType api.ClusterType, clusterName string) api.Cluster {
+	cluster := Default(clusterType, clusterName)
+
+	// TODO
+
+	return cluster
+}
+
+func HA(clusterType api.ClusterType, clusterName string) api.Cluster {
+	cluster := Default(clusterType, clusterName)
+
+	// TODO
 
 	return cluster
 }

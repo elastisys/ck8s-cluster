@@ -11,6 +11,17 @@ const (
 	Safespring CloudProviderType = "safespring"
 )
 
+type ClusterFlavor string
+
+type CloudProvider interface {
+	// Flavors should return a list of cluster flavors.
+	Flavors() []ClusterFlavor
+	// Default should return a cluster with only the default configuration set.
+	Default(ClusterType, string) Cluster
+	// Cluster should return a preconfigured cluster depending on flavor.
+	Cluster(ClusterType, ClusterFlavor, string) (Cluster, error)
+}
+
 type ClusterStateLoadFunc func(interface{}) error
 
 type Cluster interface {

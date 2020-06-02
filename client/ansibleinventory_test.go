@@ -20,11 +20,8 @@ func TestRenderAnsibleInventory(t *testing.T) {
 		cluster              api.Cluster
 	}
 
-	sc := exoscale.Default(api.ServiceCluster)
-	sc.EnvironmentName = "ck8stest"
-
-	wc := exoscale.Default(api.WorkloadCluster)
-	wc.EnvironmentName = "ck8stest"
+	sc := exoscale.Default(api.ServiceCluster, "ck8stest")
+	wc := exoscale.Default(api.WorkloadCluster, "ck8stest")
 
 	testCases := []testCase{{
 		"testdata/exoscale-ansible-hosts-sc.ini",

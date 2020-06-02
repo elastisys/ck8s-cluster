@@ -12,7 +12,6 @@ import (
 	"go.mozilla.org/sops/v3/decrypt"
 
 	"github.com/elastisys/ck8s/api"
-	"github.com/elastisys/ck8s/api/exoscale"
 	"github.com/elastisys/ck8s/runner"
 )
 
@@ -259,20 +258,14 @@ func (c *ConfigHandler) readConfig() (api.Cluster, error) {
 		return nil, fmt.Errorf("missing cloud provider in config")
 	}
 
-	var cluster api.Cluster
-
-	switch api.CloudProviderType(cloudProviderValue) {
-	case api.AWS:
-		return nil, api.NewUnsupportedCloudProviderError(api.AWS)
-	case api.CityCloud:
-		return nil, api.NewUnsupportedCloudProviderError(api.CityCloud)
-	case api.Exoscale:
-		cluster = exoscale.Default(c.clusterType)
-	case api.Safespring:
-		return nil, api.NewUnsupportedCloudProviderError(api.Safespring)
-	default:
-		return nil, &UnknownCloudProviderError{cloudProviderValue}
+	cloudProvider, err := CloudProviderFromType(
+		api.CloudProviderType(cloudProviderValue),
+	)
+	if err != nil {
+		return nil, err
 	}
+
+	cluster := cloudProvider.Default(c.clusterType, "")
 
 	if err := v.Unmarshal(&cluster); err != nil {
 		return nil, fmt.Errorf("error decoding config: %w", err)
