@@ -14,6 +14,10 @@ const (
 type ClusterStateLoadFunc func(interface{}) error
 
 type Cluster interface {
+	Config() interface{}
+	Secret() interface{}
+	TFVars() interface{}
+
 	// TODO: We should be able to combine these if we only handled a single
 	// 		 cluster and deprecated the prefixes in tfvars.
 	Name() string
@@ -27,8 +31,6 @@ type Cluster interface {
 
 	// TODO: We should try to get rid of this.
 	TerraformEnv(sshPublicKey string) map[string]string
-
-	TFVars() interface{}
 
 	State(ClusterStateLoadFunc) (ClusterState, error)
 

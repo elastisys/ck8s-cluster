@@ -8,7 +8,7 @@ import (
 	"github.com/elastisys/ck8s/api"
 )
 
-type TFVarsConfig struct {
+type ExoscaleTFVars struct {
 	PrefixSC string `hcl:"prefix_sc"`
 	PrefixWC string `hcl:"prefix_wc"`
 
@@ -37,7 +37,7 @@ type TFVarsConfig struct {
 	APIServerWhitelist []string `hcl:"api_server_whitelist" validate:"required"`
 }
 
-func (e *ExoscaleCluster) CloneMachine(
+func (e *Cluster) CloneMachine(
 	nodeType api.NodeType,
 	name string,
 ) (string, error) {
@@ -67,10 +67,12 @@ func (e *ExoscaleCluster) CloneMachine(
 	return cloneName, nil
 }
 
-func (e *ExoscaleCluster) RemoveMachine(
+func (e *Cluster) RemoveMachine(
 	nodeType api.NodeType,
 	name string,
 ) error {
+	// TODO: When we no longer need ClusterType these methods could be
+	//		 implemented directly on the TFVars struct.
 	part := e.lookupMachinePart(e.ClusterType, nodeType)
 
 	_, ok := part.sizeMap[name]
@@ -100,33 +102,33 @@ type tfvarsMachinePart struct {
 	esLocalStorageCapacity map[string]int
 }
 
-func (e *ExoscaleCluster) lookupMachinePart(
+func (e *Cluster) lookupMachinePart(
 	cluster api.ClusterType,
 	nodeType api.NodeType,
 ) tfvarsMachinePart {
 	return map[api.ClusterType]map[api.NodeType]tfvarsMachinePart{
 		api.ServiceCluster: {
 			api.Master: {
-				&e.TFVarsConfig.MasterNamesSC,
-				e.TFVarsConfig.MasterNameSizeMapSC,
+				&e.ExoscaleTFVars.MasterNamesSC,
+				e.ExoscaleTFVars.MasterNameSizeMapSC,
 				nil,
 			},
 			api.Worker: {
-				&e.TFVarsConfig.WorkerNamesSC,
-				e.TFVarsConfig.WorkerNameSizeMapSC,
-				e.TFVarsConfig.ESLocalStorageCapacityMapSC,
+				&e.ExoscaleTFVars.WorkerNamesSC,
+				e.ExoscaleTFVars.WorkerNameSizeMapSC,
+				e.ExoscaleTFVars.ESLocalStorageCapacityMapSC,
 			},
 		},
 		api.WorkloadCluster: {
 			api.Master: {
-				&e.TFVarsConfig.MasterNamesWC,
-				e.TFVarsConfig.MasterNameSizeMapWC,
+				&e.ExoscaleTFVars.MasterNamesWC,
+				e.ExoscaleTFVars.MasterNameSizeMapWC,
 				nil,
 			},
 			api.Worker: {
-				&e.TFVarsConfig.WorkerNamesWC,
-				e.TFVarsConfig.WorkerNameSizeMapWC,
-				e.TFVarsConfig.ESLocalStorageCapacityMapWC,
+				&e.ExoscaleTFVars.WorkerNamesWC,
+				e.ExoscaleTFVars.WorkerNameSizeMapWC,
+				e.ExoscaleTFVars.ESLocalStorageCapacityMapWC,
 			},
 		},
 	}[cluster][nodeType]

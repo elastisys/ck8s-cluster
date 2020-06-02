@@ -32,14 +32,16 @@ type BaseConfig struct {
 
 	DNSPrefix string `mapstructure:"TF_VAR_dns_prefix" validate:"required"`
 
-	S3AccessKey string `mapstructure:"S3_ACCESS_KEY" validate:"required"`
-	S3SecretKey string `mapstructure:"S3_SECRET_KEY" validate:"required"`
-
 	S3BucketNameElasticsearch string `mapstructure:"S3_ES_BACKUP_BUCKET_NAME" validate:"required"`
 	S3BucketNameHarbor        string `mapstructure:"S3_HARBOR_BUCKET_NAME" validate:"required"`
 	S3BucketNameInfluxDB      string `mapstructure:"S3_INFLUX_BUCKET_NAME" validate:"required"`
 	S3BucketNameFluentd       string `mapstructure:"S3_SC_FLUENTD_BUCKET_NAME" validate:"required"`
 	S3BucketNameVelero        string `mapstructure:"S3_VELERO_BUCKET_NAME" validate:"required"`
+}
+
+type BaseSecret struct {
+	S3AccessKey string `mapstructure:"S3_ACCESS_KEY" validate:"required"`
+	S3SecretKey string `mapstructure:"S3_SECRET_KEY" validate:"required"`
 }
 
 func EmptyBaseConfig(clusterType ClusterType) BaseConfig {

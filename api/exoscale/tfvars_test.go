@@ -19,21 +19,18 @@ func TestCloneMachine(t *testing.T) {
 		esCapMap  map[string]int
 	}
 
-	cluster := &ExoscaleCluster{
-		BaseConfig: api.BaseConfig{},
-		TFVarsConfig: &TFVarsConfig{
-			MasterNamesSC:               []string{testName},
-			MasterNameSizeMapSC:         map[string]string{testName: testSize},
-			WorkerNamesSC:               []string{testName},
-			WorkerNameSizeMapSC:         map[string]string{testName: testSize},
-			ESLocalStorageCapacityMapSC: map[string]int{testName: testESCap},
-			MasterNamesWC:               []string{testName},
-			MasterNameSizeMapWC:         map[string]string{testName: testSize},
-			WorkerNamesWC:               []string{testName},
-			WorkerNameSizeMapWC:         map[string]string{testName: testSize},
-			ESLocalStorageCapacityMapWC: map[string]int{testName: testESCap},
-		},
-	}
+	cluster := Empty(-1)
+
+	cluster.MasterNamesSC = []string{testName}
+	cluster.MasterNameSizeMapSC = map[string]string{testName: testSize}
+	cluster.WorkerNamesSC = []string{testName}
+	cluster.WorkerNameSizeMapSC = map[string]string{testName: testSize}
+	cluster.ESLocalStorageCapacityMapSC = map[string]int{testName: testESCap}
+	cluster.MasterNamesWC = []string{testName}
+	cluster.MasterNameSizeMapWC = map[string]string{testName: testSize}
+	cluster.WorkerNamesWC = []string{testName}
+	cluster.WorkerNameSizeMapWC = map[string]string{testName: testSize}
+	cluster.ESLocalStorageCapacityMapWC = map[string]int{testName: testESCap}
 
 	for _, clusterType := range []api.ClusterType{
 		api.ServiceCluster,
@@ -53,24 +50,24 @@ func TestCloneMachine(t *testing.T) {
 
 	for machineType, part := range map[string]tfvarsPart{
 		"sc master": {
-			cluster.TFVarsConfig.MasterNamesSC,
-			cluster.TFVarsConfig.MasterNameSizeMapSC,
+			cluster.MasterNamesSC,
+			cluster.MasterNameSizeMapSC,
 			nil,
 		},
 		"sc worker": {
-			cluster.TFVarsConfig.WorkerNamesSC,
-			cluster.TFVarsConfig.WorkerNameSizeMapSC,
-			cluster.TFVarsConfig.ESLocalStorageCapacityMapSC,
+			cluster.WorkerNamesSC,
+			cluster.WorkerNameSizeMapSC,
+			cluster.ESLocalStorageCapacityMapSC,
 		},
 		"wc master": {
-			cluster.TFVarsConfig.MasterNamesWC,
-			cluster.TFVarsConfig.MasterNameSizeMapWC,
+			cluster.MasterNamesWC,
+			cluster.MasterNameSizeMapWC,
 			nil,
 		},
 		"wc worker": {
-			cluster.TFVarsConfig.WorkerNamesWC,
-			cluster.TFVarsConfig.WorkerNameSizeMapWC,
-			cluster.TFVarsConfig.ESLocalStorageCapacityMapWC,
+			cluster.WorkerNamesWC,
+			cluster.WorkerNameSizeMapWC,
+			cluster.ESLocalStorageCapacityMapWC,
 		},
 	} {
 		if len(part.nameSlice) != 2 {
@@ -106,9 +103,9 @@ func TestCloneMachine(t *testing.T) {
 func TestRemoveMachine(t *testing.T) {
 	testName := "bar"
 
-	got, want := &ExoscaleCluster{}, &ExoscaleCluster{}
+	got, want := Empty(-1), Empty(-1)
 
-	got.TFVarsConfig = &TFVarsConfig{
+	got.ExoscaleTFVars = ExoscaleTFVars{
 		MasterNamesSC:               []string{testName},
 		MasterNameSizeMapSC:         map[string]string{testName: "a"},
 		WorkerNamesSC:               []string{testName},
@@ -121,7 +118,7 @@ func TestRemoveMachine(t *testing.T) {
 		ESLocalStorageCapacityMapWC: map[string]int{testName: 1},
 	}
 
-	want.TFVarsConfig = &TFVarsConfig{
+	want.ExoscaleTFVars = ExoscaleTFVars{
 		MasterNamesSC:               []string{},
 		MasterNameSizeMapSC:         map[string]string{},
 		WorkerNamesSC:               []string{},
@@ -150,7 +147,7 @@ func TestRemoveMachine(t *testing.T) {
 		}
 	}
 
-	if diff := cmp.Diff(want.TFVarsConfig, got.TFVarsConfig); diff != "" {
+	if diff := cmp.Diff(want.ExoscaleTFVars, got.ExoscaleTFVars); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
