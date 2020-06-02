@@ -24,7 +24,7 @@ module "service_cluster" {
   worker_ami = var.aws_amis["sc_worker"]
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
-  api_server_whitelist = var.api_server_whitelist
+  api_server_whitelist          = var.api_server_whitelist
 
 
   ssh_pub_key = var.ssh_pub_key_sc
@@ -43,7 +43,7 @@ module "workload_cluster" {
   worker_ami = var.aws_amis["wc_worker"]
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
-  api_server_whitelist = var.api_server_whitelist
+  api_server_whitelist          = var.api_server_whitelist
 
   ssh_pub_key = var.ssh_pub_key_wc
 
