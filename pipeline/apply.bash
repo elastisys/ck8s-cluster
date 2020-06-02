@@ -15,6 +15,14 @@ sops_pgp_setup
 terraform_setup
 
 TF_CLI_ARGS_apply="-auto-approve" "${ck8s}" apply all
+
+# Run smoke tests (simple deployment and LoadBalancer on supported cloud providers)
+# We only run this on WC as SC is thoroughly tested from all apps deployed there.
+with_kubeconfig "${secrets[kube_config_wc]}" \
+    "${pipeline_path}/test/k8s/test-deploy.sh" workload_cluster \
+        "${config[infrastructure_file]}"
+
+# Test API server whitelist
 ${test_path}/infrastructure/whitelist.sh "positive"
 
 whitelist_update "public_ingress_cidr_whitelist" "127.0.0.1"
