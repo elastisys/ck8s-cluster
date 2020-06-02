@@ -164,9 +164,12 @@ func setupClusterClient() error {
 		return err
 	}
 
-	tfPath, err := api.TerraformPath(codeRootPath, cluster.CloudProvider())
-	if err != nil {
-		return err
+	var tfPath api.Path
+	switch c := cluster.CloudProvider(); c {
+	case api.Exoscale:
+		tfPath = codePath[api.TerraformExoscaleDir]
+	default:
+		return api.NewUnsupportedCloudProviderError(c)
 	}
 	if err := tfPath.Exists(); err != nil {
 		var notFoundErr *api.PathNotFoundError

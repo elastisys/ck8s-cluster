@@ -25,6 +25,10 @@ func (p Path) Exists() error {
 	return nil
 }
 
+type CodePath map[CodePathID]Path
+type ConfigPath map[ConfigPathID]Path
+
+type CodePathID int
 type ConfigPathID int
 
 const (
@@ -41,8 +45,6 @@ const (
 	S3CfgFile
 )
 
-type CodePathID int
-
 const (
 	AnsibleConfigFile CodePathID = iota
 	AnsiblePlaybookDeployKubernetesFile
@@ -50,9 +52,12 @@ const (
 	AnsiblePlaybookJoinClusterFile
 	ManageS3BucketsScriptFile
 	CRDFile
+	// TODO: Would be nice to get rid of this and only have one single main
+	//		 Terraform module.
+	TerraformExoscaleDir
 )
 
-var relativeConfigPaths = map[ConfigPathID]Path{
+var relativeConfigPaths = ConfigPath{
 	ConfigFile:          {"config.sh", "dotenv"},
 	SecretsFile:         {"secrets.env", "dotenv"},
 	TFBackendConfigFile: {"backend_config.hcl", "hclv2"},
@@ -62,7 +67,7 @@ var relativeConfigPaths = map[ConfigPathID]Path{
 	S3CfgFile:           {".state/s3cfg.ini", "ini"},
 }
 
-var clusterSpecificRelativeConfigPaths = map[ClusterType]map[ConfigPathID]Path{
+var clusterSpecificRelativeConfigPaths = map[ClusterType]ConfigPath{
 	ServiceCluster: {
 		AnsibleInventoryFile: {".state/ansible_hosts_sc.ini", "ini"},
 		KubeconfigFile:       {".state/kube_config_sc.yaml", "yaml"},
@@ -77,12 +82,7 @@ var clusterSpecificRelativeConfigPaths = map[ClusterType]map[ConfigPathID]Path{
 	},
 }
 
-var relativeTFPaths = map[CloudProviderType]string{
-	Exoscale:   "terraform/exoscale",
-	Safespring: "terraform/safespring",
-}
-
-var relativeCodePaths = map[CodePathID]Path{
+var relativeCodePaths = CodePath{
 	AnsibleConfigFile: {
 		"ansible/ansible.cfg", "ini",
 	},
@@ -95,9 +95,12 @@ var relativeCodePaths = map[CodePathID]Path{
 	ManageS3BucketsScriptFile: {
 		"scripts/manage-s3-buckets.sh", "",
 	},
+	TerraformExoscaleDir: {
+		"terraform/exoscale", "",
+	},
 }
 
-var clusterSpecificRelativeCodePaths = map[ClusterType]map[CodePathID]Path{
+var clusterSpecificRelativeCodePaths = map[ClusterType]CodePath{
 	ServiceCluster: {
 		CRDFile: {"crds/crds-sc.txt", ""},
 	},
@@ -105,8 +108,6 @@ var clusterSpecificRelativeCodePaths = map[ClusterType]map[CodePathID]Path{
 		CRDFile: {"crds/crds-wc.txt", ""},
 	},
 }
-
-type ConfigPath map[ConfigPathID]Path
 
 func NewConfigPath(configRootPath string, clusterType ClusterType) ConfigPath {
 	configPath := make(
@@ -129,10 +130,8 @@ func NewConfigPath(configRootPath string, clusterType ClusterType) ConfigPath {
 	return configPath
 }
 
-type CodePath map[CodePathID]Path
-
 func NewCodePath(codeRootPath string, clusterType ClusterType) CodePath {
-	codePath := make(CodePath, len(relativeCodePaths))
+	codePath := make(CodePath, len(relativeCodePaths)+len(clusterSpecificRelativeCodePaths))
 	for id, p := range relativeCodePaths {
 		codePath[id] = Path{
 			Path:   path.Join(codeRootPath, p.Path),
@@ -146,19 +145,4 @@ func NewCodePath(codeRootPath string, clusterType ClusterType) CodePath {
 		}
 	}
 	return codePath
-}
-
-func TerraformPath(
-	codeRootPath string,
-	cloudProvider CloudProviderType,
-) (Path, error) {
-	relativePath, ok := relativeTFPaths[cloudProvider]
-	if !ok {
-		return Path{}, NewUnsupportedCloudProviderError(cloudProvider)
-	}
-
-	return Path{
-		Path:   path.Join(codeRootPath, relativePath),
-		Format: "hclv2",
-	}, nil
 }
