@@ -45,11 +45,6 @@ To create a patch release, do the following:
 5. Once all fixes are merged to the `patch/x.y` branch. Create a
    `pre-release-patch` branch from it and push it to the remote. The normal
    release process described above then applies.
-6. *Optional* Create a new patch branch (based on a different release branch)
-   and rebase the commits in `patch/x.y` onto it if the fix should be released
-   on multiple tracked releases.
-7. *Optional* Merge back the patch release to master if the fix applies for the
-   next version as well.
 
 ## While developing
 
