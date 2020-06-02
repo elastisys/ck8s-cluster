@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/elastisys/ck8s/api"
 	"github.com/elastisys/ck8s/client"
-	"github.com/elastisys/ck8s/runner"
 )
 
 var version = "dev"
@@ -157,65 +155,27 @@ func setupClusterClient() error {
 	}
 
 	configPath := api.NewConfigPath(configRootPath, clusterType)
+
 	codePath := api.NewCodePath(codeRootPath, clusterType)
 
-	cluster, err := client.ClusterFromConfigPath(clusterType, configPath)
+	configHandler := client.NewConfigHandler(clusterType, configPath, codePath)
+
+	cluster, err := configHandler.Read()
 	if err != nil {
-		return err
+		return fmt.Errorf("error reading config path: %w", err)
 	}
 
-	var tfPath api.Path
-	switch c := cluster.CloudProvider(); c {
-	case api.Exoscale:
-		tfPath = codePath[api.TerraformExoscaleDir]
-	default:
-		return api.NewUnsupportedCloudProviderError(c)
-	}
-	if err := tfPath.Exists(); err != nil {
-		var notFoundErr *api.PathNotFoundError
-		if errors.As(err, &notFoundErr) {
-			return fmt.Errorf(
-				"terraform path not found: %s\nwrong CK8S code path?",
-				notFoundErr.Path.Path,
-			)
-		}
-		return err
-	}
-
-	// TODO: Exoscale specific
-	var tfTarget string
-	switch clusterType {
-	case api.ServiceCluster:
-		tfTarget = "module.service_cluster"
-	case api.WorkloadCluster:
-		tfTarget = "module.workload_cluster"
-	}
-
-	tfEnv := cluster.TerraformEnv(configPath[api.SSHPublicKeyFile].Path)
-
-	tfConfig := &runner.TerraformConfig{
-		Path:              tfPath.Path,
-		Workspace:         cluster.TerraformWorkspace(),
-		DataDirPath:       configPath[api.TFDataDir].Path,
-		BackendConfigPath: configPath[api.TFBackendConfigFile].Path,
-		TFVarsPath:        configPath[api.TFVarsFile].Path,
-
-		Target: tfTarget,
-
-		Env: tfEnv,
-	}
-
-	clusterClient = client.NewClusterClient(
+	clusterClient, err = client.NewClusterClient(
 		logger,
 		cluster,
+		configHandler,
 		viper.GetBool(silentFlag),
 		viper.GetBool(autoApproveFlag),
-		configPath,
-		codePath,
-		tfConfig,
+		configPath[api.SSHPrivateKeyFile],
+		configPath[api.KubeconfigFile],
 	)
 
-	return nil
+	return err
 }
 
 func setupLogger() error {

@@ -2,23 +2,23 @@ package runner
 
 import (
 	"fmt"
-	"io"
-	"text/template"
 
 	"go.uber.org/zap"
-
-	"github.com/elastisys/ck8s/api"
 )
+
+type S3CmdConfig struct {
+	CloudProviderName string
+
+	S3cfgPath                 string
+	ManageS3BucketsScriptPath string
+
+	Buckets map[string]string
+}
 
 type S3Cmd struct {
 	runner Runner
 
-	cloudProviderName string
-
-	s3cfgPath                 string
-	manageS3BucketsScriptPath string
-
-	buckets map[string]string
+	config *S3CmdConfig
 
 	logger *zap.Logger
 }
@@ -26,20 +26,12 @@ type S3Cmd struct {
 func NewS3Cmd(
 	logger *zap.Logger,
 	runner Runner,
-	cloudProviderName string,
-	s3cfgPath string,
-	manageS3BucketsScriptPath string,
-	buckets map[string]string,
+	config *S3CmdConfig,
 ) *S3Cmd {
 	return &S3Cmd{
 		runner: runner,
 
-		cloudProviderName: cloudProviderName,
-
-		s3cfgPath:                 s3cfgPath,
-		manageS3BucketsScriptPath: manageS3BucketsScriptPath,
-
-		buckets: buckets,
+		config: config,
 
 		logger: logger,
 	}
@@ -50,33 +42,15 @@ func (s *S3Cmd) Create() error {
 
 	cmd := NewCommand(
 		"sops",
-		"exec-file", "--no-fifo", s.s3cfgPath,
+		"exec-file", "--no-fifo", s.config.S3cfgPath,
 		fmt.Sprintf(
 			"S3COMMAND_CONFIG_FILE={} %s --create",
-			s.manageS3BucketsScriptPath,
+			s.config.ManageS3BucketsScriptPath,
 		),
 	)
 
-	cmd.Env = s.buckets
-	cmd.Env["CLOUD_PROVIDER"] = s.cloudProviderName
+	cmd.Env = s.config.Buckets
+	cmd.Env["CLOUD_PROVIDER"] = s.config.CloudProviderName
 
 	return s.runner.Run(cmd)
-}
-
-// TODO: AWS
-var s3cfgTemplate = `[default]
-use_https = True
-host_base = {{ .S3RegionAddress }}
-host_bucket = %(bucket)s.{{ .S3RegionAddress }}
-access_key = {{ .S3AccessKey }}
-secret_key = {{ .S3SecretKey }}
-`
-
-func RenderS3CfgPlaintext(cluster api.Cluster, w io.Writer) error {
-	tmpl, err := template.New("s3cfg").Parse(s3cfgTemplate)
-	if err != nil {
-		return err
-	}
-
-	return tmpl.Execute(w, cluster)
 }

@@ -8,7 +8,9 @@ import (
 )
 
 var (
-	testSOPSConfigPath = ".sops.yaml"
+	testSOPSConfig = &SOPSConfig{
+		SOPSConfigPath: ".sops.yaml",
+	}
 	testSOPSInputType  = "sops-input-type"
 	testSOPSOutputType = "sops-output-type"
 	testSOPSFilePath   = "somefile"
@@ -27,7 +29,7 @@ func TestSOPSEncryptStdin(t *testing.T) {
 
 	wantCmd := NewCommand(
 		"sops", "-e",
-		"--config", testSOPSConfigPath,
+		"--config", testSOPSConfig.SOPSConfigPath,
 		"--input-type", testSOPSInputType,
 		"--output-type", testSOPSOutputType,
 		"/dev/stdin",
@@ -38,7 +40,7 @@ func TestSOPSEncryptStdin(t *testing.T) {
 
 	r.Push(&TestCommand{Command: wantCmd, Stdout: wantFakeEncrypted})
 
-	sops := NewSOPS(logger, r, testSOPSConfigPath)
+	sops := NewSOPS(logger, r, testSOPSConfig)
 
 	if err := sops.EncryptStdin(
 		testSOPSInputType,
@@ -70,7 +72,7 @@ func TestSOPSEncryptFileInPlace(t *testing.T) {
 
 	wantCmd := NewCommand(
 		"sops", "-e", "-i",
-		"--config", testSOPSConfigPath,
+		"--config", testSOPSConfig.SOPSConfigPath,
 		"--input-type", testSOPSInputType,
 		"--output-type", testSOPSOutputType,
 		testSOPSFilePath,
@@ -78,7 +80,7 @@ func TestSOPSEncryptFileInPlace(t *testing.T) {
 
 	r.Push(&TestCommand{Command: wantCmd})
 
-	sops := NewSOPS(logger, r, testSOPSConfigPath)
+	sops := NewSOPS(logger, r, testSOPSConfig)
 
 	if err := sops.EncryptFileInPlace(
 		testSOPSInputType,

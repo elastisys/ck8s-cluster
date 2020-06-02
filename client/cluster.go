@@ -1,10 +1,9 @@
 package client
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"time"
 
@@ -23,13 +22,16 @@ const (
 type ClusterClient struct {
 	cluster api.Cluster
 
+	configHandler *ConfigHandler
+
 	silent      bool
 	autoApprove bool
 
-	configPath api.ConfigPath
-	codePath   api.CodePath
-
 	sshPrivateKeyPath api.Path
+
+	// TODO: Only needed because we need to encrypt the kubeconfig after it has
+	//		 been created by the Ansible playbook.
+	kubeconfigPath api.Path
 
 	sops *runner.SOPS
 
@@ -47,15 +49,13 @@ type ClusterClient struct {
 func NewClusterClient(
 	logger *zap.Logger,
 	cluster api.Cluster,
+	configHandler *ConfigHandler,
 	silent bool,
 	autoApprove bool,
-	configPath api.ConfigPath,
-	codePath api.CodePath,
-	terraformConfig *runner.TerraformConfig,
-) *ClusterClient {
+	sshPrivateKeyPath api.Path,
+	kubeconfigPath api.Path,
+) (*ClusterClient, error) {
 	localRunner := runner.NewLocalRunner(logger, silent)
-
-	sshPrivateKeyPath := configPath[api.SSHPrivateKeyFile]
 
 	sshAgentRunner := runner.NewSSHAgentRunner(
 		logger,
@@ -63,30 +63,34 @@ func NewClusterClient(
 		sshPrivateKeyPath.Path,
 	)
 
+	// TODO: Try to get rid of the error return.
+	terraformConfig, err := configHandler.TerraformConfig(cluster)
+	if err != nil {
+		return nil, err
+	}
+
 	return &ClusterClient{
 		cluster: cluster,
+
+		configHandler: configHandler,
 
 		silent:      silent,
 		autoApprove: autoApprove,
 
-		configPath: configPath,
-		codePath:   codePath,
-
 		sshPrivateKeyPath: sshPrivateKeyPath,
+
+		kubeconfigPath: kubeconfigPath,
 
 		sops: runner.NewSOPS(
 			logger,
 			localRunner,
-			configPath[api.SOPSConfigFile].Path,
+			configHandler.SOPSConfig(),
 		),
 
 		s3cmd: runner.NewS3Cmd(
 			logger,
 			localRunner,
-			string(cluster.CloudProvider()),
-			configPath[api.S3CfgFile].Path,
-			codePath[api.ManageS3BucketsScriptFile].Path,
-			cluster.S3Buckets(),
+			configHandler.S3CmdConfig(cluster),
 		),
 
 		terraform: runner.NewTerraform(
@@ -98,22 +102,17 @@ func NewClusterClient(
 		ansible: runner.NewAnsible(
 			logger,
 			sshAgentRunner,
-			codePath[api.AnsibleConfigFile].Path,
-			configPath[api.AnsibleInventoryFile].Path,
-			codePath[api.AnsiblePlaybookDeployKubernetesFile].Path,
-			codePath[api.AnsiblePlaybookPrepareNodesFile].Path,
-			codePath[api.AnsiblePlaybookJoinClusterFile].Path,
+			configHandler.AnsibleConfig(),
 		),
 
 		kubectl: runner.NewKubectl(
 			logger,
 			localRunner,
-			configPath[api.KubeconfigFile].Path,
-			cluster.Name(),
+			configHandler.KubectlConfig(cluster),
 		),
 
 		logger: logger,
-	}
+	}, nil
 }
 
 func (c *ClusterClient) MachineClient(m api.MachineState) *MachineClient {
@@ -147,10 +146,7 @@ func (c *ClusterClient) Apply() error {
 		}
 	}
 
-	if err := c.ansible.DeployKubernetes(
-		c.configPath[api.KubeconfigFile].Path,
-		c.codePath[api.CRDFile].Path,
-	); err != nil {
+	if err := c.ansible.DeployKubernetes(); err != nil {
 		return fmt.Errorf("error joining cluster: %w", err)
 	}
 
@@ -162,12 +158,10 @@ func (c *ClusterClient) Apply() error {
 // 		 file system. We could use the SSH runner and fetch the kubeconfig
 //		 instead of using Ansible.
 func (c *ClusterClient) encryptKubeconfig() error {
-	kubeconfigPath := c.configPath[api.KubeconfigFile]
-
 	if err := c.sops.EncryptFileInPlace(
-		kubeconfigPath.Format,
-		kubeconfigPath.Format,
-		kubeconfigPath.Path,
+		c.kubeconfigPath.Format,
+		c.kubeconfigPath.Format,
+		c.kubeconfigPath.Path,
 	); err != nil {
 		c.logger.Error(
 			"client_apply_error_encrypting_kubeconfig",
@@ -176,9 +170,9 @@ func (c *ClusterClient) encryptKubeconfig() error {
 
 		c.logger.Info(
 			"client_apply_delete_kubeconfig",
-			zap.String("kubeconfig_path", kubeconfigPath.String()),
+			zap.String("kubeconfig_path", c.kubeconfigPath.String()),
 		)
-		if err := os.Remove(kubeconfigPath.Path); err != nil {
+		if err := os.Remove(c.kubeconfigPath.Path); err != nil {
 			c.logger.Error(
 				"client_apply_error_deleting_kubeconfig",
 				zap.Error(err),
@@ -199,62 +193,17 @@ func (c *ClusterClient) state() (api.ClusterState, error) {
 func (c *ClusterClient) s3Apply() error {
 	c.logger.Info("client_s3_apply")
 
-	if err := c.renderS3cfg(); err != nil {
-		return fmt.Errorf("error rendering s3 cfg: %w", err)
-	}
-
-	if err := c.s3cmd.Create(); err != nil {
-		return fmt.Errorf("error creating S3 buckets: %w", err)
-	}
-
-	return nil
-}
-
-func (c *ClusterClient) renderS3cfg() error {
-	var s3cfgPlain, s3cfgEnc bytes.Buffer
-
-	if err := runner.RenderS3CfgPlaintext(c.cluster, &s3cfgPlain); err != nil {
-		return fmt.Errorf("error rendering plaintext s3cfg: %w", err)
-	}
-
-	if err := c.sops.EncryptStdin(
-		"ini",
-		"ini",
-		&s3cfgPlain,
-		&s3cfgEnc,
-	); err != nil {
-		return fmt.Errorf("error encrypting s3cfg: %w", err)
-	}
-
-	if err := ioutil.WriteFile(
-		c.configPath[api.S3CfgFile].Path,
-		s3cfgEnc.Bytes(),
-		0644,
+	if err := c.configHandler.WriteS3cfg(
+		c.cluster,
+		func(format string, plain io.Reader, enc io.Writer) error {
+			return c.sops.EncryptStdin(format, format, plain, enc)
+		},
 	); err != nil {
 		return fmt.Errorf("error writing s3cfg: %w", err)
 	}
 
-	return nil
-}
-
-func (c *ClusterClient) renderAnsibleInventory() error {
-	c.logger.Info("client_render_ansible_inventory")
-
-	state, err := c.state()
-	if err != nil {
-		return err
-	}
-
-	f, err := os.OpenFile(
-		c.configPath[api.AnsibleInventoryFile].Path,
-		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
-		0666,
-	)
-	if err != nil {
-		return fmt.Errorf("error opening file: %w", err)
-	}
-	if err := runner.RenderAnsibleInventory(c.cluster, state, f); err != nil {
-		return fmt.Errorf("error rendering Ansible inventory: %w", err)
+	if err := c.s3cmd.Create(); err != nil {
+		return fmt.Errorf("error creating S3 buckets: %w", err)
 	}
 
 	return nil
@@ -269,13 +218,18 @@ func (c *ClusterClient) TerraformApply() error {
 		return err
 	}
 
-	c.logger.Info("client_terraform_apply2")
-
 	if err := c.terraform.Apply(c.autoApprove); err != nil {
 		return fmt.Errorf("error applying Terraform config: %w", err)
 	}
 
-	return c.renderAnsibleInventory()
+	if err := c.configHandler.WriteAnsibleInventory(
+		c.cluster,
+		c.state,
+	); err != nil {
+		return fmt.Errorf("error writing Ansible inventory: %w", err)
+	}
+
+	return nil
 }
 
 func (c *ClusterClient) TerraformOutput(output interface{}) error {
@@ -331,8 +285,8 @@ func (c *ClusterClient) CloneNode(
 	if err != nil {
 		return fmt.Errorf("error cloning machine: %w", err)
 	}
-	if err := c.saveTFVars(); err != nil {
-		return fmt.Errorf("error saving tfvars: %w", err)
+	if err := c.configHandler.WriteTFVars(c.cluster); err != nil {
+		return fmt.Errorf("error writing tfvars: %w", err)
 	}
 
 	if err := c.Apply(); err != nil {
@@ -427,8 +381,8 @@ func (c *ClusterClient) RemoveNode(nodeType api.NodeType, name string) error {
 	if err := c.cluster.RemoveMachine(nodeType, name); err != nil {
 		return fmt.Errorf("error removing machine: %w", err)
 	}
-	if err := c.saveTFVars(); err != nil {
-		return fmt.Errorf("error saving tfvars: %w", err)
+	if err := c.configHandler.WriteTFVars(c.cluster); err != nil {
+		return fmt.Errorf("error writing tfvars: %w", err)
 	}
 
 	if err := c.TerraformApply(); err != nil {
@@ -468,12 +422,4 @@ func (c *ClusterClient) ReplaceNode(nodeType api.NodeType, name string) error {
 	}
 
 	return nil
-}
-
-func (c *ClusterClient) saveTFVars() error {
-	return ioutil.WriteFile(
-		c.configPath[api.TFVarsFile].Path,
-		tfvarsEncode(c.cluster.TFVars()),
-		0644,
-	)
 }

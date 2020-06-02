@@ -12,11 +12,15 @@ import (
 
 var NodeNotFoundErr = errors.New("kubernetes node not found")
 
+type KubectlConfig struct {
+	KubeconfigPath string
+	NodePrefix     string
+}
+
 type Kubectl struct {
 	runner Runner
 
-	kubeconfigPath string
-	nodePrefix     string
+	config *KubectlConfig
 
 	logger *zap.Logger
 }
@@ -24,18 +28,16 @@ type Kubectl struct {
 func NewKubectl(
 	logger *zap.Logger,
 	runner Runner,
-	kubeconfigPath string,
-	nodePrefix string,
+	config *KubectlConfig,
 ) *Kubectl {
 	return &Kubectl{
 		runner: runner,
 
-		kubeconfigPath: kubeconfigPath,
-		nodePrefix:     nodePrefix,
+		config: config,
 
 		logger: logger.With(
-			zap.String("kubeconfig", kubeconfigPath),
-			zap.String("node_prefix", nodePrefix),
+			zap.String("kubeconfig", config.KubeconfigPath),
+			zap.String("node_prefix", config.NodePrefix),
 		),
 	}
 }
@@ -43,13 +45,13 @@ func NewKubectl(
 func (k *Kubectl) command(args ...string) *Command {
 	return NewCommand(
 		"sops",
-		"exec-file", k.kubeconfigPath,
+		"exec-file", k.config.KubeconfigPath,
 		fmt.Sprintf("KUBECONFIG={} kubectl %s", strings.Join(args, " ")),
 	)
 }
 
 func (k *Kubectl) fullNodeName(name string) string {
-	return fmt.Sprintf("%s%s", k.nodePrefix, name)
+	return fmt.Sprintf("%s%s", k.config.NodePrefix, name)
 }
 
 // NodeExists runs `sops exec-file KUBECONFIG 'kubectl get node NAME'` in the

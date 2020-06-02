@@ -6,19 +6,23 @@ import (
 	"go.uber.org/zap"
 )
 
+type SOPSConfig struct {
+	SOPSConfigPath string
+}
+
 type SOPS struct {
 	runner Runner
 
-	sopsConfigPath string
+	config *SOPSConfig
 
 	logger *zap.Logger
 }
 
-func NewSOPS(logger *zap.Logger, runner Runner, sopsConfigPath string) *SOPS {
+func NewSOPS(logger *zap.Logger, runner Runner, config *SOPSConfig) *SOPS {
 	return &SOPS{
 		runner: runner,
 
-		sopsConfigPath: sopsConfigPath,
+		config: config,
 
 		logger: logger,
 	}
@@ -40,7 +44,7 @@ func (s *SOPS) EncryptStdin(
 
 	cmd := NewCommand(
 		"sops", "-e",
-		"--config", s.sopsConfigPath,
+		"--config", s.config.SOPSConfigPath,
 		"--input-type", inputType,
 		"--output-type", outputType,
 		"/dev/stdin",
@@ -75,7 +79,7 @@ func (s *SOPS) EncryptFileInPlace(
 
 	return s.runner.Run(NewCommand(
 		"sops", "-e", "-i",
-		"--config", s.sopsConfigPath,
+		"--config", s.config.SOPSConfigPath,
 		"--input-type", inputType,
 		"--output-type", outputType,
 		path,
