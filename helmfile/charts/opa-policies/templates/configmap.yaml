@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "opa-policies.fullname" . }}
-  labels:
-    openpolicyagent.org/policy: rego
-{{ include "opa-policies.labels" . | indent 4 }}
-data:
-{{ tpl (.Files.Glob "policies/*").AsConfig . | indent 2 }}
