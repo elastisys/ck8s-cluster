@@ -1,4 +1,5 @@
 ### Breaking changes
+- Kubeadm replaces RKE as the Kubernetes cluster lifecycle tool.
 - Terraform now uses new a required config file for configuring the remote backend.
 - Terraform for safespring and citycloud have been restructured with new modules.
 - Upgraded cert-manager to v0.14.1 which breaks the user facing API.
@@ -14,6 +15,7 @@
 - Api change: `public_ingress_cidr_whitelist` is now required to be a list in `config.tfvars`
 
 ### Release notes
+- It's not possible to migrate from RKE to Kubeadm without creating a new cluster.
 - To migrate your CK8S config to use the new backend config file run `./migration/v0.2.x-v0.3.0/migrate-tf-config.bash`
 - No migration script is available for the terraform changes to safespring and citycloud. Manual migration might be possible.
 - No migration script is available for cert-manager. A new cluster is required.
