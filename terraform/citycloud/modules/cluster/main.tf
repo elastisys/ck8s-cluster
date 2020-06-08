@@ -20,6 +20,14 @@ resource "openstack_compute_keypair_v2" "sshkey" {
   public_key = file(pathexpand(var.ssh_pub_key))
 }
 
+resource "openstack_compute_servergroup_v2" "master_anti_affinity" {
+  # You are not allowed to create a servergroup with an empty policy
+  count = var.master_anti_affinity_policy != "" ? 1 : 0
+
+  name     = "${var.prefix}-master-anti-affinity"
+  policies = [var.master_anti_affinity_policy]
+}
+
 module "master" {
   source = "../../../modules/openstack/vm"
 
@@ -39,6 +47,16 @@ module "master" {
     module.secgroups.cluster_secgroup,
     module.secgroups.master_secgroup,
   ]
+
+  server_group_id = var.master_anti_affinity_policy != "" ? openstack_compute_servergroup_v2.master_anti_affinity[0].id : ""
+}
+
+resource "openstack_compute_servergroup_v2" "worker_anti_affinity" {
+  # You are not allowed to create a servergroup with an empty policy
+  count = var.worker_anti_affinity_policy != "" ? 1 : 0
+
+  name     = "${var.prefix}-worker-anti-affinity"
+  policies = [var.worker_anti_affinity_policy]
 }
 
 module "worker" {
@@ -60,6 +78,8 @@ module "worker" {
     module.secgroups.cluster_secgroup,
     module.secgroups.worker_secgroup,
   ]
+
+  server_group_id = var.worker_anti_affinity_policy != "" ? openstack_compute_servergroup_v2.worker_anti_affinity[0].id : ""
 }
 
 module "octavia_lb" {

@@ -56,6 +56,11 @@ variable worker_name_flavor_map_sc {
   }
 }
 
+variable "worker_anti_affinity_policy_sc" {
+  description = "This can be set to 'anti-affinity' or 'soft-anti-affinity' to spread out workers on different physical machines, otherwise leave it empty"
+  type = string
+}
+
 variable worker_names_wc {
   description = "List of names for worker instances to create."
   type        = list(string)
@@ -69,6 +74,11 @@ variable worker_name_flavor_map_wc {
     "worker-0" : "ecd976c3-c71c-4096-b138-e4d964c0b27f",
     "worker-1" : "ecd976c3-c71c-4096-b138-e4d964c0b27f"
   }
+}
+
+variable "worker_anti_affinity_policy_wc" {
+  description = "This can be set to 'anti-affinity' or 'soft-anti-affinity' to spread out workers on different physical machines, otherwise leave it empty"
+  type = string
 }
 
 # For masters
@@ -86,6 +96,11 @@ variable master_name_flavor_map_sc {
   }
 }
 
+variable "master_anti_affinity_policy_sc" {
+  description = "This can be set to 'anti-affinity' or 'soft-anti-affinity' to spread out masters on different physical machines, otherwise leave it empty"
+  type = string
+}
+
 variable master_names_wc {
   description = "List of names for master instances to create."
   type        = list(string)
@@ -98,6 +113,11 @@ variable master_name_flavor_map_wc {
   default = {
     "master-0" : "89afeed0-9e41-4091-af73-727298a5d959"
   }
+}
+
+variable "master_anti_affinity_policy_wc" {
+  description = "This can be set to 'anti-affinity' or 'soft-anti-affinity' to spread out masters on different physical machines, otherwise leave it empty"
+  type = string
 }
 
 variable public_ingress_cidr_whitelist {

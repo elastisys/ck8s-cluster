@@ -23,3 +23,8 @@ variable external_network_name {
   description = "the name of the external network"
   type        = string
 }
+
+variable "server_group_id" {
+  description = "Id to the servergroup these instances should belong to."
+  type        = string
+}

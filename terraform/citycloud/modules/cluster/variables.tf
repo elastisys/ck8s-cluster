@@ -39,6 +39,11 @@ variable "master_name_flavor_map" {
   type = map
 }
 
+variable "master_anti_affinity_policy" {
+  description = "This can be set to 'anti-affinity' or 'soft-anti-affinity' to spread out masters on different physical machines, otherwise leave it empty"
+  type = string
+}
+
 # For workers
 variable "worker_names" {
   type = list(string)
@@ -46,6 +51,11 @@ variable "worker_names" {
 
 variable "worker_name_flavor_map" {
   type = map
+}
+
+variable "worker_anti_affinity_policy" {
+  description = "This can be set to 'anti-affinity' or 'soft-anti-affinity' to spread out workers on different physical machines, otherwise leave it empty"
+  type = string
 }
 
 # For DNS

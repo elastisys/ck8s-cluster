@@ -34,11 +34,13 @@ module "service_cluster" {
   external_network_id   = var.external_network_id
   external_network_name = var.external_network_name
 
-  master_names           = var.master_names_sc
-  master_name_flavor_map = var.master_name_flavor_map_sc
+  master_names                = var.master_names_sc
+  master_name_flavor_map      = var.master_name_flavor_map_sc
+  master_anti_affinity_policy = var.master_anti_affinity_policy_sc
 
-  worker_names           = var.worker_names_sc
-  worker_name_flavor_map = var.worker_name_flavor_map_sc
+  worker_names                = var.worker_names_sc
+  worker_name_flavor_map      = var.worker_name_flavor_map_sc
+  worker_anti_affinity_policy = var.worker_anti_affinity_policy_sc
 
   dns_prefix = var.dns_prefix
   dns_list = [
@@ -68,11 +70,13 @@ module "workload_cluster" {
   external_network_id   = var.external_network_id
   external_network_name = var.external_network_name
 
-  master_names           = var.master_names_wc
-  master_name_flavor_map = var.master_name_flavor_map_wc
+  master_names                = var.master_names_wc
+  master_name_flavor_map      = var.master_name_flavor_map_wc
+  master_anti_affinity_policy = var.master_anti_affinity_policy_wc
 
-  worker_names           = var.worker_names_wc
-  worker_name_flavor_map = var.worker_name_flavor_map_wc
+  worker_names                = var.worker_names_wc
+  worker_name_flavor_map      = var.worker_name_flavor_map_wc
+  worker_anti_affinity_policy = var.worker_anti_affinity_policy_wc
 
   dns_prefix = var.dns_prefix
   dns_list = [

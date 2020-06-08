@@ -12,6 +12,8 @@ worker_name_flavor_map_sc = {
   "worker-1" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
 
+worker_anti_affinity_policy_sc = ""
+
 worker_names_wc = [
   "worker-0",
 ]
@@ -19,6 +21,8 @@ worker_names_wc = [
 worker_name_flavor_map_wc = {
   "worker-0" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
+
+worker_anti_affinity_policy_wc = ""
 
 master_names_sc = [
   "master-0",
@@ -29,6 +33,8 @@ master_name_flavor_map_sc = {
   "master-0" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
 
+master_anti_affinity_policy_sc = "anti-affinity"
+
 master_names_wc = [
   "master-0",
 ]
@@ -37,6 +43,8 @@ master_name_flavor_map_wc = {
   # TODO: could go with smaller flavor here if made available
   "master-0" : "dc67a9eb-0685-4bb6-9383-a01c717e02e8", # lb.large.1d
 }
+
+master_anti_affinity_policy_wc = "anti-affinity"
 
 loadbalancer_names_sc=[
   "loadbalancer-0"

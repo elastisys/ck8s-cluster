@@ -24,6 +24,10 @@ resource "openstack_compute_instance_v2" "instance" {
   network {
     port = openstack_networking_port_v2.port[each.value].id
   }
+
+  scheduler_hints {
+      group = var.server_group_id
+   }
 }
 
 resource "openstack_compute_floatingip_v2" "fip" {

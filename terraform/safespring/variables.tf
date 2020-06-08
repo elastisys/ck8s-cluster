@@ -59,6 +59,11 @@ variable worker_name_flavor_map_sc {
   }
 }
 
+variable "worker_anti_affinity_policy_sc" {
+  description = "This can be set to 'anti-affinity' to spread out workers on different physical machines, otherwise leave it empty"
+  type = string
+}
+
 variable worker_names_wc {
   description = "List of names for worker instances to create."
   type        = list(string)
@@ -72,6 +77,11 @@ variable worker_name_flavor_map_wc {
     "worker-0" : "16d11558-62fe-4bce-b8de-f49a077dc881",
     "worker-1" : "16d11558-62fe-4bce-b8de-f49a077dc881"
   }
+}
+
+variable "worker_anti_affinity_policy_wc" {
+  description = "This can be set to 'anti-affinity' to spread out workers on different physical machines, otherwise leave it empty"
+  type = string
 }
 
 # For masters
@@ -89,6 +99,11 @@ variable master_name_flavor_map_sc {
   }
 }
 
+variable "master_anti_affinity_policy_sc" {
+  description = "This can be set to anti-affinity to spread out masters on different physical machines, otherwise leave it empty"
+  type = string
+}
+
 variable master_names_wc {
   description = "List of names for master instances to create."
   type        = list(string)
@@ -101,6 +116,11 @@ variable master_name_flavor_map_wc {
   default = {
     "master-0" : "9d82d1ee-ca29-4928-a868-d56e224b92a1"
   }
+}
+
+variable "master_anti_affinity_policy_wc" {
+  description = "This can be set to anti-affinity to spread out masters on different physical machines, otherwise leave it empty"
+  type = string
 }
 
 variable loadbalancer_names_sc {
