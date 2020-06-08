@@ -13,7 +13,6 @@ deployments=(
     "cert-manager cert-manager"
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
-    "elastic-system kibana-kb"
     "kube-system calico-kube-controllers"
     "kube-system coredns"
     "kube-system metrics-server"
@@ -24,6 +23,9 @@ deployments=(
     "monitoring blackbox-prometheus-blackbox-exporter"
     "fluentd fluentd-aggregator"
     "velero velero"
+    "elastic-system elasticsearch-exporter"
+    "elastic-system opendistro-es-client"
+    "elastic-system opendistro-es-kibana"
 )
 if [ $CLOUD_PROVIDER == "exoscale" ]
 then
@@ -86,8 +88,9 @@ statefulsets=(
     "monitoring prometheus-prometheus-operator-prometheus"
     "monitoring prometheus-wc-scraper-prometheus-instance"
     "monitoring alertmanager-prometheus-operator-alertmanager"
-    "elastic-system elastic-operator"
     "influxdb-prometheus influxdb"
+    "elastic-system opendistro-es-data"
+    "elastic-system opendistro-es-master"
 )
 if [ "$ENABLE_HARBOR" == true ]; then
     statefulsets+=(
@@ -104,19 +107,10 @@ do
     testResourceExistenceFast ${resourceKind} $statefulset "${simpleData}"
 done
 
-# elasticsearch-es-nodes has update strategy OnDelete.
-# Therefore `kubectl rollout status` which is used in the other test doesn't
-# work
-STATEFULSET="elastic-system elasticsearch-es-nodes"
-echo -n -e "\nelasticsearch-es-nodes\t"
-if testResourceExistence statefulset $STATEFULSET; then
-    testStatefulsetStatusByPods $STATEFULSET
-fi
-
 # Format:
 # namespace job-name timeout
 JOBS=(
-  "elastic-system configure-es-job 120s"
+    "elastic-system opendistro-es-configurer 120s"
 )
 if [ "$ENABLE_HARBOR" == true ]; then
     JOBS+=(
@@ -147,7 +141,9 @@ CRONJOBS=(
   "influxdb-prometheus influxdb-metrics-retention-cronjob-sc" 
   "influxdb-prometheus influxdb-metrics-retention-cronjob-wc"
   "influxdb-prometheus influxdb-backup"
-  "elastic-system curator"
+  "elastic-system opendistro-es-curator"
+  "elastic-system elasticsearch-slm"
+  "elastic-system elasticsearch-backup"
 )
 
 echo
@@ -164,28 +160,3 @@ do
         logCronJob $CRONJOB
     fi
 done
-
-echo
-echo
-echo "Testing other services"
-echo "======================"
-
-echo -n -e "\nelasticsearch\t"
-# This checks the health status of the elasticsearch custom resource
-retries=5
-while true; do
-    RES=$(kubectl -n elastic-system get elasticsearches.elasticsearch.k8s.elastic.co -o jsonpath="{.items[0].status.health}")
-
-    retries=$((retries - 1))
-
-    [ "${retries}" -lt 1 ] || [ "${RES}" = "green" ] && break
-
-    echo "health not green yet, retrying..."
-    echo -n -e "elasticsearch\t"
-
-    sleep 10
-done
-if [[ $RES == "green" ]]
-then echo -n -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-else echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
-fi

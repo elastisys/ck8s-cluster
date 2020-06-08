@@ -260,27 +260,6 @@ releases:
 {{ end }}
 
 
-# Elasticsearch-operator
-- name: elasticsearch-operator
-  namespace: elastic-system
-  labels:
-    app: elasticsearch-operator
-  chart: ./charts/elasticsearch-operator
-  version: 0.1.0
-  missingFileHandler: Error
-  wait: true
-  needs:
-  - cert-manager/cert-manager
-  {{ if eq (env "ES_STORAGE_CLASS") "local-storage" }}
-  - kube-system/local-volume-provisioner
-  {{ end }}
-  values:
-  - values/elasticsearch-operator.yaml.gotmpl
-  {{ if env "CK8S_ADDITIONAL_VALUES" }}
-  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch-operator.yaml"
-  {{ end }}
-
-
 # Local volume provisioner
 - name: local-volume-provisioner
   namespace: kube-system
@@ -296,57 +275,48 @@ releases:
   {{ end }}
 
 
-# Elasticsearch
-- name: elasticsearch
-  namespace: elastic-system
-  labels:
-    app: elasticsearch
-  chart: ./charts/elasticsearch
-  version: 0.1.0
-  missingFileHandler: Error
-  needs:
-  - elastic-system/elasticsearch-operator
-  - cert-manager/cert-manager
-  values:
-  - values/elasticsearch.yaml.gotmpl
-  {{ if env "CK8S_ADDITIONAL_VALUES" }}
-  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch.yaml"
-  {{ end }}
-
-
 #Elasticsearch-prometheus-exporter
-- name: elasticsearch-prometheus-exporter
+- name: elasticsearch-exporter
   namespace: elastic-system
   labels:
-    app: elasticsearch-prometheus-exporter
+    app: elasticsearch-exporter
   chart: stable/elasticsearch-exporter
-  version: 2.1.1
+  version: 3.3.0
   missingFileHandler: Error
   needs:
-  - elastic-system/elasticsearch
+  - elastic-system/opendistro-es
   values:
-  - values/elasticsearch-prometheus-exporter.yaml.gotmpl
+  - values/elasticsearch-exporter.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
-  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch-prometheus-exporter.yaml"
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/elasticsearch-exporter.yaml"
   {{ end }}
 
 
-# configure elasticsearch
-- name: configure-es
+# opendistro elasticsearch snapshot lifecycle management
+- name: elasticsearch-slm
   namespace: elastic-system
   labels:
-    app: config
-  chart: ./charts/configure-es
+    app: elasticsearch-slm
+  chart: ./charts/elasticsearch-slm
   version: 0.1.0
   missingFileHandler: Error
   needs:
-  - elastic-system/elasticsearch
+  - elastic-system/opendistro-es
   values:
-  - values/configure-es.yaml.gotmpl
-  {{ if env "CK8S_ADDITIONAL_VALUES" }}
-  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/configure-es.yaml"
-  {{ end }}
+  - values/elasticsearch-slm.yaml.gotmpl
 
+# opendistro elasticsearch backup job
+- name: elasticsearch-backup
+  namespace: elastic-system
+  labels:
+    app: elasticsearch-backup
+  chart: ./charts/elasticsearch-backup
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - elastic-system/opendistro-es
+  values:
+  - values/elasticsearch-backup.yaml.gotmpl
 
 # Harbor
 - name: harbor-certs
@@ -493,6 +463,29 @@ releases:
   - values/velero-sc.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/velero-sc.yaml"
+  {{ end }}
+
+
+# Opendistro
+- name: opendistro-es
+  namespace: elastic-system
+  labels:
+    app: opendistro
+  chart: elastisys/opendistro-es
+  version: 1.9.0
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  {{ if eq (env "ES_STORAGE_CLASS") "local-storage" }}
+  - kube-system/local-volume-provisioner
+  {{ end }}
+  {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
+  - kube-system/nfs-client-provisioner
+  {{ end }}
+  values:
+  - values/opendistro-es.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/opendistro-es.yaml"
   {{ end }}
 
 

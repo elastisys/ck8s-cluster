@@ -1,3 +1,12 @@
+### Breaking changes
+- Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
+
+### Release notes
+- No migration path is available for adding anti-affinity in openstack.
+- Mirgration of harbor to v.2.0.0 requires a manual garbage collaction. Please follow the steps described here: [https://goharbor.io/docs/1.10/administration/garbage-collection/]. Could be a good idea to backup aswell [https://github.com/elastisys/ck8s-ops/tree/master/backup/harbor].
+- Migration of Grafana to 7.0.3 requires a manual database backup and restore to preserve the customer data. Please follow the steps described [here](docs/migration.md#service-cluster).
+- If upgrading, manual removal of old elasticsearch, kibana, and exporter releases are required. Manual restoration of elasticsearch logs is required.
+
 ### Changed
 - Curator now looks at the index name to determine its age instead of looking at the index creation date
 - Nginx-ingress upgraded to 0.28.
@@ -10,19 +19,18 @@
 - InfluxDB Helm Chart upgraded to 4.8.1.
 - InfluxDB now uses the upstream S3 backup jobs instead of our own solution.
 - Prometheus Node exporter in InfluxDB Helm Chart upgraded to v1.0.1.
-
-### Breaking changes
-- Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
-
-### Release notes
-- No migration path is available for adding anti-affinity in openstack.
-- Mirgration of harbor to v.2.0.0 requires a manual garbage collaction. Please follow the steps described here: [https://goharbor.io/docs/1.10/administration/garbage-collection/]. Could be a good idea to backup aswell [https://github.com/elastisys/ck8s-ops/tree/master/backup/harbor].
-- Migration of Grafana to 7.0.3 requires a manual database backup and restore to preserve the customer data. Please follow the steps described [here](docs/migration.md#service-cluster).
+- Upgraded elasticsearch-prometheus-exporter chart version from 2.1.1 to 3.3.0.
+- Renamed release `elasticsearch-prometheus-exporter` to `elasticsearch-exporter`.
+- Elasticsearch-exporter now loads its credentials from a secret.
+- Upgraded ck8sdash to v0.3.1
 
 ### Added
 - The master and worker VMs in openstack can now, optionally, have anti-affinity or soft anti-affinity. Soft anti-affinity is not available in Safespring.
 - Documentation describing which api extensions that are used by ck8s.
 - Customers now have rights to configure their Alertmanager.
+- Open Distro for Elasticsearch.
+- Elasticsearch-backup helm chart for taking snapshots.
+- Elasticsearch-slm helm chart for managing the lifecycle of snaphosts.
 
 ### Fixed
 - Added quotes to handle special characters (e.g for password etc) in cloud.conf.
@@ -47,6 +55,4 @@
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
 - InfluxDB Helm Chart moved out to a separate repository.
-
-### Changed
-- Upgraded ck8sdash to v0.3.1
+- Old elasticsearch and kibana setup.

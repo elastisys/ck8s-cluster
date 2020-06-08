@@ -18,7 +18,7 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 : "${CUSTOMER_ADMIN_USERS:?Missing CUSTOMER_ADMIN_USERS}"
 : "${HARBOR_PWD:?Missing HARBOR_PWD}"
 : "${CUSTOMER_GRAFANA_PWD:?Missing CUSTOMER_GRAFANA_PWD}"
-: "${ELASTIC_USER_SECRET:?Missing ELASTIC_USER_SECRET}"
+: "${ES_FLUENTD_PWD:?Missing ES_FLUENTD_PWD}"
 : "${CUSTOMER_PROMETHEUS_PWD:?Missing CUSTOMER_PROMETHEUS_PWD}"
 : "${ENABLE_CUSTOMER_ALERTMANAGER:?Missing ENABLE_CUSTOMER_ALERTMANAGER}"
 if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
@@ -94,9 +94,9 @@ install_storage_class_provider "${STORAGE_CLASS}" workload_cluster
 echo "Creating Elasticsearch and fluentd secrets" >&2
 
 kubectl -n kube-system create secret generic elasticsearch \
-    --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
+    --from-literal=password="${ES_FLUENTD_PWD}" --dry-run -o yaml | kubectl apply -f -
 kubectl -n fluentd create secret generic elasticsearch \
-    --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
+    --from-literal=password="${ES_FLUENTD_PWD}" --dry-run -o yaml | kubectl apply -f -
 
 charts_ignore_list="app!=nfs-client-provisioner"
 [[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-operator,app!=gatekeeper-templates,app!=gatekeeper-constraints"

@@ -87,36 +87,6 @@ export INFLUXDB_RETENTION_WC="7d"
 # Retention policy for influxdb service cluster database
 export INFLUXDB_RETENTION_SC="3d"
 
-# TODO: Prefix these variables with ES/ELASTICSEARCH
-export ES_NODE_COUNT="2"
-# SIZE of the ES node storage
-export ES_STORAGE_SIZE="25Gi"
-
-# SIZE in GB when auditlogs should be removed for index 'kubeaudit'
-export KUBEAUDIT_RETENTION_SIZE="20"
-# AGE in days when auditlogs should be removed for index 'kubeaudit'
-export KUBEAUDIT_RETENTION_AGE="30"
-# SIZE in GB when api-server logs should be removed for index 'kubecomponents'
-export KUBECOMPONENTS_RETENTION_SIZE="10"
-# AGE in days when api-server logs should be removed for index 'kubecomponents'
-export KUBECOMPONENTS_RETENTION_AGE="10"
-# SIZE in GB when kubernetes container logs should be removed for index 'kubernetes'
-export KUBERNETES_RETENTION_SIZE="10"
-# AGE in days when kubernetes container  logs should be removed for index 'kubernetes'
-export KUBERNETES_RETENTION_AGE="30"
-# SIZE in GB when other logs should be removed for index 'other'
-export OTHER_RETENTION_SIZE="10"
-# AGE in days when other logs should be removed for index 'other'
-export OTHER_RETENTION_AGE="30"
-# SIZE in GB when other logs should be removed for index 'postgresql'
-export POSTGRESQL_RETENTION_SIZE="30"
-# AGE in days when other logs should be removed for index 'postgresql'
-export POSTGRESQL_RETENTION_AGE="30"
-# SIZE in GB when indices should perform rollover
-export ROLLOVER_SIZE="1"
-# AGE in days when indices should perform rollover
-export ROLLOVER_AGE="1"
-
 export PROMETHEUS_STORAGE_SIZE_WC="5Gi"
 # Size-based retention policy for Prometheus workload cluster database
 export PROMETHEUS_RETENTION_SIZE_WC="4GiB"
@@ -131,3 +101,64 @@ export PROMETHEUS_RETENTION_SC="3d"
 
 # Time-based retention policy for Alertmanager
 export ALERTMANAGER_RETENTION="72h"
+
+# Elasticsearch setup configuration
+
+## Master nodes configuration
+export ES_MASTER_COUNT="1"
+export ES_MASTER_STORAGE_SIZE="8Gi"
+export ES_MASTER_CPU_REQUEST="200m"
+export ES_MASTER_MEM_REQUEST="1024Mi"
+export ES_MASTER_CPU_LIMIT="1"
+export ES_MASTER_MEM_LIMIT="1024Mi"
+export ES_MASTER_JAVA_OPTS="-Xms512m -Xmx512m"
+
+## Data nodes configuration
+export ES_DATA_COUNT="2"
+export ES_DATA_STORAGE_SIZE="25Gi"
+export ES_DATA_CPU_REQUEST="200m"
+export ES_DATA_MEM_REQUEST="1024Mi"
+export ES_DATA_CPU_LIMIT="1"
+export ES_DATA_MEM_LIMIT="1024Mi"
+export ES_DATA_JAVA_OPTS="-Xms512m -Xmx512m"
+
+## Client nodes configuration
+export ES_CLIENT_COUNT="1"
+export ES_CLIENT_CPU_REQUEST="200m"
+export ES_CLIENT_MEM_REQUEST="1024Mi"
+export ES_CLIENT_CPU_LIMIT="1"
+export ES_CLIENT_MEM_LIMIT="1024Mi"
+export ES_CLIENT_JAVA_OPTS="-Xms512m -Xmx512m"
+
+## Curator index retention configuration
+## - SIZE is specified in Gigabytes
+## - AGE is specified in Days
+
+## Retention for indices matched by the index pattern kubeaudit-*
+export ES_KUBEAUDIT_RETENTION_SIZE="20"
+export ES_KUBEAUDIT_RETENTION_AGE="30"
+
+## Retention for indices matched by the index pattern kubernetes-*
+export ES_KUBERNETES_RETENTION_SIZE="10"
+export ES_KUBERNETES_RETENTION_AGE="30"
+
+## Retention for indices matched by the index pattern other-*
+export ES_OTHER_RETENTION_SIZE="10"
+export ES_OTHER_RETENTION_AGE="30"
+
+## Retention for indices matched by the index pattern postgresql-*
+export ES_POSTGRESQL_RETENTION_SIZE="30"
+export ES_POSTGRESQL_RETENTION_AGE="30"
+
+## ISM parameter specification for rollover action
+export ES_ROLLOVER_SIZE="5"
+export ES_ROLLOVER_AGE="1"
+
+## Snapshot retention configuration
+export ES_SNAPSHOT_MIN="7"
+export ES_SNAPSHOT_MAX="14"
+export ES_SNAPSHOT_AGE_SECONDS="864000" # 10 days
+export ES_SNAPSHOT_RETENTION_SCHEDULE="@daily"
+
+## Snapshot backup job configuration
+export ES_SNAPSHOT_SCHEDULE="@daily"

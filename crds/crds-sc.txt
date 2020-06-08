@@ -1,4 +1,3 @@
-elasticsearch-operator.yaml
 cert-manager.yaml
 alertmanager.yaml
 prometheus.yaml

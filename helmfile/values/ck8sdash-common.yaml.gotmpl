@@ -9,7 +9,7 @@ kibana:
   url: "https://kibana.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
 elastic:
   url: "https://elastic.{{ requiredEnv "ECK_OPS_DOMAIN" }}"
-  password: "{{ requiredEnv "ELASTIC_USER_SECRET" }}"
+  password: "{{ requiredEnv "ES_ADMIN_PWD" }}"
 oidc:
   url: "https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
   secret: "{{ requiredEnv "KUBELOGIN_CLIENT_SECRET" }}"

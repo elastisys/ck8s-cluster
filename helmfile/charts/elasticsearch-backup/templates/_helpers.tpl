@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "elasticsearch-operator.name" -}}
+{{- define "elasticsearch-backup.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "elasticsearch-operator.fullname" -}}
+{{- define "elasticsearch-backup.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,19 +27,26 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "elasticsearch-operator.chart" -}}
+{{- define "elasticsearch-backup.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "elasticsearch-operator.labels" -}}
-app.kubernetes.io/name: {{ include "elasticsearch-operator.name" . }}
-helm.sh/chart: {{ include "elasticsearch-operator.chart" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- define "elasticsearch-backup.labels" -}}
+helm.sh/chart: {{ include "elasticsearch-backup.chart" . }}
+{{ include "elasticsearch-backup.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
+Selector labels
+*/}}
+{{- define "elasticsearch-backup.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "elasticsearch-backup.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}

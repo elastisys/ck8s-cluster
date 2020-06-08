@@ -49,7 +49,7 @@ kibana:
   url: ""
 elastic:
   url: ""
-  username: "elastic"
+  username: "admin"
   password: ""
   apiKeyName: ""
   kubernetesIndexPrefix: "kubernetes-default"

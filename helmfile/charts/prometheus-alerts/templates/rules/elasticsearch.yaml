@@ -23,13 +23,13 @@ spec:
     - record: elasticsearch_filesystem_data_free_percent
       expr: 100 - elasticsearch_filesystem_data_used_percent
     - alert: ElasticsearchTooFewNodesRunning
-      expr: elasticsearch_cluster_health_number_of_nodes < {{ .Values.noEsNodes }}
+      expr: elasticsearch_cluster_health_number_of_nodes < {{ .Values.esNodeCount }}
       for: 5m
       labels:
         severity: critical
       annotations:
         description: There are only {{`{{ $value }}`}}  ElasticSearch nodes running
-        summary: ElasticSearch running on less than {{ .Values.noEsNodes }} nodes
+        summary: ElasticSearch running on less than {{ .Values.esNodeCount }} nodes
     - alert: ElasticsearchHeapTooHigh
       expr: elasticsearch_jvm_memory_used_bytes{area="heap"} / elasticsearch_jvm_memory_max_bytes{area="heap"}
         > 0.9

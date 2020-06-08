@@ -11,7 +11,7 @@ elasticsearch:
   port: 443
   auth:
     enabled: true
-    user: elastic
+    user: fluentd
     password: ""
   host: elastic.{{ requiredEnv "ECK_OPS_DOMAIN" }}
   sslVerify: {{ requiredEnv "TLS_VERIFY" }}
