@@ -163,6 +163,13 @@ resource "exoscale_security_group_rules" "worker_sg_rules" {
     cidr_list = ["0.0.0.0/0"]
     ports     = ["80", "443"]
   }
+
+  # Kubernetes Nodeport
+  ingress {
+    protocol  = "TCP"
+    cidr_list = var.nodeport_whitelist
+    ports     = ["30000-32767"]
+  }
 }
 
 resource "exoscale_security_group" "nfs_sg" {

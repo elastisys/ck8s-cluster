@@ -1,6 +1,7 @@
 region="us-west-1"
 public_ingress_cidr_whitelist=["194.132.164.168/32", "194.132.164.169/32"] # Elastisys office
 api_server_whitelist=["194.132.164.168/32", "194.132.164.169/32"] # Elastisys office
+nodeport_whitelist=["194.132.164.168/32", "194.132.164.169/32"] # Elastisys office
 prefix_sc=""
 prefix_wc=""
 

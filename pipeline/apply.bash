@@ -28,6 +28,15 @@ with_kubeconfig "${secrets[kube_config_wc]}" \
     "${pipeline_path}/test/k8s/test-deploy.sh" workload_cluster \
         "${config[infrastructure_file]}"
 
+# Test nodeport whitelist
+${test_path}/infrastructure/nodeport-whitelist.sh "positive"
+
+whitelist_update "nodeport_whitelist" "127.0.0.1"
+
+TF_CLI_ARGS_apply="-auto-approve" \
+    sops exec-env "${CK8S_CONFIG_PATH}/secrets.env" "${bin_path}/apply.bash infra tf"
+${test_path}/infrastructure/nodeport-whitelist.sh "negative"
+
 # Test API server whitelist
 ${test_path}/infrastructure/whitelist.sh "positive"
 

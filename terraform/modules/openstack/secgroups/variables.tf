@@ -9,3 +9,7 @@ variable public_ingress_cidr_whitelist {
 variable api_server_whitelist {
   type = list
 }
+
+variable nodeport_whitelist {
+  type = list
+}

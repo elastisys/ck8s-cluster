@@ -25,7 +25,7 @@ module "service_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
   api_server_whitelist          = var.api_server_whitelist
-
+  nodeport_whitelist            = var.nodeport_whitelist
 
   ssh_pub_key = var.ssh_pub_key_sc
 
@@ -44,6 +44,7 @@ module "workload_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
   api_server_whitelist          = var.api_server_whitelist
+  nodeport_whitelist            = var.nodeport_whitelist
 
   ssh_pub_key = var.ssh_pub_key_wc
 

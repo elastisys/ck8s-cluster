@@ -13,6 +13,7 @@ module "secgroups" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
   api_server_whitelist          = var.api_server_whitelist
+  nodeport_whitelist            = var.nodeport_whitelist
 }
 
 resource "openstack_compute_keypair_v2" "sshkey" {

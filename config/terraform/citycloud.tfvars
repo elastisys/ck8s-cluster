@@ -47,6 +47,7 @@ master_anti_affinity_policy_wc = "anti-affinity"
 # TODO: Remove Elastisys range before making repository public
 public_ingress_cidr_whitelist = ["194.132.164.168/32", "194.132.164.169/32"] # Elastisys office
 api_server_whitelist = ["194.132.164.168/32", "194.132.164.169/32"] # Elastisys office
+nodeport_whitelist = ["194.132.164.168/32", "194.132.164.169/32"] # Elastisys office
 
 aws_dns_zone_id="Z2STJRQSJO5PZ0" # elastisys.se
 aws_dns_role_arn="arn:aws:iam::248119176842:role/a1-pipeline"

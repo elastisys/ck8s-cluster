@@ -39,6 +39,7 @@ module "service_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
   api_server_whitelist          = var.api_server_whitelist
+  nodeport_whitelist            = var.nodeport_whitelist
 
   es_local_storage_capacity_map = var.es_local_storage_capacity_map_sc
 }
@@ -68,6 +69,7 @@ module "workload_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
   api_server_whitelist          = var.api_server_whitelist
+  nodeport_whitelist            = var.nodeport_whitelist
 
   es_local_storage_capacity_map = var.es_local_storage_capacity_map_wc
 }

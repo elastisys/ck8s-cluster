@@ -128,6 +128,10 @@ variable api_server_whitelist {
   type = list
 }
 
+variable nodeport_whitelist {
+  type = list
+}
+
 variable external_network_id {
   description = "the id of the external network"
   type        = string

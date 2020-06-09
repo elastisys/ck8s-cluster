@@ -103,6 +103,8 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
 # https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
 resource "openstack_networking_secgroup_rule_v2" "nodeports" {
 
+  for_each = toset(var.nodeport_whitelist)
+
   # https://github.com/terraform-providers/terraform-provider-openstack/issues/879
   depends_on = [openstack_networking_secgroup_rule_v2.https]
 
@@ -113,5 +115,5 @@ resource "openstack_networking_secgroup_rule_v2" "nodeports" {
   protocol         = "tcp"
   port_range_min   = 30000
   port_range_max   = 32767
-  remote_ip_prefix = "0.0.0.0/0"
+  remote_ip_prefix = each.value
 }

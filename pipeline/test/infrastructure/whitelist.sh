@@ -19,8 +19,6 @@ echo "==============================="
 echo "Testing whitelisting"
 echo "==============================="
 
-
-
 function check_ssh () {
     prefix=$1
     type=$2

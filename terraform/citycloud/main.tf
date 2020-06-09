@@ -30,6 +30,7 @@ module "service_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
   api_server_whitelist          = var.api_server_whitelist
+  nodeport_whitelist            = var.nodeport_whitelist
 
   external_network_id   = var.external_network_id
   external_network_name = var.external_network_name
@@ -66,6 +67,7 @@ module "workload_cluster" {
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
   api_server_whitelist          = var.api_server_whitelist
+  nodeport_whitelist            = var.nodeport_whitelist
 
   external_network_id   = var.external_network_id
   external_network_name = var.external_network_name

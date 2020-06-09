@@ -20,6 +20,10 @@ variable api_server_whitelist {
   type = list(string)
 }
 
+variable nodeport_whitelist {
+  type = list(string)
+}
+
 variable prefix_sc {
   type = string
 }

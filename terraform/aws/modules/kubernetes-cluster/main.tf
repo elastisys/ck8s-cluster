@@ -322,7 +322,7 @@ resource "aws_security_group_rule" "nodeport" {
   from_port         = 30000
   to_port           = 32767
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = var.nodeport_whitelist
   security_group_id = aws_security_group.worker_sg.id
 }
 

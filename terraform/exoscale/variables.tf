@@ -113,6 +113,10 @@ variable api_server_whitelist {
   type = list(string)
 }
 
+variable nodeport_whitelist {
+  type = list(string)
+}
+
 variable dns_prefix {
   description = "Prefix name for dns"
   type        = string
