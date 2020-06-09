@@ -30,6 +30,18 @@ func (e *Cluster) State(
 	tfOutput := terraformOutput{
 		ClusterType: e.ClusterType,
 		ClusterName: e.Name(),
+
+		ControlPlaneEndpoint: "127.0.0.1",
+		ControlPlanePort:     7443,
+
+		// TODO: This value currently needs to align with what is set in the
+		//		 Terraform code. We should expose this as an outer variable and
+		//		 forward it from here instead.
+		PrivateNetworkCIDR: "172.0.10.0/24",
+
+		CalicoMTU: 1480,
+
+		InternalLoadBalancerAnsibleGroups: []string{"nodes"},
 	}
 	return &tfOutput, loadState(&tfOutput)
 }

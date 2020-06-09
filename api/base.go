@@ -12,24 +12,6 @@ type BaseConfig struct {
 
 	EnvironmentName string `mapstructure:"ENVIRONMENT_NAME" validate:"required"`
 
-	ControlPlaneEndpoint string `validate:"required"`
-
-	ControlPlanePort int `validate:"required"`
-
-	PrivateNetworkCIDR string
-
-	// KubeadmInitCloudProvider and KubeadmInitCloudConfigPath only needs to
-	// be set if cloud provider specific config is to be used in the
-	// Kubernetes cluster.
-	KubeadmInitCloudProvider   string
-	KubeadmInitCloudConfigPath string
-
-	CalicoMTU int `validate:"required"`
-
-	KubeadmInitExtraArgs string
-
-	InternalLoadBalancerAnsibleGroups []string
-
 	DNSPrefix string `mapstructure:"TF_VAR_dns_prefix" validate:"required"`
 
 	S3BucketNameElasticsearch string `mapstructure:"S3_ES_BACKUP_BUCKET_NAME" validate:"required"`

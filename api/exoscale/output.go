@@ -32,6 +32,19 @@ type terraformOutput struct {
 
 	SCControlPlaneLBIP tfOutputValue `json:"sc_control_plane_lb_ip_address"`
 	WCControlPlaneLBIP tfOutputValue `json:"wc_control_plane_lb_ip_address"`
+
+	ControlPlaneEndpoint string
+	ControlPlanePort     int
+
+	PrivateNetworkCIDR string
+
+	KubeadmInitCloudProvider   string
+	KubeadmInitCloudConfigPath string
+	KubeadmInitExtraArgs       string
+
+	CalicoMTU int
+
+	InternalLoadBalancerAnsibleGroups []string
 }
 
 func (e *terraformOutput) ControlPlanePublicIP() string {

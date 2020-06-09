@@ -28,14 +28,23 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 
 	cluster.EnvironmentName = clusterName
 
-	cluster.ControlPlaneEndpoint = "127.0.0.1"
-	cluster.ControlPlanePort = 7443
-	// TODO: This value currently needs to align with what is set in the
-	//		 Terraform code. We should expose this as an outer variable and
-	//		 forward it from here instead.
-	cluster.PrivateNetworkCIDR = "172.0.10.0/24"
-	cluster.CalicoMTU = 1480
-	cluster.InternalLoadBalancerAnsibleGroups = []string{"nodes"}
+	cluster.DNSPrefix = clusterName
+
+	cluster.APIKey = "changeme"
+	cluster.SecretKey = "changeme"
+
+	cluster.S3AccessKey = "changeme"
+	cluster.S3SecretKey = "changeme"
+	cluster.S3RegionAddress = "sos-ch-gva-2.exo.io"
+
+	cluster.S3BucketNameHarbor = clusterName + "-harbor"
+	cluster.S3BucketNameVelero = clusterName + "-velero"
+	cluster.S3BucketNameElasticsearch = clusterName + "-es-backup"
+	cluster.S3BucketNameInfluxDB = clusterName + "-influxdb"
+	cluster.S3BucketNameFluentd = clusterName + "-sc-logs"
+
+	cluster.PublicIngressCIDRWhitelist = []string{}
+	cluster.APIServerWhitelist = []string{}
 
 	return cluster
 }

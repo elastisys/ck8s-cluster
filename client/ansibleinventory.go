@@ -8,10 +8,10 @@ import (
 )
 
 const ansibleInventoryTemplate = `{{ range MachinesByNodeType (NodeType "master") -}}
-{{ $.Name }}-{{ .Name }} ansible_host={{ .PublicIP }} private_ip={{ .PrivateIP }}
+{{ $.Cluster.Name }}-{{ .Name }} ansible_host={{ .PublicIP }} private_ip={{ .PrivateIP }}
 {{ end }}
 {{ range MachinesByNodeType (NodeType "worker") -}}
-{{ $.Name }}-{{ .Name }} ansible_host={{ .PublicIP }} private_ip={{ .PrivateIP }}
+{{ $.Cluster.Name }}-{{ .Name }} ansible_host={{ .PublicIP }} private_ip={{ .PrivateIP }}
 {{ end }}
 
 [all:vars]
@@ -23,49 +23,49 @@ ansible_port=22
 # TODO: move this to ansible.cfg when upgraded to ansible 2.8
 ansible_python_interpreter=/usr/bin/python3
 
-{{ if .ControlPlaneEndpoint -}}
-control_plane_endpoint='{{ .ControlPlaneEndpoint }}'
+{{ if .State.ControlPlaneEndpoint -}}
+control_plane_endpoint='{{ .State.ControlPlaneEndpoint }}'
 {{ end -}}
-{{ if .ControlPlanePort -}}
-control_plane_port='{{ .ControlPlanePort }}'
+{{ if .State.ControlPlanePort -}}
+control_plane_port='{{ .State.ControlPlanePort }}'
 {{ end -}}
-{{ if ControlPlanePublicIP -}}
-public_endpoint='{{ ControlPlanePublicIP }}'
+{{ if .State.ControlPlanePublicIP -}}
+public_endpoint='{{ .State.ControlPlanePublicIP }}'
 {{ end -}}
-{{ if .PrivateNetworkCIDR -}}
-private_network_cidr='{{ .PrivateNetworkCIDR }}'
+{{ if .State.PrivateNetworkCIDR -}}
+private_network_cidr='{{ .State.PrivateNetworkCIDR }}'
 {{ end -}}
-{{ if .KubeadmInitCloudProvider -}}
-cloud_provider='{{ .KubeadmInitCloudProvider }}'
+{{ if .State.KubeadmInitCloudProvider -}}
+cloud_provider='{{ .State.KubeadmInitCloudProvider }}'
 {{ end -}}
-{{ if .KubeadmInitCloudConfigPath -}}
-cloud_config='{{ .KubeadmInitCloudConfigPath }}'
+{{ if .State.KubeadmInitCloudConfigPath -}}
+cloud_config='{{ .State.KubeadmInitCloudConfigPath }}'
 {{ end -}}
-cluster_name='{{ .Name }}'
+cluster_name='{{ .Cluster.Name }}'
 
-calico_mtu='{{ .CalicoMTU }}'
+calico_mtu='{{ .State.CalicoMTU }}'
 
-kubeadm_init_extra_args='{{ .KubeadmInitExtraArgs }}'
+kubeadm_init_extra_args='{{ .State.KubeadmInitExtraArgs }}'
 
 [masters]
 {{ range MachinesByNodeType (NodeType "master") -}}
-{{ $.Name }}-{{ .Name }}
+{{ $.Cluster.Name }}-{{ .Name }}
 {{ end }}
 
 [workers]
 {{ range MachinesByNodeType (NodeType "worker") -}}
-{{ $.Name }}-{{ .Name }}
+{{ $.Cluster.Name }}-{{ .Name }}
 {{ end }}
 
 {{ if MachinesByNodeType (NodeType "loadbalancer") -}}
 [loadbalancers]
 {{ range MachinesByNodeType (NodeType "loadbalancer") -}}
-{{ $.Name }}-{{ .Name }}
+{{ $.Cluster.Name }}-{{ .Name }}
 {{ end }}
 {{ end }}
-{{ if .InternalLoadBalancerAnsibleGroups -}}
+{{ if .State.InternalLoadBalancerAnsibleGroups -}}
 [internal_lb:children]
-{{ range .InternalLoadBalancerAnsibleGroups -}}
+{{ range .State.InternalLoadBalancerAnsibleGroups -}}
 {{ . }}
 {{ end }}
 {{ end -}}
@@ -90,13 +90,18 @@ func renderAnsibleInventory(
 	}
 
 	tmpl, err := template.New("inventory").Funcs(template.FuncMap{
-		"NodeType":             api.NodeTypeFromString,
-		"ControlPlanePublicIP": state.ControlPlanePublicIP,
-		"MachinesByNodeType":   machinesByNodeType,
+		"NodeType":           api.NodeTypeFromString,
+		"MachinesByNodeType": machinesByNodeType,
 	}).Parse(ansibleInventoryTemplate)
 	if err != nil {
 		return err
 	}
 
-	return tmpl.Execute(w, cluster)
+	return tmpl.Execute(w, struct {
+		Cluster api.Cluster
+		State   api.ClusterState
+	}{
+		Cluster: cluster,
+		State:   state,
+	})
 }
