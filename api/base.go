@@ -26,9 +26,10 @@ type BaseSecret struct {
 	S3SecretKey string `mapstructure:"S3_SECRET_KEY" validate:"required"`
 }
 
-func EmptyBaseConfig(clusterType ClusterType) BaseConfig {
+func EmptyBaseConfig(clusterType ClusterType, cloudProvider CloudProviderType) BaseConfig {
 	return BaseConfig{
-		ClusterType: clusterType,
+		ClusterType:       clusterType,
+		CloudProviderType: cloudProvider,
 	}
 }
 
@@ -67,6 +68,10 @@ func (b *BaseConfig) TerraformEnv(sshPublicKey string) map[string]string {
 		currentSSHPublicKeyTFVar: sshPublicKey,
 		otherSSHPublicKeyTFVar:   "",
 	}
+}
+
+func (b *BaseConfig) AnsibleEnv() map[string]string {
+	return map[string]string{}
 }
 
 func (b *BaseConfig) S3Buckets() map[string]string {

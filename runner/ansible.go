@@ -9,11 +9,14 @@ type AnsibleConfig struct {
 	InventoryPath     string
 
 	PlaybookPathDeployKubernetes string
+	PlaybookPathInfrastructure   string
 	PlaybookPathPrepareNodes     string
 	PlaybookPathJoinCluster      string
 
 	KubeconfigPath string
 	CRDFilePath    string
+
+	Env map[string]string
 }
 
 type Ansible struct {
@@ -50,9 +53,14 @@ func (a *Ansible) playbook(playbookPath string, extraArgs ...string) *Command {
 
 	cmd := NewCommand("ansible-playbook", args...)
 
+	cmd.Env = a.config.Env
 	cmd.Env["ANSIBLE_CONFIG"] = a.config.AnsibleConfigPath
 
 	return cmd
+}
+
+func (a *Ansible) Infrustructure() error {
+	return a.runner.Run(a.playbook(a.config.PlaybookPathInfrastructure))
 }
 
 func (a *Ansible) DeployKubernetes() error {

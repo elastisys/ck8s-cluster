@@ -60,7 +60,7 @@ kubeadm_init_extra_args='{{ .State.KubeadmInitExtraArgs }}'
 {{ if MachinesByNodeType (NodeType "loadbalancer") -}}
 [loadbalancers]
 {{ range MachinesByNodeType (NodeType "loadbalancer") -}}
-{{ $.Cluster.Name }}-{{ .Name }}
+{{ $.Name }}-{{ .Name }} ansible_host={{ .PublicIP }} private_ip={{ .PrivateIP }}
 {{ end }}
 {{ end }}
 {{ if .State.InternalLoadBalancerAnsibleGroups -}}

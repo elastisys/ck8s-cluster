@@ -50,11 +50,13 @@ const (
 	AnsiblePlaybookDeployKubernetesFile
 	AnsiblePlaybookPrepareNodesFile
 	AnsiblePlaybookJoinClusterFile
+	AnsiblePlaybookInfrustructureFiles
 	ManageS3BucketsScriptFile
 	CRDFile
 	// TODO: Would be nice to get rid of this and only have one single main
 	//		 Terraform module.
 	TerraformExoscaleDir
+	TerraformSafespringDir
 )
 
 var relativeConfigPaths = ConfigPath{
@@ -92,11 +94,17 @@ var relativeCodePaths = CodePath{
 	AnsiblePlaybookPrepareNodesFile: {
 		"ansible/prepare-nodes.yml", "yaml",
 	},
+	AnsiblePlaybookInfrustructureFiles: {
+		"ansible/infrastructure.yml", "yaml",
+	},
 	ManageS3BucketsScriptFile: {
 		"scripts/manage-s3-buckets.sh", "",
 	},
 	TerraformExoscaleDir: {
 		"terraform/exoscale", "",
+	},
+	TerraformSafespringDir: {
+		"terraform/safespring", "",
 	},
 }
 

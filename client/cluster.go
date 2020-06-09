@@ -102,7 +102,7 @@ func NewClusterClient(
 		ansible: runner.NewAnsible(
 			logger,
 			sshAgentRunner,
-			configHandler.AnsibleConfig(),
+			configHandler.AnsibleConfig(cluster),
 		),
 
 		kubectl: runner.NewKubectl(
@@ -143,6 +143,13 @@ func (c *ClusterClient) Apply() error {
 	for _, machine := range machines {
 		if err := c.WaitForSSH(machine); err != nil {
 			return err
+		}
+	}
+
+	if c.cluster.CloudProvider() == api.Safespring ||
+		c.cluster.CloudProvider() == api.CityCloud {
+		if err := c.ansible.Infrustructure(); err != nil {
+			return fmt.Errorf("error infrastructure: %w", err)
 		}
 	}
 
@@ -373,6 +380,7 @@ func (c *ClusterClient) RemoveNode(nodeType api.NodeType, name string) error {
 		logger.Warn("client_node_remove_node_not_found")
 	}
 
+	// TODO: Do not throw error if the node hasn't joined k8s
 	if err := c.ResetNode(nodeType, name); err != nil {
 		return fmt.Errorf("error resetting node: %w", err)
 	}

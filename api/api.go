@@ -9,6 +9,7 @@ const (
 	CityCloud  CloudProviderType = "citycloud"
 	Exoscale   CloudProviderType = "exoscale"
 	Safespring CloudProviderType = "safespring"
+	Openstack  CloudProviderType = "openstack"
 )
 
 type ClusterFlavor string
@@ -43,6 +44,8 @@ type Cluster interface {
 	// TODO: We should try to get rid of this.
 	TerraformEnv(sshPublicKey string) map[string]string
 
+	AnsibleEnv() map[string]string
+
 	State(ClusterStateLoadFunc) (ClusterState, error)
 
 	S3Buckets() map[string]string
@@ -50,6 +53,7 @@ type Cluster interface {
 
 type ClusterState interface {
 	ControlPlanePublicIP() string
+	ControlPlaneEndpoint() string
 
 	Machines() []MachineState
 

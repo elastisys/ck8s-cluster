@@ -114,7 +114,7 @@ func parseClusterFlag() (api.ClusterType, error) {
 	cluster := viper.GetString(clusterFlag)
 
 	if cluster == "" {
-		return -1, fmt.Errorf("cluster cannot be empty")
+		return -1, fmt.Errorf("cluster flag cannot be empty")
 	}
 
 	switch cluster {

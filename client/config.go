@@ -157,6 +157,15 @@ func (c *ConfigHandler) TerraformConfig(
 		case api.WorkloadCluster:
 			tfTarget = "module.workload_cluster"
 		}
+	case api.Safespring:
+		tfPath = c.codePath[api.TerraformSafespringDir]
+
+		switch c.clusterType {
+		case api.ServiceCluster:
+			tfTarget = "module.service_cluster"
+		case api.WorkloadCluster:
+			tfTarget = "module.workload_cluster"
+		}
 	default:
 		return nil, api.NewUnsupportedCloudProviderError(cloudProvider)
 	}
@@ -186,17 +195,21 @@ func (c *ConfigHandler) TerraformConfig(
 	}, nil
 }
 
-func (c *ConfigHandler) AnsibleConfig() *runner.AnsibleConfig {
+func (c *ConfigHandler) AnsibleConfig(cluster api.Cluster) *runner.AnsibleConfig {
+	ansibleEnv := cluster.AnsibleEnv()
 	return &runner.AnsibleConfig{
 		AnsibleConfigPath: c.codePath[api.AnsibleConfigFile].Path,
 		InventoryPath:     c.configPath[api.AnsibleInventoryFile].Path,
 
 		PlaybookPathDeployKubernetes: c.codePath[api.AnsiblePlaybookDeployKubernetesFile].Path,
+		PlaybookPathInfrastructure:   c.codePath[api.AnsiblePlaybookInfrustructureFiles].Path,
 		PlaybookPathPrepareNodes:     c.codePath[api.AnsiblePlaybookPrepareNodesFile].Path,
 		PlaybookPathJoinCluster:      c.codePath[api.AnsiblePlaybookJoinClusterFile].Path,
 
 		KubeconfigPath: c.configPath[api.KubeconfigFile].Path,
 		CRDFilePath:    c.codePath[api.CRDFile].Path,
+
+		Env: ansibleEnv,
 	}
 }
 

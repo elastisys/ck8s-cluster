@@ -1,26 +1,23 @@
-package exoscale
+package openstack
 
 import (
 	"github.com/elastisys/ck8s/api"
 )
 
-const (
-	FlavorMinimum api.ClusterFlavor = "minimum"
-	FlavorHA      api.ClusterFlavor = "ha"
-)
-
+// Empty TODO
 func Empty(clusterType api.ClusterType) *Cluster {
 	return &Cluster{
-		ExoscaleConfig: ExoscaleConfig{
-			BaseConfig: api.EmptyBaseConfig(clusterType, api.Exoscale),
+		OpenstackConfig: OpenstackConfig{
+			BaseConfig: api.EmptyBaseConfig(clusterType, api.Openstack),
 		},
-		ExoscaleSecret: ExoscaleSecret{
+		OpenstackSecret: OpenstackSecret{
 			BaseSecret: api.BaseSecret{},
 		},
-		ExoscaleTFVars: ExoscaleTFVars{},
+		OpenstackTFVars: OpenstackTFVars{},
 	}
 }
 
+// Default TODO
 func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 	cluster := Empty(clusterType)
 
@@ -28,12 +25,9 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 
 	cluster.DNSPrefix = clusterName
 
-	cluster.APIKey = "changeme"
-	cluster.SecretKey = "changeme"
-
 	cluster.S3AccessKey = "changeme"
 	cluster.S3SecretKey = "changeme"
-	cluster.S3RegionAddress = "sos-ch-gva-2.exo.io"
+	cluster.S3RegionAddress = "changeme"
 
 	cluster.S3BucketNameHarbor = clusterName + "-harbor"
 	cluster.S3BucketNameVelero = clusterName + "-velero"
@@ -43,22 +37,6 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 
 	cluster.PublicIngressCIDRWhitelist = []string{}
 	cluster.APIServerWhitelist = []string{}
-
-	return cluster
-}
-
-func Minimum(clusterType api.ClusterType, clusterName string) api.Cluster {
-	cluster := Default(clusterType, clusterName)
-
-	// TODO
-
-	return cluster
-}
-
-func HA(clusterType api.ClusterType, clusterName string) api.Cluster {
-	cluster := Default(clusterType, clusterName)
-
-	// TODO
 
 	return cluster
 }

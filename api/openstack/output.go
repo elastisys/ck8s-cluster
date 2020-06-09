@@ -1,4 +1,4 @@
-package exoscale
+package openstack
 
 import (
 	"fmt"
@@ -8,20 +8,20 @@ import (
 	"github.com/elastisys/ck8s/api"
 )
 
-type tfOutputPublicIPsValue struct {
-	PublicIP  string `json:"public_ip"`
-	PrivateIP string `json:"private_ip"`
+type tfOutputIPsObject struct {
+	Value map[string]tfOutputIPsValue `json:"value"`
 }
 
-type tfOutputIPsObject struct {
-	Value map[string]tfOutputPublicIPsValue `json:"value"`
+type tfOutputIPsValue struct {
+	PrivateIP string `json:"private_ip"`
+	PublicIP  string `json:"public_ip"`
 }
 
 type tfOutputValue struct {
 	Value string `json:"value"`
 }
 
-type terraformOutput struct {
+type TerraformOutput struct {
 	ClusterType api.ClusterType
 	ClusterName string
 
@@ -30,8 +30,8 @@ type terraformOutput struct {
 	WCMasterIPs tfOutputIPsObject `json:"wc_master_ips"`
 	WCWorkerIPs tfOutputIPsObject `json:"wc_worker_ips"`
 
-	SCControlPlaneLBIP tfOutputValue `json:"sc_control_plane_lb_ip_address"`
-	WCControlPlaneLBIP tfOutputValue `json:"wc_control_plane_lb_ip_address"`
+	SCControlPlaneLBIPs tfOutputIPsObject `json:"sc_loadbalancer_ips"`
+	WCControlPlaneLBIPs tfOutputIPsObject `json:"wc_loadbalancer_ips"`
 
 	ControlPlanePort int
 
@@ -42,26 +42,51 @@ type terraformOutput struct {
 	KubeadmInitExtraArgs       string
 
 	CalicoMTU int
-
-	InternalLoadBalancerAnsibleGroups []string
 }
 
-func (e *terraformOutput) ControlPlaneEndpoint() string {
-	return "127.0.0.1"
-}
-
-func (e *terraformOutput) ControlPlanePublicIP() string {
+func (e *TerraformOutput) ControlPlaneEndpoint() string {
 	switch e.ClusterType {
 	case api.ServiceCluster:
-		return e.SCControlPlaneLBIP.Value
+		firstValue := ""
+		for _, ipsValue := range e.SCControlPlaneLBIPs.Value {
+			firstValue = ipsValue.PrivateIP
+			break
+		}
+		return firstValue
 	case api.WorkloadCluster:
-		return e.WCControlPlaneLBIP.Value
+		firstValue := ""
+		for _, ipsValue := range e.WCControlPlaneLBIPs.Value {
+			firstValue = ipsValue.PrivateIP
+			break
+		}
+		return firstValue
 	default:
 		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
 	}
 }
 
-func (e *terraformOutput) Machines() (machines []api.MachineState) {
+func (e *TerraformOutput) ControlPlanePublicIP() string {
+	switch e.ClusterType {
+	case api.ServiceCluster:
+		firstValue := ""
+		for _, ipsValue := range e.SCControlPlaneLBIPs.Value {
+			firstValue = ipsValue.PublicIP
+			break
+		}
+		return firstValue
+	case api.WorkloadCluster:
+		firstValue := ""
+		for _, ipsValue := range e.WCControlPlaneLBIPs.Value {
+			firstValue = ipsValue.PublicIP
+			break
+		}
+		return firstValue
+	default:
+		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
+	}
+}
+
+func (e *TerraformOutput) Machines() (machines []api.MachineState) {
 	switch e.ClusterType {
 	case api.ServiceCluster:
 		machines = append(
@@ -72,6 +97,10 @@ func (e *terraformOutput) Machines() (machines []api.MachineState) {
 			machines,
 			e.machines(api.Worker, e.SCWorkerIPs)...,
 		)
+		machines = append(
+			machines,
+			e.machines(api.LoadBalancer, e.SCControlPlaneLBIPs)...,
+		)
 	case api.WorkloadCluster:
 		machines = append(
 			machines,
@@ -80,6 +109,10 @@ func (e *terraformOutput) Machines() (machines []api.MachineState) {
 		machines = append(
 			machines,
 			e.machines(api.Worker, e.WCWorkerIPs)...,
+		)
+		machines = append(
+			machines,
+			e.machines(api.LoadBalancer, e.WCControlPlaneLBIPs)...,
 		)
 	default:
 		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
@@ -93,7 +126,7 @@ func (e *terraformOutput) Machines() (machines []api.MachineState) {
 	return
 }
 
-func (e *terraformOutput) Machine(
+func (e *TerraformOutput) Machine(
 	nodeType api.NodeType,
 	name string,
 ) (machine api.MachineState, err error) {
@@ -110,16 +143,16 @@ func (e *terraformOutput) Machine(
 	return
 }
 
-func (e *terraformOutput) machines(
+func (e *TerraformOutput) machines(
 	nodeType api.NodeType,
-	ips tfOutputIPsObject,
+	IPs tfOutputIPsObject,
 ) (machines []api.MachineState) {
-	for name, ips := range ips.Value {
+	for name, ipsValue := range IPs.Value {
 		machines = append(machines, api.MachineState{
 			NodeType:  nodeType,
 			Name:      strings.TrimPrefix(name, e.ClusterName+"-"),
-			PublicIP:  ips.PublicIP,
-			PrivateIP: ips.PrivateIP,
+			PublicIP:  ipsValue.PublicIP,
+			PrivateIP: ipsValue.PrivateIP,
 		})
 	}
 	return

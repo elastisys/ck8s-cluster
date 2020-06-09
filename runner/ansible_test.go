@@ -17,6 +17,8 @@ var (
 
 		KubeconfigPath: "kubeconfig",
 		CRDFilePath:    "crd",
+
+		Env: map[string]string{},
 	}
 )
 

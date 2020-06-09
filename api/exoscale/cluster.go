@@ -31,8 +31,7 @@ func (e *Cluster) State(
 		ClusterType: e.ClusterType,
 		ClusterName: e.Name(),
 
-		ControlPlaneEndpoint: "127.0.0.1",
-		ControlPlanePort:     7443,
+		ControlPlanePort: 7443,
 
 		// TODO: This value currently needs to align with what is set in the
 		//		 Terraform code. We should expose this as an outer variable and

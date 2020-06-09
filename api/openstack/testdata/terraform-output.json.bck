@@ -1,0 +1,158 @@
+{
+    "domain_name": {
+        "sensitive": false,
+        "type": "string",
+        "value": "ck8stest.a1ck.io"
+    },
+    "sc_control_plane_lb_ip_address": {
+        "sensitive": false,
+        "type": "string",
+        "value": "159.100.243.37"
+    },
+    "sc_dns_name": {
+        "sensitive": false,
+        "type": [
+            "tuple",
+            [
+                "string",
+                "string",
+                "string",
+                "string",
+                "string",
+                "string"
+            ]
+        ],
+        "value": [
+            "*.ops.ck8stest.a1ck.io",
+            "dex.ck8stest.a1ck.io",
+            "grafana.ck8stest.a1ck.io",
+            "harbor.ck8stest.a1ck.io",
+            "kibana.ck8stest.a1ck.io",
+            "notary.harbor.ck8stest.a1ck.io"
+        ]
+    },
+    "sc_ingress_controller_lb_ip_address": {
+        "sensitive": false,
+        "type": "string",
+        "value": "159.100.243.37"
+    },
+    "sc_master_ips": {
+        "sensitive": false,
+        "type": [
+            "object",
+            {
+                "ck8stest-service-cluster-master-0": [
+                    "object",
+                    {
+                        "private_ip": "string",
+                        "public_ip": "string"
+                    }
+                ]
+            }
+        ],
+        "value": {
+            "ck8stest-service-cluster-master-0": {
+                "private_ip": "172.0.10.1",
+                "public_ip": "159.100.242.12"
+            }
+        }
+    },
+    "sc_worker_ips": {
+        "sensitive": false,
+        "type": [
+            "object",
+            {
+                "ck8stest-service-cluster-worker-0": [
+                    "object",
+                    {
+                        "private_ip": "string",
+                        "public_ip": "string"
+                    }
+                ],
+                "ck8stest-service-cluster-worker-1": [
+                    "object",
+                    {
+                        "private_ip": "string",
+                        "public_ip": "string"
+                    }
+                ]
+            }
+        ],
+        "value": {
+            "ck8stest-service-cluster-worker-0": {
+                "private_ip": "172.0.10.2",
+                "public_ip": "159.100.242.13"
+            },
+            "ck8stest-service-cluster-worker-1": {
+                "private_ip": "172.0.10.3",
+                "public_ip": "159.100.242.14"
+            }
+        }
+    },
+    "wc_control_plane_lb_ip_address": {
+        "sensitive": false,
+        "type": "string",
+        "value": "159.100.242.135"
+    },
+    "wc_dns_name": {
+        "sensitive": false,
+        "type": [
+            "tuple",
+            [
+                "string",
+                "string"
+            ]
+        ],
+        "value": [
+            "*.ck8stest.a1ck.io",
+            "prometheus.ops.ck8stest.a1ck.io"
+        ]
+    },
+    "wc_ingress_controller_lb_ip_address": {
+        "sensitive": false,
+        "type": "string",
+        "value": "159.100.243.91"
+    },
+    "wc_master_ips": {
+        "sensitive": false,
+        "type": [
+            "object",
+            {
+                "ck8stest-workload-cluster-master-0": [
+                    "object",
+                    {
+                        "private_ip": "string",
+                        "public_ip": "string"
+                    }
+                ]
+            }
+        ],
+        "value": {
+            "ck8stest-workload-cluster-master-0": {
+                "private_ip": "172.0.10.4",
+                "public_ip": "159.100.242.15"
+            }
+        }
+    },
+    "wc_worker_ips": {
+        "sensitive": false,
+        "type": [
+            "object",
+            {
+                "ck8stest-workload-cluster-worker-0": [
+                    "object",
+                    {
+                        "private_ip": "string",
+                        "public_ip": "string"
+                    }
+                ]
+            }
+        ],
+        "value": {
+            "ck8stest-workload-cluster-worker-0": {
+                "private_ip": "172.0.10.5",
+                "public_ip": "159.100.242.16"
+            }
+        }
+    }
+}
