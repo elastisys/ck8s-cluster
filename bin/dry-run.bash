@@ -34,5 +34,21 @@ popd > /dev/null
 # Helmfile diff
 #
 
-"${here}/ops.bash" helmfile sc diff
-"${here}/ops.bash" helmfile wc diff
+log_info "Running helmfile diff on the service cluster"
+
+charts_ignore_list=""
+[[ $CLOUD_PROVIDER != "exoscale" ]] && charts_ignore_list+=",app!=nfs-client-provisioner,app!=local-volume-provisioner"
+[[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"
+[[ $ENABLE_CK8SDASH_SC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
+
+"${here}/ops.bash" helmfile sc -l "${charts_ignore_list:1}" diff
+
+log_info "Running helmfile diff on the workload cluster"
+
+charts_ignore_list=""
+[[ $CLOUD_PROVIDER != "exoscale" ]] && charts_ignore_list+=",app!=nfs-client-provisioner"
+[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-operator,app!=gatekeeper-templates,app!=gatekeeper-constraints"
+[[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
+[[ $ENABLE_CK8SDASH_WC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
+
+"${here}/ops.bash" helmfile wc -l "${charts_ignore_list:1}" diff
