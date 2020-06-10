@@ -70,7 +70,7 @@
       when: private_network_cidr is defined
 
     - name: Wait for master to become ready
-      command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes -o jsonpath='{.items[0].status.conditions[?(@.type=="Ready")].status}'
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes {{ inventory_hostname }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
       register: master_node_status
       until: master_node_status.stdout == "True"
       retries: 30
