@@ -1,3 +1,6 @@
+### Fixed
+- Tests respect the `ENABLE_FALCO` and `ENABLE_FALCO_ALERTS` configuration
+
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
 

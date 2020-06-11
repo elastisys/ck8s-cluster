@@ -19,7 +19,6 @@ deployments=(
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
-    "falco falcosidekick"
 )
 if [ $CLOUD_PROVIDER == "exoscale" ]; then
     deployments+=("kube-system nfs-client-provisioner")
@@ -29,6 +28,9 @@ if [ "$ENABLE_CK8SDASH_WC" == true ]; then
 fi
 if [ "$ENABLE_OPA" == true ]; then
     deployments+=("gatekeeper-system gatekeeper-controller-manager")
+fi
+if [ $ENABLE_FALCO_ALERTS == true ]; then
+    deployments+=("falco falcosidekick")
 fi
 
 resourceKind="Deployment"
@@ -45,7 +47,6 @@ echo "Testing daemonsets"
 echo "=================="
 
 daemonsets=(
-    "falco falco"
     "fluentd fluentd-fluentd-elasticsearch"
     "kube-system calico-node"
     "kube-system fluentd-system-fluentd-elasticsearch"
@@ -54,6 +55,9 @@ daemonsets=(
     "monitoring prometheus-operator-prometheus-node-exporter"
     "velero restic"
 )
+if [ $ENABLE_FALCO == true ]; then
+    daemonsets+=("falco falco")
+fi
 
 resourceKind="DaemonSet"
 # Get json data in a smaller dataset
