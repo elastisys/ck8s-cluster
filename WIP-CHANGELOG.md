@@ -1,3 +1,6 @@
+### Fixed
+- Added quotes to handle special characters (e.g for password etc) in cloud.conf.
+
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
 
