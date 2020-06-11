@@ -93,18 +93,18 @@ func (c *ConfigHandler) WriteS3cfg(
 ) error {
 	var s3cfgPlain, s3cfgEnc bytes.Buffer
 
-	path := c.configPath[api.S3CfgFile]
+	s3cfgPath := c.configPath[api.S3CfgFile]
 
 	if err := renderS3CfgPlaintext(cluster, &s3cfgPlain); err != nil {
 		return fmt.Errorf("error rendering plaintext s3cfg: %w", err)
 	}
 
-	if err := encryptFn(path.Format, &s3cfgPlain, &s3cfgEnc); err != nil {
+	if err := encryptFn(s3cfgPath.Format, &s3cfgPlain, &s3cfgEnc); err != nil {
 		return fmt.Errorf("error encrypting s3cfg: %w", err)
 	}
 
 	if err := ioutil.WriteFile(
-		path.Path,
+		s3cfgPath.Path,
 		s3cfgEnc.Bytes(),
 		0644,
 	); err != nil {
