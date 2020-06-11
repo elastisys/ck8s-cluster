@@ -189,6 +189,7 @@ func newConfigHandler(
 	codePath := api.NewCodePath(codeRootPath, clusterType)
 
 	return client.NewConfigHandler(
+		logger,
 		clusterType,
 		configPath,
 		codePath,

@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/viper"
 	"go.mozilla.org/sops/v3/decrypt"
+	"go.uber.org/zap"
 
 	"github.com/elastisys/ck8s/api"
 	"github.com/elastisys/ck8s/runner"
@@ -19,9 +20,12 @@ type ConfigHandler struct {
 	clusterType api.ClusterType
 	configPath  api.ConfigPath
 	codePath    api.CodePath
+
+	logger *zap.Logger
 }
 
 func NewConfigHandler(
+	logger *zap.Logger,
 	clusterType api.ClusterType,
 	configPath api.ConfigPath,
 	codePath api.CodePath,
@@ -30,6 +34,8 @@ func NewConfigHandler(
 		clusterType: clusterType,
 		configPath:  configPath,
 		codePath:    codePath,
+
+		logger: logger,
 	}
 }
 
@@ -56,27 +62,6 @@ func (c *ConfigHandler) Read() (api.Cluster, error) {
 	return cluster, nil
 }
 
-// Save validates and saves a cluster configuration to the config path.
-func (c *ConfigHandler) Write(cluster api.Cluster) error {
-	if err := api.ValidateCluster(cluster); err != nil {
-		return fmt.Errorf("config validation failed: %w", err)
-	}
-
-	if err := c.writeConfig(cluster); err != nil {
-		return fmt.Errorf("error saving config: %w", err)
-	}
-
-	if err := c.writeSecrets(cluster); err != nil {
-		return fmt.Errorf("error saving secrets: %w", err)
-	}
-
-	if err := c.writeTFVars(cluster); err != nil {
-		return fmt.Errorf("error saving tfvars: %w", err)
-	}
-
-	return nil
-}
-
 // WriteTFVars validates the cluster configuration and saves only the Terraform
 // variables part of the config path.
 func (c *ConfigHandler) WriteTFVars(cluster api.Cluster) error {
@@ -91,6 +76,8 @@ func (c *ConfigHandler) WriteS3cfg(
 	cluster api.Cluster,
 	encryptFn func(format string, plain io.Reader, enc io.Writer) error,
 ) error {
+	c.logger.Debug("config_handler_s3cfg_write")
+
 	var s3cfgPlain, s3cfgEnc bytes.Buffer
 
 	s3cfgPath := c.configPath[api.S3CfgFile]
@@ -335,40 +322,8 @@ func (c *ConfigHandler) readTFVars(cluster api.Cluster) error {
 		return fmt.Errorf("error reading tfvars: %w", err)
 	}
 
-	if err := tfvarsDecode(tfvarsData, cluster.TFVars()); err != nil {
+	if err := hclDecode(tfvarsData, cluster.TFVars()); err != nil {
 		return fmt.Errorf("error decoding tfvars: %w", err)
-	}
-
-	return nil
-}
-
-func (c *ConfigHandler) writeConfig(cluster api.Cluster) error {
-	v := c.configViper()
-
-	v.SetConfigPermissions(0644)
-
-	if err := v.Unmarshal(cluster.Config()); err != nil {
-		return fmt.Errorf("error unmarshaling config: %w", err)
-	}
-
-	if err := v.WriteConfig(); err != nil {
-		return fmt.Errorf("error writing config: %w", err)
-	}
-
-	return nil
-}
-
-func (c *ConfigHandler) writeSecrets(cluster api.Cluster) error {
-	v := c.secretsViper()
-
-	v.SetConfigPermissions(0644)
-
-	if err := v.Unmarshal(cluster.Secret()); err != nil {
-		return fmt.Errorf("error unmarshaling config: %w", err)
-	}
-
-	if err := v.WriteConfig(); err != nil {
-		return fmt.Errorf("error writing config: %w", err)
 	}
 
 	return nil
@@ -377,7 +332,7 @@ func (c *ConfigHandler) writeSecrets(cluster api.Cluster) error {
 func (c *ConfigHandler) writeTFVars(cluster api.Cluster) error {
 	return ioutil.WriteFile(
 		c.configPath[api.TFVarsFile].Path,
-		tfvarsEncode(cluster.TFVars()),
+		hclEncode(cluster.TFVars()),
 		0644,
 	)
 }

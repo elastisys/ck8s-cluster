@@ -45,3 +45,12 @@ func (e *CloudProvider) Cluster(
 	}
 	return clusterFactory(clusterType, clusterName), nil
 }
+
+func (e *CloudProvider) TerraformBackendConfig() *api.TerraformBackendConfig {
+	backendConfig := &api.TerraformBackendConfig{
+		Hostname:     "app.terraform.io",
+		Organization: "elastisys",
+	}
+	backendConfig.Workspaces.Prefix = "ck8s-citycloud-"
+	return backendConfig
+}

@@ -80,26 +80,36 @@ func (t *Terraform) command(args ...string) *Command {
 	return cmd
 }
 
-// Init runs `terraform init -backend-config BACKEND_CONFIG_PATH`
+// Init runs `terraform init` optionally with the `-backend-config` flag if a
+// backend config path is configured.
 func (t *Terraform) Init() error {
 	t.logger.Debug("terraform_init")
-	return t.runner.Background(t.command(
-		"init", "-backend-config", t.config.BackendConfigPath,
-	))
+	args := []string{"init"}
+	if t.config.BackendConfigPath != "" {
+		args = append(
+			args,
+			[]string{"-backend-config", t.config.BackendConfigPath}...,
+		)
+	}
+	return t.runner.Background(t.command(args...))
 }
 
-// HasNoDiff runs `terraform plan -var-file TFVARS_PATH -target TARGET
-// -detailed-exitcode` and returns an error of type TerraformPlanDiffErr if it
-// has a diff.
+// HasNoDiff runs `terraform plan -detailed-exitcode` and returns an error of
+// type TerraformPlanDiffErr if it has a diff. It optionally runs with the
+// flags `-var-file` and `-target` if either is configured.
 func (t *Terraform) PlanNoDiff() error {
 	t.logger.Debug("terraform_plan_no_diff")
 
-	cmd := t.command(
-		"plan",
-		"-var-file", t.config.TFVarsPath,
-		"-target", t.config.Target,
-		"-detailed-exitcode",
-	)
+	args := []string{"plan"}
+	if t.config.TFVarsPath != "" {
+		args = append(args, []string{"-var-file", t.config.TFVarsPath}...)
+	}
+	if t.config.Target != "" {
+		args = append(args, []string{"-target", t.config.Target}...)
+	}
+	args = append(args, "-detailed-exitcode")
+
+	cmd := t.command(args...)
 
 	cmd.ExitCodeHandlers[2] = func() error {
 		return TerraformPlanDiffErr
@@ -108,22 +118,25 @@ func (t *Terraform) PlanNoDiff() error {
 	return t.runner.Run(cmd)
 }
 
-// Apply runs `terraform apply -var-file TFVARS_PATH -target TARGET` with the
-// -auto-approve flag if autoApprove is true. If autoApprove is false it
-// always outputs to allow for interactive input.
-func (t *Terraform) Apply(autoApprove bool) error {
+// Apply runs `terraform apply` with the -auto-approve flag if autoApprove is
+// true. If autoApprove is false it always outputs to allow for interactive
+// input. It optionally runs with the flags `-var-file` and `-target` if
+// either is configured.
+func (t *Terraform) Apply(autoApprove bool, extraArgs ...string) error {
 	t.logger.Debug("terraform_apply")
 
-	args := []string{
-		"apply",
-		"-var-file", t.config.TFVarsPath,
-		"-target", t.config.Target,
+	args := []string{"apply"}
+	if t.config.TFVarsPath != "" {
+		args = append(args, []string{"-var-file", t.config.TFVarsPath}...)
+	}
+	if t.config.Target != "" {
+		args = append(args, []string{"-target", t.config.Target}...)
 	}
 	if autoApprove {
 		args = append(args, "-auto-approve")
 	}
 
-	cmd := t.command(args...)
+	cmd := t.command(append(args, extraArgs...)...)
 
 	if !autoApprove {
 		return t.runner.Output(cmd)

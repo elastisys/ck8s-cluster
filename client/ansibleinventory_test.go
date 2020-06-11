@@ -62,7 +62,7 @@ func TestRenderAnsibleInventory(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		tfvarsDecode(tfvarsData, tc.cluster.TFVars())
+		hclDecode(tfvarsData, tc.cluster.TFVars())
 
 		state, err := tc.cluster.State(func(state interface{}) error {
 			tfOutputData, err := ioutil.ReadFile(tc.terraformOutputPath)

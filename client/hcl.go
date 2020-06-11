@@ -9,25 +9,25 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
-func tfvarsEncode(data interface{}) []byte {
+func hclEncode(data interface{}) []byte {
 	f := hclwrite.NewEmptyFile()
 	gohcl.EncodeIntoBody(data, f.Body())
 	return f.Bytes()
 }
 
-func tfvarsDecode(data []byte, tfVars interface{}) error {
+func hclDecode(data []byte, target interface{}) error {
 	file, diags := hclsyntax.ParseConfig(
 		data,
 		"",
 		hcl.Pos{Line: 1, Column: 1},
 	)
 	if diags.HasErrors() {
-		return fmt.Errorf("failed to parse tfvars config: %s", diags)
+		return fmt.Errorf("failed to parse hcl config: %s", diags)
 	}
 
-	diags = gohcl.DecodeBody(file.Body, nil, tfVars)
+	diags = gohcl.DecodeBody(file.Body, nil, target)
 	if diags.HasErrors() {
-		return fmt.Errorf("failed to decode tfvars config: %s", diags)
+		return fmt.Errorf("failed to decode hcl config: %s", diags)
 	}
 
 	return nil

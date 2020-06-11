@@ -39,6 +39,7 @@ const (
 	SSHPublicKeyFile
 	SSHPrivateKeyFile
 	TFDataDir
+	TFEDataDir
 	AnsibleInventoryFile
 	SOPSConfigFile
 	KubeconfigFile
@@ -53,6 +54,7 @@ const (
 	AnsiblePlaybookInfrustructureFiles
 	ManageS3BucketsScriptFile
 	CRDFile
+	TerraformTFEDir
 	// TODO: Would be nice to get rid of this and only have one single main
 	//		 Terraform module.
 	TerraformExoscaleDir
@@ -66,6 +68,7 @@ var relativeConfigPaths = ConfigPath{
 	TFBackendConfigFile: {"backend_config.hcl", "hclv2"},
 	TFVarsFile:          {"config.tfvars", "hclv2"},
 	TFDataDir:           {".state/.terraform", ""},
+	TFEDataDir:          {".state/.terraform-tfe", ""},
 	SOPSConfigFile:      {".sops.yaml", "yaml"},
 	S3CfgFile:           {".state/s3cfg.ini", "ini"},
 }
@@ -100,6 +103,9 @@ var relativeCodePaths = CodePath{
 	},
 	ManageS3BucketsScriptFile: {
 		"scripts/manage-s3-buckets.sh", "",
+	},
+	TerraformTFEDir: {
+		"terraform/tfe", "",
 	},
 	TerraformExoscaleDir: {
 		"terraform/exoscale", "",

@@ -20,6 +20,8 @@ type CloudProvider interface {
 	Default(ClusterType, string) Cluster
 	// Cluster should return a preconfigured cluster depending on flavor.
 	Cluster(ClusterType, ClusterFlavor, string) (Cluster, error)
+	// TerraformBackendConfig should return the default backend config.
+	TerraformBackendConfig() *TerraformBackendConfig
 }
 
 type ClusterStateLoadFunc func(interface{}) error
@@ -117,4 +119,12 @@ func NodeTypeFromString(s string) NodeType {
 	}
 	// TODO: return error?
 	panic("unknown node type")
+}
+
+type TerraformBackendConfig struct {
+	Hostname     string `hcl:"hostname"`
+	Organization string `hcl:"organization"`
+	Workspaces   struct {
+		Prefix string `hcl:"prefix"`
+	} `hcl:"workspaces,block"`
 }
