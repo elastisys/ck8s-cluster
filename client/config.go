@@ -141,7 +141,7 @@ func (c *ConfigHandler) WriteAnsibleInventory(
 	return nil
 }
 
-func (c *ConfigHandler) TerraformConfig(
+func (c *ConfigHandler) TerraformRunnerConfig(
 	cluster api.Cluster,
 ) (*runner.TerraformConfig, error) {
 	var tfPath api.Path
@@ -203,8 +203,9 @@ func (c *ConfigHandler) TerraformConfig(
 	}, nil
 }
 
-func (c *ConfigHandler) AnsibleConfig(cluster api.Cluster) *runner.AnsibleConfig {
-	ansibleEnv := cluster.AnsibleEnv()
+func (c *ConfigHandler) AnsibleRunnerConfig(
+	cluster api.Cluster,
+) *runner.AnsibleConfig {
 	return &runner.AnsibleConfig{
 		AnsibleConfigPath: c.codePath[api.AnsibleConfigFile].Path,
 		InventoryPath:     c.configPath[api.AnsibleInventoryFile].Path,
@@ -217,11 +218,13 @@ func (c *ConfigHandler) AnsibleConfig(cluster api.Cluster) *runner.AnsibleConfig
 		KubeconfigPath: c.configPath[api.KubeconfigFile].Path,
 		CRDFilePath:    c.codePath[api.CRDFile].Path,
 
-		Env: ansibleEnv,
+		Env: cluster.AnsibleEnv(),
 	}
 }
 
-func (c *ConfigHandler) S3CmdConfig(cluster api.Cluster) *runner.S3CmdConfig {
+func (c *ConfigHandler) S3CmdRunnerConfig(
+	cluster api.Cluster,
+) *runner.S3CmdConfig {
 	return &runner.S3CmdConfig{
 		CloudProviderName:         string(cluster.CloudProvider()),
 		S3cfgPath:                 c.configPath[api.S3CfgFile].Path,
@@ -230,7 +233,7 @@ func (c *ConfigHandler) S3CmdConfig(cluster api.Cluster) *runner.S3CmdConfig {
 	}
 }
 
-func (c *ConfigHandler) KubectlConfig(
+func (c *ConfigHandler) KubectlRunnerConfig(
 	cluster api.Cluster,
 ) *runner.KubectlConfig {
 	return &runner.KubectlConfig{
@@ -239,7 +242,7 @@ func (c *ConfigHandler) KubectlConfig(
 	}
 }
 
-func (c *ConfigHandler) SOPSConfig() *runner.SOPSConfig {
+func (c *ConfigHandler) SOPSRunnerConfig() *runner.SOPSConfig {
 	return &runner.SOPSConfig{
 		SOPSConfigPath: c.configPath[api.SOPSConfigFile].Path,
 	}

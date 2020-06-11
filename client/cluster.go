@@ -64,7 +64,7 @@ func NewClusterClient(
 	)
 
 	// TODO: Try to get rid of the error return.
-	terraformConfig, err := configHandler.TerraformConfig(cluster)
+	terraformConfig, err := configHandler.TerraformRunnerConfig(cluster)
 	if err != nil {
 		return nil, err
 	}
@@ -84,13 +84,13 @@ func NewClusterClient(
 		sops: runner.NewSOPS(
 			logger,
 			localRunner,
-			configHandler.SOPSConfig(),
+			configHandler.SOPSRunnerConfig(),
 		),
 
 		s3cmd: runner.NewS3Cmd(
 			logger,
 			localRunner,
-			configHandler.S3CmdConfig(cluster),
+			configHandler.S3CmdRunnerConfig(cluster),
 		),
 
 		terraform: runner.NewTerraform(
@@ -102,13 +102,13 @@ func NewClusterClient(
 		ansible: runner.NewAnsible(
 			logger,
 			sshAgentRunner,
-			configHandler.AnsibleConfig(cluster),
+			configHandler.AnsibleRunnerConfig(cluster),
 		),
 
 		kubectl: runner.NewKubectl(
 			logger,
 			localRunner,
-			configHandler.KubectlConfig(cluster),
+			configHandler.KubectlRunnerConfig(cluster),
 		),
 
 		logger: logger,
