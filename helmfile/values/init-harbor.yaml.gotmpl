@@ -1,9 +1,0 @@
-password: {{ requiredEnv "HARBOR_PWD" }}
-oidc:
-  clientSecret: {{ requiredEnv "HARBOR_CLIENT_SECRET" }}
-  endpoint: "https://dex.{{ requiredEnv "ECK_BASE_DOMAIN" }}"
-{{ if eq (env "CERT_TYPE") "prod" }}
-  verifyCert: true
-{{ else }}
-  verifyCert: false
-{{ end }}

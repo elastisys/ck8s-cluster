@@ -1,16 +1,1 @@
-virtenv
-.ssh
-kubeconfig
-certs
-.env
-**/terraform.tfstate
-**/terraform.tfstate.*
-**/cluster.yaml
-**/.terraform
-**/*.tfstate
-**/*.state
-clusters
-**/*.coverage
-**/__pycache__
 .vscode
-.s3cfg*

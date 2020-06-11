@@ -1,4 +1,0 @@
-terraform.tfstate.*
-*.auto.tfvars
-.terraform
-cred.sh

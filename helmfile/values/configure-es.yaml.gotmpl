@@ -1,7 +1,0 @@
-snapshot:
-  target_bucket_name: {{ requiredEnv "S3_ES_BACKUP_BUCKET_NAME" }}
-  s3_provider: {{ requiredEnv "CLOUD_PROVIDER" }}
-
-ilm:
-  rollover_size: {{ requiredEnv "ROLLOVER_SIZE" }}
-  rollover_age: {{ requiredEnv "ROLLOVER_AGE" }}

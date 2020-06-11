@@ -1,3 +1,0 @@
-baseDomain: ""
-ingress:
-  enabled: false

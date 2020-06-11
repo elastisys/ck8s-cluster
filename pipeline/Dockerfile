@@ -6,7 +6,7 @@ RUN  apt-get update && \
      apt-get install -y \
          python3-pip make git wget \
          unzip ssh gettext-base \
-         jq curl python3.7 apache2-utils \
+         curl python3.7 apache2-utils \
          ansible="${ANSIBLE_VERSION}" \
          net-tools iputils-ping && \
      rm -rf /var/lib/apt/lists/*
@@ -76,15 +76,3 @@ RUN wget "https://github.com/s3tools/s3cmd/releases/download/v${S3CMD_VERSION}/s
     python3 setup.py install && \
     cd ../ && \
     rm "s3cmd-${S3CMD_VERSION}.tar.gz"
-
-# yq
-ENV YQ_VERSION "3.2.1"
-RUN wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
-    chmod +x yq_linux_amd64 && \
-    mv yq_linux_amd64 /usr/local/bin/yq
-
-# opa
-ENV OPA_VERSION "v0.17.2"
-RUN wget "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
-    chmod +x opa_linux_amd64 && \
-    mv opa_linux_amd64 /usr/local/bin/opa

@@ -1,6 +1,0 @@
-baseDomain: {{ requiredEnv "ECK_BASE_DOMAIN" }}
-ingress:
-  enabled: {{ requiredEnv "ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" }}
-basic_auth:
-  username: alertmanager
-  password: {{ requiredEnv "CUSTOMER_PROMETHEUS_PWD" }}

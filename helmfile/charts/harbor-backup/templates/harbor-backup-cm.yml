@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-cm
-data:
-  {{ (.Files.Glob "scripts/harbor-backup.sh").AsConfig | indent 2 }}
