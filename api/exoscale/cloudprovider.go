@@ -3,8 +3,8 @@ package exoscale
 import "github.com/elastisys/ck8s/api"
 
 var clusterFlavorMap = map[api.ClusterFlavor]func(api.ClusterType, string) api.Cluster{
-	FlavorMinimum: Minimum,
-	FlavorHA:      HA,
+	FlavorDevelopment: Development,
+	FlavorProduction:  Production,
 }
 
 type CloudProvider struct{}

@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	FlavorMinimum api.ClusterFlavor = "minimum"
-	FlavorHA      api.ClusterFlavor = "ha"
+	FlavorDevelopment api.ClusterFlavor = "dev"
+	FlavorProduction  api.ClusterFlavor = "prod"
 )
 
 func Default(clusterType api.ClusterType, clusterName string) *Cluster {
@@ -34,15 +34,36 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 	}
 }
 
-func Minimum(clusterType api.ClusterType, clusterName string) api.Cluster {
+func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 	cluster := Default(clusterType, clusterName)
 
-	// TODO
+	cluster.tfvars.MasterNamesSC = []string{"master-0"}
+	cluster.tfvars.MasterNameSizeMapSC = map[string]string{"master-0": "Small"}
+
+	cluster.tfvars.WorkerNamesSC = []string{"worker-0", "worker-1"}
+	cluster.tfvars.WorkerNameSizeMapSC = map[string]string{
+		"worker-0": "Extra-large",
+		"worker-1": "Large",
+	}
+	cluster.tfvars.ESLocalStorageCapacityMapSC = map[string]int{
+		"worker-0": 26,
+		"worker-1": 26,
+	}
+
+	cluster.tfvars.MasterNamesWC = []string{"master-0"}
+	cluster.tfvars.MasterNameSizeMapWC = map[string]string{"master-0": "Small"}
+
+	cluster.tfvars.WorkerNamesWC = []string{"worker-0"}
+	cluster.tfvars.WorkerNameSizeMapWC = map[string]string{"worker-0": "Large"}
+
+	cluster.tfvars.ESLocalStorageCapacityMapWC = map[string]int{"worker-0": 0}
+
+	cluster.tfvars.NFSSize = "Small"
 
 	return cluster
 }
 
-func HA(clusterType api.ClusterType, clusterName string) api.Cluster {
+func Production(clusterType api.ClusterType, clusterName string) api.Cluster {
 	cluster := Default(clusterType, clusterName)
 
 	// TODO
