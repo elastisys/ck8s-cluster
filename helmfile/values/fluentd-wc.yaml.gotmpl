@@ -17,6 +17,11 @@ elasticsearch:
   sslVerify: {{ requiredEnv "TLS_VERIFY" }}
   logLevel: "info"
 
+secret:
+- name: OUTPUT_PASSWORD
+  secret_name: elasticsearch
+  secret_key: password
+
 env:
   LIVENESS_THRESHOLD_SECONDS: 900
   STUCK_THRESHOLD_SECONDS: 1200
@@ -28,23 +33,12 @@ configMaps:
     systemConf: false
     containersInputConf: false
     outputConf: false
-secret:
-- name: OUTPUT_PASSWORD
-  secret_name: elasticsearch
-  secret_key: password
 
 additionalPlugins:
-  #New version bugfixes for ilm
-  #default: gem 'fluent-plugin-elasticsearch', '~>3.5.3'
-- name: fluent-plugin-elasticsearch
-  version: 3.6.0
   #New version due to https://github.com/fluent/fluent-plugin-prometheus/issues/119
   #default: gem 'fluent-plugin-prometheus', '~>1.4.0'
 - name: fluent-plugin-prometheus
   version: 1.6.1
-  #Required for ilm features
-- name: elasticsearch-xpack
-  version: 7.4
 
 serviceMonitor:
   enabled: true
@@ -59,6 +53,7 @@ extraConfigMaps:
         format json
       </log>
     </system>
+
   10-kube-audit.conf: |-
     <source>
       @id kube-audit
@@ -188,13 +183,8 @@ extraConfigMaps:
         # Custom parameters --START--
         reload_on_failure true
         reload_connections false
-        # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubeaudit
-        rollover_index true
-        deflector_alias kubeaudit
-        index_prefix kubeaudit
-        index_date_pattern "now/d"
         # Custom parameters --END--
         <buffer>
           @type file
@@ -228,13 +218,8 @@ extraConfigMaps:
         # Custom parameters --START--
         reload_on_failure true
         reload_connections false
-        # Rollover index configuration
         include_timestamp true # defaults to false
         index_name kubernetes
-        rollover_index true
-        deflector_alias kubernetes
-        index_prefix kubernetes
-        index_date_pattern "now/d"
         # Custom parameters --END--
         <buffer>
           @type file
@@ -268,13 +253,8 @@ extraConfigMaps:
         # Custom parameters --START--
         reload_on_failure true
         reload_connections false
-        # Rollover index configuration
         include_timestamp true # defaults to false
         index_name other
-        rollover_index true
-        deflector_alias other
-        index_prefix other
-        index_date_pattern "now/d"
         # Custom parameters --END--
         <buffer>
           @type file
