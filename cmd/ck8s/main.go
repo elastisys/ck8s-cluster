@@ -28,8 +28,7 @@ var (
 )
 
 var (
-	clusterClient *client.ClusterClient
-	logger        *zap.Logger
+	logger *zap.Logger
 )
 
 var rootCmd = &cobra.Command{
@@ -138,47 +137,11 @@ func parseNodeTypeFlag(nodeType string) (api.NodeType, error) {
 	}
 }
 
-func setupClusterClient() error {
-	configRootPath := viper.GetString(configPathFlag)
-	if configRootPath == "" {
-		return fmt.Errorf("config path cannot be empty")
-	}
-
-	clusterType, err := parseClusterFlag()
-	if err != nil {
-		return err
-	}
-
-	codeRootPath, err := filepath.Abs(viper.GetString(codePathFlag))
-	if err != nil {
-		return err
-	}
-
-	configPath := api.NewConfigPath(configRootPath, clusterType)
-
-	codePath := api.NewCodePath(codeRootPath, clusterType)
-
-	configHandler := client.NewConfigHandler(clusterType, configPath, codePath)
-
-	cluster, err := configHandler.Read()
-	if err != nil {
-		return fmt.Errorf("error reading config path: %w", err)
-	}
-
-	clusterClient, err = client.NewClusterClient(
-		logger,
-		cluster,
-		configHandler,
-		viper.GetBool(silentFlag),
-		viper.GetBool(autoApproveFlag),
-		configPath[api.SSHPrivateKeyFile],
-		configPath[api.KubeconfigFile],
-	)
-
-	return err
-}
-
 func setupLogger() error {
+	if logger != nil {
+		panic("logger already setup")
+	}
+
 	config := zap.NewDevelopmentConfig()
 
 	logLevel := viper.GetString(logLevelFlag)
@@ -205,11 +168,60 @@ func setup(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error setting up logger: %s", err)
 	}
 
-	if err := setupClusterClient(); err != nil {
-		return fmt.Errorf("error setting up client: %s", err)
-	}
-
 	return nil
+}
+
+func withClusterClient(fn func(
+	*client.ClusterClient,
+	*cobra.Command,
+	[]string,
+) error) func(*cobra.Command, []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		clusterType, err := parseClusterFlag()
+		if err != nil {
+			return err
+		}
+
+		configRootPath := viper.GetString(configPathFlag)
+		if configRootPath == "" {
+			return fmt.Errorf("config path cannot be empty")
+		}
+
+		codeRootPath, err := filepath.Abs(viper.GetString(codePathFlag))
+		if err != nil {
+			return err
+		}
+
+		configPath := api.NewConfigPath(configRootPath, clusterType)
+
+		codePath := api.NewCodePath(codeRootPath, clusterType)
+
+		configHandler := client.NewConfigHandler(
+			clusterType,
+			configPath,
+			codePath,
+		)
+
+		cluster, err := configHandler.Read()
+		if err != nil {
+			return fmt.Errorf("error reading config path: %w", err)
+		}
+
+		clusterClient, err := client.NewClusterClient(
+			logger,
+			cluster,
+			configHandler,
+			viper.GetBool(silentFlag),
+			viper.GetBool(autoApproveFlag),
+			configPath[api.SSHPrivateKeyFile],
+			configPath[api.KubeconfigFile],
+		)
+		if err != nil {
+			return err
+		}
+
+		return fn(clusterClient, cmd, args)
+	}
 }
 
 func main() {

@@ -1,10 +1,15 @@
 package main
 
 import (
+	"github.com/elastisys/ck8s/client"
 	"github.com/spf13/cobra"
 )
 
-func apply(cmd *cobra.Command, args []string) error {
+func apply(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	return clusterClient.Apply()
 }
 
@@ -16,6 +21,6 @@ func init() {
 terraform apply to create any changes in the Terraform configuration and
 kubeadm init and kubeadm join to setup any new Kubernetes nodes.`,
 		Args: cobra.NoArgs,
-		RunE: apply,
+		RunE: withClusterClient(apply),
 	})
 }

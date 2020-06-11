@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/elastisys/ck8s/api"
 	"github.com/spf13/cobra"
-	// "github.com/elastisys/ck8s/api"
+
+	"github.com/elastisys/ck8s/api"
+	"github.com/elastisys/ck8s/client"
 )
 
 func init() {
@@ -13,21 +14,21 @@ func init() {
 		Use:   "get NODE_TYPE NAME",
 		Short: "Get machine details",
 		Args:  cobra.ExactArgs(2),
-		RunE:  machineGet,
+		RunE:  withClusterClient(machineGet),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "list",
 		Short: "List machines",
 		Args:  cobra.NoArgs,
-		RunE:  machineList,
+		RunE:  withClusterClient(machineList),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ssh NODE_TYPE NAME",
 		Short: "Open an SSH login shell on a machine",
 		Args:  cobra.ExactArgs(2),
-		RunE:  machineSSH,
+		RunE:  withClusterClient(machineSSH),
 	})
 }
 
@@ -40,7 +41,11 @@ func printMachine(machine api.MachineState) {
 	)
 }
 
-func machineGet(cmd *cobra.Command, args []string) error {
+func machineGet(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	nodeType, err := parseNodeTypeFlag(args[0])
 	if err != nil {
 		return err
@@ -58,7 +63,11 @@ func machineGet(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func machineList(cmd *cobra.Command, args []string) error {
+func machineList(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	machines, err := clusterClient.Machines()
 	if err != nil {
 		return fmt.Errorf("error listing machines: %s", err)
@@ -71,7 +80,11 @@ func machineList(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func machineSSH(cmd *cobra.Command, args []string) error {
+func machineSSH(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	nodeType, err := parseNodeTypeFlag(args[0])
 	if err != nil {
 		return err

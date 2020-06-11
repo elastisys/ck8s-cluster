@@ -5,13 +5,23 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+
+	"github.com/elastisys/ck8s/client"
 )
 
-func terraformApply(cmd *cobra.Command, args []string) error {
+func terraformApply(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	return clusterClient.TerraformApply()
 }
 
-func terraformOutput(cmd *cobra.Command, args []string) error {
+func terraformOutput(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	var output interface{}
 	if err := clusterClient.TerraformOutput(&output); err != nil {
 		return err
@@ -41,14 +51,14 @@ func init() {
 		Use:   "apply",
 		Short: "Apply the Terraform configuration",
 		Args:  cobra.NoArgs,
-		RunE:  terraformApply,
+		RunE:  withClusterClient(terraformApply),
 	})
 
 	tf.AddCommand(&cobra.Command{
 		Use:   "output",
 		Short: "Get the raw Terraform output in JSON format",
 		Args:  cobra.NoArgs,
-		RunE:  terraformOutput,
+		RunE:  withClusterClient(terraformOutput),
 	})
 
 	internal.AddCommand(tf)

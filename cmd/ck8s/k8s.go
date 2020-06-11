@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+
+	"github.com/elastisys/ck8s/client"
 )
 
 func init() {
@@ -15,7 +17,7 @@ func init() {
    apply.
 2. Joining the new node to the Kubernetes cluster.`,
 		Args: cobra.ExactArgs(2),
-		RunE: cloneNode,
+		RunE: withClusterClient(cloneNode),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
@@ -23,7 +25,7 @@ func init() {
 		Short: "Drain a Kubernetes node",
 		Long:  `This command will cordon and drain a Kubernetes node.`,
 		Args:  cobra.ExactArgs(1),
-		RunE:  drainNode,
+		RunE:  withClusterClient(drainNode),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
@@ -31,7 +33,7 @@ func init() {
 		Short: "Runs kubeadm reset on a machine",
 		Long:  `This command will remove any trace of Kubernetes from a machine.`,
 		Args:  cobra.ExactArgs(2),
-		RunE:  resetNode,
+		RunE:  withClusterClient(resetNode),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
@@ -44,7 +46,7 @@ machine by:
 3. Removing the old machine from the Terraform configuration and running
    terraform apply.`,
 		Args: cobra.ExactArgs(2),
-		RunE: removeNode,
+		RunE: withClusterClient(removeNode),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
@@ -62,11 +64,15 @@ machine by:
 This useful when, for example, the Kubernetes cluster needs to be updated
 gracefully by performing a rolling upgrade.`,
 		Args: cobra.ExactArgs(2),
-		RunE: replaceNode,
+		RunE: withClusterClient(replaceNode),
 	})
 }
 
-func resetNode(cmd *cobra.Command, args []string) error {
+func resetNode(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	nodeType, err := parseNodeTypeFlag(args[0])
 	if err != nil {
 		return err
@@ -80,7 +86,11 @@ func resetNode(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func cloneNode(cmd *cobra.Command, args []string) error {
+func cloneNode(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	nodeType, err := parseNodeTypeFlag(args[0])
 	if err != nil {
 		return err
@@ -94,7 +104,11 @@ func cloneNode(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func drainNode(cmd *cobra.Command, args []string) error {
+func drainNode(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	name := args[0]
 
 	if err := clusterClient.DrainNode(name); err != nil {
@@ -103,7 +117,11 @@ func drainNode(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func replaceNode(cmd *cobra.Command, args []string) error {
+func replaceNode(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	nodeType, err := parseNodeTypeFlag(args[0])
 	if err != nil {
 		return err
@@ -117,7 +135,11 @@ func replaceNode(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func removeNode(cmd *cobra.Command, args []string) error {
+func removeNode(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
 	nodeType, err := parseNodeTypeFlag(args[0])
 	if err != nil {
 		return err
