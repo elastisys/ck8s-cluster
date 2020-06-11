@@ -1,12 +1,13 @@
 **What this PR does / why we need it**:
 
-**Which issue this PR fixes** *(use the format `fixes #<issue number>(, fixes #<issue_number>, ...)` to automatically close the issue when PR gets merged)*: fixes #
+**Which issue this PR fixes** *(use the format `fixes #<issue number>(, fixes #<issue_number>, ...)` to automatically close the issue when PR gets merged)*:
+fixes #
 
 **Special notes for reviewer**:
 
 **Checklist:**
 
-- [ ] Added relevant notes to [WIP-CHANGELOG.md](https://github.com/elastisys/ck8s/blob/master/WIP-CHANGELOG.md)
+- [ ] Added relevant notes to [WIP-CHANGELOG.md](https://github.com/elastisys/ck8s-cluster/blob/master/WIP-CHANGELOG.md)
 - [ ] Proper commit message prefix on all commits
 - Is this changeset backwards compatible for existing clusters? Applying:
     - [ ] is completely transparent, will not impact the workload in any way.
@@ -23,23 +24,16 @@
 
 <!--
 Here are the commit prefixes and comments on when to use them:
-all: (things that touch on more than one of the areas below, or don't fit any of them)
-infra: (changes to our infrastructure code that apply to more than one cloud)
-infra aws (changes to our infrastructure code that apply only to AWS)
-infra exo: (changes to our infrastructure code that apply only to Exoscale)
-infra safe: (changes to our infrastructure code that apply only to Safespring)
-infra city: (changes to our infrastructure code that apply only to CityCloud)
-lb: (things related to the HAProxy load balancer)
-k8s: (kubernetes related changes, e.g. cluster initialization or join)
-apps: (changes to the applications running in both/all clusters)
-apps sc: (changes to applications in the service cluster)
-apps wc: (changes to applications in the workload cluster)
-docs: (documentation)
-tests: (test related changes)
-pipeline: (the pipeline)
-config: (configuration, e.g. add/remove/rename a parameter, this is not for changes to the default values for an application that would go into `apps [sc/wc]`)
-bin: (changes to binaries or scripts used manage ck8s)
-release: (anything release related)
+all: things that touch on more than one of the areas below, or don't fit any of them
+tf: Terraform code that apply to more than one cloud
+tf aws: Terraform code that apply only to AWS
+tf exo: Terraform code that apply only to Exoscale
+tf safe: Terraform code that apply only to Safespring
+tf city: Terraform code that apply only to CityCloud
+ansible: Ansible related changes, e.g. cluster initialization or join
+docs: documentation
+pipeline: the pipeline
+release: anything release related
 
 Example commit prefix usage:
 
