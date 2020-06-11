@@ -52,9 +52,9 @@ func NewClusterClient(
 	configHandler *ConfigHandler,
 	silent bool,
 	autoApprove bool,
-	sshPrivateKeyPath api.Path,
-	kubeconfigPath api.Path,
 ) (*ClusterClient, error) {
+	sshPrivateKeyPath := configHandler.SSHPrivateKeyPath()
+
 	localRunner := runner.NewLocalRunner(logger, silent)
 
 	sshAgentRunner := runner.NewSSHAgentRunner(
@@ -79,7 +79,7 @@ func NewClusterClient(
 
 		sshPrivateKeyPath: sshPrivateKeyPath,
 
-		kubeconfigPath: kubeconfigPath,
+		kubeconfigPath: configHandler.KubeconfigPath(),
 
 		sops: runner.NewSOPS(
 			logger,

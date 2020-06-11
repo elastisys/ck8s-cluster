@@ -171,6 +171,47 @@ func setup(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func newConfigHandler(
+	clusterType api.ClusterType,
+) (*client.ConfigHandler, error) {
+	configRootPath := viper.GetString(configPathFlag)
+	if configRootPath == "" {
+		return nil, fmt.Errorf("config path cannot be empty")
+	}
+
+	codeRootPath, err := filepath.Abs(viper.GetString(codePathFlag))
+	if err != nil {
+		return nil, err
+	}
+
+	configPath := api.NewConfigPath(configRootPath, clusterType)
+
+	codePath := api.NewCodePath(codeRootPath, clusterType)
+
+	return client.NewConfigHandler(
+		clusterType,
+		configPath,
+		codePath,
+	), nil
+}
+
+func newClusterClient(
+	configHandler *client.ConfigHandler,
+) (*client.ClusterClient, error) {
+	cluster, err := configHandler.Read()
+	if err != nil {
+		return nil, fmt.Errorf("error reading config path: %w", err)
+	}
+
+	return client.NewClusterClient(
+		logger,
+		cluster,
+		configHandler,
+		viper.GetBool(silentFlag),
+		viper.GetBool(autoApproveFlag),
+	)
+}
+
 func withClusterClient(fn func(
 	*client.ClusterClient,
 	*cobra.Command,
@@ -182,40 +223,12 @@ func withClusterClient(fn func(
 			return err
 		}
 
-		configRootPath := viper.GetString(configPathFlag)
-		if configRootPath == "" {
-			return fmt.Errorf("config path cannot be empty")
-		}
-
-		codeRootPath, err := filepath.Abs(viper.GetString(codePathFlag))
+		configHandler, err := newConfigHandler(clusterType)
 		if err != nil {
 			return err
 		}
 
-		configPath := api.NewConfigPath(configRootPath, clusterType)
-
-		codePath := api.NewCodePath(codeRootPath, clusterType)
-
-		configHandler := client.NewConfigHandler(
-			clusterType,
-			configPath,
-			codePath,
-		)
-
-		cluster, err := configHandler.Read()
-		if err != nil {
-			return fmt.Errorf("error reading config path: %w", err)
-		}
-
-		clusterClient, err := client.NewClusterClient(
-			logger,
-			cluster,
-			configHandler,
-			viper.GetBool(silentFlag),
-			viper.GetBool(autoApproveFlag),
-			configPath[api.SSHPrivateKeyFile],
-			configPath[api.KubeconfigFile],
-		)
+		clusterClient, err := newClusterClient(configHandler)
 		if err != nil {
 			return err
 		}

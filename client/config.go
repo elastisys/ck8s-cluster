@@ -245,6 +245,14 @@ func (c *ConfigHandler) SOPSConfig() *runner.SOPSConfig {
 	}
 }
 
+func (c *ConfigHandler) SSHPrivateKeyPath() api.Path {
+	return c.configPath[api.SSHPrivateKeyFile]
+}
+
+func (c *ConfigHandler) KubeconfigPath() api.Path {
+	return c.configPath[api.KubeconfigFile]
+}
+
 func (c *ConfigHandler) configViper() *viper.Viper {
 	configFilePath := c.configPath[api.ConfigFile]
 
