@@ -18,9 +18,9 @@ func (p Path) String() string {
 func (p Path) Exists() error {
 	if _, err := os.Stat(p.Path); err != nil {
 		if os.IsNotExist(err) {
-			return &PathNotFoundError{p}
+			return NewPathError(p, PathNotFoundErr)
 		}
-		return fmt.Errorf("error checking path %s: %w", p, err)
+		return NewPathError(p, err)
 	}
 	return nil
 }

@@ -1,6 +1,9 @@
 package api
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // UnsupportedCloudProviderError is returned if an operation is not supported
 // by the cloud provider.
@@ -16,14 +19,27 @@ func (e *UnsupportedCloudProviderError) Error() string {
 	return fmt.Sprintf("unsupported cloud provider: %s", e.CloudProvider)
 }
 
-// PathNotFoundError is returned if a file or directory is not found.
-type PathNotFoundError struct {
+// PathError is any general errors related to a Path.
+type PathError struct {
 	Path Path
+
+	Err error
 }
 
-func (e *PathNotFoundError) Error() string {
-	return fmt.Sprintf("path not found: %s", e.Path.Path)
+func NewPathError(p Path, e error) *PathError {
+	return &PathError{p, e}
 }
+
+func (e *PathError) Error() string {
+	return fmt.Sprintf("path error (%s): %s", e.Path, e.Err)
+}
+
+func (e *PathError) Unwrap() error {
+	return e.Err
+}
+
+// PathNotFoundErr is returned if a file or directory is not found.
+var PathNotFoundErr = errors.New("not found")
 
 // MachineStateNotFoundError is returned if a machine is not found.
 type MachineStateNotFoundError struct {

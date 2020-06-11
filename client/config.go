@@ -179,11 +179,10 @@ func (c *ConfigHandler) TerraformConfig(
 		return nil, api.NewUnsupportedCloudProviderError(cloudProvider)
 	}
 	if err := tfPath.Exists(); err != nil {
-		var notFoundErr *api.PathNotFoundError
-		if errors.As(err, &notFoundErr) {
+		if errors.Is(err, api.PathNotFoundErr) {
 			return nil, fmt.Errorf(
 				"terraform path not found: %s\nwrong CK8S code path?",
-				notFoundErr.Path.Path,
+				tfPath.Path,
 			)
 		}
 		return nil, err
