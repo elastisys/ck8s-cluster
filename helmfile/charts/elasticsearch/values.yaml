@@ -68,3 +68,4 @@ curator:
     postgresql_days: 30
   # Should curator clean up the postgresql indices?
   postgresql: false
+  startingDeadlineSeconds: 200

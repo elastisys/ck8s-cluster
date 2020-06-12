@@ -5,6 +5,7 @@ metadata:
 spec:
   # Run every 5 minutes
   schedule: "*/5 * * * *"
+  startingDeadlineSeconds: {{ .Values.curator.startingDeadlineSeconds }}
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:

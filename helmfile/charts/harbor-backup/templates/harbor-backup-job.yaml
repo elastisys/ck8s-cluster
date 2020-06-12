@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-cronjob
 spec:
   schedule: {{ .Values.schedule }}
+  startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
   jobTemplate:
     spec:
       template:

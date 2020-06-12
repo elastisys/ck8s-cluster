@@ -7,4 +7,5 @@ s3:
   secretKey: ""
   bucket: ""
   endpoint: ""
+startingDeadlineSeconds: 200
   
