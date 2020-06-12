@@ -13,7 +13,8 @@
   - filtertype: space
     disk_space: ${POSTGRESQL_RETENTION_SIZE}
     use_age: True
-    source: creation_date
+    source: name
+    timestring: '%Y.%m.%d'
   - filtertype: kibana
     exclude: True
 10:
@@ -29,8 +30,9 @@
     kind: regex
     value: 'postgresql-*'
   - filtertype: age
-    source: creation_date
+    source: name
     direction: older
+    timestring: '%Y.%m.%d'
     unit: days
     unit_count: ${POSTGRESQL_RETENTION_AGE}
   - filtertype: kibana

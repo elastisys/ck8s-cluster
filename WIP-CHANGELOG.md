@@ -1,6 +1,5 @@
-### Fixed
-- Tests respect the `ENABLE_FALCO` and `ENABLE_FALCO_ALERTS` configuration
-- Fixed so nfs-kernel-server is installed on the nfs node.
+### Changed
+- Curator now looks at the index name to determine its age instead of looking at the index creation date
 
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
@@ -18,6 +17,8 @@
 - Default `startingDeadlineSeconds` of 200 for cronjobs and option to override the default value 
 - Influxdb retention script runs for both service and workload cluster.
 - Influxdb custom charts uses template name instead of hardcoded name.
+- Tests respect the `ENABLE_FALCO` and `ENABLE_FALCO_ALERTS` configuration
+- Fixed so nfs-kernel-server is installed on the nfs node.
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.

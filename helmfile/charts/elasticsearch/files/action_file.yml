@@ -18,7 +18,8 @@ actions:
     - filtertype: space
       disk_space: ${OTHER_RETENTION_SIZE}
       use_age: True
-      source: creation_date
+      source: name
+      timestring: '%Y.%m.%d'
     - filtertype: kibana
       exclude: True
   2:
@@ -34,8 +35,9 @@ actions:
       kind: regex
       value: 'other-*'
     - filtertype: age
-      source: creation_date
+      source: name
       direction: older
+      timestring: '%Y.%m.%d'
       unit: days
       unit_count: ${OTHER_RETENTION_AGE}
     - filtertype: kibana
@@ -55,7 +57,8 @@ actions:
     - filtertype: space
       disk_space: ${KUBECOMPONENTS_RETENTION_SIZE}
       use_age: True
-      source: creation_date
+      source: name
+      timestring: '%Y.%m.%d'
     - filtertype: kibana
       exclude: True
   4:
@@ -71,8 +74,9 @@ actions:
       kind: regex
       value: 'kubecomponents-*'
     - filtertype: age
-      source: creation_date
+      source: name
       direction: older
+      timestring: '%Y.%m.%d'
       unit: days
       unit_count: ${KUBECOMPONENTS_RETENTION_AGE}
     - filtertype: kibana
@@ -92,7 +96,8 @@ actions:
     - filtertype: space
       disk_space: ${KUBEAUDIT_RETENTION_SIZE}
       use_age: True
-      source: creation_date
+      source: name
+      timestring: '%Y.%m.%d'
     - filtertype: kibana
       exclude: True
   6:
@@ -108,8 +113,9 @@ actions:
       kind: regex
       value: 'kubeaudit-*'
     - filtertype: age
-      source: creation_date
+      source: name
       direction: older
+      timestring: '%Y.%m.%d'
       unit: days
       unit_count: ${KUBEAUDIT_RETENTION_AGE}
     - filtertype: kibana
@@ -129,7 +135,8 @@ actions:
     - filtertype: space
       disk_space: ${KUBERNETES_RETENTION_SIZE}
       use_age: True
-      source: creation_date
+      source: name
+      timestring: '%Y.%m.%d'
     - filtertype: kibana
       exclude: True
   8:
@@ -145,8 +152,9 @@ actions:
       kind: regex
       value: 'kubernetes-*'
     - filtertype: age
-      source: creation_date
+      source: name
       direction: older
+      timestring: '%Y.%m.%d'
       unit: days
       unit_count: ${KUBERNETES_RETENTION_AGE}
     - filtertype: kibana
