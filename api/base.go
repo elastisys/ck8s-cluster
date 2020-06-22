@@ -1,6 +1,22 @@
 package api
 
-import "fmt"
+func DefaultBaseConfig(
+	clusterType ClusterType,
+	cloudProviderType CloudProviderType,
+	clusterName string,
+) *BaseConfig {
+	return &BaseConfig{
+		ClusterType:               clusterType,
+		CloudProviderType:         cloudProviderType,
+		EnvironmentName:           clusterName,
+		DNSPrefix:                 clusterName,
+		S3BucketNameHarbor:        clusterName + "-harbor",
+		S3BucketNameVelero:        clusterName + "-velero",
+		S3BucketNameElasticsearch: clusterName + "-es-backup",
+		S3BucketNameInfluxDB:      clusterName + "-influxdb",
+		S3BucketNameFluentd:       clusterName + "-sc-logs",
+	}
+}
 
 type BaseConfig struct {
 	// TODO: We'd like to get rid of this but it's not currently possible since
@@ -24,62 +40,4 @@ type BaseConfig struct {
 type BaseSecret struct {
 	S3AccessKey string `mapstructure:"S3_ACCESS_KEY" validate:"required"`
 	S3SecretKey string `mapstructure:"S3_SECRET_KEY" validate:"required"`
-}
-
-func EmptyBaseConfig(clusterType ClusterType, cloudProvider CloudProviderType) BaseConfig {
-	return BaseConfig{
-		ClusterType:       clusterType,
-		CloudProviderType: cloudProvider,
-	}
-}
-
-func (b *BaseConfig) Name() string {
-	switch b.ClusterType {
-	case ServiceCluster:
-		return b.EnvironmentName + "-service-cluster"
-	case WorkloadCluster:
-		return b.EnvironmentName + "-workload-cluster"
-	default:
-		panic(fmt.Sprintf("invalid cluster type: %s", b.ClusterType))
-	}
-}
-
-func (b *BaseConfig) TerraformWorkspace() string {
-	return b.EnvironmentName
-}
-
-func (b *BaseConfig) CloudProvider() CloudProviderType {
-	return b.CloudProviderType
-}
-
-func (b *BaseConfig) TerraformEnv(sshPublicKey string) map[string]string {
-	var currentSSHPublicKeyTFVar, otherSSHPublicKeyTFVar string
-	switch b.ClusterType {
-	case ServiceCluster:
-		currentSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_sc"
-		otherSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_wc"
-	case WorkloadCluster:
-		currentSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_wc"
-		otherSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_sc"
-	}
-	return map[string]string{
-		"TF_VAR_dns_prefix": b.DNSPrefix,
-
-		currentSSHPublicKeyTFVar: sshPublicKey,
-		otherSSHPublicKeyTFVar:   "",
-	}
-}
-
-func (b *BaseConfig) AnsibleEnv() map[string]string {
-	return map[string]string{}
-}
-
-func (b *BaseConfig) S3Buckets() map[string]string {
-	return map[string]string{
-		"S3_ES_BACKUP_BUCKET_NAME":  b.S3BucketNameElasticsearch,
-		"S3_HARBOR_BUCKET_NAME":     b.S3BucketNameHarbor,
-		"S3_INFLUX_BUCKET_NAME":     b.S3BucketNameInfluxDB,
-		"S3_SC_FLUENTD_BUCKET_NAME": b.S3BucketNameFluentd,
-		"S3_VELERO_BUCKET_NAME":     b.S3BucketNameVelero,
-	}
 }

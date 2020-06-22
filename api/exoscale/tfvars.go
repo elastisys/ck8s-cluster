@@ -41,7 +41,7 @@ func (e *Cluster) CloneMachine(
 	nodeType api.NodeType,
 	name string,
 ) (string, error) {
-	part := e.lookupMachinePart(e.ClusterType, nodeType)
+	part := e.lookupMachinePart(e.config.ClusterType, nodeType)
 
 	cloneName := uuid.New().String()
 
@@ -73,7 +73,7 @@ func (e *Cluster) RemoveMachine(
 ) error {
 	// TODO: When we no longer need ClusterType these methods could be
 	//		 implemented directly on the TFVars struct.
-	part := e.lookupMachinePart(e.ClusterType, nodeType)
+	part := e.lookupMachinePart(e.config.ClusterType, nodeType)
 
 	_, ok := part.sizeMap[name]
 	if !ok {
@@ -109,26 +109,26 @@ func (e *Cluster) lookupMachinePart(
 	return map[api.ClusterType]map[api.NodeType]tfvarsMachinePart{
 		api.ServiceCluster: {
 			api.Master: {
-				&e.ExoscaleTFVars.MasterNamesSC,
-				e.ExoscaleTFVars.MasterNameSizeMapSC,
+				&e.tfvars.MasterNamesSC,
+				e.tfvars.MasterNameSizeMapSC,
 				nil,
 			},
 			api.Worker: {
-				&e.ExoscaleTFVars.WorkerNamesSC,
-				e.ExoscaleTFVars.WorkerNameSizeMapSC,
-				e.ExoscaleTFVars.ESLocalStorageCapacityMapSC,
+				&e.tfvars.WorkerNamesSC,
+				e.tfvars.WorkerNameSizeMapSC,
+				e.tfvars.ESLocalStorageCapacityMapSC,
 			},
 		},
 		api.WorkloadCluster: {
 			api.Master: {
-				&e.ExoscaleTFVars.MasterNamesWC,
-				e.ExoscaleTFVars.MasterNameSizeMapWC,
+				&e.tfvars.MasterNamesWC,
+				e.tfvars.MasterNameSizeMapWC,
 				nil,
 			},
 			api.Worker: {
-				&e.ExoscaleTFVars.WorkerNamesWC,
-				e.ExoscaleTFVars.WorkerNameSizeMapWC,
-				e.ExoscaleTFVars.ESLocalStorageCapacityMapWC,
+				&e.tfvars.WorkerNamesWC,
+				e.tfvars.WorkerNameSizeMapWC,
+				e.tfvars.ESLocalStorageCapacityMapWC,
 			},
 		},
 	}[cluster][nodeType]

@@ -9,7 +9,6 @@ const (
 	CityCloud  CloudProviderType = "citycloud"
 	Exoscale   CloudProviderType = "exoscale"
 	Safespring CloudProviderType = "safespring"
-	Openstack  CloudProviderType = "openstack"
 )
 
 type ClusterFlavor string
@@ -36,6 +35,7 @@ type Cluster interface {
 	TerraformWorkspace() string
 
 	CloudProvider() CloudProviderType
+	CloudProviderVars(ClusterState) interface{}
 
 	CloneMachine(NodeType, string) (string, error)
 

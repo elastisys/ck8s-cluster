@@ -1,0 +1,200 @@
+{
+  "domain_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ck8stest.elastisys.se"
+  },
+  "sc_dns_name": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "*.ops.ck8stest.elastisys.se",
+      "dex.ck8stest.elastisys.se",
+      "grafana.ck8stest.elastisys.se",
+      "harbor.ck8stest.elastisys.se",
+      "kibana.ck8stest.elastisys.se",
+      "notary.harbor.ck8stest.elastisys.se"
+    ]
+  },
+  "sc_loadbalancer_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "ck8stest-service-cluster": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "ck8stest-service-cluster": {
+        "private_ip": "172.16.0.143",
+        "public_ip": "86.107.243.200"
+      }
+    }
+  },
+  "sc_master_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "ck8stest-service-cluster-master-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "ck8stest-service-cluster-master-0": {
+        "private_ip": "172.16.0.118",
+        "public_ip": "86.107.243.58"
+      }
+    }
+  },
+  "sc_worker_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "ck8stest-service-cluster-worker-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ],
+        "ck8stest-service-cluster-worker-1": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "ck8stest-service-cluster-worker-0": {
+        "private_ip": "172.16.0.30",
+        "public_ip": "86.107.243.171"
+      },
+      "ck8stest-service-cluster-worker-1": {
+        "private_ip": "172.16.0.168",
+        "public_ip": "86.107.243.131"
+      }
+    }
+  },
+  "wc_dns_name": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "*.ck8stest.elastisys.se",
+      "prometheus.ops.ck8stest.elastisys.se"
+    ]
+  },
+  "wc_loadbalancer_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "ck8stest-workload-cluster": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "ck8stest-workload-cluster": {
+        "private_ip": "172.16.0.91",
+        "public_ip": "86.107.243.201"
+      }
+    }
+  },
+  "wc_master_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "ck8stest-workload-cluster-master-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "ck8stest-workload-cluster-master-0": {
+        "private_ip": "172.16.0.17",
+        "public_ip": "86.107.243.91"
+      }
+    }
+  },
+  "wc_worker_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "ck8stest-workload-cluster-worker-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "ck8stest-workload-cluster-worker-0": {
+        "private_ip": "172.16.0.154",
+        "public_ip": "86.107.243.253"
+      }
+    }
+  },
+  "sc_lb_subnet_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "9e1b2ae2-c360-41be-a4f8-9fe027bd5934"
+  },
+  "wc_lb_subnet_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "b0c24806-9691-452e-b210-3fcbd3af2ba8"
+  },
+  "sc_secgroup_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "2bae585e-3fb3-484a-9666-26ebd44fdc61"
+  },
+  "wc_secgroup_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "d5105f0c-24fb-43b7-8a05-8d9f08600c0c"
+  }
+}

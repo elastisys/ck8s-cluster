@@ -1,4 +1,4 @@
-package safespring
+package citycloud
 
 import (
 	"github.com/elastisys/ck8s/api"
@@ -19,13 +19,21 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 		config: openstack.OpenstackConfig{
 			BaseConfig: *api.DefaultBaseConfig(
 				clusterType,
-				api.Safespring,
+				api.CityCloud,
 				clusterName,
 			),
-
-			S3RegionAddress: "s3.sto1.safedc.net",
+			S3RegionAddress: "swift-fra1.citycloud.com:8080",
 		},
-		secret: openstack.OpenstackSecret{},
+		secret: openstack.OpenstackSecret{
+			BaseSecret: api.BaseSecret{
+				S3AccessKey: "changeme",
+				S3SecretKey: "changeme",
+			},
+		},
+		tfvars: openstack.OpenstackTFVars{
+			PublicIngressCIDRWhitelist: []string{},
+			APIServerWhitelist:         []string{},
+		},
 	}
 }
 

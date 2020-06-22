@@ -1,8 +1,9 @@
 package client
 
 import (
-	"html/template"
+	"encoding/json"
 	"io"
+	"text/template"
 
 	"github.com/elastisys/ck8s/api"
 )
@@ -41,6 +42,9 @@ cloud_provider='{{ .State.KubeadmInitCloudProvider }}'
 {{ if .State.KubeadmInitCloudConfigPath -}}
 cloud_config='{{ .State.KubeadmInitCloudConfigPath }}'
 {{ end -}}
+{{ if .CloudProviderVars -}}
+cloud_provider_vars='{{ .CloudProviderVars }}'
+{{ end -}}
 cluster_name='{{ .Cluster.Name }}'
 
 calico_mtu='{{ .State.CalicoMTU }}'
@@ -60,7 +64,7 @@ kubeadm_init_extra_args='{{ .State.KubeadmInitExtraArgs }}'
 {{ if MachinesByNodeType (NodeType "loadbalancer") -}}
 [loadbalancers]
 {{ range MachinesByNodeType (NodeType "loadbalancer") -}}
-{{ $.Name }}-{{ .Name }} ansible_host={{ .PublicIP }} private_ip={{ .PrivateIP }}
+{{ $.Cluster.Name }}-{{ .Name }} ansible_host={{ .PublicIP }} private_ip={{ .PrivateIP }}
 {{ end }}
 {{ end }}
 {{ if .State.InternalLoadBalancerAnsibleGroups -}}
@@ -89,6 +93,20 @@ func renderAnsibleInventory(
 		return
 	}
 
+	// TODO: We really should try to get away from arbitrary JSON in the
+	//		 Ansible inventory. Individual cloud config types would make more
+	//		 sense. Perhaps even use the upstream types?
+	//		 E.g. https://github.com/kubernetes/cloud-provider-openstack/blob/2493d936afe901a63066e4506dcfa716f1d96dc9/pkg/cloudprovider/providers/openstack/openstack.go#L223
+	var cloudProviderVarsBytes []byte
+	cloudProviderVars := cluster.CloudProviderVars(state)
+	if cloudProviderVars != nil {
+		var err error
+		cloudProviderVarsBytes, err = json.Marshal(cloudProviderVars)
+		if err != nil {
+			return err
+		}
+	}
+
 	tmpl, err := template.New("inventory").Funcs(template.FuncMap{
 		"NodeType":           api.NodeTypeFromString,
 		"MachinesByNodeType": machinesByNodeType,
@@ -98,10 +116,12 @@ func renderAnsibleInventory(
 	}
 
 	return tmpl.Execute(w, struct {
-		Cluster api.Cluster
-		State   api.ClusterState
+		Cluster           api.Cluster
+		State             api.ClusterState
+		CloudProviderVars string
 	}{
-		Cluster: cluster,
-		State:   state,
+		Cluster:           cluster,
+		State:             state,
+		CloudProviderVars: string(cloudProviderVarsBytes),
 	})
 }

@@ -1,5 +1,5 @@
-prefix_sc                        = "foo"
-prefix_wc                        = "bar"
+prefix_sc                        = ""
+prefix_wc                        = ""
 master_names_sc                  = ["master-0"]
 master_name_size_map_sc          = { master-0 = "Small" }
 worker_names_sc                  = ["worker-0", "worker-1"]

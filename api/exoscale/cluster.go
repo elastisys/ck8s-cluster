@@ -7,28 +7,28 @@ import (
 )
 
 type Cluster struct {
-	ExoscaleConfig `mapstructure:",squash"`
-	ExoscaleSecret `mapstructure:",squash"`
-	ExoscaleTFVars `mapstructure:",squash"`
+	config ExoscaleConfig `mapstructure:",squash"`
+	secret ExoscaleSecret `mapstructure:",squash"`
+	tfvars ExoscaleTFVars `mapstructure:",squash"`
 }
 
 func (e *Cluster) Config() interface{} {
-	return &e.ExoscaleConfig
+	return &e.config
 }
 
 func (e *Cluster) Secret() interface{} {
-	return &e.ExoscaleSecret
+	return &e.secret
 }
 
 func (e *Cluster) TFVars() interface{} {
-	return &e.ExoscaleTFVars
+	return &e.tfvars
 }
 
 func (e *Cluster) State(
 	loadState api.ClusterStateLoadFunc,
 ) (api.ClusterState, error) {
 	tfOutput := terraformOutput{
-		ClusterType: e.ClusterType,
+		ClusterType: e.config.ClusterType,
 		ClusterName: e.Name(),
 
 		ControlPlanePort: 7443,
@@ -45,26 +45,46 @@ func (e *Cluster) State(
 	return &tfOutput, loadState(&tfOutput)
 }
 
+func (e *Cluster) CloudProvider() api.CloudProviderType {
+	return e.config.CloudProviderType
+}
+
+func (e *Cluster) CloudProviderVars(state api.ClusterState) interface{} {
+	return nil
+}
+
 func (e *Cluster) Name() string {
-	switch e.ClusterType {
+	switch e.config.ClusterType {
 	case api.ServiceCluster:
-		if e.PrefixSC != "" {
-			return e.PrefixSC
+		if e.tfvars.PrefixSC != "" {
+			return e.tfvars.PrefixSC
 		}
 	case api.WorkloadCluster:
-		if e.PrefixWC != "" {
-			return e.PrefixWC
+		if e.tfvars.PrefixWC != "" {
+			return e.tfvars.PrefixWC
 		}
 	default:
-		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
+		panic(fmt.Sprintf("invalid cluster type: %s", e.config.ClusterType))
 	}
 
-	return e.ExoscaleConfig.Name()
+	return api.NameHelper(&e.config.BaseConfig)
+}
+
+func (e *Cluster) S3Buckets() map[string]string {
+	return api.S3BucketsHelper(&e.config.BaseConfig)
+}
+
+func (e *Cluster) TerraformWorkspace() string {
+	return e.config.EnvironmentName
 }
 
 func (e *Cluster) TerraformEnv(sshPublicKey string) map[string]string {
-	env := e.BaseConfig.TerraformEnv(sshPublicKey)
-	env["TF_VAR_exoscale_api_key"] = e.APIKey
-	env["TF_VAR_exoscale_secret_key"] = e.SecretKey
+	env := api.TerraformEnvHelper(&e.config.BaseConfig, sshPublicKey)
+	env["TF_VAR_exoscale_api_key"] = e.secret.APIKey
+	env["TF_VAR_exoscale_secret_key"] = e.secret.SecretKey
 	return env
+}
+
+func (e *Cluster) AnsibleEnv() map[string]string {
+	return map[string]string{}
 }

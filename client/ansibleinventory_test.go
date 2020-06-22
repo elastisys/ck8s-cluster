@@ -10,31 +10,59 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastisys/ck8s/api"
+	"github.com/elastisys/ck8s/api/citycloud"
 	"github.com/elastisys/ck8s/api/exoscale"
+	"github.com/elastisys/ck8s/api/safespring"
 )
 
 func TestRenderAnsibleInventory(t *testing.T) {
 	type testCase struct {
 		ansibleInventoryPath string
+		tfVarsPath           string
 		terraformOutputPath  string
 		cluster              api.Cluster
 	}
 
-	sc := exoscale.Default(api.ServiceCluster, "ck8stest")
-	wc := exoscale.Default(api.WorkloadCluster, "ck8stest")
-
 	testCases := []testCase{{
 		"testdata/exoscale-ansible-hosts-sc.ini",
+		"testdata/exoscale.tfvars",
 		"testdata/exoscale-terraform-output.json",
-		sc,
+		exoscale.Default(api.ServiceCluster, "ck8stest"),
 	}, {
 		"testdata/exoscale-ansible-hosts-wc.ini",
+		"testdata/exoscale.tfvars",
 		"testdata/exoscale-terraform-output.json",
-		wc,
+		exoscale.Default(api.WorkloadCluster, "ck8stest"),
+	}, {
+		"testdata/safespring-ansible-hosts-sc.ini",
+		"testdata/safespring.tfvars",
+		"testdata/safespring-terraform-output.json",
+		safespring.Default(api.ServiceCluster, "ck8stest"),
+	}, {
+		"testdata/safespring-ansible-hosts-wc.ini",
+		"testdata/safespring.tfvars",
+		"testdata/safespring-terraform-output.json",
+		safespring.Default(api.WorkloadCluster, "ck8stest"),
+	}, {
+		"testdata/citycloud-ansible-hosts-sc.ini",
+		"testdata/citycloud.tfvars",
+		"testdata/citycloud-terraform-output.json",
+		citycloud.Default(api.ServiceCluster, "ck8stest"),
+	}, {
+		"testdata/citycloud-ansible-hosts-wc.ini",
+		"testdata/citycloud.tfvars",
+		"testdata/citycloud-terraform-output.json",
+		citycloud.Default(api.WorkloadCluster, "ck8stest"),
 	}}
 
 	for _, tc := range testCases {
 		var inventory bytes.Buffer
+
+		tfvarsData, err := ioutil.ReadFile(tc.tfVarsPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		tfvarsDecode(tfvarsData, tc.cluster.TFVars())
 
 		state, err := tc.cluster.State(func(state interface{}) error {
 			tfOutputData, err := ioutil.ReadFile(tc.terraformOutputPath)

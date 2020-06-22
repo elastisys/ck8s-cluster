@@ -1,4 +1,4 @@
-package safespring
+package citycloud
 
 import (
 	"fmt"
@@ -11,7 +11,15 @@ import (
 type Cluster struct {
 	config openstack.OpenstackConfig
 	secret openstack.OpenstackSecret
-	tfvars SafespringTFVars
+	tfvars openstack.OpenstackTFVars
+}
+
+type cloudProviderVars struct {
+	LBEnabled           bool   `json:"lb_enabled"`
+	LBExternalNetworkID string `json:"lb_external_network_id"`
+	LBSubnetID          string `json:"lb_subnet_id"`
+	SecurityGroupID     string `json:"secgroup_id"`
+	UseOctavia          bool   `json:"use_octavia"`
 }
 
 // Config TODO
@@ -29,12 +37,48 @@ func (e *Cluster) TFVars() interface{} {
 	return &e.tfvars
 }
 
+// State TODO
+func (e *Cluster) State(
+	loadState api.ClusterStateLoadFunc,
+) (api.ClusterState, error) {
+	tfOutput := terraformOutput{
+		TerraformOutput: openstack.StateHelper(
+			e.config.ClusterType,
+			e.Name(),
+		),
+	}
+
+	return &tfOutput, loadState(&tfOutput)
+}
+
 func (e *Cluster) CloudProvider() api.CloudProviderType {
 	return e.config.CloudProviderType
 }
 
 func (e *Cluster) CloudProviderVars(state api.ClusterState) interface{} {
-	return nil
+	cityCloudState, ok := state.(*terraformOutput)
+	if !ok {
+		panic("wrong CityCloud state type")
+	}
+
+	cpv := &cloudProviderVars{
+		LBEnabled:           true,
+		LBExternalNetworkID: e.tfvars.ExternalNetworkID,
+		UseOctavia:          true,
+	}
+
+	switch e.config.ClusterType {
+	case api.ServiceCluster:
+		cpv.LBSubnetID = cityCloudState.SCLBSubnetID.Value
+		cpv.SecurityGroupID = cityCloudState.SCSecurityGroupID.Value
+	case api.WorkloadCluster:
+		cpv.LBSubnetID = cityCloudState.WCLBSubnetID.Value
+		cpv.SecurityGroupID = cityCloudState.WCSecurityGroupID.Value
+	default:
+		panic(fmt.Sprintf("invalid cluster type: %s", e.config.ClusterType))
+	}
+
+	return cpv
 }
 
 func (e *Cluster) Name() string {
@@ -52,20 +96,6 @@ func (e *Cluster) Name() string {
 	}
 
 	return api.NameHelper(&e.config.BaseConfig)
-}
-
-// State TODO
-func (e *Cluster) State(
-	loadState api.ClusterStateLoadFunc,
-) (api.ClusterState, error) {
-	tfOutput := terraformOutput{
-		TerraformOutput: openstack.StateHelper(
-			e.config.ClusterType,
-			e.Name(),
-		),
-	}
-
-	return &tfOutput, loadState(&tfOutput)
 }
 
 func (e *Cluster) S3Buckets() map[string]string {

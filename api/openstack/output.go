@@ -8,16 +8,16 @@ import (
 	"github.com/elastisys/ck8s/api"
 )
 
-type tfOutputIPsObject struct {
-	Value map[string]tfOutputIPsValue `json:"value"`
+type TfOutputIPsObject struct {
+	Value map[string]TfOutputIPsValue `json:"value"`
 }
 
-type tfOutputIPsValue struct {
+type TfOutputIPsValue struct {
 	PrivateIP string `json:"private_ip"`
 	PublicIP  string `json:"public_ip"`
 }
 
-type tfOutputValue struct {
+type TfOutputValue struct {
 	Value string `json:"value"`
 }
 
@@ -25,13 +25,12 @@ type TerraformOutput struct {
 	ClusterType api.ClusterType
 	ClusterName string
 
-	SCMasterIPs tfOutputIPsObject `json:"sc_master_ips"`
-	SCWorkerIPs tfOutputIPsObject `json:"sc_worker_ips"`
-	WCMasterIPs tfOutputIPsObject `json:"wc_master_ips"`
-	WCWorkerIPs tfOutputIPsObject `json:"wc_worker_ips"`
-
-	SCControlPlaneLBIPs tfOutputIPsObject `json:"sc_loadbalancer_ips"`
-	WCControlPlaneLBIPs tfOutputIPsObject `json:"wc_loadbalancer_ips"`
+	SCMasterIPs         TfOutputIPsObject `json:"sc_master_ips"`
+	SCWorkerIPs         TfOutputIPsObject `json:"sc_worker_ips"`
+	WCMasterIPs         TfOutputIPsObject `json:"wc_master_ips"`
+	WCWorkerIPs         TfOutputIPsObject `json:"wc_worker_ips"`
+	SCControlPlaneLBIPs TfOutputIPsObject `json:"sc_loadbalancer_ips"`
+	WCControlPlaneLBIPs TfOutputIPsObject `json:"wc_loadbalancer_ips"`
 
 	ControlPlanePort int
 
@@ -42,6 +41,8 @@ type TerraformOutput struct {
 	KubeadmInitExtraArgs       string
 
 	CalicoMTU int
+
+	InternalLoadBalancerAnsibleGroups []string
 }
 
 func (e *TerraformOutput) ControlPlaneEndpoint() string {
@@ -91,28 +92,20 @@ func (e *TerraformOutput) Machines() (machines []api.MachineState) {
 	case api.ServiceCluster:
 		machines = append(
 			machines,
-			e.machines(api.Master, e.SCMasterIPs)...,
+			e.GetMachinesState(api.Master, e.SCMasterIPs)...,
 		)
 		machines = append(
 			machines,
-			e.machines(api.Worker, e.SCWorkerIPs)...,
-		)
-		machines = append(
-			machines,
-			e.machines(api.LoadBalancer, e.SCControlPlaneLBIPs)...,
+			e.GetMachinesState(api.Worker, e.SCWorkerIPs)...,
 		)
 	case api.WorkloadCluster:
 		machines = append(
 			machines,
-			e.machines(api.Master, e.WCMasterIPs)...,
+			e.GetMachinesState(api.Master, e.WCMasterIPs)...,
 		)
 		machines = append(
 			machines,
-			e.machines(api.Worker, e.WCWorkerIPs)...,
-		)
-		machines = append(
-			machines,
-			e.machines(api.LoadBalancer, e.WCControlPlaneLBIPs)...,
+			e.GetMachinesState(api.Worker, e.WCWorkerIPs)...,
 		)
 	default:
 		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
@@ -143,9 +136,9 @@ func (e *TerraformOutput) Machine(
 	return
 }
 
-func (e *TerraformOutput) machines(
+func (e *TerraformOutput) GetMachinesState(
 	nodeType api.NodeType,
-	IPs tfOutputIPsObject,
+	IPs TfOutputIPsObject,
 ) (machines []api.MachineState) {
 	for name, ipsValue := range IPs.Value {
 		machines = append(machines, api.MachineState{

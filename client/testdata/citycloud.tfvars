@@ -12,9 +12,5 @@ public_ingress_cidr_whitelist   = ["194.132.164.168/32", "194.132.164.169/32"]
 api_server_whitelist            = ["194.132.164.168/32", "194.132.164.169/32"]
 aws_dns_zone_id                 = "Z2STJRQSJO5PZ0"
 aws_dns_role_arn                = "arn:aws:iam::248119176842:role/pipeline"
-external_network_id             = "71b10496-2617-47ae-abbc-36239f0863bb"
-external_network_name           = "public-v4"
-loadbalancer_names_sc           = ["loadbalancer-0"]
-loadbalancer_name_flavor_map_sc = { loadbalancer-0 = "51d480b8-2517-4ba8-bfe0-c649ac93eb61" }
-loadbalancer_names_wc           = ["loadbalancer-0"]
-loadbalancer_name_flavor_map_wc = { loadbalancer-0 = "51d480b8-2517-4ba8-bfe0-c649ac93eb61" }
+external_network_id             = "2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c"
+external_network_name           = "ext-net"

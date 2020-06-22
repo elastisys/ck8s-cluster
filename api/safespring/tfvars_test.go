@@ -1,4 +1,4 @@
-package openstack
+package safespring
 
 import (
 	"testing"
@@ -17,26 +17,26 @@ func TestCloneMachine(t *testing.T) {
 		sizeMap   map[string]string
 	}
 
-	cluster := Empty(-1)
+	cluster := Default(-1, "")
 
-	cluster.LoadBalancerNamesSC = []string{testName}
-	cluster.LoadBalancerNameFlavorMapSC = map[string]string{testName: testSize}
-	cluster.MasterNamesSC = []string{testName}
-	cluster.MasterNameSizeMapSC = map[string]string{testName: testSize}
-	cluster.WorkerNamesSC = []string{testName}
-	cluster.WorkerNameSizeMapSC = map[string]string{testName: testSize}
-	cluster.LoadBalancerNamesWC = []string{testName}
-	cluster.LoadBalancerNameFlavorMapWC = map[string]string{testName: testSize}
-	cluster.MasterNamesWC = []string{testName}
-	cluster.MasterNameSizeMapWC = map[string]string{testName: testSize}
-	cluster.WorkerNamesWC = []string{testName}
-	cluster.WorkerNameSizeMapWC = map[string]string{testName: testSize}
+	cluster.tfvars.LoadBalancerNamesSC = []string{testName}
+	cluster.tfvars.LoadBalancerNameFlavorMapSC = map[string]string{testName: testSize}
+	cluster.tfvars.MasterNamesSC = []string{testName}
+	cluster.tfvars.MasterNameSizeMapSC = map[string]string{testName: testSize}
+	cluster.tfvars.WorkerNamesSC = []string{testName}
+	cluster.tfvars.WorkerNameSizeMapSC = map[string]string{testName: testSize}
+	cluster.tfvars.LoadBalancerNamesWC = []string{testName}
+	cluster.tfvars.LoadBalancerNameFlavorMapWC = map[string]string{testName: testSize}
+	cluster.tfvars.MasterNamesWC = []string{testName}
+	cluster.tfvars.MasterNameSizeMapWC = map[string]string{testName: testSize}
+	cluster.tfvars.WorkerNamesWC = []string{testName}
+	cluster.tfvars.WorkerNameSizeMapWC = map[string]string{testName: testSize}
 
 	for _, clusterType := range []api.ClusterType{
 		api.ServiceCluster,
 		api.WorkloadCluster,
 	} {
-		cluster.ClusterType = clusterType
+		cluster.config.ClusterType = clusterType
 
 		for _, nodeType := range []api.NodeType{api.Master, api.Worker, api.LoadBalancer} {
 			if _, err := cluster.CloneMachine(nodeType, testName); err != nil {
@@ -50,28 +50,28 @@ func TestCloneMachine(t *testing.T) {
 
 	for machineType, part := range map[string]tfvarsPart{
 		"sc loadbalancer": {
-			cluster.LoadBalancerNamesSC,
-			cluster.LoadBalancerNameFlavorMapSC,
+			cluster.tfvars.LoadBalancerNamesSC,
+			cluster.tfvars.LoadBalancerNameFlavorMapSC,
 		},
 		"sc master": {
-			cluster.MasterNamesSC,
-			cluster.MasterNameSizeMapSC,
+			cluster.tfvars.MasterNamesSC,
+			cluster.tfvars.MasterNameSizeMapSC,
 		},
 		"sc worker": {
-			cluster.WorkerNamesSC,
-			cluster.WorkerNameSizeMapSC,
+			cluster.tfvars.WorkerNamesSC,
+			cluster.tfvars.WorkerNameSizeMapSC,
 		},
 		"wc loadbalancer": {
-			cluster.LoadBalancerNamesWC,
-			cluster.LoadBalancerNameFlavorMapWC,
+			cluster.tfvars.LoadBalancerNamesWC,
+			cluster.tfvars.LoadBalancerNameFlavorMapWC,
 		},
 		"wc master": {
-			cluster.MasterNamesWC,
-			cluster.MasterNameSizeMapWC,
+			cluster.tfvars.MasterNamesWC,
+			cluster.tfvars.MasterNameSizeMapWC,
 		},
 		"wc worker": {
-			cluster.WorkerNamesWC,
-			cluster.WorkerNameSizeMapWC,
+			cluster.tfvars.WorkerNamesWC,
+			cluster.tfvars.WorkerNameSizeMapWC,
 		},
 	} {
 		if len(part.nameSlice) != 2 {
@@ -94,43 +94,43 @@ func TestCloneMachine(t *testing.T) {
 func TestRemoveMachine(t *testing.T) {
 	testName := "bar"
 
-	got, want := Empty(-1), Empty(-1)
+	got, want := Default(-1, ""), Default(-1, "")
 
-	got.OpenstackTFVars = OpenstackTFVars{
-		LoadBalancerNamesSC:         []string{testName},
-		LoadBalancerNameFlavorMapSC: map[string]string{testName: "a"},
+	got.tfvars = SafespringTFVars{
 		MasterNamesSC:               []string{testName},
 		MasterNameSizeMapSC:         map[string]string{testName: "a"},
 		WorkerNamesSC:               []string{testName},
 		WorkerNameSizeMapSC:         map[string]string{testName: "a"},
-		LoadBalancerNamesWC:         []string{testName},
-		LoadBalancerNameFlavorMapWC: map[string]string{testName: "a"},
 		MasterNamesWC:               []string{testName},
 		MasterNameSizeMapWC:         map[string]string{testName: "a"},
 		WorkerNamesWC:               []string{testName},
 		WorkerNameSizeMapWC:         map[string]string{testName: "a"},
+		LoadBalancerNamesSC:         []string{testName},
+		LoadBalancerNameFlavorMapSC: map[string]string{testName: "a"},
+		LoadBalancerNamesWC:         []string{testName},
+		LoadBalancerNameFlavorMapWC: map[string]string{testName: "a"},
 	}
 
-	want.OpenstackTFVars = OpenstackTFVars{
-		LoadBalancerNamesSC:         []string{},
-		LoadBalancerNameFlavorMapSC: map[string]string{},
+	want.tfvars = SafespringTFVars{
 		MasterNamesSC:               []string{},
 		MasterNameSizeMapSC:         map[string]string{},
 		WorkerNamesSC:               []string{},
 		WorkerNameSizeMapSC:         map[string]string{},
-		LoadBalancerNamesWC:         []string{},
-		LoadBalancerNameFlavorMapWC: map[string]string{},
 		MasterNamesWC:               []string{},
 		MasterNameSizeMapWC:         map[string]string{},
 		WorkerNamesWC:               []string{},
 		WorkerNameSizeMapWC:         map[string]string{},
+		LoadBalancerNamesSC:         []string{},
+		LoadBalancerNameFlavorMapSC: map[string]string{},
+		LoadBalancerNamesWC:         []string{},
+		LoadBalancerNameFlavorMapWC: map[string]string{},
 	}
 
 	for _, clusterType := range []api.ClusterType{
 		api.ServiceCluster,
 		api.WorkloadCluster,
 	} {
-		got.ClusterType = clusterType
+		got.config.ClusterType = clusterType
 
 		for _, nodeType := range []api.NodeType{api.Master, api.Worker, api.LoadBalancer} {
 			if err := got.RemoveMachine(nodeType, testName); err != nil {
@@ -142,7 +142,7 @@ func TestRemoveMachine(t *testing.T) {
 		}
 	}
 
-	if diff := cmp.Diff(want.OpenstackTFVars, got.OpenstackTFVars); diff != "" {
+	if diff := cmp.Diff(want.tfvars, got.tfvars); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }

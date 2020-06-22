@@ -8,13 +8,15 @@ import (
 
 	"github.com/elastisys/ck8s/api"
 	"github.com/elastisys/ck8s/api/exoscale"
+	"github.com/elastisys/ck8s/api/safespring"
 )
 
 var roundTripTests = map[string]api.Cluster{
 	// TODO: clusterType
-	"testdata/exoscale.tfvars": exoscale.Empty(api.ServiceCluster),
+	"testdata/exoscale.tfvars":   exoscale.Default(api.ServiceCluster, "testName"),
+	"testdata/safespring.tfvars": safespring.Default(api.ServiceCluster, "testName"),
 	// TODO
-	// "testdata/safespring.tfvars": &api.SafespringTFVars{},
+	// "testdata/citycloud.tfvars": citycloud.Default(api.ServiceCluster, "testName"),
 }
 
 func TestTFVarsRoundTrip(t *testing.T) {

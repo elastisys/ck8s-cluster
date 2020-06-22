@@ -166,6 +166,15 @@ func (c *ConfigHandler) TerraformConfig(
 		case api.WorkloadCluster:
 			tfTarget = "module.workload_cluster"
 		}
+	case api.CityCloud:
+		tfPath = c.codePath[api.TerraformCityCloudDir]
+
+		switch c.clusterType {
+		case api.ServiceCluster:
+			tfTarget = "module.service_cluster"
+		case api.WorkloadCluster:
+			tfTarget = "module.workload_cluster"
+		}
 	default:
 		return nil, api.NewUnsupportedCloudProviderError(cloudProvider)
 	}
@@ -280,7 +289,7 @@ func (c *ConfigHandler) readConfig() (api.Cluster, error) {
 
 	cluster := cloudProvider.Default(c.clusterType, "")
 
-	if err := v.Unmarshal(&cluster); err != nil {
+	if err := v.Unmarshal(cluster.Config()); err != nil {
 		return nil, fmt.Errorf("error decoding config: %w", err)
 	}
 
@@ -301,7 +310,7 @@ func (c *ConfigHandler) readSecrets(cluster api.Cluster) error {
 		return err
 	}
 
-	if err := v.Unmarshal(&cluster); err != nil {
+	if err := v.Unmarshal(cluster.Secret()); err != nil {
 		return fmt.Errorf("error decoding secrets: %w", err)
 	}
 

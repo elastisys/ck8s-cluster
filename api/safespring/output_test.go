@@ -1,4 +1,4 @@
-package openstack
+package safespring
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastisys/ck8s/api"
+	"github.com/elastisys/ck8s/api/openstack"
 )
 
 func testState(
@@ -23,9 +24,11 @@ func testState(
 		clusterName += "-workload-cluster"
 	}
 
-	tfOutput := &TerraformOutput{
-		ClusterType: clusterType,
-		ClusterName: clusterName,
+	tfOutput := &terraformOutput{
+		TerraformOutput: openstack.TerraformOutput{
+			ClusterType: clusterType,
+			ClusterName: clusterName,
+		},
 	}
 
 	data, err := ioutil.ReadFile("testdata/terraform-output.json")
@@ -62,6 +65,11 @@ func TestTerraformOutputControlPlanePublicIP(t *testing.T) {
 func TestTerraformOutputMachines(t *testing.T) {
 	testCases := map[api.ClusterType][]api.MachineState{
 		api.ServiceCluster: {{
+			NodeType:  api.LoadBalancer,
+			Name:      "loadbalancer-0",
+			PublicIP:  "159.100.242.14",
+			PrivateIP: "172.16.0.4",
+		}, {
 			NodeType:  api.Master,
 			Name:      "master-0",
 			PublicIP:  "159.100.242.12",
@@ -78,6 +86,11 @@ func TestTerraformOutputMachines(t *testing.T) {
 			PrivateIP: "172.16.0.3",
 		}},
 		api.WorkloadCluster: {{
+			NodeType:  api.LoadBalancer,
+			Name:      "loadbalancer-0",
+			PublicIP:  "159.100.242.17",
+			PrivateIP: "172.16.0.7",
+		}, {
 			NodeType:  api.Master,
 			Name:      "master-0",
 			PublicIP:  "159.100.242.15",

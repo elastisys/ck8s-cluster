@@ -9,30 +9,31 @@ import (
 
 var exoscaleS3Template = `[default]
 use_https = True
-host_base = {{ .S3RegionAddress }}
-host_bucket = %(bucket)s.{{ .S3RegionAddress }}
-access_key = {{ .S3AccessKey }}
-secret_key = {{ .S3SecretKey }}
+host_base = {{ .Config.S3RegionAddress }}
+host_bucket = %(bucket)s.{{ .Config.S3RegionAddress }}
+access_key = {{ .Secret.S3AccessKey }}
+secret_key = {{ .Secret.S3SecretKey }}
 `
 
 var openstackS3Template = `[default]
 use_https = True
-host_base = {{ .S3RegionAddress }}
-host_bucket = {{ .S3RegionAddress }}
-access_key = {{ .S3AccessKey }}
-secret_key = {{ .S3SecretKey }}
+host_base = {{ .Config.S3RegionAddress }}
+host_bucket = {{ .Config.S3RegionAddress }}
+access_key = {{ .Secret.S3AccessKey }}
+secret_key = {{ .Secret.S3SecretKey }}
 `
+
 var awsS3Template = `[default]
-access_key = {{ .S3AccessKey }}
-secret_key = {{ .S3SecretKey }}
+access_key = {{ .Secret.S3AccessKey }}
+secret_key = {{ .Secret.S3SecretKey }}
 use_https = True
-bucket_location = {{ .S3RegionAddress }}
+bucket_location = {{ .Config.S3RegionAddress }}
 `
 
 var s3cfgTemplates = map[api.CloudProviderType]string{
 	api.Exoscale:   exoscaleS3Template,
-	api.Openstack:  openstackS3Template,
 	api.Safespring: openstackS3Template,
+	api.CityCloud:  openstackS3Template,
 	api.AWS:        awsS3Template,
 }
 
