@@ -5,8 +5,8 @@ import (
 )
 
 var clusterFlavorMap = map[api.ClusterFlavor]func(api.ClusterType, string) api.Cluster{
-	FlavorMinimum: Minimum,
-	FlavorHA:      HA,
+	FlavorDevelopment: Development,
+	FlavorProduction:  Production,
 }
 
 // CloudProvider TODO

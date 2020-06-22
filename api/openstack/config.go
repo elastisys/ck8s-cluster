@@ -10,7 +10,7 @@ type OpenstackConfig struct {
 	IdentityAPIVersion string `mapstructure:"OS_IDENTITY_API_VERSION" validate:"required"`
 	AuthURL            string `mapstructure:"OS_AUTH_URL" validate:"required"`
 	RegionName         string `mapstructure:"OS_REGION_NAME" validate:"required"`
-	UserDomainName     string `mapstructure:"OS_PROJECT_DOMAIN_NAME" validate:"required"`
+	UserDomainName     string `mapstructure:"OS_USER_DOMAIN_NAME" validate:"required"`
 	ProjectDomainName  string `mapstructure:"OS_PROJECT_DOMAIN_NAME" validate:"required"`
 	ProjectID          string `mapstructure:"OS_PROJECT_ID" validate:"required"`
 

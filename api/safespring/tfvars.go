@@ -30,6 +30,11 @@ type SafespringTFVars struct {
 	WorkerNamesWC       []string          `hcl:"worker_names_wc" validate:"required"`
 	WorkerNameSizeMapWC map[string]string `hcl:"worker_name_flavor_map_wc" validate:"required"`
 
+	MasterAntiAffinityPolicySC string `hcl:"master_anti_affinity_policy_sc"`
+	WorkerAntiAffinityPolicySC string `hcl:"worker_anti_affinity_policy_sc"`
+	MasterAntiAffinityPolicyWC string `hcl:"master_anti_affinity_policy_wc"`
+	WorkerAntiAffinityPolicyWC string `hcl:"worker_anti_affinity_policy_wc"`
+
 	PublicIngressCIDRWhitelist []string `hcl:"public_ingress_cidr_whitelist" validate:"required"`
 
 	APIServerWhitelist []string `hcl:"api_server_whitelist" validate:"required"`

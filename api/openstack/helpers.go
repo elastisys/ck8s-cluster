@@ -45,6 +45,9 @@ func TerraformEnvHelper(
 	env["OS_PROJECT_DOMAIN_NAME"] = config.ProjectDomainName
 	env["OS_PROJECT_ID"] = config.ProjectID
 
+	env["AWS_ACCESS_KEY_ID"] = secret.AWSAccessKeyID
+	env["AWS_SECRET_ACCESS_KEY"] = secret.AWSSecretAccessKey
+
 	return env
 }
 
