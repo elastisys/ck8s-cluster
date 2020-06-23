@@ -16,7 +16,7 @@ func init() {
 1. Cloning the machine in the tfvars configuration and running terraform
    apply.
 2. Joining the new node to the Kubernetes cluster.`,
-		Args: cobra.ExactArgs(2),
+		Args: ExactArgs(2),
 		RunE: withClusterClient(cloneNode),
 	})
 
@@ -24,7 +24,7 @@ func init() {
 		Use:   "drain NODE_NAME",
 		Short: "Drain a Kubernetes node",
 		Long:  `This command will cordon and drain a Kubernetes node.`,
-		Args:  cobra.ExactArgs(1),
+		Args:  ExactArgs(1),
 		RunE:  withClusterClient(drainNode),
 	})
 
@@ -32,7 +32,7 @@ func init() {
 		Use:   "reset NODE_TYPE NODE_NAME",
 		Short: "Runs kubeadm reset on a machine",
 		Long:  `This command will remove any trace of Kubernetes from a machine.`,
-		Args:  cobra.ExactArgs(2),
+		Args:  ExactArgs(2),
 		RunE:  withClusterClient(resetNode),
 	})
 
@@ -45,7 +45,7 @@ machine by:
 2. Running kubeadm reset on old machine.
 3. Removing the old machine from the Terraform configuration and running
    terraform apply.`,
-		Args: cobra.ExactArgs(2),
+		Args: ExactArgs(2),
 		RunE: withClusterClient(removeNode),
 	})
 
@@ -63,7 +63,7 @@ machine by:
 
 This useful when, for example, the Kubernetes cluster needs to be updated
 gracefully by performing a rolling upgrade.`,
-		Args: cobra.ExactArgs(2),
+		Args: ExactArgs(2),
 		RunE: withClusterClient(replaceNode),
 	})
 }

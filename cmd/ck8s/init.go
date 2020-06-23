@@ -22,7 +22,7 @@ func init() {
 	initCmd := &cobra.Command{
 		Use:   "init CLUSTER_NAME CLOUD_PROVIDER",
 		Short: "Initialize the CK8S configuration and Terraform workspace",
-		Args:  cobra.ExactArgs(2),
+		Args:  ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if _, ok := os.LookupEnv("CK8S_PGP_UID"); ok {
 				return fmt.Errorf(

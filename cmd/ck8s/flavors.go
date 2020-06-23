@@ -28,7 +28,7 @@ func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "flavors CLOUD_PROVIDER",
 		Short: "List the available cluster flavors",
-		Args:  cobra.ExactArgs(1),
+		Args:  ExactArgs(1),
 		RunE:  flavors,
 	})
 }

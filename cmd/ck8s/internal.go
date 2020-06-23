@@ -38,26 +38,26 @@ func init() {
 	internal := &cobra.Command{
 		Use:   "internal",
 		Short: "Only use if you know what you're doing.",
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 	}
 
 	tf := &cobra.Command{
 		Use:   "terraform",
 		Short: "Direct access to Terraform commands",
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 	}
 
 	tf.AddCommand(&cobra.Command{
 		Use:   "apply",
 		Short: "Apply the Terraform configuration",
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 		RunE:  withClusterClient(terraformApply),
 	})
 
 	tf.AddCommand(&cobra.Command{
 		Use:   "output",
 		Short: "Get the raw Terraform output in JSON format",
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 		RunE:  withClusterClient(terraformOutput),
 	})
 

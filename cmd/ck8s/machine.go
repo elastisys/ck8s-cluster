@@ -13,21 +13,21 @@ func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "get NODE_TYPE NAME",
 		Short: "Get machine details",
-		Args:  cobra.ExactArgs(2),
+		Args:  ExactArgs(2),
 		RunE:  withClusterClient(machineGet),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "list",
 		Short: "List machines",
-		Args:  cobra.NoArgs,
+		Args:  NoArgs,
 		RunE:  withClusterClient(machineList),
 	})
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ssh NODE_TYPE NAME",
 		Short: "Open an SSH login shell on a machine",
-		Args:  cobra.ExactArgs(2),
+		Args:  ExactArgs(2),
 		RunE:  withClusterClient(machineSSH),
 	})
 }

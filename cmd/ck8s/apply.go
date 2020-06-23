@@ -20,7 +20,7 @@ func init() {
 		Long: `The apply command creates the S3 buckets if they doesn't already exist, runs
 terraform apply to create any changes in the Terraform configuration and
 kubeadm init and kubeadm join to setup any new Kubernetes nodes.`,
-		Args: cobra.NoArgs,
+		Args: NoArgs,
 		RunE: withClusterClient(apply),
 	})
 }
