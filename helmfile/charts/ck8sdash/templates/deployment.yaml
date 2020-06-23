@@ -82,16 +82,12 @@ spec:
         resources:
           {{- toYaml .Values.server.resources | nindent 12 }}
         volumeMounts:
-        - name: info-text
-          mountPath: /info-text
+        - name: config
+          mountPath: /etc/ck8sdash
         # Note that these values are not reloaded if the secret is changed
         # The pod needs to be restarted to load new values
         env:
-        - name: PORT
-          value: "{{ .Values.server.port }}"
-        - name: INFO_PATH
-          value: /info-text/info.json
-        - name: GRAFANA_API_KEY
+        - name: GRAFANA_APIKEY
           valueFrom:
             secretKeyRef:
               name: ck8sdash-grafana-api-key
@@ -101,45 +97,22 @@ spec:
             secretKeyRef:
               name: ck8sdash-elastic-api-key
               key: elastic-api-key
-        - name: ELASTIC_API_KEY_ID
+        - name: ELASTIC_API_KEYID
           valueFrom:
             secretKeyRef:
               name: ck8sdash-elastic-api-key
               key: elastic-api-key-id
-        - name: GRAFANA_URL
-          value: {{ .Values.grafana.url }}
-        - name: HARBOR_URL
-          value: {{ .Values.harbor.url }}
-        - name: KIBANA_URL
-          value: {{ .Values.kibana.url }}
-        - name: ELASTIC_URL
-          value: {{ .Values.elastic.url }}
-        - name: OIDC_URL
-          value: {{ .Values.oidc.url }}
-        - name: HARBOR_USERNAME
-          value: {{ .Values.harbor.username }}
         - name: HARBOR_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{include "ck8sdash.fullname" . }}-secrets
               key: harbor-password
-        - name: OIDC_CLIENT_ID
-          value: {{ .Values.oidc.clientId }}
         - name: OIDC_SECRET
           valueFrom:
             secretKeyRef:
               name: {{include "ck8sdash.fullname" . }}-secrets
               key: oidc-secret
-        - name: ENABLE_OPA
-          value: {{ quote .Values.opa.enabled }}
-        - name: ENABLE_FALCO
-          value: {{ quote .Values.falco.enabled }}
-        - name: ELASTIC_KUBERNETES_INDEX_PREFIX
-          value: {{ .Values.elastic.kubernetesIndexPrefix }}
-        - name: ELASTIC_COMPONENTS_INDEX_PREFIX
-          value: {{ .Values.elastic.componentsIndexDefault }}
-        - name: GRAFANA_DATASOURCE
-          value: {{ .Values.grafana.datasource }}
+
         ports:
         - containerPort: {{ .Values.server.port }}
       volumes:
@@ -149,9 +122,9 @@ spec:
       - name: elastic-init-script
         configMap:
           name: {{ include "ck8sdash.fullname" . }}-elastic-init-script
-      - name: info-text
+      - name: config
         configMap:
-          name: {{ include "ck8sdash.fullname" . }}-info-text
+          name: {{ include "ck8sdash.fullname" . }}-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

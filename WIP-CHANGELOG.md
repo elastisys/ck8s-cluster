@@ -28,3 +28,6 @@
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
+
+### Changed
+- Upgraded ck8sdash to v0.3.1
