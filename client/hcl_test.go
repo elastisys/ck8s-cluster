@@ -19,6 +19,7 @@ var roundTripTests = map[string]interface{}{
 	"testdata/citycloud.tfvars":              citycloud.Default(api.ServiceCluster, "testName").TFVars(),
 	"testdata/exoscale-backend-config.hcl":   exoscale.NewCloudProvider().TerraformBackendConfig(),
 	"testdata/safespring-backend-config.hcl": safespring.NewCloudProvider().TerraformBackendConfig(),
+	"testdata/citycloud-backend-config.hcl":  citycloud.NewCloudProvider().TerraformBackendConfig(),
 }
 
 func TestHCLRoundTrip(t *testing.T) {
