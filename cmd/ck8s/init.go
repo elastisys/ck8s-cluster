@@ -25,7 +25,9 @@ func init() {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if _, ok := os.LookupEnv("CK8S_PGP_UID"); ok {
-				return fmt.Errorf("CK8S_PGP_UID is currently not supported")
+				return fmt.Errorf(
+					"CK8S_PGP_UID is currently not supported, use CK8S_PGP_FP or the --pgp-fp flag instead",
+				)
 			}
 
 			clusterName := args[0]
