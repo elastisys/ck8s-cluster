@@ -30,6 +30,18 @@ func init() {
 				)
 			}
 
+			// TODO: Remove after deprecation period is over
+			if _, ok := os.LookupEnv("CK8S_ENVIRONMENT_NAME"); ok {
+				return fmt.Errorf(
+					"CK8S_ENVIRONMENT_NAME is deprecated, use positional arg",
+				)
+			}
+			if _, ok := os.LookupEnv("CK8S_CLOUD_PROVIDER"); ok {
+				return fmt.Errorf(
+					"CK8S_CLOUD_PROVIDER is deprecated, use positional arg",
+				)
+			}
+
 			clusterName := args[0]
 
 			cloudProvider, err := client.CloudProviderFromType(
