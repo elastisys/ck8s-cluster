@@ -21,7 +21,7 @@ var roundTripTests = map[string]interface{}{
 	"testdata/safespring-backend-config.hcl": safespring.NewCloudProvider().TerraformBackendConfig(),
 }
 
-func TestTFVarsRoundTrip(t *testing.T) {
+func TestHCLRoundTrip(t *testing.T) {
 	for path, data := range roundTripTests {
 		input, err := ioutil.ReadFile(path)
 		if err != nil {
