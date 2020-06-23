@@ -158,3 +158,30 @@ func (t *Terraform) Output(output interface{}) error {
 
 	return t.runner.Background(cmd)
 }
+
+// Destroy runs `terraform destroy`. with the -auto-approve flag if
+// autoApprove is true. If autoApprove is false it always outputs to allow for
+// interactive input. It optionally runs with the flags `-var-file` and
+// `-target` if either is configured.
+func (t *Terraform) Destroy(autoApprove bool) error {
+	t.logger.Debug("terraform_destroy")
+
+	args := []string{"destroy"}
+	if t.config.TFVarsPath != "" {
+		args = append(args, []string{"-var-file", t.config.TFVarsPath}...)
+	}
+	if t.config.Target != "" {
+		args = append(args, []string{"-target", t.config.Target}...)
+	}
+	if autoApprove {
+		args = append(args, "-auto-approve")
+	}
+
+	cmd := t.command(args...)
+
+	if !autoApprove {
+		return t.runner.Output(cmd)
+	}
+
+	return t.runner.Run(cmd)
+}

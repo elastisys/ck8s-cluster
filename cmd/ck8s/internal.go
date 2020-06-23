@@ -34,6 +34,14 @@ func terraformOutput(
 	return nil
 }
 
+func terraformDestroy(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
+	return clusterClient.TerraformDestroy()
+}
+
 func init() {
 	internal := &cobra.Command{
 		Use:   "internal",
@@ -59,6 +67,13 @@ func init() {
 		Short: "Get the raw Terraform output in JSON format",
 		Args:  NoArgs,
 		RunE:  withClusterClient(terraformOutput),
+	})
+
+	tf.AddCommand(&cobra.Command{
+		Use:   "destroy",
+		Short: "Destroy the Terraform managed infrastructure",
+		Args:  cobra.NoArgs,
+		RunE:  withClusterClient(terraformDestroy),
 	})
 
 	internal.AddCommand(tf)

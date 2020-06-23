@@ -160,6 +160,26 @@ func (c *ClusterClient) Apply() error {
 	return c.encryptKubeconfig()
 }
 
+func (c *ClusterClient) Destroy() error {
+	c.logger.Info("client_destroy")
+
+	// TODO: Handle Kubernetes/non-Terraform managed resources
+
+	if err := c.TerraformDestroy(); err != nil {
+		return fmt.Errorf("error destroying Terraform resources: %w", err)
+	}
+
+	if err := c.s3cmd.Abort(); err != nil {
+		return fmt.Errorf("error aborting multipart S3 uploads")
+	}
+
+	if err := c.s3cmd.Delete(); err != nil {
+		return fmt.Errorf("error deleting S3 buckets")
+	}
+
+	return nil
+}
+
 // encryptKubeconfig encrypts the kubeconfig file.
 // TODO: We should ideally never let the plaintext kubeconfig file touch the
 // 		 file system. We could use the SSH runner and fetch the kubeconfig
@@ -247,6 +267,20 @@ func (c *ClusterClient) TerraformOutput(output interface{}) error {
 	}
 
 	return c.terraform.Output(output)
+}
+
+func (c *ClusterClient) TerraformDestroy() error {
+	c.logger.Info("client_terraform_destroy")
+
+	if err := c.terraform.Init(); err != nil {
+		return err
+	}
+
+	if err := c.terraform.Destroy(c.autoApprove); err != nil {
+		return fmt.Errorf("error destroying Terraform resources: %w", err)
+	}
+
+	return nil
 }
 
 func (c *ClusterClient) Machines() ([]api.MachineState, error) {

@@ -182,3 +182,43 @@ func TestTerraformOutput(t *testing.T) {
 
 	logTest.Diff(t)
 }
+
+func TestTerraformDestroy(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"terraform_destroy",
+		"terraform_destroy",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := newTerraformTestCommand(
+		"destroy",
+		"-var-file", "tfvars",
+		"-target", testTerraformConfig.Target,
+	)
+
+	r.Push(&TestCommand{Command: wantCmd})
+
+	tf := NewTerraform(logger, r, testTerraformConfig)
+
+	if err := tf.Destroy(false); err != nil {
+		t.Error(err)
+	}
+
+	wantCmd = newTerraformTestCommand(
+		"destroy",
+		"-var-file", "tfvars",
+		"-target", testTerraformConfig.Target,
+		"-auto-approve",
+	)
+
+	r.Push(&TestCommand{Command: wantCmd})
+
+	tf = NewTerraform(logger, r, testTerraformConfig)
+
+	if err := tf.Destroy(true); err != nil {
+		t.Error(err)
+	}
+
+	logTest.Diff(t)
+}
