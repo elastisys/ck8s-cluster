@@ -14,10 +14,11 @@ import (
 
 var roundTripTests = map[string]interface{}{
 	// TODO: clusterType
-	"testdata/exoscale.tfvars":             exoscale.Default(api.ServiceCluster, "testName").TFVars(),
-	"testdata/safespring.tfvars":           safespring.Default(api.ServiceCluster, "testName").TFVars(),
-	"testdata/citycloud.tfvars":            citycloud.Default(api.ServiceCluster, "testName").TFVars(),
-	"testdata/exoscale-backend-config.hcl": exoscale.NewCloudProvider().TerraformBackendConfig(),
+	"testdata/exoscale.tfvars":               exoscale.Default(api.ServiceCluster, "testName").TFVars(),
+	"testdata/safespring.tfvars":             safespring.Default(api.ServiceCluster, "testName").TFVars(),
+	"testdata/citycloud.tfvars":              citycloud.Default(api.ServiceCluster, "testName").TFVars(),
+	"testdata/exoscale-backend-config.hcl":   exoscale.NewCloudProvider().TerraformBackendConfig(),
+	"testdata/safespring-backend-config.hcl": safespring.NewCloudProvider().TerraformBackendConfig(),
 }
 
 func TestTFVarsRoundTrip(t *testing.T) {
