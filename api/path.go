@@ -40,6 +40,7 @@ const (
 	SSHPrivateKeyFile
 	TFDataDir
 	TFEDataDir
+	TFEStateFile
 	AnsibleInventoryFile
 	SOPSConfigFile
 	KubeconfigFile
@@ -69,6 +70,7 @@ var relativeConfigPaths = ConfigPath{
 	TFVarsFile:          {"config.tfvars", "hclv2"},
 	TFDataDir:           {".state/.terraform", ""},
 	TFEDataDir:          {".state/.terraform-tfe", ""},
+	TFEStateFile:        {".state/terraform-tfe.tfstate", ""},
 	SOPSConfigFile:      {".sops.yaml", "yaml"},
 	S3CfgFile:           {".state/s3cfg.ini", "ini"},
 }

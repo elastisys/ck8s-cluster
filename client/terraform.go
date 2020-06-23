@@ -27,8 +27,8 @@ func InitializeTerraformRemoteWorkspace(
 		runner.NewLocalRunner(logger, silent),
 		&runner.TerraformConfig{
 			Path:        configHandler.codePath[api.TerraformTFEDir].Path,
-			Workspace:   workspace,
 			DataDirPath: configHandler.configPath[api.TFEDataDir].Path,
+			StatePath:   configHandler.configPath[api.TFEStateFile].Path,
 			Env:         map[string]string{},
 		},
 	)

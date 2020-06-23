@@ -12,9 +12,12 @@ import (
 var TerraformPlanDiffErr = errors.New("terraform plan has diff")
 
 type TerraformConfig struct {
-	Path              string
-	Workspace         string
-	DataDirPath       string
+	Path        string
+	Workspace   string
+	DataDirPath string
+	// TODO: This is only necessary when using local backend since TF_DATA_DIR
+	//		 does not seem to be considered in that case for some reason.
+	StatePath         string
 	BackendConfigPath string
 	TFVarsPath        string
 
@@ -107,6 +110,9 @@ func (t *Terraform) PlanNoDiff() error {
 	if t.config.Target != "" {
 		args = append(args, []string{"-target", t.config.Target}...)
 	}
+	if t.config.StatePath != "" {
+		args = append(args, []string{"-state", t.config.StatePath}...)
+	}
 	args = append(args, "-detailed-exitcode")
 
 	cmd := t.command(args...)
@@ -132,6 +138,9 @@ func (t *Terraform) Apply(autoApprove bool, extraArgs ...string) error {
 	if t.config.Target != "" {
 		args = append(args, []string{"-target", t.config.Target}...)
 	}
+	if t.config.StatePath != "" {
+		args = append(args, []string{"-state", t.config.StatePath}...)
+	}
 	if autoApprove {
 		args = append(args, "-auto-approve")
 	}
@@ -150,7 +159,13 @@ func (t *Terraform) Apply(autoApprove bool, extraArgs ...string) error {
 func (t *Terraform) Output(output interface{}) error {
 	t.logger.Debug("terraform_output")
 
-	cmd := t.command("output", "-json")
+	args := []string{"output", "-json"}
+
+	if t.config.StatePath != "" {
+		args = append(args, []string{"-state", t.config.StatePath}...)
+	}
+
+	cmd := t.command(args...)
 
 	cmd.OutputHandler = func(stdout, stderr io.Reader) error {
 		return json.NewDecoder(stdout).Decode(&output)
@@ -172,6 +187,9 @@ func (t *Terraform) Destroy(autoApprove bool) error {
 	}
 	if t.config.Target != "" {
 		args = append(args, []string{"-target", t.config.Target}...)
+	}
+	if t.config.StatePath != "" {
+		args = append(args, []string{"-state", t.config.StatePath}...)
 	}
 	if autoApprove {
 		args = append(args, "-auto-approve")
