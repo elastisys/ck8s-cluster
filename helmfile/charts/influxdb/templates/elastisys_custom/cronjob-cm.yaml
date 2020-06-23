@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: influxdb-du-monitoring-cronjob
+  name: {{ template "influxdb.fullname" . }}-du-monitoring-cronjob
 data:
   cronjob: |
     ### cron file for running the export script

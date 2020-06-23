@@ -1,20 +1,22 @@
 {{- if .Values.elastisys_custom.retention.enabled }}
+{{- range $key, $val := .Values.elastisys_custom.metrics.jobs }}
+---
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: influxdb-metrics-retention-cronjob
+  name: {{ template "influxdb.fullname" $ }}-metrics-retention-cronjob-{{ $key | replace "_" " " | initials }} 
   labels:
-    app: influxdb-metrics-retention
+    app: {{ template "influxdb.fullname" $ }}-metrics-retention-{{ $key | replace "_" " " | initials }} 
 spec:
-  schedule: {{ .Values.elastisys_custom.metrics.schedule | quote }}
-  startingDeadlineSeconds: {{ .Values.elastisys_custom.metrics.startingDeadlineSeconds }}
+  schedule: {{ $val.schedule | quote }}
+  startingDeadlineSeconds: {{ $.Values.elastisys_custom.metrics.startingDeadlineSeconds }}
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            app: influxdb-metrics-retention
+            app: {{ template "influxdb.fullname" $ }}-metrics-retention-{{ $key | replace "_" " " | initials }} 
         spec:
           restartPolicy: OnFailure
           volumes:
@@ -22,7 +24,7 @@ spec:
               configMap:
                 name: influxdb-metrics-retention-script
           containers:
-            - name: influxdb-metrics-retention
+            - name: {{ template "influxdb.fullname" $ }}-metrics-retention-{{ $key | replace "_" " " | initials }}
               image: elastisys/influxdb-metrics-retention:latest
               command: ["python3", "/app/influxdb_size_based_metrics_retention.py"]
               env:
@@ -41,27 +43,22 @@ spec:
                     name: influxdb-auth
                     key: INFLUXDB_PWD
               - name: INFLUXDB_DATABASE
-                valueFrom:
-                  configMapKeyRef:
-                    name: common-env-vars-cm
-                    key: influxdb-retention-database
+                value: {{ $key | quote }}
               - name: INFLUXDB_MIN_SHARDS
-                value: "1"
+                value: {{ $val.min_shards | quote }} 
               - name: INFLUXDB_DATABASE_SIZE_LIMIT
-                value: "5000000"
+                value: {{ $val.data_size_limit | quote }} 
               - name: PROMETHEUS_HOST
                 value: prometheus-operator-prometheus.monitoring
               - name: PROMETHEUS_PORT
                 value: "9090"
               - name: PROMETHEUS_INFLUXDB_METRIC
-                valueFrom:
-                  configMapKeyRef:
-                    name: common-env-vars-cm
-                    key: prometheus-influxdb-retention-metric-name
+                value: {{ $val.metric | quote }}
               - name: LOGLEVEL
                 value: "INFO"
               volumeMounts:
                 - name: python-script
                   mountPath: /app
-              resources: {{ toYaml .Values.elastisys_custom.retention.resources | nindent 16 }}
+              resources: {{ toYaml $.Values.elastisys_custom.retention.resources | nindent 16 }}
+{{- end }}
 {{- end }}

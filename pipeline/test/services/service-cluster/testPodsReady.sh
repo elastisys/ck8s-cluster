@@ -140,8 +140,11 @@ done
 
 # Format:
 # namespace cronjob-name timeout
+# influxdb cronjob is create by <template name>-metrics-retention-cronjob-<sc/wc>
+# If the template name changes this has to be changed aswell.
 CRONJOBS=(
-  "influxdb-prometheus influxdb-metrics-retention-cronjob"
+  "influxdb-prometheus influxdb-metrics-retention-cronjob-sc" 
+  "influxdb-prometheus influxdb-metrics-retention-cronjob-wc"
   "influxdb-prometheus influxdb-backup"
   "elastic-system curator"
 )

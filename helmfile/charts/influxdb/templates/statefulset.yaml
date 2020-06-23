@@ -105,7 +105,7 @@ spec:
       - name: influxdb-cronjob
         image: bambash/docker-cron
         volumeMounts:
-          - name: influxdb-data
+          - name: {{ template "influxdb.fullname" . }}-data
             mountPath: /var/lib/influxdb
           - name: textfile-collector-dir
             mountPath: /textfile-collector
@@ -134,13 +134,13 @@ spec:
         emptyDir: {}
       - name: scripts
         configMap:
-          name: influxdb-du-monitoring-script
+          name: {{ template "influxdb.fullname" . }}-du-monitoring-script
       - name: cronfiles
         configMap:
-          name: influxdb-du-monitoring-cronjob
+          name: {{ template "influxdb.fullname" . }}-du-monitoring-cronjob
       - name: config-volume
         configMap:
-          name: common-env-vars-cm
+          name: {{ template "influxdb.fullname" . }}-common-env-vars-cm
           items:
           - key: influxdb-retention-database
             path: influxdb-retention-database

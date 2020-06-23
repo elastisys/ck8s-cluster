@@ -66,7 +66,10 @@ def parse_numeric_config():
     global INFLUXDB_MIN_SHARDS
 
     try:
-        INFLUXDB_DATABASE_SIZE_LIMIT = int(INFLUXDB_DATABASE_SIZE_LIMIT_STRING)
+        # Helm converts larges number into scientific notation. Number which is in scientific 
+        # notation e.g. 5+e06, can not be parsed by int() but float() can. 
+        # And int() can convert floats to int.
+        INFLUXDB_DATABASE_SIZE_LIMIT = int(float(INFLUXDB_DATABASE_SIZE_LIMIT_STRING))
         INFLUXDB_MIN_SHARDS = int(INFLUXDB_MIN_SHARDS_STRING)
     except ValueError as err:
         logger.error(

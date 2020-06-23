@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-    name: influxdb-du-monitoring-service-monitor
+    name: {{ template "influxdb.fullname" . }}-du-monitoring-service-monitor
     namespace: monitoring
     labels:
         app: prometheus-operator-influxdb-du-monitoring
@@ -10,7 +10,7 @@ metadata:
 spec:
     selector:
         matchLabels:
-            app: influxdb-du-monitoring
+            app: {{ template "influxdb.fullname" . }}-du-monitoring
     namespaceSelector:
         matchNames:
         - influxdb-prometheus

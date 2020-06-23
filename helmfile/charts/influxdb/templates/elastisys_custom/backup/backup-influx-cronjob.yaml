@@ -1,9 +1,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: influxdb-backup
+  name: {{ template "influxdb.fullname" . }}-backup
   labels:
-    app: influxdb-backup
+    app: {{ template "influxdb.fullname" . }}-backup
 spec:
   schedule: {{ .Values.elastisys_custom.backup.schedule | quote }}
   concurrencyPolicy: Forbid
@@ -12,14 +12,14 @@ spec:
       template:
         metadata:
           labels:
-            app: influxdb-backup
+            app: {{ template "influxdb.fullname" . }}-backup
         spec:
           restartPolicy: OnFailure
           volumes:
           - name: backups
             emptyDir: {}
           initContainers:
-          - name: influxdb-backup
+          - name: {{ template "influxdb.fullname" . }}-backup
             image: influxdb:1.7.6-alpine
             volumeMounts:
             - name: backups

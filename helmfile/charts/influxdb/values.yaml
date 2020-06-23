@@ -32,6 +32,18 @@ elastisys_custom:
     # Every 5th minute from 0 through 59 (one minute ahead of the retention cronjob)
     schedule: "0-59/5 * * * *"
     startingDeadlineSeconds: 200
+    jobs:
+      #Insure that the jobs names initials are unique. May otherwise collide and only one of the jobs will be present. 
+      service_cluster: 
+        schedule: "0-59/5 * * * *"
+        min_shards: 1
+        data_size_limit: 5000000
+        metric: influxdb_service_cluster_size
+      workload_cluster:
+        schedule: "0-59/5 * * * *"
+        min_shards: 1
+        data_size_limit: 5000000
+        metric: influxdb_workload_cluster_size
   retention:
     enabled: true
     # The schedule for running the retention script.

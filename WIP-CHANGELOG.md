@@ -16,6 +16,8 @@
 - Added quotes to handle special characters (e.g for password etc) in cloud.conf.
 - `ck8s dry-run` now takes config into account when determining which helmfile charts to diff.
 - Default `startingDeadlineSeconds` of 200 for cronjobs and option to override the default value 
+- Influxdb retention script runs for both service and workload cluster.
+- Influxdb custom charts uses template name instead of hardcoded name.
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
