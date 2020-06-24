@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastisys/ck8s/api"
+	"github.com/elastisys/ck8s/api/aws"
 	"github.com/elastisys/ck8s/api/citycloud"
 	"github.com/elastisys/ck8s/api/exoscale"
 	"github.com/elastisys/ck8s/api/openstack"
@@ -89,5 +90,40 @@ secret_key = %s
 		if diff := cmp.Diff(want, got.String()); diff != "" {
 			t.Errorf("log mismatch (-want +got):\n%s", diff)
 		}
+	}
+}
+
+func TestRenderS3CfgPlaintextAWS(t *testing.T) {
+	cluster := aws.Default(api.ServiceCluster, "testName")
+	config, ok := cluster.Config().(*aws.AWSConfig)
+	if !ok {
+		panic("WRONG TYPE")
+	}
+	secret, ok := cluster.Secret().(*aws.AWSSecret)
+	if !ok {
+		panic("WRONG TYPE")
+	}
+	secret.S3AccessKey = "a"
+	secret.S3SecretKey = "b"
+	config.S3Region = "c"
+
+	want := fmt.Sprintf(`[default]
+access_key = %s
+secret_key = %s
+use_https = True
+bucket_location = %s
+`,
+		secret.S3AccessKey,
+		secret.S3SecretKey,
+		config.S3Region,
+	)
+	var got bytes.Buffer
+
+	if err := renderS3CfgPlaintext(cluster, &got); err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got.String()); diff != "" {
+		t.Errorf("log mismatch (-want +got):\n%s", diff)
 	}
 }

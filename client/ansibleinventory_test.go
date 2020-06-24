@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastisys/ck8s/api"
+	"github.com/elastisys/ck8s/api/aws"
 	"github.com/elastisys/ck8s/api/citycloud"
 	"github.com/elastisys/ck8s/api/exoscale"
 	"github.com/elastisys/ck8s/api/safespring"
@@ -53,6 +54,16 @@ func TestRenderAnsibleInventory(t *testing.T) {
 		"testdata/citycloud.tfvars",
 		"testdata/citycloud-terraform-output.json",
 		citycloud.Default(api.WorkloadCluster, "ck8stest"),
+	}, {
+		"testdata/aws-ansible-hosts-sc.ini",
+		"testdata/aws.tfvars",
+		"testdata/aws-terraform-output.json",
+		aws.Default(api.ServiceCluster, "ck8stest"),
+	}, {
+		"testdata/aws-ansible-hosts-wc.ini",
+		"testdata/aws.tfvars",
+		"testdata/aws-terraform-output.json",
+		aws.Default(api.WorkloadCluster, "ck8stest"),
 	}}
 
 	for _, tc := range testCases {

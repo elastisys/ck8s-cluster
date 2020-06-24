@@ -61,6 +61,7 @@ const (
 	TerraformExoscaleDir
 	TerraformSafespringDir
 	TerraformCityCloudDir
+	TerraformAWSDir
 )
 
 var relativeConfigPaths = ConfigPath{
@@ -117,6 +118,9 @@ var relativeCodePaths = CodePath{
 	},
 	TerraformCityCloudDir: {
 		"terraform/citycloud", "",
+	},
+	TerraformAWSDir: {
+		"terraform/aws", "",
 	},
 }
 

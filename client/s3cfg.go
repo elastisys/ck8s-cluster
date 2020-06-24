@@ -1,8 +1,8 @@
 package client
 
 import (
-	"html/template"
 	"io"
+	"text/template"
 
 	"github.com/elastisys/ck8s/api"
 )
@@ -27,7 +27,7 @@ var awsS3Template = `[default]
 access_key = {{ .Secret.S3AccessKey }}
 secret_key = {{ .Secret.S3SecretKey }}
 use_https = True
-bucket_location = {{ .Config.S3RegionAddress }}
+bucket_location = {{ .Config.S3Region }}
 `
 
 var s3cfgTemplates = map[api.CloudProviderType]string{
