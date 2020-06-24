@@ -127,7 +127,7 @@ func (c *ClusterClient) MachineClient(m api.MachineState) *MachineClient {
 func (c *ClusterClient) Apply() error {
 	c.logger.Info("client_apply")
 
-	if err := c.s3Apply(); err != nil {
+	if err := c.S3Apply(); err != nil {
 		return err
 	}
 
@@ -169,12 +169,8 @@ func (c *ClusterClient) Destroy() error {
 		return fmt.Errorf("error destroying Terraform resources: %w", err)
 	}
 
-	if err := c.s3cmd.Abort(); err != nil {
-		return fmt.Errorf("error aborting multipart S3 uploads")
-	}
-
-	if err := c.s3cmd.Delete(); err != nil {
-		return fmt.Errorf("error deleting S3 buckets")
+	if err := c.S3Delete(); err != nil {
+		return err
 	}
 
 	return nil
@@ -216,8 +212,8 @@ func (c *ClusterClient) state() (api.ClusterState, error) {
 	return c.cluster.State(c.TerraformOutput)
 }
 
-// s3Apply renders the s3cfg file and creates the S3 buckets.
-func (c *ClusterClient) s3Apply() error {
+// S3Apply renders the s3cfg file and creates the S3 buckets.
+func (c *ClusterClient) S3Apply() error {
 	c.logger.Info("client_s3_apply")
 
 	if err := c.configHandler.WriteS3cfg(
@@ -231,6 +227,20 @@ func (c *ClusterClient) s3Apply() error {
 
 	if err := c.s3cmd.Create(); err != nil {
 		return fmt.Errorf("error creating S3 buckets: %w", err)
+	}
+
+	return nil
+}
+
+func (c *ClusterClient) S3Delete() error {
+	c.logger.Debug("client_s3_delete")
+
+	if err := c.s3cmd.Abort(); err != nil {
+		return fmt.Errorf("error aborting multipart S3 uploads")
+	}
+
+	if err := c.s3cmd.Delete(); err != nil {
+		return fmt.Errorf("error deleting S3 buckets")
 	}
 
 	return nil

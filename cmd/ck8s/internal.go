@@ -42,6 +42,22 @@ func terraformDestroy(
 	return clusterClient.TerraformDestroy()
 }
 
+func s3Apply(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
+	return clusterClient.S3Apply()
+}
+
+func s3Destroy(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
+	return clusterClient.S3Delete()
+}
+
 func init() {
 	internal := &cobra.Command{
 		Use:   "internal",
@@ -77,6 +93,28 @@ func init() {
 	})
 
 	internal.AddCommand(tf)
+
+	s3 := &cobra.Command{
+		Use:   "s3",
+		Short: "Direct access to S3 commands",
+		Args:  NoArgs,
+	}
+
+	s3.AddCommand(&cobra.Command{
+		Use:   "apply",
+		Short: "Create the S3 buckets if they don't already exist",
+		Args:  NoArgs,
+		RunE:  withClusterClient(s3Apply),
+	})
+
+	s3.AddCommand(&cobra.Command{
+		Use:   "destroy",
+		Short: "Destroy the S3 buckets if they exist",
+		Args:  NoArgs,
+		RunE:  withClusterClient(s3Destroy),
+	})
+
+	internal.AddCommand(s3)
 
 	rootCmd.AddCommand(internal)
 }
