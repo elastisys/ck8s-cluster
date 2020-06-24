@@ -20,6 +20,7 @@
 - Influxdb custom charts uses template name instead of hardcoded name.
 - Tests respect the `ENABLE_FALCO` and `ENABLE_FALCO_ALERTS` configuration
 - Fixed so nfs-kernel-server is installed on the nfs node.
+- InfluxDB helm chart updated to version 4.7.0 (with InfluxDB version 1.8.0).
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.

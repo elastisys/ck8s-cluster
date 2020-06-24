@@ -8,7 +8,7 @@ metadata:
     release: prometheus-operator
 spec:
   selector:
-    app: {{ template "influxdb.fullname" . }}
+    app.kubernetes.io/name: {{ template "influxdb.fullname" . }}
   ports:
     - name: web
       port: 9100

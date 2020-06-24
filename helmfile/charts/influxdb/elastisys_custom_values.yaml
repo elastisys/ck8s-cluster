@@ -1,0 +1,59 @@
+elastisys_custom:
+  ## The following values must be set in order to use the chart.
+  # influx_addr:
+  # s3_region:
+  # s3_region_endpoint:
+  # s3_influx_bucket_name:
+  # s3_access_key:
+  # s3_secret_key:
+  # influxdb_user:
+  # influxdb_password:
+  backup:
+    schedule: "0 0 * * *"
+    startingDeadlineSeconds: 200
+    # Resources for the init container that does the `influx backup`
+    init_resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 250m
+        memory: 500Mi
+    # Resources for the container that uploads the backup to S3
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 250m
+        memory: 300Mi
+  metrics:
+    enabled: true
+    # The schedule for running the metrics exporter.
+    # Every 5th minute from 0 through 59 (one minute ahead of the retention cronjob)
+    schedule: "0-59/5 * * * *"
+    startingDeadlineSeconds: 200
+    jobs:
+      #Insure that the jobs names initials are unique. May otherwise collide and only one of the jobs will be present. 
+      service_cluster: 
+        schedule: "0-59/5 * * * *"
+        min_shards: 1
+        data_size_limit: 5000000
+        metric: influxdb_service_cluster_size
+      workload_cluster:
+        schedule: "0-59/5 * * * *"
+        min_shards: 1
+        data_size_limit: 5000000
+        metric: influxdb_workload_cluster_size
+  retention:
+    enabled: true
+    # The schedule for running the retention script.
+    # Every 5th minute from 1 through 59 (one minute after the metrics exporter)
+    schedule: "1-59/5 * * * *"
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 250m
+        memory: 500Mi

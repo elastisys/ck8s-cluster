@@ -9,8 +9,11 @@ elastisys_custom:
   influxdb_user: {{ requiredEnv "INFLUXDB_USER" }}
   influxdb_password: {{ requiredEnv "INFLUXDB_PWD" }}
 
+serviceAccount:
+  create: false
+
 image:
-  tag: "1.7.8-alpine"
+  tag: "1.8.0-alpine"
 
 persistence:
   size: 30Gi

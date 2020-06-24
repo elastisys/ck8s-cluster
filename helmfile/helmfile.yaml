@@ -382,9 +382,10 @@ releases:
   labels:
     app: influxdb
   chart: ./charts/influxdb
-  version: 3.1.0
+  version: 4.7.0
   missingFileHandler: Error
   values:
+  - ./charts/influxdb/elastisys_custom_values.yaml
   - values/influxdb.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/influxdb.yaml"

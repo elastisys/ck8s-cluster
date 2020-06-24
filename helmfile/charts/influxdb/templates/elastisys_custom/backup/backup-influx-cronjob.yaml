@@ -6,6 +6,7 @@ metadata:
     app: {{ template "influxdb.fullname" . }}-backup
 spec:
   schedule: {{ .Values.elastisys_custom.backup.schedule | quote }}
+  startingDeadlineSeconds: {{ .Values.elastisys_custom.backup.startingDeadlineSeconds }}
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
