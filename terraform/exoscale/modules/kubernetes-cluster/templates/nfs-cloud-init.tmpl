@@ -27,6 +27,7 @@ write_files:
 runcmd:
   - netplan apply
   # Install and configre the NFS server
+  - sudo apt-get update
   - sudo apt-get install nfs-kernel-server -y
   - sudo mkdir -p /nfs && sudo chown nobody:nogroup /nfs
   - echo "/nfs ${private_network_cidr}(rw,sync,no_subtree_check,no_root_squash)" > /etc/exports

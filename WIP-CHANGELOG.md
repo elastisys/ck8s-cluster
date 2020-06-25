@@ -1,5 +1,6 @@
 ### Fixed
 - Tests respect the `ENABLE_FALCO` and `ENABLE_FALCO_ALERTS` configuration
+- Fixed so nfs-kernel-server is installed on the nfs node.
 
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
