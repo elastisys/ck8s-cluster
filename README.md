@@ -77,9 +77,18 @@ worth reading!
 
 ### Quickstart
 
+To build the cli simply run the following:
+
+```
+make build
+```
+
+The binary can then be found in `dist/ck8s_linux_amd64`.
+
 In order to setup a new Compliant Kubernetes cluster you will need to do the following.
 
 TODO
+
 
 ### DNS
 
@@ -90,6 +99,14 @@ In Exoscale we use Exoscale's own DNS features while for Safespring and Cityclou
 
 For Safespring and Citycloud the domain can be changed by setting the Terraform variable
 `aws_dns_zone_id` to an id of another hosted zone in AWS Route 53.
+
+## Development
+
+When developing the cli the most convenient way of running the cli is:
+
+```
+go run ./cmd/ck8s
+```
 
 ## Known issues
 
