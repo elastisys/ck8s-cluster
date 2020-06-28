@@ -74,21 +74,21 @@
         cmd: curl -s http://169.254.169.254/latest/meta-data/local-hostname
         warn: false
       register: master_node_name
-      when: cloud_provider == "aws"
+      when: cloud_provider is defined and cloud_provider == "aws"
 
     - name: Wait for AWS master to become ready
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes {{ master_node_name.stdout }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
       register: master_node_status
       until: master_node_status.stdout == "True"
       retries: 30
-      when: cloud_provider == "aws"
+      when: cloud_provider is defined and cloud_provider == "aws"
 
     - name: Wait for master to become ready
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes {{ inventory_hostname }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
       register: master_node_status
       until: master_node_status.stdout == "True"
       retries: 30
-      when: cloud_provider != "aws"
+      when: cloud_provider is defined and cloud_provider != "aws"
 
     - name: Copy kubeconfig to localhost
       fetch:
