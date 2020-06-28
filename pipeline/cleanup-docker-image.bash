@@ -3,7 +3,7 @@
 if [ -z ${GITHUB_SHA+x} ]; then
     echo "GITHUB_SHA not set, skipping Docker tag deletion." >&2
 else
-    : "${DOCKERHUB_USER:?Missing DOCKERHUB_USER}"
+    : "${DOCKERHUB_USERNAME:?Missing DOCKERHUB_USERNAME}"
     : "${DOCKERHUB_PASSWORD:?Missing DOCKERHUB_PASSWORD}"
 
     echo "Deleting Docker Hub tag: ${GITHUB_SHA}" >&2
@@ -18,5 +18,5 @@ else
     curl -i -X DELETE \
         -H "Accept: application/json" \
         -H "Authorization: JWT ${TOKEN}" \
-        "https://hub.docker.com/v2/repositories/elastisys/ck8s-ops/tags/${GITHUB_SHA}/"
+        "https://hub.docker.com/v2/repositories/elastisys/ckctl/tags/${GITHUB_SHA}/"
 fi

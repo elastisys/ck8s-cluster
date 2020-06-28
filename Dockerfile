@@ -1,13 +1,25 @@
 FROM golang:1.14.2-alpine3.11 as builder
 
 RUN apk add --no-cache make git
+
+# TODO: Remove when exit code propagation is released.
+#       See: https://github.com/mozilla/sops/issues/626
+RUN go get go.mozilla.org/sops/v3
+RUN cd $(go env GOPATH)/src/go.mozilla.org/sops/v3 && \
+    git checkout 7f350d81b50926a1a07294b6b8d8bb6ed3428186 && \
+    CGO_ENABLED=0 GOOS=linux go install -a -ldflags '-extldflags "-static"' go.mozilla.org/sops/v3/cmd/sops && \
+    mv $(go env GOPATH)/bin/sops /sops
+
 WORKDIR /ck8s
 COPY . /ck8s
 RUN make build
 
 FROM ubuntu:18.04
 
-ENV ANSIBLE_VERSION "2.5.1+dfsg-1ubuntu0.1"
+ARG ANSIBLE_VERSION="2.5.1+dfsg-1ubuntu0.1"
+ARG KUBECTL_VERSION="v1.15.2"
+ARG S3CMD_VERSION="2.0.2"
+ARG TERRAFORM_VERSION="0.12.19"
 
 RUN  apt-get update && \
      apt-get install -y \
@@ -18,36 +30,13 @@ RUN  apt-get update && \
          net-tools iputils-ping && \
      rm -rf /var/lib/apt/lists/*
 
-# sops
-# TODO: Use release when exit code propagation is released.
-#       See: https://github.com/mozilla/sops/issues/626
-#RUN wget https://github.com/mozilla/sops/releases/download/vX.Y.Z/sops-vX.Y.Z.linux && \
-#    chmod +x sops-vX.Y.Z.linux && \
-#    mv sops-vX.Y.Z.linux /usr/local/bin/sops && \
-ENV GO_VERSION "1.14"
-ENV SOPS_VERSION "v3"
-ENV SOPS_COMMIT "7f350d81b50926a1a07294b6b8d8bb6ed3428186"
-RUN wget "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz" && \
-    tar -xvzf "go${GO_VERSION}.linux-amd64.tar.gz" > /dev/null && \
-    export PATH="/go/bin:$PATH" && \
-    rm -rf "/go${GO_VERSION}.linux-amd64.tar.gz"
-ENV PATH="/go/bin:${PATH}"
-RUN go get "go.mozilla.org/sops/${SOPS_VERSION}" && \
-    cd "/root/go/src/go.mozilla.org/sops/${SOPS_VERSION}" && \
-    git checkout "${SOPS_COMMIT}" && \
-    make install && \
-    mv /root/go/bin/sops /usr/local/bin && \
-    rm -rf /root/go
-
 # Terraform
-ENV TERRAFORM_VERSION "0.12.19"
 RUN wget "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 RUN unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip" && \
     mv terraform /usr/local/bin/terraform && \
     rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
 # Kubectl
-ENV KUBECTL_VERSION "v1.15.2"
 RUN wget "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
@@ -75,7 +64,6 @@ RUN python3 -m pip install pip
 RUN python3.6 -m pip install pipenv
 
 # s3cmd
-ENV S3CMD_VERSION "2.0.2"
 RUN wget "https://github.com/s3tools/s3cmd/releases/download/v${S3CMD_VERSION}/s3cmd-${S3CMD_VERSION}.tar.gz" && \
     tar -zxvf "s3cmd-${S3CMD_VERSION}.tar.gz" && \
     pip3 install setuptools==45.2.0 && \
@@ -83,3 +71,11 @@ RUN wget "https://github.com/s3tools/s3cmd/releases/download/v${S3CMD_VERSION}/s
     python3 setup.py install && \
     cd ../ && \
     rm "s3cmd-${S3CMD_VERSION}.tar.gz"
+
+# sops
+# TODO: Use release when exit code propagation is released.
+#       See: https://github.com/mozilla/sops/issues/626
+#RUN wget https://github.com/mozilla/sops/releases/download/vX.Y.Z/
+COPY --from=0 /sops /usr/local/bin/sops
+
+COPY --from=0 /ck8s/dist/ck8s_linux_amd64 /usr/local/bin/ckctl

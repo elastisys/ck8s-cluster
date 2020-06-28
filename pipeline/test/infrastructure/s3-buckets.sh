@@ -1,11 +1,18 @@
 #!/bin/bash
 
-set -e
+set -eu -o pipefail
 
-: "${CLOUD_PROVIDER:?Missing CLOUD_PROVIDER}"
-: "${S3COMMAND_CONFIG_FILE:?Missing S3COMMAND_CONFIG_FILE}"
+: "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 
-buckets=("S3_HARBOR_BUCKET_NAME" "S3_VELERO_BUCKET_NAME" "S3_ES_BACKUP_BUCKET_NAME" "S3_INFLUX_BUCKET_NAME" "S3_SC_FLUENTD_BUCKET_NAME")
+source "${CK8S_CONFIG_PATH}/config.sh"
+
+buckets=(
+    "S3_ES_BACKUP_BUCKET_NAME"
+    "S3_HARBOR_BUCKET_NAME"
+    "S3_INFLUX_BUCKET_NAME"
+    "S3_SC_FLUENTD_BUCKET_NAME"
+    "S3_VELERO_BUCKET_NAME"
+)
 
 # check if all the environment variables with S3 backet names are set
 for bucket in ${buckets[@]}
@@ -21,15 +28,20 @@ function check_if_bucket_exists() { # arguments: bucket name
 
     if [ $BUCKET_EXISTS ]; then
         echo "bucket [${!bucket_name}] exists at [$CLOUD_PROVIDER]"
-    else 
+    else
         echo "bucket [${!bucket_name}] does not exist at [$CLOUD_PROVIDER]"
         exit 1
     fi
 }
 
 # get a list of all the S3 buckets
-# S3 configuration is set in scripts/gen-s3cfg.sh script
-S3_BUCKET_LIST=$(s3cmd --config=${S3COMMAND_CONFIG_FILE} ls)
+S3_BUCKET_LIST=$(sops --config ${CK8S_CONFIG_PATH}/.sops.yaml \
+                 exec-file ${CK8S_CONFIG_PATH}/.state/s3cfg.ini \
+                 's3cmd --config={} ls')
+
+echo "==============================="
+echo "Testing S3 buckets"
+echo "==============================="
 
 for bucket in ${buckets[@]}
 do

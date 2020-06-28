@@ -1,10 +1,16 @@
 #!/bin/bash
 
+set -eu -o pipefail
+
 here="$(dirname "$(readlink -f "$0")")"
 NAMESPACE="ck8s-integration-test"
 
+kubectl() {
+    ckctl --cluster wc internal kubectl -- ${@}
+}
+
 setup_test() {
-    kubectl create -f "${here}/ck8s-integration-test.yaml"
+    kubectl apply -f "${here}/ck8s-integration-test.yaml"
 }
 
 cleanup() {
@@ -35,15 +41,21 @@ test_deploy() {
     echo -n "Testing deployment"
     kubectl -n ${NAMESPACE} wait --for=condition=Available deploy/test \
         --timeout=5m &> /dev/null
-    {
-        kubectl -n ${NAMESPACE} port-forward deploy/test 8080:8080 &
-        PF_PID=$!
-        sleep 3 # It takes a littel while for the port-forward to activate.
-    } &> /dev/null
+
+    ckctl --cluster wc internal kubectl -- \
+        -n ${NAMESPACE} port-forward deploy/test 8080:8080 &>/dev/null &
+    PF_PID=$!
+
+    sleep 3 # It takes a little while for the port-forward to activate.
 
     # Check status code
     do_test "localhost:8080"
-    kill "${PF_PID}"; wait "${PF_PID}" 2>/dev/null
+
+    # TODO: pkill instead of kill to prevent kubectl port-forward to stay alive
+    #       Likely cause is that sops exec-file isn't forwarding signals
+    (sleep 1; pkill kubectl) &
+    wait ${PF_PID} || true
+    # kill "${PF_PID}"; wait "${PF_PID}" 2>/dev/null
 }
 
 test_loadbalancer() {
@@ -68,7 +80,15 @@ test_loadbalancer() {
     do_test "${external_ip}"
 }
 
+echo "==============================="
+echo "Workload cluster smoke test"
+echo "==============================="
+
 setup_test
 test_deploy
+
+# To get CLOUD_PROVIDER
+source "${CK8S_CONFIG_PATH}/config.sh"
 [ "$CLOUD_PROVIDER" = "citycloud" ] && test_loadbalancer
+
 cleanup

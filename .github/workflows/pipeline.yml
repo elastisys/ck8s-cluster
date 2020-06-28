@@ -1,161 +1,76 @@
-name: Exoscale-pipeline
+name: Exoscale
 
 on:
   pull_request:
     branches:
-      - master
-  push:
-    branches:
-      - 'pre-release-*'
+      - cluster
 jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+    - run: make test
+
   build-image:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: whoan/docker-build-with-cache-action@v3
       with:
-        username: "${{ secrets.DOCKERHUB_USER }}"
+        username: "${{ secrets.DOCKERHUB_USERNAME }}"
         password: "${{ secrets.DOCKERHUB_PASSWORD }}"
-        image_name: elastisys/ck8s-ops
+        image_name: elastisys/ckctl
         image_tag: ${{ github.sha }}
-        context: pipeline
 
-  unit-tests:
+  e2e:
     needs: build-image
     runs-on: ubuntu-latest
     container:
-      image: elastisys/ck8s-ops:${{ github.sha }}
+      image: elastisys/ckctl:${{ github.sha }}
+    env:
+      CK8S_CONFIG_PATH: /ck8s-config
+      CK8S_AUTO_APPROVE: true
+      CK8S_LOG_LEVEL: debug
+      TFE_TOKEN: ${{ secrets.TF_TOKEN }}
     steps:
-    - uses: actions/checkout@v1
-    - run: ./pipeline/test/services/unit-tests/test-opa.sh
-      shell: bash
-
-  apply:
-    needs: unit-tests
-    runs-on: ubuntu-latest
-    container:
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - run: ./pipeline/init.bash
-      shell: bash
+    - uses: actions/checkout@v2
+    - run: ./pipeline/setup-pgp.bash
       env:
-        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
-        CK8S_CLOUD_PROVIDER: exoscale
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+    # TODO: This could perhaps be replaced with the terraform-credentials-env.
+    #       https://github.com/apparentlymart/terraform-credentials-env
+    - run: ./pipeline/setup-terraform.bash
+      env:
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+    - run: ckctl init cluster-pipeline-${{ github.run_id }} exoscale
+      env:
         CK8S_PGP_FP: 3EEFED60C2E86263117AC3F7792CF1BD81B69515
-        PGP_KEY: ${{ secrets.PGP_KEY }}
-        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-        # Prefixed with CI to prevent confusing people they are used from env
-        # and not from secrets.env.
-        CI_EXOSCALE_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        CI_EXOSCALE_SECRET: ${{ secrets.EXOSCALE_SECRET_KEY }}
-    - run: ./pipeline/apply.bash
-      shell: bash
+    - run: ./pipeline/configure.bash
       env:
-        CK8S_CLOUD_PROVIDER: exoscale
-        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
-        PGP_KEY: ${{ secrets.PGP_KEY }}
-        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-        PIPELINE: "true"
-    - name: Upload config
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: ck8s-config
-        path: ./ck8s_pipeline_config
-    - name: Upload logs
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: ck8s-logs
-        path: ./logs
-    - name: Upload events
-      if: always()
-      uses: actions/upload-artifact@v1
-      with:
-        name: ck8s-events
-        path: ./events
+        CI_EXOSCALE_KEY: ${{ secrets.EXOSCALE_KEY }}
+        CI_EXOSCALE_SECRET: ${{ secrets.EXOSCALE_SECRET }}
+    - run: ckctl apply --cluster sc
+    - run: ckctl apply --cluster wc
+    - run: ckctl status --cluster sc
+    - run: ckctl status --cluster wc
+    - run: ./pipeline/e2e-tests.bash
+    - if: always()
+      run: ckctl destroy --cluster wc
+    - if: always()
+      run: ckctl destroy --cluster sc
+      # We don't run --destroy-remote-workspace if: always() to reduce the risk
+      # of leaving cloud resources unmanaged.
+    - run: ckctl destroy --cluster sc --destroy-remote-workspace
 
-  get-versions:
-    if: startsWith(github.ref , 'refs/heads/pre-release-' )
-    needs: apply
-    runs-on: ubuntu-latest
-    container:
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download config
-      uses: actions/download-artifact@v1
-      with:
-        name: ck8s-config
-        path: ./ck8s_pipeline_config
-    - run: ./pipeline/versions.sh
-      shell: bash
-      env:
-        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
-        PGP_KEY: ${{ secrets.PGP_KEY }}
-        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-    - name: Upload version.json
-      uses: actions/upload-artifact@v1
-      with:
-        name: version.json
-        path: version.json
-
-  create-release-pr:
-    if: startsWith(github.ref , 'refs/heads/pre-release-')
-    needs: get-versions
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: download version.json
-      uses: actions/download-artifact@v1
-      with:
-        name: version.json
-        path: ./release/verision.json
-    - run: ./release/release.sh
-      id: release-script
-      shell: bash
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: pull-request
-      uses: repo-sync/pull-request@v2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        destination_branch: "${{ steps.release-script.outputs.MERGE_BRANCH }}"
-        pr_title: "Releasing version ${{ steps.release-script.outputs.RELEASE_VERSION }}"
-
-  cleanup:
-    needs: create-release-pr
-    if: always()
-    runs-on: ubuntu-latest
-    container:
-      image: elastisys/ck8s-ops:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@v1
-    - name: Download config
-      uses: actions/download-artifact@v1
-      with:
-        name: ck8s-config
-        path: ./ck8s_pipeline_config
-    - run: ./pipeline/cleanup.bash
-      shell: bash
-      env:
-        CK8S_CONFIG_PATH: ./ck8s_pipeline_config
-        PGP_KEY: ${{ secrets.PGP_KEY }}
-        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-        TF_TOKEN: ${{ secrets.TF_TOKEN }}
-
-  cleanup-docker-image:
-    needs: cleanup
+  clean-image:
+    needs: e2e
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Cleanup-docker-image
-      run: ./pipeline/cleanup-docker-image.bash
-      shell: bash
+    - uses: actions/checkout@v2
+    - run: ./pipeline/cleanup-docker-image.bash
       env:
-        DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
