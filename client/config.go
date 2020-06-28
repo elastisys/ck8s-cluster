@@ -174,6 +174,8 @@ func (c *ConfigHandler) TerraformRunnerConfig(
 	default:
 		return nil, api.NewUnsupportedCloudProviderError(cloudProvider)
 	}
+
+	// TODO: Find a nicer solution to this.
 	if err := tfPath.Exists(); err != nil {
 		if errors.Is(err, api.PathNotFoundErr) {
 			return nil, fmt.Errorf(
@@ -196,6 +198,28 @@ func (c *ConfigHandler) TerraformRunnerConfig(
 		Target: tfTarget,
 
 		Env: tfEnv,
+	}, nil
+}
+
+func (c *ConfigHandler) TFETerraformRunnerConfig() (*runner.TerraformConfig, error) {
+	tfModulePath := c.codePath[api.TerraformTFEDir]
+
+	// TODO: Find a nicer solution to this.
+	if err := tfModulePath.Exists(); err != nil {
+		if errors.Is(err, api.PathNotFoundErr) {
+			return nil, fmt.Errorf(
+				"tfe module path not found: %s\nwrong CK8S code path?",
+				tfModulePath.Path,
+			)
+		}
+		return nil, err
+	}
+
+	return &runner.TerraformConfig{
+		Path:        tfModulePath.Path,
+		StatePath:   c.configPath[api.TFEStateFile].Path,
+		DataDirPath: c.configPath[api.TFEDataDir].Path,
+		Env:         map[string]string{},
 	}, nil
 }
 

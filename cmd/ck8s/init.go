@@ -87,17 +87,6 @@ func init() {
 				if err := configInitializer.Init(cluster, pgpFP); err != nil {
 					return err
 				}
-
-				if err := client.InitializeTerraformRemoteWorkspace(
-					logger,
-					configHandler,
-					cluster,
-					cloudProvider.TerraformBackendConfig(),
-					viper.GetBool(silentFlag),
-					viper.GetBool(autoApproveFlag),
-				); err != nil {
-					return err
-				}
 			}
 
 			return nil

@@ -3,6 +3,11 @@ package main
 import (
 	"github.com/elastisys/ck8s/client"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+const (
+	destroyRemoteWorkspaceFlag = "destroy-remote-workspace"
 )
 
 func destroy(
@@ -10,16 +15,28 @@ func destroy(
 	cmd *cobra.Command,
 	args []string,
 ) error {
-	return clusterClient.Destroy()
+	return clusterClient.Destroy(viper.GetBool(destroyRemoteWorkspaceFlag))
 }
 
 func init() {
-	rootCmd.AddCommand(&cobra.Command{
+	destroyCmd := &cobra.Command{
 		Use:   "destroy",
 		Short: "Destroy the CK8S cluster",
 		Long: `The destroy command tears down the CK8S cluster by destroying
 all Terraform managed cloud resources and all S3 buckets.`,
-		Args: cobra.NoArgs,
+		Args: NoArgs,
 		RunE: withClusterClient(destroy),
-	})
+	}
+
+	destroyCmd.Flags().Bool(
+		destroyRemoteWorkspaceFlag,
+		false,
+		"destroy the remote Terraform workspace (CAUTION: removing it before all resources have been destroyed will make them unmanaged)",
+	)
+	viper.BindPFlag(
+		destroyRemoteWorkspaceFlag,
+		destroyCmd.Flags().Lookup(destroyRemoteWorkspaceFlag),
+	)
+
+	rootCmd.AddCommand(destroyCmd)
 }

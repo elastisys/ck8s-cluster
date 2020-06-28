@@ -33,6 +33,7 @@ func (c *TerraformConfig) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddString("path", c.Path)
 	enc.AddString("workspace", c.Workspace)
 	enc.AddString("data_dir", c.DataDirPath)
+	enc.AddString("state", c.StatePath)
 	enc.AddString("backend_config", c.BackendConfigPath)
 	enc.AddString("tfvars", c.TFVarsPath)
 	return nil
@@ -178,7 +179,7 @@ func (t *Terraform) Output(output interface{}) error {
 // autoApprove is true. If autoApprove is false it always outputs to allow for
 // interactive input. It optionally runs with the flags `-var-file` and
 // `-target` if either is configured.
-func (t *Terraform) Destroy(autoApprove bool) error {
+func (t *Terraform) Destroy(autoApprove bool, extraArgs ...string) error {
 	t.logger.Debug("terraform_destroy")
 
 	args := []string{"destroy"}
@@ -195,7 +196,7 @@ func (t *Terraform) Destroy(autoApprove bool) error {
 		args = append(args, "-auto-approve")
 	}
 
-	cmd := t.command(args...)
+	cmd := t.command(append(args, extraArgs...)...)
 
 	if !autoApprove {
 		return t.runner.Output(cmd)

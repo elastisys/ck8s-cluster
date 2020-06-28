@@ -37,6 +37,8 @@ type ClusterClient struct {
 
 	s3cmd *runner.S3Cmd
 
+	tfe *runner.Terraform
+
 	terraform *runner.Terraform
 
 	ansible *runner.Ansible
@@ -63,6 +65,11 @@ func NewClusterClient(
 		sshPrivateKeyPath.Path,
 	)
 
+	// TODO: Try to get rid of the error return.
+	tfeConfig, err := configHandler.TFETerraformRunnerConfig()
+	if err != nil {
+		return nil, err
+	}
 	// TODO: Try to get rid of the error return.
 	terraformConfig, err := configHandler.TerraformRunnerConfig(cluster)
 	if err != nil {
@@ -91,6 +98,12 @@ func NewClusterClient(
 			logger,
 			localRunner,
 			configHandler.S3CmdRunnerConfig(cluster),
+		),
+
+		tfe: runner.NewTerraform(
+			logger,
+			runner.NewLocalRunner(logger, silent),
+			tfeConfig,
 		),
 
 		terraform: runner.NewTerraform(
@@ -126,6 +139,10 @@ func (c *ClusterClient) MachineClient(m api.MachineState) *MachineClient {
 
 func (c *ClusterClient) Apply() error {
 	c.logger.Info("client_apply")
+
+	if err := c.terraformRemoteWorkspaceInit(); err != nil {
+		return err
+	}
 
 	if err := c.S3Apply(); err != nil {
 		return err
@@ -168,7 +185,7 @@ func (c *ClusterClient) Apply() error {
 	return c.encryptKubeconfig()
 }
 
-func (c *ClusterClient) Destroy() error {
+func (c *ClusterClient) Destroy(deleteRemoteWorkspace bool) error {
 	c.logger.Info("client_destroy")
 
 	// TODO: Handle Kubernetes/non-Terraform managed resources
@@ -179,6 +196,12 @@ func (c *ClusterClient) Destroy() error {
 
 	if err := c.S3Delete(); err != nil {
 		return err
+	}
+
+	if deleteRemoteWorkspace {
+		if err := c.terraformRemoteWorkspaceDestroy(); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -220,10 +243,64 @@ func (c *ClusterClient) state() (api.ClusterState, error) {
 	return c.cluster.State(c.TerraformOutput)
 }
 
-// S3Apply renders the s3cfg file and creates the S3 buckets.
-func (c *ClusterClient) S3Apply() error {
-	c.logger.Info("client_s3_apply")
+func (c *ClusterClient) terraformRemoteWorkspaceInit() error {
+	c.logger.Debug("client_terraform_remote_workspace_init")
 
+	cloudProvider, err := CloudProviderFromType(c.cluster.CloudProvider())
+	if err != nil {
+		return err
+	}
+
+	dataDirPath := c.configHandler.configPath[api.TFDataDir].Path
+	if err := os.MkdirAll(dataDirPath, 0755); err != nil {
+		return fmt.Errorf("error creating dir %s: %w", dataDirPath, err)
+	}
+
+	if err := c.tfe.Init(); err != nil {
+		return fmt.Errorf("error initializing TFE workspace: %w", err)
+	}
+
+	backendConfig := cloudProvider.TerraformBackendConfig()
+	workspace := c.cluster.TerraformWorkspace()
+
+	if err := c.tfe.Apply(
+		c.autoApprove,
+		"-var", "organization="+backendConfig.Organization,
+		"-var", "workspace_name="+backendConfig.Workspaces.Prefix+workspace,
+	); err != nil {
+		return fmt.Errorf("error applying TFE remote workspace: %w", err)
+	}
+
+	return nil
+}
+
+func (c *ClusterClient) terraformRemoteWorkspaceDestroy() error {
+	c.logger.Debug("client_terraform_remote_workspace_destroy")
+
+	cloudProvider, err := CloudProviderFromType(c.cluster.CloudProvider())
+	if err != nil {
+		return err
+	}
+
+	if err := c.tfe.Init(); err != nil {
+		return fmt.Errorf("error initializing TFE workspace: %w", err)
+	}
+
+	backendConfig := cloudProvider.TerraformBackendConfig()
+	workspace := c.cluster.TerraformWorkspace()
+
+	if err := c.tfe.Destroy(
+		c.autoApprove,
+		"-var", "organization="+backendConfig.Organization,
+		"-var", "workspace_name="+backendConfig.Workspaces.Prefix+workspace,
+	); err != nil {
+		return fmt.Errorf("error destroying the remote workspace")
+	}
+
+	return nil
+}
+
+func (c *ClusterClient) s3WriteConfig() error {
 	if err := c.configHandler.WriteS3cfg(
 		c.cluster,
 		func(format string, plain io.Reader, enc io.Writer) error {
@@ -231,6 +308,17 @@ func (c *ClusterClient) S3Apply() error {
 		},
 	); err != nil {
 		return fmt.Errorf("error writing s3cfg: %w", err)
+	}
+
+	return nil
+}
+
+// S3Apply renders the s3cfg file and creates the S3 buckets.
+func (c *ClusterClient) S3Apply() error {
+	c.logger.Info("client_s3_apply")
+
+	if err := c.s3WriteConfig(); err != nil {
+		return err
 	}
 
 	if err := c.s3cmd.Create(); err != nil {
@@ -242,6 +330,10 @@ func (c *ClusterClient) S3Apply() error {
 
 func (c *ClusterClient) S3Delete() error {
 	c.logger.Debug("client_s3_delete")
+
+	if err := c.s3WriteConfig(); err != nil {
+		return err
+	}
 
 	if err := c.s3cmd.Abort(); err != nil {
 		return fmt.Errorf("error aborting multipart S3 uploads")
