@@ -27,7 +27,7 @@ CityCloud.
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.5-1-a5b5cbe)
 - htpasswd available directly in ubuntus repositories
 - [sops](https://github.com/mozilla/sops) (tested with 3.5.0)
-- [s3cmd](https://s3tools.org/s3cmd) (tested with 2.0.1)
+- [s3cmd](https://s3tools.org/s3cmd) (tested with 2.0.2)
 - [ansible](https://www.ansible.com) (tested with 2.5.1)
 
 Note that you will need a [BaseOS](https://github.com/elastisys/ck8s-base-vm)
