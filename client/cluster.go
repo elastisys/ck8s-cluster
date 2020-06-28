@@ -592,3 +592,7 @@ func (c *ClusterClient) ReplaceNode(nodeType api.NodeType, name string) error {
 
 	return nil
 }
+
+func (c *ClusterClient) Kubectl(args []string) error {
+	return c.kubectl.Command(args)
+}

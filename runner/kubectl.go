@@ -54,6 +54,10 @@ func (k *Kubectl) fullNodeName(name string) string {
 	return fmt.Sprintf("%s-%s", k.config.NodePrefix, name)
 }
 
+func (k *Kubectl) Command(args []string) error {
+	return k.runner.Run(k.command(args...))
+}
+
 // NodeExists runs `sops exec-file KUBECONFIG 'kubectl get node NAME'` in the
 // background. If the node is not found a NodeNotFoundErr error is returned.
 func (k *Kubectl) NodeExists(name string) error {

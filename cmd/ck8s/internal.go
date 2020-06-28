@@ -58,6 +58,14 @@ func s3Destroy(
 	return clusterClient.S3Delete()
 }
 
+func kubectl(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
+	return clusterClient.Kubectl(args)
+}
+
 func init() {
 	internal := &cobra.Command{
 		Use:   "internal",
@@ -115,6 +123,13 @@ func init() {
 	})
 
 	internal.AddCommand(s3)
+
+	internal.AddCommand(&cobra.Command{
+		Use:   "kubectl",
+		Short: "Direct kubectl access",
+		Args:  cobra.ArbitraryArgs,
+		RunE:  withClusterClient(kubectl),
+	})
 
 	rootCmd.AddCommand(internal)
 }
