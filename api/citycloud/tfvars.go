@@ -34,6 +34,26 @@ func (e *Cluster) CloneMachine(
 	return cloneName, nil
 }
 
+func (e *Cluster) Machines() (machines []api.Machine) {
+	for _, nodeType := range []api.NodeType{
+		api.Master,
+		api.Worker,
+	} {
+		part := openstack.LookupMachinePartHelper(
+			&e.tfvars,
+			e.config.ClusterType,
+			nodeType,
+		)
+		for _, name := range *part.NameSlice {
+			machines = append(machines, api.Machine{
+				Name:     name,
+				NodeType: nodeType,
+			})
+		}
+	}
+	return
+}
+
 func (e *Cluster) RemoveMachine(
 	nodeType api.NodeType,
 	name string,

@@ -66,7 +66,7 @@ func machineGet(
 
 	name := args[1]
 
-	machine, err := clusterClient.Machine(nodeType, name)
+	machine, err := clusterClient.CurrentMachine(nodeType, name)
 	if err != nil {
 		return fmt.Errorf("error getting machine: %s", err)
 	}
@@ -91,7 +91,7 @@ func machineList(
 		}
 	}
 
-	machines, err := clusterClient.Machines()
+	machines, err := clusterClient.CurrentMachines()
 	if err != nil {
 		return fmt.Errorf("error listing machines: %s", err)
 	}
@@ -119,7 +119,7 @@ func machineSSH(
 
 	name := args[1]
 
-	machine, err := clusterClient.Machine(nodeType, name)
+	machine, err := clusterClient.CurrentMachine(nodeType, name)
 	if err != nil {
 		return fmt.Errorf("error getting machine: %w", err)
 	}

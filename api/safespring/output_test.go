@@ -65,39 +65,53 @@ func TestTerraformOutputControlPlanePublicIP(t *testing.T) {
 func TestTerraformOutputMachines(t *testing.T) {
 	testCases := map[api.ClusterType][]api.MachineState{
 		api.ServiceCluster: {{
-			NodeType:  api.LoadBalancer,
-			Name:      "loadbalancer-0",
+			Machine: api.Machine{
+				NodeType: api.LoadBalancer,
+				Name:     "loadbalancer-0",
+			},
 			PublicIP:  "159.100.242.14",
 			PrivateIP: "172.16.0.4",
 		}, {
-			NodeType:  api.Master,
-			Name:      "master-0",
+			Machine: api.Machine{
+				NodeType: api.Master,
+				Name:     "master-0",
+			},
 			PublicIP:  "159.100.242.12",
 			PrivateIP: "172.16.0.1",
 		}, {
-			NodeType:  api.Worker,
-			Name:      "worker-0",
+			Machine: api.Machine{
+				NodeType: api.Worker,
+				Name:     "worker-0",
+			},
 			PublicIP:  "159.100.242.13",
 			PrivateIP: "172.16.0.2",
 		}, {
-			NodeType:  api.Worker,
-			Name:      "worker-1",
+			Machine: api.Machine{
+				NodeType: api.Worker,
+				Name:     "worker-1",
+			},
 			PublicIP:  "159.100.242.14",
 			PrivateIP: "172.16.0.3",
 		}},
 		api.WorkloadCluster: {{
-			NodeType:  api.LoadBalancer,
-			Name:      "loadbalancer-0",
+			Machine: api.Machine{
+				NodeType: api.LoadBalancer,
+				Name:     "loadbalancer-0",
+			},
 			PublicIP:  "159.100.242.17",
 			PrivateIP: "172.16.0.7",
 		}, {
-			NodeType:  api.Master,
-			Name:      "master-0",
+			Machine: api.Machine{
+				NodeType: api.Master,
+				Name:     "master-0",
+			},
 			PublicIP:  "159.100.242.15",
 			PrivateIP: "172.16.0.5",
 		}, {
-			NodeType:  api.Worker,
-			Name:      "worker-0",
+			Machine: api.Machine{
+				NodeType: api.Worker,
+				Name:     "worker-0",
+			},
 			PublicIP:  "159.100.242.16",
 			PrivateIP: "172.16.0.6",
 		}},

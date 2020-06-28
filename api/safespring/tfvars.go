@@ -100,6 +100,23 @@ func (e *Cluster) RemoveMachine(
 	return nil
 }
 
+func (e *Cluster) Machines() (machines []api.Machine) {
+	for _, nodeType := range []api.NodeType{
+		api.Master,
+		api.Worker,
+		api.LoadBalancer,
+	} {
+		part := e.lookupMachinePart(e.config.ClusterType, nodeType)
+		for _, name := range *part.NameSlice {
+			machines = append(machines, api.Machine{
+				Name:     name,
+				NodeType: nodeType,
+			})
+		}
+	}
+	return
+}
+
 func (e *Cluster) lookupMachinePart(
 	cluster api.ClusterType,
 	nodeType api.NodeType,

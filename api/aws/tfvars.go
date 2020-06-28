@@ -25,6 +25,22 @@ type AWSTFVars struct {
 	APIServerWhitelist []string `hcl:"api_server_whitelist" validate:"required"`
 }
 
+func (e *Cluster) Machines() (machines []api.Machine) {
+	for _, nodeType := range []api.NodeType{
+		api.Master,
+		api.Worker,
+	} {
+		part := e.lookupMachinePart(e.config.ClusterType, nodeType)
+		for name := range part.nameSizeMap {
+			machines = append(machines, api.Machine{
+				Name:     name,
+				NodeType: nodeType,
+			})
+		}
+	}
+	return
+}
+
 // CloneMachine TODO
 func (e *Cluster) CloneMachine(
 	nodeType api.NodeType,

@@ -31,6 +31,8 @@ type Cluster interface {
 	Secret() interface{}
 	TFVars() interface{}
 
+	Machines() []Machine
+
 	// TODO: We should be able to combine these if we only handled a single
 	// 		 cluster and deprecated the prefixes in tfvars.
 	Name() string
@@ -53,6 +55,11 @@ type Cluster interface {
 	S3Buckets() map[string]string
 }
 
+type Machine struct {
+	NodeType NodeType
+	Name     string
+}
+
 type ClusterState interface {
 	ControlPlanePublicIP() string
 	ControlPlaneEndpoint() string
@@ -65,8 +72,8 @@ type ClusterState interface {
 }
 
 type MachineState struct {
-	NodeType  NodeType
-	Name      string
+	Machine
+
 	PublicIP  string
 	PrivateIP string
 }

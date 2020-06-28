@@ -135,8 +135,10 @@ func (e *terraformOutput) GetMachinesState(
 ) (machines []api.MachineState) {
 	for name, ipsValue := range IPs.Value {
 		machines = append(machines, api.MachineState{
-			NodeType:  nodeType,
-			Name:      strings.TrimPrefix(name, e.ClusterName+"-"),
+			Machine: api.Machine{
+				NodeType: nodeType,
+				Name:     strings.TrimPrefix(name, e.ClusterName+"-"),
+			},
 			PublicIP:  ipsValue.PublicIP,
 			PrivateIP: ipsValue.PrivateIP,
 		})

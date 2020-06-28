@@ -152,7 +152,7 @@ func (c *ClusterClient) Apply() error {
 		return err
 	}
 
-	machines, err := c.Machines()
+	machines, err := c.CurrentMachines()
 	if err != nil {
 		return fmt.Errorf("error getting machines: %w", err)
 	}
@@ -402,8 +402,13 @@ func (c *ClusterClient) TerraformDestroy() error {
 	return nil
 }
 
-func (c *ClusterClient) Machines() ([]api.MachineState, error) {
-	c.logger.Info("client_machine_list")
+func (c *ClusterClient) DesiredMachines() []api.Machine {
+	c.logger.Info("client_desired_machines")
+	return c.cluster.Machines()
+}
+
+func (c *ClusterClient) CurrentMachines() ([]api.MachineState, error) {
+	c.logger.Info("client_current_machines")
 
 	state, err := c.state()
 	if err != nil {
@@ -413,12 +418,12 @@ func (c *ClusterClient) Machines() ([]api.MachineState, error) {
 	return state.Machines(), nil
 }
 
-func (c *ClusterClient) Machine(
+func (c *ClusterClient) CurrentMachine(
 	nodeType api.NodeType,
 	name string,
 ) (api.MachineState, error) {
 	c.logger.Info(
-		"client_machine",
+		"client_current_machine",
 		zap.String("node_type", nodeType.String()),
 		zap.String("name", name),
 	)
@@ -453,7 +458,7 @@ func (c *ClusterClient) CloneNode(
 		return fmt.Errorf("error applying Terraform config: %w", err)
 	}
 
-	machine, err := c.Machine(nodeType, cloneName)
+	machine, err := c.CurrentMachine(nodeType, cloneName)
 	if err != nil {
 		return fmt.Errorf("error getting machine: %w", err)
 	}
@@ -499,7 +504,7 @@ func (c *ClusterClient) nodeExists(name string) (bool, error) {
 }
 
 func (c *ClusterClient) ResetNode(nodeType api.NodeType, name string) error {
-	machine, err := c.Machine(nodeType, name)
+	machine, err := c.CurrentMachine(nodeType, name)
 	if err != nil {
 		return fmt.Errorf("error getting machine: %w", err)
 	}

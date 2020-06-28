@@ -81,29 +81,39 @@ func TestTerraformOutputControlPlanePublicIP(t *testing.T) {
 func TestTerraformOutputMachines(t *testing.T) {
 	testCases := map[api.ClusterType][]api.MachineState{
 		api.ServiceCluster: {{
-			NodeType:  api.Master,
-			Name:      "master-0",
+			Machine: api.Machine{
+				NodeType: api.Master,
+				Name:     "master-0",
+			},
 			PublicIP:  "159.100.242.187",
 			PrivateIP: "172.0.10.205",
 		}, {
-			NodeType:  api.Worker,
-			Name:      "worker-0",
+			Machine: api.Machine{
+				NodeType: api.Worker,
+				Name:     "worker-0",
+			},
 			PublicIP:  "159.100.242.78",
 			PrivateIP: "172.0.10.59",
 		}, {
-			NodeType:  api.Worker,
-			Name:      "worker-1",
+			Machine: api.Machine{
+				NodeType: api.Worker,
+				Name:     "worker-1",
+			},
 			PublicIP:  "89.145.167.81",
 			PrivateIP: "172.0.10.72",
 		}},
 		api.WorkloadCluster: {{
-			NodeType:  api.Master,
-			Name:      "master-0",
+			Machine: api.Machine{
+				NodeType: api.Master,
+				Name:     "master-0",
+			},
 			PublicIP:  "159.100.244.19",
 			PrivateIP: "172.0.10.132",
 		}, {
-			NodeType:  api.Worker,
-			Name:      "worker-0",
+			Machine: api.Machine{
+				NodeType: api.Worker,
+				Name:     "worker-0",
+			},
 			PublicIP:  "89.145.167.114",
 			PrivateIP: "172.0.10.72",
 		}},
