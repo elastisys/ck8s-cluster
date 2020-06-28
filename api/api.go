@@ -92,7 +92,7 @@ func (c ClusterType) String() string {
 type NodeType int
 
 const (
-	Master NodeType = iota
+	Master NodeType = iota + 1
 	Worker
 	LoadBalancer
 )
