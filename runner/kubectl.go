@@ -51,7 +51,7 @@ func (k *Kubectl) command(args ...string) *Command {
 }
 
 func (k *Kubectl) fullNodeName(name string) string {
-	return fmt.Sprintf("%s%s", k.config.NodePrefix, name)
+	return fmt.Sprintf("%s-%s", k.config.NodePrefix, name)
 }
 
 // NodeExists runs `sops exec-file KUBECONFIG 'kubectl get node NAME'` in the

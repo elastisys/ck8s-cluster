@@ -11,10 +11,10 @@ import (
 var (
 	testKubectlConfig = &KubectlConfig{
 		KubeconfigPath: "kubeconfig",
-		NodePrefix:     "prefix_",
+		NodePrefix:     "prefix",
 	}
 	testNodeName     = "node"
-	testFullNodeName = testKubectlConfig.NodePrefix + testNodeName
+	testFullNodeName = testKubectlConfig.NodePrefix + "-" + testNodeName
 )
 
 func TestKubectlNodeExists(t *testing.T) {
