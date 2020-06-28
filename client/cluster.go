@@ -158,7 +158,7 @@ func (c *ClusterClient) Apply() error {
 	}
 
 	for _, machine := range machines {
-		if err := c.WaitForSSH(machine); err != nil {
+		if err := c.waitForNewMachine(machine); err != nil {
 			return err
 		}
 	}
@@ -463,7 +463,7 @@ func (c *ClusterClient) CloneNode(
 		return fmt.Errorf("error getting machine: %w", err)
 	}
 
-	if err := c.WaitForSSH(machine); err != nil {
+	if err := c.waitForNewMachine(machine); err != nil {
 		return err
 	}
 
@@ -474,7 +474,7 @@ func (c *ClusterClient) CloneNode(
 	return nil
 }
 
-func (c *ClusterClient) WaitForSSH(machine api.MachineState) error {
+func (c *ClusterClient) waitForNewMachine(machine api.MachineState) error {
 	machineClient := c.MachineClient(machine)
 
 	if err := machineClient.WaitForSSH(newMachineSSHWaitTimeout); err != nil {
@@ -493,13 +493,16 @@ func (c *ClusterClient) DrainNode(name string) error {
 	return c.kubectl.Drain(name)
 }
 
-func (c *ClusterClient) nodeExists(name string) (bool, error) {
+func (c *ClusterClient) NodeExists(name string) (bool, error) {
+	c.logger.Info("client_node_exists", zap.String("name", name))
+
 	if err := c.kubectl.NodeExists(name); err != nil {
 		if errors.Is(err, runner.NodeNotFoundErr) {
 			return false, nil
 		}
 		return false, err
 	}
+
 	return true, nil
 }
 
@@ -525,7 +528,7 @@ func (c *ClusterClient) RemoveNode(nodeType api.NodeType, name string) error {
 
 	logger.Info("client_node_remove")
 
-	nodeExists, err := c.nodeExists(name)
+	nodeExists, err := c.NodeExists(name)
 	if err != nil {
 		return fmt.Errorf("error checking node existence: %w", err)
 	}

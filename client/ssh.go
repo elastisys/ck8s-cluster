@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -12,6 +13,8 @@ import (
 
 	"github.com/elastisys/ck8s/api"
 )
+
+const dialTimeout = 3 * time.Second
 
 type SSHClientConfig struct {
 	Host           string
@@ -61,6 +64,7 @@ func (s *SSHClient) Connect() error {
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
+		Timeout: dialTimeout,
 	}
 
 	// TODO: Make this opt-in and handle host key checking.
