@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/elastisys/ck8s/api"
 	"github.com/elastisys/ck8s/client"
@@ -17,12 +18,24 @@ func init() {
 		RunE:  withClusterClient(machineGet),
 	})
 
-	rootCmd.AddCommand(&cobra.Command{
+	listCmd := &cobra.Command{
 		Use:   "list",
 		Short: "List machines",
 		Args:  NoArgs,
 		RunE:  withClusterClient(machineList),
-	})
+	}
+
+	listCmd.Flags().String(
+		nodeTypeFlag,
+		"",
+		"filter by node type",
+	)
+	viper.BindPFlag(
+		nodeTypeFlag,
+		listCmd.Flags().Lookup(nodeTypeFlag),
+	)
+
+	rootCmd.AddCommand(listCmd)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ssh NODE_TYPE NAME",
@@ -68,12 +81,26 @@ func machineList(
 	cmd *cobra.Command,
 	args []string,
 ) error {
+	var nodeType api.NodeType
+
+	nodeTypeStr := viper.GetString(nodeTypeFlag)
+	if nodeTypeStr != "" {
+		var err error
+		if nodeType, err = parseNodeTypeFlag(nodeTypeStr); err != nil {
+			return err
+		}
+	}
+
 	machines, err := clusterClient.Machines()
 	if err != nil {
 		return fmt.Errorf("error listing machines: %s", err)
 	}
 
 	for _, machine := range machines {
+		if nodeType != 0 && machine.NodeType != nodeType {
+			continue
+		}
+
 		printMachine(machine)
 	}
 
