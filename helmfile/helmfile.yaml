@@ -89,6 +89,11 @@ releases:
   chart: stable/prometheus-operator
   version: 8.15.11
   missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
+  - kube-system/nfs-client-provisioner
+  {{ end }}
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   - values/prometheus-operator-sc.yaml.gotmpl
@@ -111,6 +116,8 @@ releases:
   chart: ./charts/ck8sdash
   version: 0.3.1
   missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
   values:
   - values/ck8sdash-common.yaml.gotmpl
 {{ if eq .Environment.Name "service_cluster" }}
@@ -165,6 +172,8 @@ releases:
   version: 2.5.0
   missingFileHandler: Error
   wait: true
+  needs:
+  - cert-manager/cert-manager
   values:
   - values/dex.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -180,6 +189,10 @@ releases:
   chart: ./charts/prometheus-instance
   version: 0.1.0
   missingFileHandler: Error
+  {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
+  needs:
+  - kube-system/nfs-client-provisioner
+  {{ end }}
   values:
   - values/prometheus-wc-federate-scraper.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -232,6 +245,11 @@ releases:
   chart: stable/grafana
   version: 5.3.4
   missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
+  - kube-system/nfs-client-provisioner
+  {{ end }}
   values:
   - values/grafana-customer.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -249,6 +267,11 @@ releases:
   version: 0.1.0
   missingFileHandler: Error
   wait: true
+  needs:
+  - cert-manager/cert-manager
+  {{ if eq (env "ES_STORAGE_CLASS") "local-storage" }}
+  - kube-system/local-volume-provisioner
+  {{ end }}
   values:
   - values/elasticsearch-operator.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -266,7 +289,9 @@ releases:
   missingFileHandler: Info
   values:
   - values/local-volume-provisioner.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/local-volume-provisioner.yaml"
+  {{ end }}
 
 
 # Elasticsearch
@@ -279,6 +304,7 @@ releases:
   missingFileHandler: Error
   needs:
   - elastic-system/elasticsearch-operator
+  - cert-manager/cert-manager
   values:
   - values/elasticsearch.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -328,6 +354,8 @@ releases:
   chart: ./charts/harbor-certs
   version: 0.1.0
   missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
   values:
   - values/harbor-certs.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -344,6 +372,11 @@ releases:
   missingFileHandler: Error
   wait: true
   timeout: 600
+  needs:
+  - cert-manager/cert-manager
+  {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
+  - kube-system/nfs-client-provisioner
+  {{ end }}
   values:
   - values/harbor.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -358,6 +391,8 @@ releases:
   chart: ./charts/init-harbor
   version: 0.1.0
   missingFileHandler: Error
+  needs:
+  - harbor/harbor
   values:
   - values/init-harbor.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -387,6 +422,10 @@ releases:
   chart: ./charts/influxdb
   version: 4.7.0
   missingFileHandler: Error
+  {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
+  needs:
+  - kube-system/nfs-client-provisioner
+  {{ end }}
   values:
   - ./charts/influxdb/elastisys_custom_values.yaml
   - values/influxdb.yaml.gotmpl
@@ -430,6 +469,10 @@ releases:
   chart: stable/fluentd
   version: 2.3.2
   missingFileHandler: Error
+  {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
+  needs:
+  - kube-system/nfs-client-provisioner
+  {{ end }}
   values:
   - values/fluentd-aggregator.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -495,6 +538,8 @@ releases:
   chart: ./charts/examples/customer-alertmanager
   version: 0.1.0
   missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
   values:
   - values/customer-alertmanager.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -572,6 +617,8 @@ releases:
   chart: ./charts/gatekeeper-templates
   version: 1.6.0
   missingFileHandler: Error
+  needs:
+  - gatekeeper-system/gatekeeper-operator
   values:
   - values/gatekeeper-templates.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -587,6 +634,8 @@ releases:
   chart: ./charts/gatekeeper-constraints
   version: 1.6.0
   missingFileHandler: Error
+  needs:
+  - gatekeeper-system/gatekeeper-templates
   values:
   - values/gatekeeper-constraints.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
@@ -634,6 +683,10 @@ releases:
   chart: ./charts/customer-rbac
   version: 0.1.0
   missingFileHandler: Error
+  {{ if eq (env "ENABLE_OPA") "true" }}
+  needs:
+  - gatekeeper-system/gatekeeper-constraints
+  {{ end }}
   values:
   - values/customer-rbac.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}

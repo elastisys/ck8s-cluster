@@ -156,49 +156,16 @@ fi
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
-echo "Install cert-manager" >&2
-helmfile -f helmfile.yaml -e service_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
-
 source ${SCRIPTS_PATH}/install-storage-class-provider.sh
 install_storage_class_provider "${STORAGE_CLASS}" service_cluster
 install_storage_class_provider "${ES_STORAGE_CLASS}" service_cluster
 
-echo "Installing Dex" >&2
-helmfile -f helmfile.yaml -e service_cluster -l app=dex $INTERACTIVE apply --suppress-diff
-
-charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=local-volume-provisioner,app!=dex,app!=prometheus-operator,app!=elasticsearch-prometheus-exporter"
-
+charts_ignore_list="app!=nfs-client-provisioner,app!=local-volume-provisioner"
 [[ $ENABLE_HARBOR != "true" ]] && charts_ignore_list+=",app!=harbor"
 [[ $ENABLE_CK8SDASH_SC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
 
 echo "Installing the rest of the charts" >&2
 helmfile -f helmfile.yaml -e service_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
-
-echo "Installing prometheus operator" >&2
-tries=3
-success=false
-
-for i in $(seq 1 $tries)
-do
-    if helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE apply --suppress-diff
-    then
-        success=true
-        break
-    else
-        echo failed to deploy prometheus operator on try $i
-        helmfile -f helmfile.yaml -e service_cluster -l app=prometheus-operator $INTERACTIVE destroy
-    fi
-done
-
-# Then prometheus operator failed too many times
-if [ $success != "true" ]
-then
-    echo "Error: Prometheus failed to install three times" >&2
-    exit 1
-fi
-
-echo "Install elasticsearch prometheus exporter" >&2
-helmfile -f helmfile.yaml -e service_cluster -l app=elasticsearch-prometheus-exporter $INTERACTIVE apply --suppress-diff
 
 # Restore InfluxDB from backup
 # Requires dropping existing databases first

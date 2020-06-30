@@ -88,49 +88,8 @@ done
 echo -e "Continuing with Helmfile" >&2
 cd ${SCRIPTS_PATH}/../helmfile
 
-echo "Installing cert-manager" >&2
-helmfile -f helmfile.yaml -e workload_cluster -l app=cert-manager $INTERACTIVE apply --suppress-diff
-
-if [[ $ENABLE_OPA == "true" ]]
-then
-    echo "Installing gatekeeper operator" >&2
-    helmfile -f helmfile.yaml -e workload_cluster -l app=gatekeeper-operator $INTERACTIVE apply --suppress-diff
-fi
-
 source ${SCRIPTS_PATH}/install-storage-class-provider.sh
 install_storage_class_provider "${STORAGE_CLASS}" workload_cluster
-
-charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=gatekeeper-operator,app!=gatekeeper-constraints,app!=customer-alertmanager-auth"
-[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-templates"
-[[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
-[[ $ENABLE_CK8SDASH_WC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
-
-echo "Installing the remaining helm charts" >&2
-helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
-
-echo "Installing prometheus operator" >&2
-tries=3
-success=false
-
-for i in $(seq 1 $tries)
-do
-    if helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE apply --suppress-diff
-    then
-        success=true
-        break
-    else
-        echo failed to deploy prometheus operator on try $i
-        helmfile -f helmfile.yaml -e workload_cluster -l app=prometheus-operator $INTERACTIVE destroy
-    fi
-done
-
-
-if [ $success != "true" ]
-then
-    echo "Error: Prometheus failed to install three times" >&2
-    exit 1
-fi
-
 
 echo "Creating Elasticsearch and fluentd secrets" >&2
 
@@ -139,15 +98,13 @@ kubectl -n kube-system create secret generic elasticsearch \
 kubectl -n fluentd create secret generic elasticsearch \
     --from-literal=password="${ELASTIC_USER_SECRET}" --dry-run -o yaml | kubectl apply -f -
 
-echo "Installing fluentd" >&2
-helmfile -f helmfile.yaml -e workload_cluster -l app=fluentd $INTERACTIVE apply --suppress-diff
+charts_ignore_list="app!=nfs-client-provisioner"
+[[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-operator,app!=gatekeeper-templates,app!=gatekeeper-constraints"
+[[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
+[[ $ENABLE_CK8SDASH_WC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
 
-if [[ $ENABLE_OPA == "true" ]]
-then
-    echo "Installing gatekeeper constraints" >&2
-    #This must be installed after gatekeeper templates
-    helmfile -f helmfile.yaml -e workload_cluster -l app=gatekeeper-constraints $INTERACTIVE apply --suppress-diff
-fi
+echo "Installing the remaining helm charts" >&2
+helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
 
 # TODO: Move this to separate command
 echo "Creating kubeconfig for the customer" >&2
