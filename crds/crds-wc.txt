@@ -17,3 +17,4 @@ schedules.yaml
 serverstatusrequests.yaml
 volumesnapshotlocations.yaml
 gatekeeper.yaml
+gatekeeper-constraints.yaml
