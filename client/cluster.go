@@ -259,6 +259,15 @@ func (c *ClusterClient) TerraformApply() error {
 		return fmt.Errorf("error applying Terraform config: %w", err)
 	}
 
+	// TODO REMOVE as soon as ck8s-apps doesn't depend on this
+	var tfOutput interface{}
+	if err := c.terraform.Output(&tfOutput); err != nil {
+		return fmt.Errorf("error outputting Terraform config: %w", err)
+	}
+	if err := c.configHandler.WriteInfraJSON(c.cluster, c.state, tfOutput); err != nil {
+		return fmt.Errorf("error writing infra inventory: %w", err)
+	}
+
 	if err := c.configHandler.WriteAnsibleInventory(
 		c.cluster,
 		c.state,

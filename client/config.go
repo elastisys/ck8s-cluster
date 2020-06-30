@@ -345,3 +345,27 @@ func (c *ConfigHandler) writeTFVars(cluster api.Cluster) error {
 		0644,
 	)
 }
+
+// WriteInfraJSON TODO Remove this when apps isn't dependent on it (maybe using terraform instead)
+func (c *ConfigHandler) WriteInfraJSON(
+	cluster api.Cluster,
+	stateFn func() (api.ClusterState, error),
+	tfOutput interface{},
+) error {
+	c.logger.Debug("config_handler_infra_write")
+
+	f, err := os.OpenFile(
+		c.configPath[api.InfraJsonFile].Path,
+		os.O_RDONLY|os.O_CREATE,
+		0644,
+	)
+	if err != nil {
+		return fmt.Errorf("error opening file: %w", err)
+	}
+
+	if err := renderInfraJSON(c, f, tfOutput); err != nil {
+		return fmt.Errorf("error rendering infra inventory: %w", err)
+	}
+
+	return nil
+}

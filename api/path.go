@@ -45,6 +45,7 @@ const (
 	SOPSConfigFile
 	KubeconfigFile
 	S3CfgFile
+	InfraJsonFile
 )
 
 const (
@@ -74,6 +75,7 @@ var relativeConfigPaths = ConfigPath{
 	TFEStateFile:        {".state/terraform-tfe.tfstate", ""},
 	SOPSConfigFile:      {".sops.yaml", "yaml"},
 	S3CfgFile:           {".state/s3cfg.ini", "ini"},
+	InfraJsonFile:       {".state/infra.json", "json"},
 }
 
 var clusterSpecificRelativeConfigPaths = map[ClusterType]ConfigPath{
