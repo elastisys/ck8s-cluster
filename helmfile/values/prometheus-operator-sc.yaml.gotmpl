@@ -45,12 +45,14 @@ alertmanager:
         {{ else }}
         receiver: 'null'
         {{ end }}
+      {{ if eq (env "ENABLE_CUSTOMER_ALERTMANAGER") "false" }}
       - match:
           # TODO: it would be nice to do this some other way.
           # The workload_cluster does not have an alertmanager, send to null.
           alertname: AlertmanagerDown
           cluster: workload_cluster
         receiver: 'null'
+      {{ end }}
       - match:
           # TODO: it would be nice to do this some other way.
           # The workload_cluster does not have an alertmanager, send to null.

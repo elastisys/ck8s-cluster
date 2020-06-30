@@ -23,6 +23,7 @@
 - InfluxDB helm chart updated to version 4.7.0 (with InfluxDB version 1.8.0).
 - Only a single alertmanager is installed in the workload cluster if `ENABLE_CUSTOMER_ALERTMANAGER=true`.
 - Customer alertmanager is scraped by Prometheus in workload cluster so AlertmanagerDown alert is not fired.
+- AlertmanagerDown alert in the service cluster for the alertmanager in the workload cluster is muted only when `ENABLE_CUSTOMER_ALERTMANAGER=false`.
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
