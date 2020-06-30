@@ -21,6 +21,7 @@
 - Tests respect the `ENABLE_FALCO` and `ENABLE_FALCO_ALERTS` configuration
 - Fixed so nfs-kernel-server is installed on the nfs node.
 - InfluxDB helm chart updated to version 4.7.0 (with InfluxDB version 1.8.0).
+- Only a single alertmanager is installed in the workload cluster if `ENABLE_CUSTOMER_ALERTMANAGER=true`.
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
