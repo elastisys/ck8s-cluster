@@ -469,6 +469,33 @@ releases:
   {{ end }}
 {{ end }}
 
+#Basic auth credentials for accessing workload cluster prometheus
+- name: prometheus-auth
+  namespace: monitoring
+  labels:
+    app: prometheus-auth
+  chart: ./charts/basic-auth-secret
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/prometheus-auth.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-auth.yaml"
+  {{ end }}
+
+- name: customer-alertmanager-auth
+  namespace: monitoring
+  labels:
+    app: customer-alertmanager-auth
+  chart: ./charts/basic-auth-secret
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/customer-alertmanager-auth.yaml.gotmpl
+  {{ if env "CK8S_ADDITIONAL_VALUES" }}
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/customer-alertmanager-auth.yaml"
+  {{ end }}
+
 {{ if eq (env "ENABLE_FALCO_ALERTS") "true" }}
 - name: falcosidekick
   namespace: falco

@@ -100,18 +100,13 @@ fi
 source ${SCRIPTS_PATH}/install-storage-class-provider.sh
 install_storage_class_provider "${STORAGE_CLASS}" workload_cluster
 
-charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=gatekeeper-operator,app!=gatekeeper-constraints"
+charts_ignore_list="app!=cert-manager,app!=nfs-client-provisioner,app!=fluentd-system,app!=fluentd,app!=prometheus-operator,app!=gatekeeper-operator,app!=gatekeeper-constraints,app!=customer-alertmanager-auth"
 [[ $ENABLE_OPA != "true" ]] && charts_ignore_list+=",app!=gatekeeper-templates"
 [[ $ENABLE_FALCO != "true" ]] && charts_ignore_list+=",app!=falco"
 [[ $ENABLE_CK8SDASH_WC != "true" ]] && charts_ignore_list+=",app!=ck8sdash"
 
 echo "Installing the remaining helm charts" >&2
 helmfile -f helmfile.yaml -e workload_cluster -l "$charts_ignore_list" $INTERACTIVE apply --suppress-diff
-
-echo "Create basic auth credentials for accessing workload cluster prometheus" >&2
-htpasswd -c -b auth prometheus ${CUSTOMER_PROMETHEUS_PWD}
-kubectl -n monitoring create secret generic prometheus-auth --from-file=auth --dry-run -o yaml | kubectl apply -f -
-rm auth
 
 echo "Installing prometheus operator" >&2
 tries=3
@@ -211,14 +206,9 @@ kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-pl
 if [ "$ENABLE_CUSTOMER_ALERTMANAGER" == "true" ]
 then
     echo "Adding customer alertmanager" >&2
-    # Use `kubectl create` to avoid overwriting customer changes
     if [ "$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" == "true" ]
     then
-        htpasswd -c -b auth alertmanager "${CUSTOMER_ALERTMANAGER_PWD}"
-        kubectl -n "monitoring" create secret generic alertmanager-auth \
-            --from-file=auth 2> /dev/null || \
-            echo "Example alertmanager auth secret already in place. Ignoring."
-        rm auth
+        helmfile -f helmfile.yaml -e workload_cluster -l app=customer-alertmanager-auth $INTERACTIVE apply --suppress-diff
     fi
     helm template ./charts/examples/customer-alertmanager \
             --namespace "monitoring" \
