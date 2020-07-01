@@ -160,31 +160,11 @@ A default instance is included as an example (see `kubectl get alertmanagers`).
 The [Alertmanager documentation](https://prometheus.io/docs/alerting/alertmanager/) and [Prometheus operator alerting documentation](https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/alerting.md) contains more details on how to configure and use Alertmanager.
 Note that alerts are configured through Prometheus, Alertmanager just aggregates and sends out notifications.
 
-You may change or delete the default Alertmanager instance or add a new if you wish.
-Here is an example:
-
-```yaml
-# See https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#alertmanager
-apiVersion: monitoring.coreos.com/v1
-kind: Alertmanager
-metadata:
-  name: alertmanager
-  labels:
-    app: alertmanager
-spec:
-  replicas: 1
-  securityContext:
-    fsGroup: 2000
-    runAsNonRoot: true
-    runAsUser: 1000
-```
-
 Alertmanager is configured using a [configuration file](https://prometheus.io/docs/alerting/configuration/).
 Here is an example configuration file for Alertmanager:
 
 ```yaml
-# Note: Alertmanager instances require the secret resource naming to follow
-# the format alertmanager-{ALERTMANAGER_NAME}.
+# Note: The Secret must be named "alertmanager-alertmanager".
 # This config should be stored in a secret with a proper name to be picked
 # up by your alertmanager instance. The name of the file in the secret
 # must be `alertmanager.yaml`.
@@ -220,9 +200,9 @@ receivers:
     text: "You have an alert! {{ .CommonAnnotations.summary }}"
 ```
 
-To configure the Alertmanager instance, store the file as `alertmanager.yaml` and create a Secret from it named `alertmanager-{ALERTMANAGER_NAME}`, where `{ALERTMANAGER_NAME}` is the name of the Alertmanager instance.
-Use kubectl to create the secret like this: `kubectl create secret generic alertmanager-{ALERTMANAGER_NAME} --from-file=alertmanager.yaml`.
-Note that it is important that the file is named `alertmanager.yaml` and that the Secret is named according to the instructions for Alertmanager to pick it up.
+To configure the Alertmanager instance, store the file as `alertmanager.yaml` and create a Secret from it named `alertmanager-alertmanager`.
+Use kubectl to update `alertmanager-alertmanager` secret in the `monitoring` namespace like this: `kubectl create secret generic alertmanager-alertmanager --from-file=alertmanager.yaml --dry-run -o yaml | kubectl -n monitoring apply -f -`.
+Note that it is important that the file is named `alertmanager.yaml` and that the Secret is named according to the instructions and placed in the `monitoring` namespace for Alertmanager to pick it up.
 
 #### Alerts from Grafana
 
