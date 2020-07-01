@@ -106,11 +106,11 @@ spec:
   - port: metrics-port
 ```
 
-Prometheus will detect ServiceMonitors in all namespaces and scrate metrics from them automatically.
+Prometheus will detect ServiceMonitors in all namespaces and scrape metrics from them automatically.
 You may also use [PodMonitors](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#podmonitor) in a similar fashion to ServiceMonitors.
 
 If your application doesn't already publish metrics in a suitable way for Prometheus to scrape, you may need to use an exporter of some kind.
-For example, the [JMX exporter](https://github.com/prometheus/jmx_exporter) exoses JMX metrics from Java applications.
+For example, the [JMX exporter](https://github.com/prometheus/jmx_exporter) exposes JMX metrics from Java applications.
 
 #### Prometheus alerts
 
