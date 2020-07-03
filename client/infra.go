@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 
@@ -77,12 +78,20 @@ func (i *infraStruct) updateValues(tfOutput interface{}, clusterType api.Cluster
 	//Prepare for a really ugly parsing (since this is going away this is okey)
 	tfOutputSlice := tfOutput.(map[string]interface{})
 
-	currentCluster.DNSName = tfOutputSlice[clusterTypeString+"_dns_name"].(map[string]interface{})["value"]
-	currentCluster.DomainName = tfOutputSlice["domain_name"].(map[string]interface{})["value"]
-	currentCluster.LBIPAddress = tfOutputSlice[clusterTypeString+"_ingress_controller_lb_ip_address"].(map[string]interface{})["value"]
-	currentCluster.MasterCount = len(tfOutputSlice[clusterTypeString+"_master_ips"].(map[string]interface{})["value"].(map[string]interface{}))
-	currentCluster.MasterIPAddress = tfOutputSlice[clusterTypeString+"_master_ips"].(map[string]interface{})["value"]
-	currentCluster.WorkerCount = len(tfOutputSlice[clusterTypeString+"_worker_ips"].(map[string]interface{})["value"].(map[string]interface{}))
-	currentCluster.WorkerIPAddress = tfOutputSlice[clusterTypeString+"_worker_ips"].(map[string]interface{})["value"]
-	currentCluster.NFSIPAddress = tfOutputSlice[clusterTypeString+"_nfs_ips"].(map[string]interface{})["value"]
+	currentCluster.DNSName = getValue(tfOutputSlice, clusterTypeString+"_dns_name")
+	currentCluster.DomainName = getValue(tfOutputSlice, "domain_name")
+	currentCluster.LBIPAddress = getValue(tfOutputSlice, clusterTypeString+"_ingress_controller_lb_ip_address")
+	currentCluster.MasterCount = len(getValue(tfOutputSlice, clusterTypeString+"_master_ips").(map[string]interface{}))
+	currentCluster.MasterIPAddress = getValue(tfOutputSlice, clusterTypeString+"_master_ips")
+	currentCluster.WorkerCount = len(getValue(tfOutputSlice, clusterTypeString+"_worker_ips").(map[string]interface{}))
+	currentCluster.WorkerIPAddress = getValue(tfOutputSlice, clusterTypeString+"_worker_ips")
+	currentCluster.NFSIPAddress = getValue(tfOutputSlice, clusterTypeString+"_nfs_ips")
+}
+
+func getValue(slice map[string]interface{}, key string) interface{} {
+	if val, ok := slice[key]; ok {
+		return val.(map[string]interface{})["value"]
+	}
+	fmt.Printf("Warning: Skipping key %s since it doesn't exist\n", key)
+	return nil
 }
