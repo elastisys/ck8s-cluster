@@ -26,6 +26,7 @@
 - Only a single alertmanager is installed in the workload cluster if `ENABLE_CUSTOMER_ALERTMANAGER=true`.
 - Customer alertmanager is scraped by Prometheus in workload cluster so AlertmanagerDown alert is not fired.
 - AlertmanagerDown alert in the service cluster for the alertmanager in the workload cluster is muted only when `ENABLE_CUSTOMER_ALERTMANAGER=false`.
+- Customer alertmanager ingress is using the proper secret.
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
