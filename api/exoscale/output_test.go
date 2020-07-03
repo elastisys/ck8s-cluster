@@ -40,6 +40,25 @@ func testState(
 	return tfOutput
 }
 
+func TestTerraformOutputBaseDomain(t *testing.T) {
+	testCases := map[api.ClusterType]string{
+		api.ServiceCluster:  "ck8stest.a1ck.io",
+		api.WorkloadCluster: "ck8stest.a1ck.io",
+	}
+
+	for clusterType, want := range testCases {
+		tfOutput := testState(t, clusterType, "ck8stest")
+
+		got := tfOutput.BaseDomain()
+		if got != want {
+			t.Errorf(
+				"Base domain mismatch, want: %s, got: %s",
+				want, got,
+			)
+		}
+	}
+}
+
 func TestTerraformOutputControlPlanePublicIP(t *testing.T) {
 	testCases := map[api.ClusterType]string{
 		api.ServiceCluster:  "89.145.167.47",

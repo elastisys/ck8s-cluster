@@ -57,6 +57,8 @@ type ClusterState interface {
 	ControlPlanePublicIP() string
 	ControlPlaneEndpoint() string
 
+	BaseDomain() string
+
 	Machines() []MachineState
 
 	Machine(NodeType, string) (MachineState, error)

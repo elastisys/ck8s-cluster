@@ -59,6 +59,12 @@ func (a *Ansible) playbook(playbookPath string, extraArgs ...string) *Command {
 	return cmd
 }
 
+func (a *Ansible) AddEnv(env map[string]string) {
+	for key, val := range env {
+		a.config.Env[key] = val
+	}
+}
+
 func (a *Ansible) Infrustructure() error {
 	return a.runner.Run(a.playbook(a.config.PlaybookPathInfrastructure))
 }
