@@ -5,8 +5,8 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 SUCCESSES=0
 FAILURES=0
 DEBUG_OUTPUT=("")
-DEBUG_LOGS=("")
 DEBUG_PROMETHEUS_TARGETS=("")
+CLUSTER="ServiceCluster"
 
 source ${SCRIPTS_PATH}/service-cluster/testPodsReady.sh
 source ${SCRIPTS_PATH}/service-cluster/testEndpoints.sh
@@ -22,7 +22,12 @@ then
     echo "Logs from failed test resources"
     echo "==============================="
     echo
-    echo "${DEBUG_LOGS[@]}"
+    echo "Exists in logs/ServiceCluster/<kind>/<namespace>"
+    echo
+    echo "Events from failed test resources"
+    echo "==============================="
+    echo
+    echo "Exists in events/ServiceCluster/<kind>/<namespace>"
     echo
     echo "Json output of failed test resources"
     echo "===================================="

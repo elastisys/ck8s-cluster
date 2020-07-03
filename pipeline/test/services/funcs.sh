@@ -90,6 +90,9 @@ function resourceReplicaCompare() {
 
         if [[ "${activeResourceStatus}" == "${desiredResourceStatus}" ]]; then
             echo -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
+            writeLog ${namespace} ${resourceName} "Pod"
+            writeLog ${namespace} ${resourceName} ${kind}
+            writeEvent ${namespace} ${resourceName} "Pod"
             return
         else
             # retry for 30s
@@ -102,6 +105,9 @@ function resourceReplicaCompare() {
 
     echo -e "\tready ❌"; FAILURES=$((FAILURES+1))
     DEBUG_OUTPUT+=$(kubectl get ${kind} -n ${namespace} ${resourceName} -o json)
+    writeLog ${namespace} ${resourceName} "pod"
+    writeLog ${namespace} ${resourceName} ${kind}
+    writeEvent ${namespace} ${resourceName} "Pod"
 }
 
 # This function is required for statefulsets with update strategy OnDelete
@@ -117,6 +123,9 @@ function testStatefulsetStatusByPods {
         if ! kubectl wait -n $1 --for=condition=ready pod $POD_NAME --timeout=60s > /dev/null; then
             echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
             DEBUG_OUTPUT+=($(kubectl get statefulset -n $1 $2 -o json))
+            writeLog ${1} ${2} "Pod"
+            writeLog ${1} ${2} ${kind}
+            writeEvent ${1} ${2} "Pod"
             return
         fi
     done
@@ -134,8 +143,86 @@ function testJobStatus {
     else
       echo -n -e "\tnot completed ❌"; FAILURES=$((FAILURES+1))
       DEBUG_OUTPUT+=($(kubectl get -n $1 job $2 -o json))
-      DEBUG_LOGS+=($(kubectl logs -n $1 job/$2))
     fi
+    logJob ${1} ${2}
+}
+
+#Args:
+#   1. namespace
+#   2. name
+function logCronJob {
+    writeEvent ${1} ${2} "CronJob"
+    logJob ${1} ${2}
+}
+
+#Args:
+#   1. namespace
+#   2. name
+function logJob {
+    writeLog ${1} ${2} "Job"
+    writeEvent ${1} ${2} "Job"
+    writeEvent ${1} ${2} "Pod"    
+}
+
+LOGSFOLDER="logs"
+EVENTSFOLDER="events"
+
+#This function writes logs to file for specified <kind>
+#Args:
+#   1. namespace
+#   2. name
+#   3. kind
+function writeLog {
+    if [ -z "$PIPELINE" ]
+    then
+        return
+    fi
+
+    NAMESPACE=$1
+    NAME=$2
+    KIND=$3
+    NAMES=$(kubectl get $KIND -n $NAMESPACE -o custom-columns=NAME:.metadata.name | grep $NAME | tail -n +1)
+    NAMESLIST=($NAMES)
+
+    mkdir -p "./$LOGSFOLDER/$CLUSTER/$KIND/$NAMESPACE"
+    for NAME in "${NAMESLIST[@]}"
+    do
+        FILE="./$LOGSFOLDER/$CLUSTER/$KIND/$NAMESPACE/$NAME.log"
+        if [[ ! -f "$FILE" ]]; then
+            touch $FILE
+            echo "$(kubectl -n $NAMESPACE logs $KIND/$NAME --all-containers=true 2>&1)" > $FILE
+        fi
+    done   
+}
+
+#This function writes events to file for specified <kind>
+#Args:
+#   1. namespace
+#   2. name
+#   3. kind
+function writeEvent {
+    if [ -z "$PIPELINE" ] 
+    then
+        return
+    fi
+
+    NAMESPACE=$1
+    NAME=$2
+    KIND=$3
+    NAMES=$(kubectl get $KIND -n $NAMESPACE -o custom-columns=NAME:.metadata.name | grep $NAME | tail -n +1)
+    NAMESLIST=($NAMES)
+
+    mkdir -p "./$EVENTSFOLDER/$CLUSTER/$KIND/$NAMESPACE"
+    for NAME in "${NAMESLIST[@]}"
+    do
+        FILE="./$EVENTSFOLDER/$CLUSTER/$KIND/$NAMESPACE/$NAME.event"
+        if [[ ! -f "$FILE" ]]; then
+            touch $FILE
+            DATA=$(kubectl get event -n ${NAMESPACE} --field-selector involvedObject.kind=${KIND},involvedObject.name=${NAME} -o json)
+            MESSAGES=$(echo "${DATA}" | jq -r '.items | map(.message) | .[]')
+            echo "$MESSAGES" > $FILE
+        fi
+    done 
 }
 
 #Args:

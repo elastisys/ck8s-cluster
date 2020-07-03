@@ -45,7 +45,6 @@ fi
 if [ "$ENABLE_CK8SDASH_SC" == true ]; then
     deployments+=("ck8sdash ck8sdash")
 fi
-
 resourceKind="Deployment"
 # Get json data in a smaller dataset
 simpleData="$(getStatus $resourceKind)"
@@ -158,7 +157,10 @@ for CRONJOB in "${CRONJOBS[@]}"
 do
     arguments=($CRONJOB)
     echo -n -e "\n${arguments[1]}\t"
-    testResourceExistence cronjob $CRONJOB
+    if testResourceExistence cronjob $CRONJOB 
+    then
+        logCronJob $CRONJOB
+    fi
 done
 
 echo

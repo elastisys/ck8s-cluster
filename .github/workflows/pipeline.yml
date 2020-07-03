@@ -57,6 +57,7 @@ jobs:
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
+        PIPELINE: "true"
     - name: Upload config
       if: always()
       uses: actions/upload-artifact@v1
