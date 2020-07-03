@@ -125,7 +125,7 @@ prometheus:
 
     # Add additionalScrapeConfigs section only if needed
     # Need to be manually updated in case of cases being added or removed
-    {{ if or ((eq (env "STORAGE_CLASS") "nfs-client") (eq (env "ENABLE_POSTGRESQL") "true") (eq (env "ENABLE_CUSTOMER_ALERTMANAGER") "true")) }}
+    {{ if or (or (eq (env "STORAGE_CLASS") "nfs-client") (eq (env "ENABLE_POSTGRESQL") "true")) (eq (env "ENABLE_CUSTOMER_ALERTMANAGER") "true") }}
     additionalScrapeConfigs:
     {{ end }}
     {{ if eq (env "STORAGE_CLASS") "nfs-client"  }}
