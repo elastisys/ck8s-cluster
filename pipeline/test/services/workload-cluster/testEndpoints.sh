@@ -7,7 +7,7 @@ echo "Testing endpoints"
 echo "=================="
 
 testEndpoint Prometheus-wc https://prometheus.${ECK_BASE_DOMAIN}/ prometheus:${CUSTOMER_PROMETHEUS_PWD}
-if [ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]
+if [ $ENABLE_CUSTOMER_ALERTMANAGER_INGRESS == "true" ]
 then
     testEndpoint Alertmanager-customer https://alertmanager.${ECK_BASE_DOMAIN}/ alertmanager:${CUSTOMER_ALERTMANAGER_PWD}
 fi

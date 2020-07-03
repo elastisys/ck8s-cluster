@@ -74,3 +74,36 @@ for user in ${CUSTOMER_ADMIN_USERS}; do
         done
     done
 done
+
+if [[ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]]
+then
+    ALERTMANAGER_SECRET_VERBS=(
+        update
+    )
+    ALERTMANAGER_SECRET_RESOURCES=(
+        secret/alertmanager-alertmanager
+    )
+
+    for user in ${CUSTOMER_ADMIN_USERS}; do
+        for resource in "${ALERTMANAGER_SECRET_RESOURCES[@]}"; do
+            for verb in "${ALERTMANAGER_SECRET_VERBS[@]}"; do
+                testCanUserDoInNamespace "$verb" "$resource" "monitoring" "$user"
+            done
+        done
+    done
+
+    ALERTMANAGER_ROLEBINDING_VERBS=(
+        create
+    )
+    ALERTMANAGER_ROLEBINDING_RESOURCES=(
+        rolebinding/alertmanager-configurer
+    )
+
+    for user in ${CUSTOMER_ADMIN_USERS}; do
+        for resource in "${ALERTMANAGER_ROLEBINDING_RESOURCES[@]}"; do
+            for verb in "${ALERTMANAGER_ROLEBINDING_VERBS[@]}"; do
+                testCanUserDoInNamespace "$verb" "$resource" "monitoring" "$user"
+            done
+        done
+    done
+fi

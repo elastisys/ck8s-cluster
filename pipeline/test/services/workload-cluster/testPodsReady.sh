@@ -79,7 +79,7 @@ set -- ${CUSTOMER_NAMESPACES}
 CONTEXT_NAMESPACE=$1
 if [[ $ENABLE_CUSTOMER_ALERTMANAGER == "true" ]]
 then
-    statefulsets+=("$CONTEXT_NAMESPACE alertmanager-alertmanager")
+    statefulsets+=("monitoring alertmanager-alertmanager")
 fi
 
 resourceKind="StatefulSet"
