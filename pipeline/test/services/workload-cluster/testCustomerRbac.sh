@@ -82,6 +82,7 @@ then
     )
     ALERTMANAGER_SECRET_RESOURCES=(
         secret/alertmanager-alertmanager
+        secret/customer-alertmanager-auth
     )
 
     for user in ${CUSTOMER_ADMIN_USERS}; do
