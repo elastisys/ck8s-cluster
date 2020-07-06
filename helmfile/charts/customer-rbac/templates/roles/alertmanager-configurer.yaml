@@ -23,6 +23,19 @@ rules:
   - watch
   - update
   - patch
+# Allow editing the customer-alertmanager-auth secret
+- apiGroups:
+  - ""
+  resourceNames:
+  - customer-alertmanager-auth
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
 # Allow creating rolebindings (to give others permission to configure alertmanager)
 - apiGroups:
   - rbac.authorization.k8s.io
