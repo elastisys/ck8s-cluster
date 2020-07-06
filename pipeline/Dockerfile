@@ -58,7 +58,7 @@ ENV XDG_DATA_HOME=/root/.config
 RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.1
 
 # Helmfile
-ENV HELMFILE_VERSION "v0.99.0"
+ENV HELMFILE_VERSION "v0.119.1"
 RUN wget "https://github.com/roboll/helmfile/releases/download/${HELMFILE_VERSION}/helmfile_linux_amd64" && \
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile

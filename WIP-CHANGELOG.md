@@ -1,6 +1,7 @@
 ### Changed
 - Curator now looks at the index name to determine its age instead of looking at the index creation date
 - Nginx-ingress upgraded to 0.28.
+- Helmfile upgraded to 0.119.1.
 
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
