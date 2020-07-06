@@ -5,7 +5,7 @@
       install_user: "{{ lookup('env','USER') }}"
       terraform_version: "0.12.19"
       kubectl_version: "1.15.2"
-      helm_version: "3.2.0"
+      helm_version: "3.2.4"
       helmfile_version: "0.119.1"
       helmdiff_version: "3.1.1"
       jq_version: "1.5+dfsg-2"

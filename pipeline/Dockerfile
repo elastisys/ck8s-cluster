@@ -46,7 +46,7 @@ RUN wget "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VE
     mv ./kubectl /usr/local/bin/kubectl
 
 # Helm
-ENV HELM_VERSION "v3.2.0"
+ENV HELM_VERSION "v3.2.4"
 RUN wget "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
     tar -zxvf "helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
     mv linux-amd64/helm /usr/local/bin/helm && \

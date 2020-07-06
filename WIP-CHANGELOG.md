@@ -3,6 +3,7 @@
 - Nginx-ingress upgraded to 0.28.
 - Helmfile upgraded to 0.119.1.
 - Nodeport is now whitelisted for all cloud providers.
+- Helm upgraded to 3.2.4.
 
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
