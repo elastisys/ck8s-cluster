@@ -4,7 +4,8 @@
 - Helmfile upgraded to 0.119.1.
 - Nodeport is now whitelisted for all cloud providers.
 - Helm upgraded to 3.2.4.
-- Harbor upgraded to 2.0.0. 
+- Harbor upgraded to 2.0.0.
+- Customer and Ops Grafana upgraded to 7.0.3.
 
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
@@ -12,6 +13,7 @@
 ### Release notes
 - No migration path is available for adding anti-affinity in openstack.
 - Mirgration of harbor to v.2.0.0 requires a manual garbage collaction. Please follow the steps described here: [https://goharbor.io/docs/1.10/administration/garbage-collection/]. Could be a good idea to backup aswell [https://github.com/elastisys/ck8s-ops/tree/master/backup/harbor].
+- Migration of Grafana to 7.0.3 requires a manual database backup and restore to preserve the customer data. Please follow the steps described [here](docs/migration.md#service-cluster).
 
 ### Added
 - The master and worker VMs in openstack can now, optionally, have anti-affinity or soft anti-affinity. Soft anti-affinity is not available in Safespring.

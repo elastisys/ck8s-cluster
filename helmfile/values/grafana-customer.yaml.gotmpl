@@ -1,5 +1,9 @@
 adminPassword: {{ requiredEnv "CUSTOMER_GRAFANA_PWD" }}
 
+image:
+  repository: grafana/grafana
+  tag: 7.0.3
+
 testFramework:
   enabled: false
 

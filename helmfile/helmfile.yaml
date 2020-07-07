@@ -226,8 +226,10 @@ releases:
   namespace: monitoring
   labels:
     app: customer-grafana
+    app.kubernetes.io/instance: customer-grafana
+    app.kubernetes.io/name: grafana
   chart: stable/grafana
-  version: 4.2.2
+  version: 5.3.4
   missingFileHandler: Error
   values:
   - values/grafana-customer.yaml.gotmpl
