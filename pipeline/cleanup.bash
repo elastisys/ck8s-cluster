@@ -25,8 +25,10 @@ whitelist_update "public_ingress_cidr_whitelist" $my_ip
 whitelist_update "api_server_whitelist" $my_ip
 whitelist_update "nodeport_whitelist" $my_ip
 
+echo "Ensure that whitelist allows the pipeline to access the cluster."
 TF_CLI_ARGS_apply="-auto-approve" \
-    sops exec-env "${CK8S_CONFIG_PATH}/secrets.env" "${bin_path}/apply.bash infra tf"
+    sops exec-env "${CK8S_CONFIG_PATH}/secrets.env" "${bin_path}/apply.bash infra tf" \
+    || echo "Applying whitelist failed, will try to destroy anyway."
 
 TF_CLI_ARGS_destroy="-auto-approve" \
     sops exec-env "${CK8S_CONFIG_PATH}/secrets.env" "${bin_path}/destroy.bash"
