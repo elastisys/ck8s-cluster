@@ -484,18 +484,20 @@ releases:
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/prometheus-auth.yaml"
   {{ end }}
 
-- name: customer-alertmanager-auth
+{{ if eq (env "ENABLE_CUSTOMER_ALERTMANAGER") "true" }}
+- name: customer-alertmanager
   namespace: monitoring
   labels:
-    app: customer-alertmanager-auth
-  chart: ./charts/basic-auth-secret
+    app: customer-alertmanager
+  chart: ./charts/examples/customer-alertmanager
   version: 0.1.0
   missingFileHandler: Error
   values:
-  - values/customer-alertmanager-auth.yaml.gotmpl
+  - values/customer-alertmanager.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
-  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/customer-alertmanager-auth.yaml"
+  - "{{ env "CK8S_ADDITIONAL_VALUES" }}/customer-alertmanager.yaml"
   {{ end }}
+{{ end }}
 
 {{ if eq (env "ENABLE_FALCO_ALERTS") "true" }}
 - name: falcosidekick

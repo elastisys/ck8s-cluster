@@ -203,18 +203,4 @@ kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-co
 kubectl create -f ${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml \
     2> /dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring."
 
-if [ "$ENABLE_CUSTOMER_ALERTMANAGER" == "true" ]
-then
-    echo "Adding customer alertmanager" >&2
-    if [ "$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" == "true" ]
-    then
-        helmfile -f helmfile.yaml -e workload_cluster -l app=customer-alertmanager-auth $INTERACTIVE apply --suppress-diff
-    fi
-    helm template ./charts/examples/customer-alertmanager \
-            --namespace "monitoring" \
-            --set baseDomain="${ECK_BASE_DOMAIN}" \
-            --set ingress.enabled="$ENABLE_CUSTOMER_ALERTMANAGER_INGRESS" \
-            | kubectl -n "monitoring" create -f - 2> /dev/null || \
-            echo "Example alertmanager already in place. Ignoring."
-fi
 echo "Deploy-wc completed!" >&2
