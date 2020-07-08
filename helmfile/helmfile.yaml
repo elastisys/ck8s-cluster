@@ -86,7 +86,7 @@ releases:
   labels:
     app: prometheus-operator
   chart: stable/prometheus-operator
-  version: 8.13.2
+  version: 8.15.11
   missingFileHandler: Error
   values:
 {{ if eq .Environment.Name "service_cluster" }}

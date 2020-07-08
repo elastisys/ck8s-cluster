@@ -10,7 +10,7 @@ prometheusSpec:
   # Add them under scrapeConfig forther down
   # additionalScrapeConfigs: DO NOT SET THIS HERE
 
-  version: "v2.13.1"
+  version: "v2.19.2"
 
   remoteRead:
   - url: http://influxdb:8086/api/v1/prom/read?db=workload_cluster&u=user&p=password
