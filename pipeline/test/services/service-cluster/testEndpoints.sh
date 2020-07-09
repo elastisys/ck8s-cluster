@@ -16,7 +16,7 @@ testEndpoint Elasticsearch https://elastic.${ECK_OPS_DOMAIN}/ elastic:${PW}
 testEndpoint Kibana https://kibana.${ECK_BASE_DOMAIN}/ elastic:${PW}
 
 if [ "$ENABLE_HARBOR" == true ]; then
-    testEndpoint Harbor https://harbor.${ECK_BASE_DOMAIN}/api/users"" admin:${HARBOR_PWD}
+    testEndpoint Harbor https://harbor.${ECK_BASE_DOMAIN}/api/v2.0/users"" admin:${HARBOR_PWD}
 fi
 
 testEndpoint Grafana https://grafana.${ECK_OPS_DOMAIN}/ admin:${GRAFANA_PWD}

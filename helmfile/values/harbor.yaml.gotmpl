@@ -96,6 +96,16 @@ notary:
       limits:
         memory: 512Mi
         cpu: 200m
+
+trivy:
+  secretName: harbor-trivy-cert
+  resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
 database:
   internal:
     password: {{ requiredEnv "HARBOR_DB_PWD" }}

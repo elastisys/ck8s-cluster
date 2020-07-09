@@ -337,7 +337,7 @@ releases:
   labels:
     app: harbor
   chart: harbor/harbor
-  version: 1.3.0
+  version: 1.4.0
   missingFileHandler: Error
   wait: true
   timeout: 600
