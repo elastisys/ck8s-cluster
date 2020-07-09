@@ -97,12 +97,25 @@ jobs:
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
         TF_TOKEN: ${{ secrets.TF_TOKEN }}
+        PIPELINE: "true"
     - name: Upload config post-apply
       if: always()
       uses: actions/upload-artifact@v1
       with:
         name: ck8s-config-${{ matrix.cloud }}-${{ matrix.flavor }}
         path: ./ck8s_pipeline_config
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: ck8s-logs
+        path: ./logs
+    - name: Upload events
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: ck8s-events
+        path: ./events
     - name: Cleanup
       if: always()
       run: ./pipeline/cleanup.bash

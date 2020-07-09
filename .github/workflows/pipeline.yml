@@ -64,6 +64,18 @@ jobs:
       with:
         name: ck8s-config
         path: ./ck8s_pipeline_config
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: ck8s-logs
+        path: ./logs
+    - name: Upload events
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: ck8s-events
+        path: ./events
 
   get-versions:
     if: startsWith(github.ref , 'refs/heads/pre-release-' )
