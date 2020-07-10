@@ -19,6 +19,9 @@ output "sc_ingress_controller_lb_ip_address" {
   value = "${module.service_cluster.ingress_controller_lb_ip_address}"
 }
 
+output "sc_loadbalancer_ips" {
+  value = "${module.service_cluster.control_plane_lb_ip_address}"
+}
 
 # Workload cluster cluster outputs
 
@@ -44,6 +47,10 @@ output "domain_name" {
 
 output "wc_ingress_controller_lb_ip_address" {
   value = "${module.workload_cluster.ingress_controller_lb_ip_address}"
+}
+
+output "wc_loadbalancer_ips" {
+  value = "${module.workload_cluster.control_plane_lb_ip_address}"
 }
 
 output "ansible_inventory_sc" {

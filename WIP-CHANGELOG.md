@@ -38,6 +38,7 @@
 - Increased `interval` and `scrapeTimput` to 30s for elasticsearch prometheus service monitor.
 - Tests respect the `ENABLE_CUSTOMER_GRAFANA` configuration
 - Ensures that `customer kubeconfig.yaml` is added to the list of secrets. So it can be handled by the scripts.
+- Fixed so that `loadbalancer_ip_addresses` is set for exoscale in `infra.json`
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
