@@ -32,6 +32,7 @@
 - AlertmanagerDown alert in the service cluster for the alertmanager in the workload cluster is muted only when `ENABLE_CUSTOMER_ALERTMANAGER=false`.
 - Customer alertmanager ingress is using the proper secret.
 - Ansible role `internal_lb` sometimes getting stuck when running apt step
+- Increased `interval` and `scrapeTimput` to 30s for elasticsearch prometheus service monitor.
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
