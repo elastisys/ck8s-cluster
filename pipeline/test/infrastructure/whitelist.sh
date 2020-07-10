@@ -61,7 +61,19 @@ function check_ssh () {
 check_api_server() {
   prefix=$1
   type=$2
-  host_addresses=($(cat $infra | jq -r ".${prefix}.master_ip_addresses[].public_ip" ))
+  if [[ "$CK8S_CLOUD_PROVIDER" == "exoscale" ]]; then
+    host_addresses=()
+    host_addresses+=("$(cat $infra | jq -r ".${prefix}.loadbalancer_ip_addresses")")
+  elif [[ "$CK8S_CLOUD_PROVIDER" == "aws" ]]; then
+    host_addresses=()
+    if [[ "$prefix" == "service_cluster" ]]; then
+        host_addresses+=("$(cat $infra | jq -r ".${prefix}.sc_master_external_loadbalancer_fqdn")")
+    else
+        host_addresses+=("$(cat $infra | jq -r ".${prefix}.wc_master_external_loadbalancer_fqdn")")
+    fi
+  else
+    host_addresses=($(cat $infra | jq -r ".${prefix}.loadbalancer_ip_addresses[].public_ip" ))
+  fi
   for host in "${host_addresses[@]}"
   do
       code=$(curl https://${host}:6443 -ks --max-time 5 | jq .code)

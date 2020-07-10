@@ -1,8 +1,8 @@
 name: Matrix-pipeline
 
-on:
-  schedule:
-    - cron: "0 3 * * *"
+on: push
+  #schedule:
+   # - cron: "0 3 * * *"
 
 jobs:
   build-image:
@@ -93,6 +93,7 @@ jobs:
       run: ./pipeline/apply.bash
       shell: bash
       env:
+        CK8S_CLOUD_PROVIDER: ${{ matrix.cloud }}
         CK8S_CONFIG_PATH: ./ck8s_pipeline_config
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
