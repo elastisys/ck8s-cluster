@@ -18,7 +18,6 @@ deployments=(
     "kube-system coredns"
     "kube-system metrics-server"
     "nginx-ingress nginx-ingress-default-backend"
-    "monitoring customer-grafana"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-grafana"
     "monitoring prometheus-operator-kube-state-metrics"
@@ -44,6 +43,9 @@ if [ "$ENABLE_HARBOR" == true ]; then
 fi
 if [ "$ENABLE_CK8SDASH_SC" == true ]; then
     deployments+=("ck8sdash ck8sdash")
+fi
+if [ "$ENABLE_CUSTOMER_GRAFANA" == true ]; then
+    deployments+=("monitoring customer-grafana")
 fi
 resourceKind="Deployment"
 # Get json data in a smaller dataset
