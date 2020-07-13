@@ -5,6 +5,8 @@
       - virtualenv
       - python3-pip
     update_cache: yes
+  async: 600
+  poll: 30
 
 - name: Install Docker Module for Python
   pip:
