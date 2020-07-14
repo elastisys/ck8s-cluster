@@ -17,6 +17,7 @@ source "${here}/common.bash"
 #       ckctl whitelist [--ingress] [--kubernetes] CIDR
 whitelist_update public_ingress_cidr_whitelist 127.0.0.1
 whitelist_update api_server_whitelist 127.0.0.1
+whitelist_update nodeport_whitelist 127.0.0.1
 ckctl internal terraform apply --cluster sc
 ckctl internal terraform apply --cluster wc
 
@@ -25,6 +26,7 @@ ckctl internal terraform apply --cluster wc
 my_ip=$(get_my_ip)
 whitelist_update public_ingress_cidr_whitelist "${my_ip}"
 whitelist_update api_server_whitelist "${my_ip}"
+whitelist_update nodeport_whitelist "${my_ip}"
 ckctl internal terraform apply --cluster sc
 ckctl internal terraform apply --cluster wc
 

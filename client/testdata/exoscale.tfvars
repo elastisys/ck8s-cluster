@@ -13,3 +13,4 @@ es_local_storage_capacity_map_wc = { master-0 = 0, worker-1 = 1 }
 nfs_size                         = "Small"
 public_ingress_cidr_whitelist    = ["194.132.164.168/32", "194.132.164.169/32"]
 api_server_whitelist             = ["194.132.164.168/32", "194.132.164.169/32"]
+nodeport_whitelist               = ["194.132.164.168/32", "194.132.164.169/32"]

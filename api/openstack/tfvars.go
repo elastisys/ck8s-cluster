@@ -33,6 +33,7 @@ type OpenstackTFVars struct {
 	PublicIngressCIDRWhitelist []string `hcl:"public_ingress_cidr_whitelist" validate:"required"`
 
 	APIServerWhitelist []string `hcl:"api_server_whitelist" validate:"required"`
+	NodeportWhitelist  []string `hcl:"nodeport_whitelist" validate:"required"`
 
 	AWSDNSZoneID  string `hcl:"aws_dns_zone_id" validate:"required"`
 	AWSDNSRoleARN string `hcl:"aws_dns_role_arn" validate:"required"`

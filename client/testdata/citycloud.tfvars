@@ -14,6 +14,7 @@ master_anti_affinity_policy_wc = "anti-affinity"
 worker_anti_affinity_policy_wc = "soft-anti-affinity"
 public_ingress_cidr_whitelist  = ["194.132.164.168/32", "194.132.164.169/32"]
 api_server_whitelist           = ["194.132.164.168/32", "194.132.164.169/32"]
+nodeport_whitelist             = ["194.132.164.168/32", "194.132.164.169/32"]
 aws_dns_zone_id                = "Z2STJRQSJO5PZ0"
 aws_dns_role_arn               = "arn:aws:iam::248119176842:role/pipeline"
 external_network_id            = "2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c"
