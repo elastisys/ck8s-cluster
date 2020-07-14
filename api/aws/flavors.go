@@ -36,6 +36,7 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 		tfvars: AWSTFVars{
 			PublicIngressCIDRWhitelist: []string{},
 			APIServerWhitelist:         []string{},
+			NodeportWhitelist:          []string{},
 		},
 	}
 }

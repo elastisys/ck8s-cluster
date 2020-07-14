@@ -30,6 +30,7 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 		tfvars: ExoscaleTFVars{
 			PublicIngressCIDRWhitelist: []string{},
 			APIServerWhitelist:         []string{},
+			NodeportWhitelist:          []string{},
 		},
 	}
 }

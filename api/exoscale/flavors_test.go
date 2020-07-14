@@ -42,6 +42,7 @@ func TestFlavors(t *testing.T) {
 			tfvars: ExoscaleTFVars{
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
+				NodeportWhitelist:          []string{},
 			},
 		},
 		got: Default(clusterType, clusterName),
@@ -72,6 +73,7 @@ func TestFlavors(t *testing.T) {
 			tfvars: ExoscaleTFVars{
 				PublicIngressCIDRWhitelist:  []string{},
 				APIServerWhitelist:          []string{},
+				NodeportWhitelist:           []string{},
 				MasterNamesSC:               []string{"master-0"},
 				MasterNameSizeMapSC:         map[string]string{"master-0": "Small"},
 				WorkerNamesSC:               []string{"worker-0", "worker-1"},
@@ -113,6 +115,7 @@ func TestFlavors(t *testing.T) {
 			tfvars: ExoscaleTFVars{
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
+				NodeportWhitelist:          []string{},
 			},
 		},
 		got: Production(clusterType, clusterName),

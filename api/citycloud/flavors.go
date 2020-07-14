@@ -33,6 +33,7 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 		tfvars: openstack.OpenstackTFVars{
 			PublicIngressCIDRWhitelist: []string{},
 			APIServerWhitelist:         []string{},
+			NodeportWhitelist:          []string{},
 
 			ExternalNetworkID:   "71b10496-2617-47ae-abbc-36239f0863bb",
 			ExternalNetworkName: "public-v4",

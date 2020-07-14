@@ -45,6 +45,7 @@ func TestFlavors(t *testing.T) {
 				Region:                     "",
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
+				NodeportWhitelist:          []string{},
 			},
 		},
 		got: Default(clusterType, clusterName),
@@ -78,6 +79,7 @@ func TestFlavors(t *testing.T) {
 				Region:                     "us-west-1",
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
+				NodeportWhitelist:          []string{},
 
 				MasterNodesSC: map[string]string{"master-0": "t3.small"},
 				WorkerNodesSC: map[string]string{"worker-0": "t3.xlarge", "worker-1": "t3.large"},
@@ -116,6 +118,7 @@ func TestFlavors(t *testing.T) {
 				Region:                     "",
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
+				NodeportWhitelist:          []string{},
 			},
 		},
 		got: Production(clusterType, clusterName),
