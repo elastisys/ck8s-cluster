@@ -77,14 +77,23 @@ This section describes how to migrate the service cluster between releases with 
 * Migrate elasticsearch data *(see [this](backup/elasticsearch.md))*
 * Migrate influx data *(see [this](backup/influxdb.md))*
 * Migrate harbor data *(see [this](backup/harbor.md))*
-* Migrate customer grafana dashboards
-  * Two options is possible here:
-    1. Copy the grafana DB from the pod
-    ```
-    kubectl cp -c grafana monitoring/<grafana pod name>:/var/lib/grafana/grafana.db $(pwd)/grafana.db.bck
-    ```
-    Restore a new grafana instance by copy it back
-    ```
-    kubectl cp -c grafana $(pwd)/grafana.db.bck monitoring/<grafana pod name>:/var/lib/grafana/grafana.db
-    ```
-    2. Use velero as described above to backup and restore the customer grafana
+* Migrate customer grafana data
+    1. Copy the grafana database from the pod
+
+        ``` bash
+        kubectl cp -c grafana monitoring/<grafana pod name>:/var/lib/grafana/grafana.db $(pwd)/grafana.db.bck
+        ```
+
+    2. Perform the customer grafana version upgrade
+
+    3. Restore customer grafana data by copying the database back to the new instance
+
+        ``` bash
+        kubectl cp -c grafana $(pwd)/grafana.db.bck monitoring/<NEW grafana pod name>:/var/lib/grafana/grafana.db
+        ```
+
+    4. Delete the grafana pod to trigger [the automatic database schema upgrade](https://grafana.com/docs/grafana/latest/installation/upgrading/?src=grafana_footer#database-backup)
+
+        ``` bash
+        kubectl delete pod -n monitoring <NEW grafana pod name>
+        ```
