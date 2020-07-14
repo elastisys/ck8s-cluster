@@ -2,7 +2,7 @@ name: Matrix-pipeline
 
 on: push
   #schedule:
-   # - cron: "0 3 * * *"
+  #  - cron: "0 3 * * *"
 
 jobs:
   build-image:
@@ -36,7 +36,7 @@ jobs:
       fail-fast: false
       # max-parallel: 1
       matrix:
-        cloud: ["exoscale", "safespring", "citycloud"]
+        cloud: ["safespring", "citycloud"]
         # cloud: ["safespring", "exoscale", "aws", "citycloud"]
         flavor: ["ha"]
         ## In addition to the matrix, add this

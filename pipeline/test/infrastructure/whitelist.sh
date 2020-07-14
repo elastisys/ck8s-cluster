@@ -95,8 +95,15 @@ check_api_server() {
 
 check_ssh service_cluster "$test_type"
 check_ssh workload_cluster "$test_type"
-check_api_server service_cluster "$test_type"
-check_api_server workload_cluster "$test_type"
+
+# TODO: remove this when whitelisting for citycloud load balancer works.
+# Becuase the security group applyed to loadbalancer has no effect at the moment. 
+if [[ "$CK8S_CLOUD_PROVIDER" == "citycloud" ]]; then
+    echo "Skipping api server test for citycloud"
+else
+    check_api_server service_cluster "$test_type"
+    check_api_server workload_cluster "$test_type"
+fi
 
 echo "==============================="
 echo "Whitelist test result $test_type"
