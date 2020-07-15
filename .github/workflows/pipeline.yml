@@ -56,6 +56,38 @@ jobs:
     - run: ckctl status --cluster sc
     - run: ckctl status --cluster wc
     - run: ./pipeline/e2e-tests.bash
+    - name: Upload config
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: ck8s-config
+        path: /ck8s-config
+
+  cleanup:
+    needs: e2e
+    if: always()
+    runs-on: ubuntu-latest
+    container:
+      image: elastisys/ckctl:${{ github.sha }}
+    env:
+      CK8S_CONFIG_PATH: /ck8s-config
+      CK8S_AUTO_APPROVE: true
+      CK8S_LOG_LEVEL: debug
+      TFE_TOKEN: ${{ secrets.TF_TOKEN }}
+    steps:
+    - name: Download config
+      uses: actions/download-artifact@v2
+      with:
+        name: ck8s-config
+        path: /ck8s-config
+    - uses: actions/checkout@v2
+    - run: ./pipeline/setup-pgp.bash
+      env:
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+    - run: ./pipeline/setup-terraform.bash
+      env:
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
     - if: always()
       run: ckctl destroy --cluster wc
     - if: always()
@@ -65,7 +97,7 @@ jobs:
     - run: ckctl destroy --cluster sc --destroy-remote-workspace
 
   clean-image:
-    needs: e2e
+    needs: cleanup
     if: always()
     runs-on: ubuntu-latest
     steps:
