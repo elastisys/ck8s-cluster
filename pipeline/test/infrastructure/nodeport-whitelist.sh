@@ -55,10 +55,16 @@ check_nodeport_whitelist() {
   done
 }
 
-startup 
+#As there is a bug in kubernetes where resourses is not resleased straight away. https://github.com/kubernetes/kubernetes/issues/32987
+#This means that startup is only done by positive to ensure that it works. Meaning that the negative tests have something to test against aswell.
+if [[ "$test_type" == "positive" ]]; then
+    startup 
+fi
 check_nodeport_whitelist service_cluster "$test_type"
 check_nodeport_whitelist workload_cluster "$test_type"
-cleanup
+if [[ "$test_type" == "negative" ]]; then
+    cleanup 
+fi
 
 echo "==============================="
 echo "Nodeport whitelist test result"

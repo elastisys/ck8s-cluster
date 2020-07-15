@@ -49,6 +49,7 @@ case "${CK8S_CLOUD_PROVIDER}" in
 
     whitelist_update "public_ingress_cidr_whitelist" $my_ip 
     whitelist_update "api_server_whitelist" $my_ip
+    whitelist_update "nodeport_whitelist" $my_ip
     ;;
     "citycloud")
     config_update ECK_BASE_DOMAIN "${CK8S_ENVIRONMENT_NAME}.elastisys.se"
@@ -63,6 +64,7 @@ case "${CK8S_CLOUD_PROVIDER}" in
 
     whitelist_update "public_ingress_cidr_whitelist" $my_ip 
     whitelist_update "api_server_whitelist" $my_ip
+    whitelist_update "nodeport_whitelist" $my_ip
     ;;
 esac
 

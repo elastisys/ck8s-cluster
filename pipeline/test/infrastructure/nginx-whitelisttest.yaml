@@ -39,7 +39,6 @@ metadata:
   name: nginx-deployment-68c7f5464c-whnjq
   namespace: ck8s-nodeport-test
 spec:
-  clusterIP: 10.107.71.93
   externalTrafficPolicy: Cluster
   ports:
   - nodePort: 32116
