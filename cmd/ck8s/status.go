@@ -150,23 +150,25 @@ func statusNode(
 	var errChain error
 
 	for _, machine := range clusterClient.DesiredMachines() {
-		exists, err := clusterClient.NodeExists(machine.Name)
-		if err != nil {
-			printMachineStatus("K8S node", machine, false)
-			errChain = multierror.Append(fmt.Errorf(
-				"node status failed for %s: %w",
-				machine.Name, err,
-			))
-			continue
-		} else if !exists {
-			printMachineStatus("K8S node", machine, false)
-			errChain = multierror.Append(fmt.Errorf(
-				"node does not exist in Kubernetes: %s",
-				machine,
-			))
-			continue
+		if machine.NodeType == api.Worker || machine.NodeType == api.Master {
+			exists, err := clusterClient.NodeExists(machine.Name)
+			if err != nil {
+				printMachineStatus("K8S node", machine, false)
+				errChain = multierror.Append(fmt.Errorf(
+					"node status failed for %s: %w",
+					machine.Name, err,
+				))
+				continue
+			} else if !exists {
+				printMachineStatus("K8S node", machine, false)
+				errChain = multierror.Append(fmt.Errorf(
+					"node does not exist in Kubernetes: %s",
+					machine,
+				))
+				continue
+			}
+			printMachineStatus("K8S node", machine, true)
 		}
-		printMachineStatus("K8S node", machine, true)
 	}
 
 	return errChain
