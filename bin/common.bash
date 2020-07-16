@@ -48,6 +48,8 @@ secrets["kube_config_wc"]="${state_path}/kube_config_wc.yaml"
 secrets["ssh_priv_key_sc"]="${ssh_path}/id_rsa_sc"
 secrets["ssh_priv_key_wc"]="${ssh_path}/id_rsa_wc"
 
+secrets["customer_kubeconfig"]="${CK8S_CONFIG_PATH}/customer/kubeconfig.yaml"
+
 config["ssh_pub_key_sc"]="${secrets[ssh_priv_key_sc]}.pub"
 config["ssh_pub_key_wc"]="${secrets[ssh_priv_key_wc]}.pub"
 
