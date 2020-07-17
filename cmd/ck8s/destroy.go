@@ -8,6 +8,7 @@ import (
 
 const (
 	destroyRemoteWorkspaceFlag = "destroy-remote-workspace"
+	kubernetesCleanupFlag      = "kubernetes-cleanup"
 )
 
 func destroy(
@@ -15,7 +16,7 @@ func destroy(
 	cmd *cobra.Command,
 	args []string,
 ) error {
-	return clusterClient.Destroy(viper.GetBool(destroyRemoteWorkspaceFlag))
+	return clusterClient.Destroy(viper.GetBool(destroyRemoteWorkspaceFlag), viper.GetBool(kubernetesCleanupFlag))
 }
 
 func init() {
@@ -36,6 +37,16 @@ all Terraform managed cloud resources and all S3 buckets.`,
 	viper.BindPFlag(
 		destroyRemoteWorkspaceFlag,
 		destroyCmd.Flags().Lookup(destroyRemoteWorkspaceFlag),
+	)
+
+	destroyCmd.Flags().Bool(
+		kubernetesCleanupFlag,
+		true,
+		"tries to release volumes and loadbalancers before tearing down the cluster.",
+	)
+	viper.BindPFlag(
+		kubernetesCleanupFlag,
+		destroyCmd.Flags().Lookup(kubernetesCleanupFlag),
 	)
 
 	rootCmd.AddCommand(destroyCmd)

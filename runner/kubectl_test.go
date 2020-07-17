@@ -13,8 +13,10 @@ var (
 		KubeconfigPath: "kubeconfig",
 		NodePrefix:     "prefix",
 	}
-	testNodeName     = "node"
-	testFullNodeName = testKubectlConfig.NodePrefix + "-" + testNodeName
+	testNodeName        = "node"
+	testFullNodeName    = testKubectlConfig.NodePrefix + "-" + testNodeName
+	testDeleteResource  = "testResource"
+	testDeleteExtraArgs = "testExtraArg"
 )
 
 func TestKubectlNodeExists(t *testing.T) {
@@ -111,6 +113,54 @@ func TestKubectlDeleteNode(t *testing.T) {
 	if err := k.DeleteNode(testNodeName); err != nil {
 		t.Error(err)
 	}
+
+	logTest.Diff(t)
+}
+
+func TestKubectlDeleteAll(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"kubectl_delete_all",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := NewCommand(
+		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
+		fmt.Sprintf(
+			"KUBECONFIG={} kubectl delete %s -A --all %s",
+			testDeleteResource,
+			testDeleteExtraArgs,
+		),
+	)
+
+	r.Push(&TestCommand{Command: wantCmd})
+
+	k := NewKubectl(logger, r, testKubectlConfig)
+
+	if err := k.DeleteAll(testDeleteResource, testDeleteExtraArgs); err != nil {
+		t.Error(err)
+	}
+
+	logTest.Diff(t)
+}
+
+func TestKubectlIsUp(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"kubectl_is_up",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := NewCommand(
+		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
+		fmt.Sprintf("KUBECONFIG={} kubectl get --raw /api --request-timeout=2s"),
+	)
+
+	r.Push(&TestCommand{Command: wantCmd})
+
+	k := NewKubectl(logger, r, testKubectlConfig)
+
+	k.IsUp()
 
 	logTest.Diff(t)
 }

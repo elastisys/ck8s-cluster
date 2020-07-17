@@ -98,3 +98,16 @@ func (k *Kubectl) DeleteNode(name string) error {
 	k.logger.Debug("kubectl_delete_node")
 	return k.runner.Run(k.command("delete", "node", k.fullNodeName(name)))
 }
+
+// DeleteAll runs `sops exec-file KUBECONFIG 'kubectl delete RESOURCE -A --all EXTRAARGS...'
+func (k *Kubectl) DeleteAll(resource string, extraArgs ...string) error {
+	k.logger.Debug("kubectl_delete_all", zap.String("resource", resource))
+	args := append([]string{"delete", resource, "-A", "--all"}, extraArgs...)
+	return k.runner.Run(k.command(args...))
+}
+
+// DeleteAll runs `sops exec-file KUBECONFIG 'kubectl get --raw /api --request-timeout=2s'
+func (k *Kubectl) IsUp() bool {
+	k.logger.Debug("kubectl_is_up")
+	return k.runner.Background(k.command("get", "--raw", "/api", "--request-timeout=2s")) == nil
+}

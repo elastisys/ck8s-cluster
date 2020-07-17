@@ -185,10 +185,20 @@ func (c *ClusterClient) Apply() error {
 	return c.encryptKubeconfig()
 }
 
-func (c *ClusterClient) Destroy(deleteRemoteWorkspace bool) error {
+func (c *ClusterClient) Destroy(deleteRemoteWorkspace bool, kubernetesCleanup bool) error {
 	c.logger.Info("client_destroy")
 
-	// TODO: Handle Kubernetes/non-Terraform managed resources
+	// Best effort to clean up volumes and loadbalancer
+	if kubernetesCleanup && c.kubectl.IsUp() {
+		c.kubectl.DeleteAll("persistentvolumeclaims", "--timeout=5s")
+
+		// TODO Make smarter that to delete all pods, try to delete only once with pvc
+		c.kubectl.DeleteAll("pod", "--grace-period=60")
+
+		if err := c.kubectl.DeleteAll("service"); err != nil {
+			return fmt.Errorf("error deleting persistent volume claims: %w", err)
+		}
+	}
 
 	if err := c.TerraformDestroy(); err != nil {
 		return fmt.Errorf("error destroying Terraform resources: %w", err)
