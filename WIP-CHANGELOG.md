@@ -7,6 +7,8 @@
 - Harbor upgraded to 2.0.0.
 - Customer and Ops Grafana upgraded to 7.0.3.
 - Prometheus operator upgraded to version 8.15.11 and Prometheus to v2.19.2.
+- InfluxDB Helm Chart upgraded to 4.8.1.
+- Prometheus Node exporter in InfluxDB Helm Chart upgraded to v1.0.1.
 
 ### Breaking changes
 - Adding anti-affinity to nodes in openstack will force them to be recreated by terraform. This will then break the kubernetes clusters.
@@ -43,6 +45,7 @@
 
 ### Removed
 - Unused elasticsearch output plugin parameters from fluentd.
+- InfluxDB Helm Chart moved out to a separate repository.
 
 ### Changed
 - Upgraded ck8sdash to v0.3.1

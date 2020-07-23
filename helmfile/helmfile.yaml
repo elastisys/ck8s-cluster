@@ -13,6 +13,8 @@ repositories:
 {{ if eq .Environment.Name "service_cluster" }}
 - name: harbor
   url: https://helm.goharbor.io
+- name: elastisys
+  url: https://elastisys.github.io/chart-repo
 {{ end }}
 
 # Defult settings to use with helm.
@@ -419,15 +421,14 @@ releases:
   namespace: influxdb-prometheus
   labels:
     app: influxdb
-  chart: ./charts/influxdb
-  version: 4.7.0
+  chart: elastisys/influxdb
+  version: 4.8.1
   missingFileHandler: Error
   {{ if eq (env "STORAGE_CLASS") "nfs-client" }}
   needs:
   - kube-system/nfs-client-provisioner
   {{ end }}
   values:
-  - ./charts/influxdb/elastisys_custom_values.yaml
   - values/influxdb.yaml.gotmpl
   {{ if env "CK8S_ADDITIONAL_VALUES" }}
   - "{{ env "CK8S_ADDITIONAL_VALUES" }}/influxdb.yaml"
