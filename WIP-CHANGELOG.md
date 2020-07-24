@@ -8,6 +8,7 @@
 - Customer and Ops Grafana upgraded to 7.0.3.
 - Prometheus operator upgraded to version 8.15.11 and Prometheus to v2.19.2.
 - InfluxDB Helm Chart upgraded to 4.8.1.
+- InfluxDB now uses the upstream S3 backup jobs instead of our own solution.
 - Prometheus Node exporter in InfluxDB Helm Chart upgraded to v1.0.1.
 
 ### Breaking changes

@@ -1,13 +1,12 @@
 elastisys_custom:
   # The following values must be set in order to use the chart.
   influx_addr: {{ requiredEnv "INFLUX_ADDR" }}
-  s3_region: {{ requiredEnv "S3_REGION" }}
-  s3_region_endpoint: {{ requiredEnv "S3_REGION_ENDPOINT" }}
-  s3_influx_bucket_name: {{ requiredEnv "S3_INFLUX_BUCKET_NAME" }}
-  s3_access_key: {{ requiredEnv "S3_ACCESS_KEY" }}
-  s3_secret_key: {{ requiredEnv "S3_SECRET_KEY" }}
   influxdb_user: {{ requiredEnv "INFLUXDB_USER" }}
   influxdb_password: {{ requiredEnv "INFLUXDB_PWD" }}
+  s3_credentials: |+
+    [default]
+    aws_access_key_id={{ requiredEnv "S3_ACCESS_KEY" }}
+    aws_secret_access_key={{ requiredEnv "S3_SECRET_KEY" }}
 
 serviceAccount:
   create: false
@@ -105,3 +104,19 @@ volumes:
         path: influxdb-retention-database
       - key: prometheus-influxdb-retention-metric-name
         path: prometheus-influxdb-retention-metric-name
+
+backup:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 250m
+      memory: 300Mi
+  schedule: "*/5 * * * *"
+  startingDeadlineSeconds: 200
+  s3:
+    credentialsSecret: influxdb-backup-secret #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+    destination: s3://{{ requiredEnv "S3_INFLUX_BUCKET_NAME" }}
+    endpointUrl: {{ requiredEnv "S3_REGION_ENDPOINT" }}
