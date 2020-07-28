@@ -12,17 +12,11 @@
 
     - name: Upload default PSP manifests
       copy:
-        src: "../manifests/podSecurityPolicy/common/{{ item }}"
+        src: "files/{{ item }}"
         dest: /etc/kubeadm/{{ item }}
       loop:
         - default-privileged-psp.yaml
         - default-restricted-psp.yaml
-      when: lookup('env','ENABLE_PSP') == "true"
-
-    - name: Upload restricted PSP manifest
-      copy:
-        src: "../manifests/podSecurityPolicy/restricted-psp.yaml"
-        dest: /etc/kubeadm/restricted-psp.yaml
       when: lookup('env','ENABLE_PSP') == "true"
 
     - name: Install default PSP
@@ -30,7 +24,6 @@
       loop:
         - /etc/kubeadm/default-privileged-psp.yaml
         - /etc/kubeadm/default-restricted-psp.yaml
-        - /etc/kubeadm/restricted-psp.yaml
       # Retries are needed here as the loadbalancer will forward requests to unhealthy master nodes
       # until master[0] is marked as healthy.
       register: result
