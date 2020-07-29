@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - cluster
+  push:
+    branches:
+      - 'pre-release-*'
+
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
@@ -63,8 +67,81 @@ jobs:
         name: ck8s-config
         path: /ck8s-config
 
-  cleanup:
+  get-versions:
+    if: startsWith(github.ref , 'refs/heads/pre-release-' )
     needs: e2e
+    runs-on: ubuntu-latest
+    container:
+      image: elastisys/ckctl:${{ github.sha }}
+    env:
+      CK8S_CONFIG_PATH: /ck8s-config
+      CK8S_AUTO_APPROVE: true
+      CK8S_LOG_LEVEL: debug
+      TFE_TOKEN: ${{ secrets.TF_TOKEN }}
+    steps:
+    - name: Checkout ck8s-cluster
+      uses: actions/checkout@v2
+    - name: Download config
+      uses: actions/download-artifact@v2
+      with:
+        name: ck8s-config
+        path: /ck8s-config
+    - name: Setup pgp key for sops
+      run: ./pipeline/setup-pgp.bash
+      env:
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+    - name: Setup terraform cloud credentials
+      run: ./pipeline/setup-terraform.bash
+      env:
+        TF_TOKEN: ${{ secrets.TF_TOKEN }}
+    - name: Configure whitelisting
+      run: ./pipeline/configure.bash
+      env:
+        CI_EXOSCALE_KEY: ${{ secrets.EXOSCALE_KEY }}
+        CI_EXOSCALE_SECRET: ${{ secrets.EXOSCALE_SECRET }}
+    - name: Update whitelisting for service cluster
+      run: ckctl apply --cluster sc
+    - name: Update whitelisting for service cluster
+      run: ckctl apply --cluster wc
+    - name: Update versions for each application in ck8s
+      run: ./pipeline/versions.sh
+      shell: bash
+    - name: Upload version.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: version.json
+        path: version.json
+
+  create-release-pr:
+    if: startsWith(github.ref , 'refs/heads/pre-release-')
+    needs: get-versions
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout ck8s-cluster
+      uses: actions/checkout@v2
+    - name: Download version.json
+      uses: actions/download-artifact@v2
+      with:
+        name: version.json
+        path: versions
+    - name: Move version.json to correct path
+      run: mv versions/version.json release/version.json
+    - name: Run release script
+      run: ./release/release.sh
+      id: release-script
+      shell: bash
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create pull-request to release branch.
+      uses: repo-sync/pull-request@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        destination_branch: "${{ steps.release-script.outputs.MERGE_BRANCH }}"
+        pr_title: "Releasing version ${{ steps.release-script.outputs.RELEASE_VERSION }}"
+
+  cleanup:
+    needs: create-release-pr
     if: always()
     runs-on: ubuntu-latest
     container:

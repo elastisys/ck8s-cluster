@@ -2,16 +2,18 @@
 
 set -eu -o pipefail
 
-here="$(dirname "$(readlink -f "$0")")"
+export here="$(dirname "$(readlink -f "$0")")"
 
 source "${here}/common.bash"
 
-sops_pgp_setup
+file=${here}/../release/version.json
+tmp=$(mktemp)
+jq '.services = {}' "$file" > "$tmp" && mv "$tmp" "$file"
 
 sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml" \
-    'KUBECONFIG={} ${GITHUB_WORKSPACE}/release/get-versions.sh'
+    'KUBECONFIG={} ${here}/../release/get-versions.sh'
 
 sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml" \
-    'KUBECONFIG={} ${GITHUB_WORKSPACE}/release/get-versions.sh'
+    'KUBECONFIG={} ${here}/../release/get-versions.sh'
 
-cat release/version.json > "${GITHUB_WORKSPACE}/version.json"
+cat ${here}/../release/version.json > "${GITHUB_WORKSPACE}/version.json"

@@ -1,5 +1,6 @@
 #!/bin/bash
 # Script to get versions from current kubeconfig and post to json file.
+set -e
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 file=${SCRIPTS_PATH}/version.json
