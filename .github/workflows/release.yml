@@ -1,0 +1,61 @@
+name: Release
+
+on: 
+  pull_request:
+    types: [closed]
+    branches:
+    - 'release-*'
+
+jobs:
+  release:
+    # Only trigger if merged from pre-release-* branch
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref , 'pre-release-')
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get the version
+        id: get_version 
+        run: version=$(cat release/version.json | jq -r '.ck8s') && echo ::set-output name=VERSION::${version}
+      - name: Create Release
+        id: create_release
+        uses: fleskesvor/create-release@1a72e235c178bf2ae6c51a8ae36febc24568c5fe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          release_name: Release v${{ steps.get_version.outputs.VERSION }}
+          body: |
+            See [CHANGELOG.md](https://github.com/elastisys/ck8s/blob/v${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
+                      
+  build-image:
+    # Only trigger if merged from pre-release-* branch
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref , 'pre-release-')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get the version
+      id: get_version 
+      run: version=$(cat release/version.json | jq -r '.ck8s') && echo ::set-output name=VERSION::${version}
+    - uses: whoan/docker-build-with-cache-action@v3
+      with:
+        username: "${{ secrets.DOCKERHUB_USER }}"
+        password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+        image_name: elastisys/ck8s-ops
+        image_tag: v${{ steps.get_version.outputs.VERSION }}
+        context: pipeline
+    - uses: whoan/docker-build-with-cache-action@v3
+      with:
+        username: "${{ secrets.DOCKERHUB_USER }}"
+        password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+        image_name: elastisys/ck8s-ops
+        image_tag: latest
+        context: pipeline
+    - uses: whoan/docker-build-with-cache-action@v3
+      with:
+        username: "${{ secrets.DOCKERHUB_USER }}"
+        password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+        image_name: elastisys/ck8s-ops
+        image_tag: v${{ steps.get_version.outputs.VERSION }}-dev
+        context: pipeline
+        dockerfile: Dockerfile.dev
