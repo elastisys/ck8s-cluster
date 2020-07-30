@@ -25,7 +25,7 @@ RUN  apt-get update && \
      apt-get install -y \
          python3-pip make git wget \
          unzip ssh gettext-base \
-         curl python3.7 apache2-utils \
+         jq curl python3.7 apache2-utils \
          ansible="${ANSIBLE_VERSION}" \
          net-tools iputils-ping && \
      rm -rf /var/lib/apt/lists/*
