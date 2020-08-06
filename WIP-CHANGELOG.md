@@ -1,4 +1,5 @@
-## Initial release
-First release of the cluster installer for Compliant Kubernetes
+# Initial release
 
-The cluster installer features a go cli that can create kubernetes klusters. It will both provision the neccessary cloud infrastructure and install kubernetes on top of the virtual machines. It is primarilly intended for use in Compliant Kubernetes.
+First release of the cluster installer for Compliant Kubernetes.
+
+The cluster installer features a go cli that can create kubernetes clusters. It will both provision the necessary cloud infrastructure and install Kubernetes on top of the virtual machines. It is primarily intended for use in Compliant Kubernetes.
