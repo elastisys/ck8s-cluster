@@ -58,6 +58,40 @@ func (c *MachineClient) Reset() error {
 	})
 }
 
+func (c *MachineClient) kubeadmVersion() (string, error) {
+	c.logger.Debug("machine_client_kubeadm_version")
+
+	var version string
+
+	return version, c.SingleSession(func(session *ssh.Session) error {
+		r := runner.NewSSHRunner(c.baseLogger, session, c.silent)
+
+		var err error
+
+		version, err = runner.NewKubeadm(c.baseLogger, r).Version()
+		if err != nil {
+			return fmt.Errorf("error retrieving Kubeadm version: %w", err)
+		}
+
+		return nil
+	})
+}
+
+// Upgrade runs kubeadm upgrade on the machine.
+func (c *MachineClient) Upgrade(autoApprove bool) error {
+	c.logger.Info("machine_client_upgrade")
+
+	version, err := c.kubeadmVersion()
+	if err != nil {
+		return err
+	}
+
+	return c.SingleSession(func(session *ssh.Session) error {
+		r := runner.NewSSHRunner(c.baseLogger, session, c.silent)
+		return runner.NewKubeadm(c.baseLogger, r).Upgrade(version, autoApprove)
+	})
+}
+
 func (c *MachineClient) WaitForSSH(timeout time.Duration) error {
 	logger := c.logger.With(
 		zap.Duration("timeout", timeout),

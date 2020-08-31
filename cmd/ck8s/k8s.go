@@ -105,6 +105,14 @@ This useful when, for example, the Kubernetes cluster needs to be updated gracef
 	}
 	replaceCmd.Flags().String(imageFlag, "", "set image")
 	rootCmd.AddCommand(replaceCmd)
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "upgrade MASTER_NODE_NAME",
+		Short: "Upgrade the Kubernetes control plane",
+		Long:  `This command upgrades the control plane of a master node.`,
+		Args:  ExactArgs(1),
+		RunE:  withClusterClient(upgradeControlPlane),
+	})
 }
 
 func addNode(
@@ -234,4 +242,12 @@ func removeNode(
 		return fmt.Errorf("error removing node: %s", err)
 	}
 	return nil
+}
+
+func upgradeControlPlane(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
+	return clusterClient.Upgrade(args[0])
 }
