@@ -26,6 +26,7 @@
 - Command to add new machines.
 - Support for cloning and replacing nodes but with a different image.
 - Support for upgrading the Kubernetes control plane.
+- Command to list available machine images.
 
 ### Fixed
 
