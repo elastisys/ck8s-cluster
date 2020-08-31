@@ -24,7 +24,6 @@ func init() {
 		Args:  NoArgs,
 		RunE:  withClusterClient(machineList),
 	}
-
 	listCmd.Flags().String(
 		nodeTypeFlag,
 		"",
@@ -34,8 +33,14 @@ func init() {
 		nodeTypeFlag,
 		listCmd.Flags().Lookup(nodeTypeFlag),
 	)
-
 	rootCmd.AddCommand(listCmd)
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "images NODE_TYPE",
+		Short: "List available machine images",
+		Args:  ExactArgs(1),
+		RunE:  withClusterClient(machineImages),
+	})
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ssh NAME",
@@ -89,6 +94,25 @@ func machineList(
 		}
 
 		printMachine(name, machine)
+	}
+
+	return nil
+}
+
+func machineImages(
+	clusterClient *client.ClusterClient,
+	cmd *cobra.Command,
+	args []string,
+) error {
+	nodeType := api.NodeType(args[0])
+
+	images, err := clusterClient.MachineImages(nodeType)
+	if err != nil {
+		return fmt.Errorf("error getting machine images: %s", err)
+	}
+
+	for _, image := range images {
+		fmt.Println(image)
 	}
 
 	return nil

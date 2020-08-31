@@ -477,6 +477,18 @@ func (c *ClusterClient) Upgrade(name string) error {
 	return nil
 }
 
+// MachineImages return the available machine images for a certain node type.
+func (c *ClusterClient) MachineImages(
+	nodeType api.NodeType,
+) ([]string, error) {
+	cloudProvider, err := CloudProviderFromType(c.cluster.CloudProvider())
+	if err != nil {
+		return nil, err
+	}
+
+	return cloudProvider.MachineImages(nodeType), nil
+}
+
 // S3Apply renders the s3cfg file and creates the S3 buckets.
 func (c *ClusterClient) S3Apply() error {
 	c.logger.Info("client_s3_apply")
