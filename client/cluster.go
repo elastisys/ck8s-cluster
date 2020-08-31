@@ -458,6 +458,25 @@ func (c *ClusterClient) RemoveNode(name string) error {
 	return nil
 }
 
+// Upgrade upgrades the Kubernetes control plane to the newest Kubeadm version
+// available on the current machine image.
+func (c *ClusterClient) Upgrade(name string) error {
+	machine, err := c.Machine(name)
+	if err != nil {
+		return fmt.Errorf("error getting machine: %w", err)
+	}
+
+	if machine.NodeType != api.Master {
+		return fmt.Errorf("machine is not a master node: %s", name)
+	}
+
+	if err := c.MachineClient(machine).Upgrade(c.autoApprove); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // S3Apply renders the s3cfg file and creates the S3 buckets.
 func (c *ClusterClient) S3Apply() error {
 	c.logger.Info("client_s3_apply")
