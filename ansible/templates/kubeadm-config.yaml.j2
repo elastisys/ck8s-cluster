@@ -58,7 +58,7 @@ apiServer:
     v: "4"
     # Set max age for audit logs
     audit-log-maxage: "7"
-    enable-admission-plugins: "{{ "PodSecurityPolicy," if lookup('env','ENABLE_PSP') == "true" else ""}}NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
+    enable-admission-plugins: "PodSecurityPolicy,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
 {% if cloud_provider is defined %}
     cloud-provider: "{{ cloud_provider }}"
 {% endif %}

@@ -17,7 +17,6 @@
       loop:
         - default-privileged-psp.yaml
         - default-restricted-psp.yaml
-      when: lookup('env','ENABLE_PSP') == "true"
 
     - name: Install default PSP
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f {{ item }}
@@ -30,7 +29,6 @@
       retries: 15
       delay: 5
       until: result is not failed
-      when: lookup('env','ENABLE_PSP') == "true"
 
     - name: Download calico manifests
       get_url:
