@@ -2,6 +2,7 @@ package client
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -9,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"go.uber.org/zap"
 
 	"github.com/elastisys/ck8s/api"
@@ -17,26 +19,12 @@ import (
 	"github.com/elastisys/ck8s/testutil"
 )
 
-type fakeRunner struct{}
-
-func (r *fakeRunner) Run(*runner.Command) error {
-	return nil
-}
-
-func (r *fakeRunner) Background(*runner.Command) error {
-	return nil
-}
-
-func (r *fakeRunner) Output(*runner.Command) error {
-	return nil
-}
-
 func setupClusterClient(
 	t *testing.T,
 	logger *zap.Logger,
 	clusterType api.ClusterType,
 	cluster api.Cluster,
-) (*ClusterClient, string) {
+) (*ClusterClient, *runner.TestRunner, string) {
 	// TODO: Get around needing filesystem access.
 	dir, err := ioutil.TempDir("/tmp", "ck8s-test")
 	if err != nil {
@@ -54,6 +42,8 @@ func setupClusterClient(
 		os.RemoveAll(dir)
 	}
 
+	testRunner := runner.NewTestRunner(t)
+
 	configHandler := NewConfigHandler(
 		logger,
 		api.ServiceCluster,
@@ -65,7 +55,7 @@ func setupClusterClient(
 		logger,
 		cluster,
 		configHandler,
-		&fakeRunner{},
+		testRunner,
 		false,
 		false,
 	)
@@ -73,11 +63,44 @@ func setupClusterClient(
 		t.Fatal(err)
 	}
 
-	return c, dir
+	return c, testRunner, dir
 }
 
 func teardownClusterClient(dir string) {
 	os.RemoveAll(dir)
+}
+
+func newTestKubectlServerVersionCommand(
+	apiServerVersion string,
+) *runner.TestCommand {
+	return &runner.TestCommand{
+		SkipDiff: true,
+		Command:  runner.NewCommand("fake-kubectl-version"),
+		Stdout: []byte(fmt.Sprintf(`{
+  "clientVersion": {
+    "major": "1",
+    "minor": "16",
+    "gitVersion": "v1.16.2",
+    "gitCommit": "c97fe5036ef3df2967d086711e6c0c405941e14b",
+    "gitTreeState": "clean",
+    "buildDate": "2019-10-15T19:18:23Z",
+    "goVersion": "go1.12.10",
+    "compiler": "gc",
+    "platform": "linux/amd64"
+  },
+  "serverVersion": {
+    "major": "1",
+    "minor": "17",
+    "gitVersion": "%s",
+    "gitCommit": "ea5f00d93211b7c80247bf607cfa422ad6fb5347",
+    "gitTreeState": "clean",
+    "buildDate": "2020-08-13T15:11:47Z",
+    "goVersion": "go1.13.15",
+    "compiler": "gc",
+    "platform": "linux/amd64"
+  }
+}`, apiServerVersion)),
+	}
 }
 
 func TestAddMachine(t *testing.T) {
@@ -88,9 +111,11 @@ func TestAddMachine(t *testing.T) {
 	cluster := cloudProvider.Default(clusterType, "test")
 
 	size := "size"
+
 	latestImageMaster := api.LatestImage(cloudProvider, api.Master)
 	latestImageWorker := api.LatestImage(cloudProvider, api.Master)
 	firstImageMaster := cloudProvider.MachineImages(api.Master)[0]
+
 	esLocalStorageCapacity := 10
 	providerSettings := &exoscale.MachineSettings{
 		ESLocalStorageCapacity: esLocalStorageCapacity,
@@ -101,9 +126,10 @@ func TestAddMachine(t *testing.T) {
 		name             string
 		nodeType         api.NodeType
 		size             string
-		image            string
+		image            *api.Image
 		providerSettings map[string]interface{}
 	}{{
+		// Master with default values
 		&api.Machine{
 			NodeType: api.Master,
 			Size:     size,
@@ -112,9 +138,10 @@ func TestAddMachine(t *testing.T) {
 		"",
 		api.Master,
 		size,
-		"",
+		nil,
 		nil,
 	}, {
+		// Worker with default values
 		&api.Machine{
 			NodeType: api.Worker,
 			Size:     size,
@@ -123,34 +150,10 @@ func TestAddMachine(t *testing.T) {
 		"",
 		api.Worker,
 		size,
-		"",
+		nil,
 		nil,
 	}, {
-		&api.Machine{
-			NodeType: api.Master,
-			Size:     size,
-			Image:    firstImageMaster,
-		},
-		"",
-		api.Master,
-		size,
-		firstImageMaster,
-		nil,
-	}, {
-		&api.Machine{
-			NodeType:         api.Master,
-			Size:             size,
-			Image:            firstImageMaster,
-			ProviderSettings: providerSettings,
-		},
-		"",
-		api.Master,
-		size,
-		firstImageMaster,
-		map[string]interface{}{
-			"es_local_storage_capacity": esLocalStorageCapacity,
-		},
-	}, {
+		// Custom values
 		&api.Machine{
 			NodeType:         api.Master,
 			Size:             size,
@@ -170,9 +173,11 @@ func TestAddMachine(t *testing.T) {
 			"client_terraform_plan_no_diff",
 			"terraform_init",
 			"terraform_plan_no_diff",
+			"client_validate_machine",
+			"kubectl_server_version",
 		})
 
-		clusterClient, dir := setupClusterClient(
+		clusterClient, testRunner, dir := setupClusterClient(
 			t,
 			logger,
 			clusterType,
@@ -180,11 +185,26 @@ func TestAddMachine(t *testing.T) {
 		)
 		defer teardownClusterClient(dir)
 
+		// terraform init
+		testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+		// terraform plan (no diff)
+		testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+		// kubectl version
+		testRunner.Push(newTestKubectlServerVersionCommand(
+			latestImageMaster.KubeletVersion.String(),
+		))
+
+		imageName := ""
+		if testCase.image != nil {
+			imageName = testCase.image.Name
+		}
 		gotName, err := clusterClient.AddMachine(
 			testCase.name,
 			testCase.nodeType,
 			testCase.size,
-			testCase.image,
+			imageName,
 			testCase.providerSettings,
 		)
 		if err != nil {
@@ -196,7 +216,11 @@ func TestAddMachine(t *testing.T) {
 			t.Errorf("machine not found after adding: %s", gotName)
 		}
 
-		if diff := cmp.Diff(testCase.machine, gotMachine); diff != "" {
+		if diff := cmp.Diff(
+			testCase.machine,
+			gotMachine,
+			cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+		); diff != "" {
 			t.Errorf("cloned machine mismatch (-want +got):\n%s", diff)
 		}
 
@@ -224,8 +248,19 @@ func TestAddMachineUnsupportedImageError(t *testing.T) {
 
 	cluster := cloudProvider.Default(clusterType, "test")
 
-	clusterClient, dir := setupClusterClient(t, logger, clusterType, cluster)
+	clusterClient, testRunner, dir := setupClusterClient(
+		t,
+		logger,
+		clusterType,
+		cluster,
+	)
 	defer teardownClusterClient(dir)
+
+	// terraform init
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+	// terraform plan (no diff)
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
 
 	_, err := clusterClient.AddMachine("", api.Master, "size", "foo", nil)
 
@@ -257,7 +292,7 @@ func TestCloneMachine(t *testing.T) {
 	if _, err := cluster.AddMachine(machineName, &api.Machine{
 		NodeType: api.Master,
 		Size:     "size",
-		Image:    "image",
+		Image:    api.NewImage("image", "v1.2.3"),
 		ProviderSettings: &exoscale.MachineSettings{
 			ESLocalStorageCapacity: 10,
 		},
@@ -265,8 +300,24 @@ func TestCloneMachine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	clusterClient, dir := setupClusterClient(t, logger, clusterType, cluster)
+	clusterClient, testRunner, dir := setupClusterClient(
+		t,
+		logger,
+		clusterType,
+		cluster,
+	)
 	defer teardownClusterClient(dir)
+
+	// terraform init
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+	// terraform plan (no diff)
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+	// kubectl version
+	testRunner.Push(newTestKubectlServerVersionCommand(
+		"v1.2.3",
+	))
 
 	cloneMachineName, err := clusterClient.CloneMachine(machineName, "")
 	if err != nil {
@@ -277,7 +328,7 @@ func TestCloneMachine(t *testing.T) {
 		machineName: {
 			NodeType: api.Master,
 			Size:     "size",
-			Image:    "image",
+			Image:    api.NewImage("image", "v1.2.3"),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
 			},
@@ -285,14 +336,18 @@ func TestCloneMachine(t *testing.T) {
 		cloneMachineName: {
 			NodeType: api.Master,
 			Size:     "size",
-			Image:    "image",
+			Image:    api.NewImage("image", "v1.2.3"),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
 			},
 		},
 	}
 
-	if diff := cmp.Diff(wantMachines, cluster.Machines()); diff != "" {
+	if diff := cmp.Diff(
+		wantMachines,
+		cluster.Machines(),
+		cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+	); diff != "" {
 		t.Errorf("cloned machine mismatch (-want +got):\n%s", diff)
 	}
 
@@ -308,6 +363,8 @@ func TestCloneMachineWithImage(t *testing.T) {
 		"terraform_init",
 		"terraform_plan_no_diff",
 		"client_configured_machines",
+		"client_validate_machine",
+		"kubectl_server_version",
 	})
 
 	cloudProvider := exoscale.NewCloudProvider()
@@ -323,7 +380,7 @@ func TestCloneMachineWithImage(t *testing.T) {
 		&api.Machine{
 			NodeType: api.Master,
 			Size:     "size",
-			Image:    "image",
+			Image:    api.NewImage("image", image.KubeletVersion.String()),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
 			},
@@ -332,10 +389,29 @@ func TestCloneMachineWithImage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	clusterClient, dir := setupClusterClient(t, logger, clusterType, cluster)
+	clusterClient, testRunner, dir := setupClusterClient(
+		t,
+		logger,
+		clusterType,
+		cluster,
+	)
 	defer teardownClusterClient(dir)
 
-	cloneMachineName, err := clusterClient.CloneMachine(machineName, image)
+	// terraform init
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+	// terraform plan (no diff)
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+	// kubectl version
+	testRunner.Push(newTestKubectlServerVersionCommand(
+		image.KubeletVersion.String(),
+	))
+
+	cloneMachineName, err := clusterClient.CloneMachine(
+		machineName,
+		image.Name,
+	)
 	if err != nil {
 		t.Errorf("error cloning machine: %s", err)
 	}
@@ -344,7 +420,7 @@ func TestCloneMachineWithImage(t *testing.T) {
 		machineName: {
 			NodeType: api.Master,
 			Size:     "size",
-			Image:    "image",
+			Image:    api.NewImage("image", "v1.2.3"),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
 			},
@@ -359,7 +435,11 @@ func TestCloneMachineWithImage(t *testing.T) {
 		},
 	}
 
-	if diff := cmp.Diff(wantMachines, cluster.Machines()); diff != "" {
+	if diff := cmp.Diff(
+		wantMachines,
+		cluster.Machines(),
+		cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+	); diff != "" {
 		t.Errorf("cloned machine mismatch (-want +got):\n%s", diff)
 	}
 
@@ -381,8 +461,19 @@ func TestCloneMachineNotFoundError(t *testing.T) {
 
 	cluster := cloudProvider.Default(clusterType, "test")
 
-	clusterClient, dir := setupClusterClient(t, logger, clusterType, cluster)
+	clusterClient, testRunner, dir := setupClusterClient(
+		t,
+		logger,
+		clusterType,
+		cluster,
+	)
 	defer teardownClusterClient(dir)
+
+	// terraform init
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+	// terraform plan (no diff)
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
 
 	_, err := clusterClient.CloneMachine("foo", "")
 
@@ -414,7 +505,7 @@ func TestCloneMachineUnsupportedImageError(t *testing.T) {
 	if _, err := cluster.AddMachine(machineName, &api.Machine{
 		NodeType: api.Master,
 		Size:     "size",
-		Image:    "image",
+		Image:    api.NewImage("image", "v1.2.3"),
 		ProviderSettings: &exoscale.MachineSettings{
 			ESLocalStorageCapacity: 10,
 		},
@@ -422,8 +513,19 @@ func TestCloneMachineUnsupportedImageError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	clusterClient, dir := setupClusterClient(t, logger, clusterType, cluster)
+	clusterClient, testRunner, dir := setupClusterClient(
+		t,
+		logger,
+		clusterType,
+		cluster,
+	)
 	defer teardownClusterClient(dir)
+
+	// terraform init
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
+
+	// terraform plan (no diff)
+	testRunner.Push(&runner.TestCommand{SkipDiff: true})
 
 	_, err := clusterClient.CloneMachine(machineName, "foo")
 
@@ -433,4 +535,52 @@ func TestCloneMachineUnsupportedImageError(t *testing.T) {
 	}
 
 	logTest.Diff(t)
+}
+
+func TestValidateMachineInvalidImage(t *testing.T) {
+	clusterType := api.ServiceCluster
+
+	for _, testCase := range []struct {
+		apiServerVersion string
+		wantErr          error
+	}{{
+		apiServerVersion: "v1.0.0",
+		wantErr:          api.ErrInvalidImageKubeletNew,
+	}, {
+		apiServerVersion: "v1.999.0",
+		wantErr:          api.ErrInvalidImageKubeletOld,
+	}} {
+		logTest, logger := testutil.NewTestLogger([]string{
+			"client_validate_machine",
+			"kubectl_server_version",
+		})
+
+		cloudProvider := exoscale.NewCloudProvider()
+
+		cluster := cloudProvider.Default(clusterType, "test")
+
+		clusterClient, testRunner, dir := setupClusterClient(
+			t,
+			logger,
+			clusterType,
+			cluster,
+		)
+		defer teardownClusterClient(dir)
+
+		// kubectl version
+		testRunner.Push(newTestKubectlServerVersionCommand(
+			testCase.apiServerVersion,
+		))
+
+		// _, err := clusterClient.AddMachine("", api.Master, "size", "", nil)
+		err := clusterClient.validateMachine(&api.Machine{
+			Image: api.NewImage("testimage", "v1.17.11"),
+		})
+
+		if !errors.Is(err, testCase.wantErr) {
+			t.Errorf("expected error %s, got: %s", testCase.wantErr, err)
+		}
+
+		logTest.Diff(t)
+	}
 }

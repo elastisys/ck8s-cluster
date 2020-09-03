@@ -112,7 +112,7 @@ func machineImages(
 	}
 
 	for _, image := range images {
-		fmt.Println(image)
+		fmt.Println(image.Name)
 	}
 
 	return nil

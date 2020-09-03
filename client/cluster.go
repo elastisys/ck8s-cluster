@@ -288,6 +288,24 @@ func (c *ClusterClient) Machine(name string) (api.MachineState, error) {
 	return state.Machine(name)
 }
 
+func (c *ClusterClient) validateMachine(machine *api.Machine) error {
+	c.logger.Debug(
+		"client_validate_machine",
+		zap.String("image", machine.Image.Name),
+	)
+
+	version, err := c.kubectl.ServerVersion()
+	if err != nil {
+		return fmt.Errorf("error getting API server version: %w", err)
+	}
+
+	if err := machine.Image.IsSupported(version); err != nil {
+		return fmt.Errorf("image not supported by cluster API server: %w", err)
+	}
+
+	return nil
+}
+
 // AddMachine adds a new machine to the cluster configuration.
 func (c *ClusterClient) AddMachine(
 	name string,
@@ -329,6 +347,10 @@ func (c *ClusterClient) AddMachine(
 		return "", fmt.Errorf("error building machine: %w", err)
 	}
 
+	if err := c.validateMachine(machine); err != nil {
+		return "", fmt.Errorf("error while validating machine: %w", err)
+	}
+
 	return c.cluster.AddMachine(name, machine)
 }
 
@@ -367,6 +389,10 @@ func (c *ClusterClient) CloneMachine(
 		machine, err = machineFactory.WithImage(image).Build()
 		if err != nil {
 			return "", fmt.Errorf("error building machine: %w", err)
+		}
+
+		if err := c.validateMachine(machine); err != nil {
+			return "", fmt.Errorf("error while validating machine: %w", err)
 		}
 	}
 
@@ -480,7 +506,7 @@ func (c *ClusterClient) Upgrade(name string) error {
 // MachineImages return the available machine images for a certain node type.
 func (c *ClusterClient) MachineImages(
 	nodeType api.NodeType,
-) ([]string, error) {
+) ([]*api.Image, error) {
 	cloudProvider, err := CloudProviderFromType(c.cluster.CloudProvider())
 	if err != nil {
 		return nil, err

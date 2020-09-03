@@ -3,8 +3,10 @@ package exoscale
 import (
 	"testing"
 
-	"github.com/elastisys/ck8s/api"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+
+	"github.com/elastisys/ck8s/api"
 )
 
 func TestFlavors(t *testing.T) {
@@ -245,7 +247,12 @@ func TestFlavors(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		if diff := cmp.Diff(tc.want, tc.got, cmp.AllowUnexported(Cluster{})); diff != "" {
+		if diff := cmp.Diff(
+			tc.want,
+			tc.got,
+			cmp.AllowUnexported(Cluster{}),
+			cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+		); diff != "" {
 			t.Errorf("flavor mismatch (-want +got):\n%s", diff)
 		}
 	}

@@ -44,7 +44,9 @@ variable machines_sc {
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
   }))
 }
 
@@ -52,6 +54,8 @@ variable machines_wc {
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
   }))
 }

@@ -24,7 +24,9 @@ variable machines_sc {
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
     provider_settings = object({
       es_local_storage_capacity = number
     })
@@ -36,7 +38,9 @@ variable machines_wc {
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
     provider_settings = object({
       es_local_storage_capacity = number
     })

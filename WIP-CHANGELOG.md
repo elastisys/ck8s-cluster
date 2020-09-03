@@ -30,6 +30,8 @@
 - Support for cloning and replacing nodes but with a different image.
 - Support for upgrading the Kubernetes control plane.
 - Command to list available machine images.
+- Image validation which checks if the Kubelet version is compatible with the
+  current control plane version running in the cluster.
 
 ### Fixed
 

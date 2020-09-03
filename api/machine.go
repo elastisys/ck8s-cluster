@@ -18,7 +18,7 @@ const (
 type Machine struct {
 	NodeType NodeType `json:"node_type" validate:"required"`
 	Size     string   `json:"size" validate:"required"`
-	Image    string   `json:"image" validate:"required"`
+	Image    *Image   `json:"image" validate:"required"`
 
 	// TODO: Could add the omitempty json tag once Terraform supports optional
 	// object arguments.
@@ -37,6 +37,8 @@ type MachineFactory struct {
 	cloudProvider CloudProvider
 
 	machine *Machine
+
+	imageName string
 }
 
 // NewMachineFactoryFromExistingMachine returns a MachineFactory which starts
@@ -95,8 +97,8 @@ func NewMachineFactory(
 }
 
 // WithImage sets the image of the Machine.
-func (f *MachineFactory) WithImage(image string) *MachineFactory {
-	f.machine.Image = image
+func (f *MachineFactory) WithImage(imageName string) *MachineFactory {
+	f.imageName = imageName
 	return f
 }
 
@@ -111,12 +113,19 @@ func (f *MachineFactory) WithProviderSettings(
 // Build returns the finished Machine. It returns an UnsupportedImageError if
 // the image is not supported by the cloud provider.
 func (f *MachineFactory) Build() (*Machine, error) {
-	image := f.machine.Image
-	if !ImageIsSupported(f.cloudProvider, f.machine.NodeType, image) {
-		return f.machine, NewUnsupportedImageError(
-			f.cloudProvider.Type(),
-			image,
+	if f.imageName != "" {
+		image, ok := LookupImage(
+			f.cloudProvider,
+			f.machine.NodeType,
+			f.imageName,
 		)
+		if !ok {
+			return f.machine, NewUnsupportedImageError(
+				f.cloudProvider.Type(),
+				f.imageName,
+			)
+		}
+		f.machine.Image = image
 	}
 
 	if err := decodeMachine(
@@ -141,24 +150,23 @@ func (f *MachineFactory) MustBuild() *Machine {
 }
 
 // LatestImage returns the latest supported image for the cloud provider.
-func LatestImage(cloudProvider CloudProvider, nodeType NodeType) string {
+func LatestImage(cloudProvider CloudProvider, nodeType NodeType) *Image {
 	images := cloudProvider.MachineImages(nodeType)
 	return images[len(images)-1]
 }
 
-// ImageIsSupported returns true if the image is supported by the cloud
-// provider.
-func ImageIsSupported(
+// LookupImage retrieves an image by name from the cloud provider.
+func LookupImage(
 	cloudProvider CloudProvider,
 	nodeType NodeType,
-	image string,
-) bool {
-	for _, supportedImage := range cloudProvider.MachineImages(nodeType) {
-		if image == supportedImage {
-			return true
+	imageName string,
+) (*Image, bool) {
+	for _, image := range cloudProvider.MachineImages(nodeType) {
+		if imageName == image.Name {
+			return image, true
 		}
 	}
-	return false
+	return nil, false
 }
 
 func decodeMachine(

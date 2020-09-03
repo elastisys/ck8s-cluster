@@ -5,15 +5,15 @@ import (
 )
 
 var (
-	supportedCK8SBaseOSImages = []string{
-		"CK8S-BaseOS-v0.0.6",
+	supportedCK8SBaseOSImages = []*api.Image{
+		api.NewImage("CK8S BaseOS v0.0.6", "v1.15.11"),
 	}
 
-	supportedImages = map[api.NodeType][]string{
+	supportedImages = map[api.NodeType][]*api.Image{
 		api.Master: supportedCK8SBaseOSImages,
 		api.Worker: supportedCK8SBaseOSImages,
 		api.LoadBalancer: {
-			"ubuntu-18.04-server-cloudimg-amd64-20190212.1",
+			api.NewImage("ubuntu-18.04-server-cloudimg-amd64-20190212.1", ""),
 		},
 	}
 )
@@ -73,7 +73,7 @@ func (e *CloudProvider) TerraformBackendConfig() *api.TerraformBackendConfig {
 	return backendConfig
 }
 
-func (e *CloudProvider) MachineImages(nodeType api.NodeType) []string {
+func (e *CloudProvider) MachineImages(nodeType api.NodeType) []*api.Image {
 	return supportedImages[nodeType]
 }
 

@@ -9,8 +9,10 @@ variable "security_group_ids" {
 
 variable machines {
   type = map(object({
-    size  = string
-    image = string
+    size = string
+    image = object({
+      name = string
+    })
   }))
 }
 

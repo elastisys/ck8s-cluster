@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/elastisys/ck8s/api"
 )
@@ -14,7 +15,7 @@ func TestAddMachine(t *testing.T) {
 	want := &api.Machine{
 		NodeType: api.Master,
 		Size:     "t3.small",
-		Image:    "test",
+		Image:    api.NewImage("test", "v1.2.3"),
 	}
 
 	for _, clusterType := range []api.ClusterType{
@@ -40,7 +41,11 @@ func TestAddMachine(t *testing.T) {
 			)
 		}
 
-		if diff := cmp.Diff(want, got); diff != "" {
+		if diff := cmp.Diff(
+			want,
+			got,
+			cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+		); diff != "" {
 			t.Errorf("machine mismatch (-want +got):\n%s", diff)
 		}
 	}
@@ -54,7 +59,7 @@ func TestAddMachineWithName(t *testing.T) {
 	want := &api.Machine{
 		NodeType: api.Master,
 		Size:     "t3.small",
-		Image:    "test",
+		Image:    api.NewImage("test", "v1.2.3"),
 	}
 
 	for _, clusterType := range []api.ClusterType{
@@ -80,7 +85,11 @@ func TestAddMachineWithName(t *testing.T) {
 			)
 		}
 
-		if diff := cmp.Diff(want, got); diff != "" {
+		if diff := cmp.Diff(
+			want,
+			got,
+			cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+		); diff != "" {
 			t.Errorf("machine mismatch (-want +got):\n%s", diff)
 		}
 	}
