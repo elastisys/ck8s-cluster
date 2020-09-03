@@ -19,6 +19,9 @@
   You may configure smaller volumes than the default to work around this.
 - The `ENABLE_PSP` value should be removed from the config, see breaking changes regarding PSPs.
 - The static apiserver pod manifests should be edited to enable the `PodSecurityPolicy` admission plugin **after** the upgrade.
+- When Kubernetes is installed it will be installed using the Kubelet version.
+  This means that if your VM image has different versions of Kubeadm and
+  Kubelet, the Kubelet version will be picked.
 
 ### Added
 
@@ -54,3 +57,4 @@
 - Reduced local volume size for dev flavor.
 - Reduced control plane node sizes on Safespring for dev flavor.
 - Configuration files *(config.sh and secrets.env)* changed from *dotenv* format to *yaml*.
+- Install Kubernetes using the Kubelet version.

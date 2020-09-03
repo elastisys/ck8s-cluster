@@ -24,13 +24,13 @@
     #       on all masters instead.
     #       Another way to solve this would be to set the cert encryption key
     #       ourselves.
-    - name: Get Kubeadm version string
-      command: kubeadm version -o json
-      register: kubeadm
+    - name: Get Kubelet version
+      shell: kubelet --version | awk '{print $2}'
+      register: kubelet_version
 
-    - name: Extract Kubernetes version
+    - name: Set k8s_version fact
       set_fact:
-        k8s_version: "{{ kubeadm.stdout | from_json | json_query('clientVersion.gitVersion') }}"
+        k8s_version: "{{ kubelet_version.stdout }}"
 
     - name: Render kubeadm config
       template:
