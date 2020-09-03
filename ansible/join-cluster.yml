@@ -48,6 +48,21 @@
       set_fact:
         cert_key: "{{ cert_upload.stdout_lines | last }}"
 
+    # TODO: Remove when dropping support for Kubernetes v1.17
+    # Workaround for joining a v1.17 cluster using Kubeadm v1.18:
+    # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/troubleshooting-kubeadm/#not-possible-to-join-a-v1-18-node-to-a-v1-17-cluster-due-to-missing-rbac
+    - name: Get Kubeadm version
+      shell: kubeadm version -o short
+      register: kubeadm_version
+    - name: Kubeadm v1.17 -> v1.18 workaround - upload
+      copy:
+        src: "files/kubeadm-v1.18-hotfix.yaml"
+        dest: /etc/kubeadm/kubeadm-v1.18-hotfix.yaml
+      when: kubeadm_version.stdout is match("v1.17.*")
+    - name: Kubeadm v1.17 -> v1.18 workaround - apply
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /etc/kubeadm/kubeadm-v1.18-hotfix.yaml
+      when: kubeadm_version.stdout is match("v1.17.*")
+
 - hosts: masters_joining
   become: yes
   become_user: root
