@@ -12,7 +12,9 @@ variable "machines" {
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
     provider_settings = object({
       es_local_storage_capacity = number
     })

@@ -17,6 +17,8 @@ type TestCommand struct {
 
 	Stdout, Stderr []byte
 	ExitCode       int
+
+	SkipDiff bool
 }
 
 func (c *TestCommand) Diff(t *testing.T, cmd *Command) {
@@ -63,7 +65,9 @@ func (r *TestRunner) pop() *TestCommand {
 func (r *TestRunner) Run(cmd *Command) (err error) {
 	want := r.pop()
 
-	want.Diff(r.t, cmd)
+	if !want.SkipDiff {
+		want.Diff(r.t, cmd)
+	}
 
 	if cmd.OutputHandler != nil {
 		err = cmd.OutputHandler(

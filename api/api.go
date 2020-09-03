@@ -25,7 +25,7 @@ type CloudProvider interface {
 	// MachineImages should return a slice with the machine images that the
 	// provider supports. The images should be sorted from oldest to latest
 	// version.
-	MachineImages(NodeType) []string
+	MachineImages(NodeType) []*Image
 	// MachineSettings should return a provider specific machine settings
 	// struct.
 	MachineSettings() interface{}

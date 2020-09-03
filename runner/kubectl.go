@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"strings"
 
 	"go.uber.org/zap"
+	"k8s.io/apimachinery/pkg/version"
 )
 
 var NodeNotFoundErr = errors.New("kubernetes node not found")
@@ -110,4 +112,29 @@ func (k *Kubectl) DeleteAll(resource string, extraArgs ...string) error {
 func (k *Kubectl) IsUp() bool {
 	k.logger.Debug("kubectl_is_up")
 	return k.runner.Background(k.command("get", "--raw", "/api", "--request-timeout=2s")) == nil
+}
+
+// ServerVersion returns the version of the Kubernetes API server.
+func (k *Kubectl) ServerVersion() (string, error) {
+	k.logger.Debug("kubectl_server_version")
+
+	type versionOutput struct {
+		ServerVersion *version.Info `json:"serverVersion"`
+	}
+
+	var output *versionOutput
+
+	cmd := k.command("version", "-o", "json")
+	cmd.OutputHandler = func(stdoutPipe, stderrPipe io.Reader) error {
+		if err := json.NewDecoder(stdoutPipe).Decode(&output); err != nil {
+			return fmt.Errorf("error JSON decoding server version: %w", err)
+		}
+		return nil
+	}
+
+	if err := k.runner.Background(cmd); err != nil {
+		return "", err
+	}
+
+	return output.ServerVersion.GitVersion, nil
 }

@@ -99,3 +99,6 @@ func NewMachineAlreadyExistsError(n string) *MachineAlreadyExistsError {
 func (e *MachineAlreadyExistsError) Error() string {
 	return fmt.Sprintf("machine already exists: %s", e.name)
 }
+
+var ErrInvalidImageKubeletNew = errors.New("kubelet version too new")
+var ErrInvalidImageKubeletOld = errors.New("kubelet version too old")

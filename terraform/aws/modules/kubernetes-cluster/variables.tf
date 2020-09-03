@@ -27,6 +27,8 @@ variable machines {
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
   }))
 }

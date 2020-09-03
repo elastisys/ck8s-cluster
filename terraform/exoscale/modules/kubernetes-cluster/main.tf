@@ -7,7 +7,7 @@ data "exoscale_compute_template" "os_image" {
   for_each = var.machines
 
   zone = var.zone
-  name = each.value.image
+  name = each.value.image.name
   # TODO: remove this when the image is publicly published
   filter = "mine"
 }

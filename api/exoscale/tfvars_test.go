@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/elastisys/ck8s/api"
 )
@@ -14,7 +15,7 @@ func TestAddMachine(t *testing.T) {
 	want := &api.Machine{
 		NodeType: api.Master,
 		Size:     "Small",
-		Image:    "test",
+		Image:    api.NewImage("test", "v1.2.3"),
 		ProviderSettings: MachineSettings{
 			ESLocalStorageCapacity: 10,
 		},
@@ -43,7 +44,11 @@ func TestAddMachine(t *testing.T) {
 			)
 		}
 
-		if diff := cmp.Diff(want, got); diff != "" {
+		if diff := cmp.Diff(
+			want,
+			got,
+			cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+		); diff != "" {
 			t.Errorf("machine mismatch (-want +got):\n%s", diff)
 		}
 	}
@@ -57,7 +62,7 @@ func TestAddMachineWithName(t *testing.T) {
 	want := &api.Machine{
 		NodeType: api.Worker,
 		Size:     "Small",
-		Image:    "test",
+		Image:    api.NewImage("test", "v1.2.3"),
 		ProviderSettings: MachineSettings{
 			ESLocalStorageCapacity: 10,
 		},
@@ -86,7 +91,11 @@ func TestAddMachineWithName(t *testing.T) {
 			)
 		}
 
-		if diff := cmp.Diff(want, got); diff != "" {
+		if diff := cmp.Diff(
+			want,
+			got,
+			cmpopts.IgnoreFields(api.Image{}, "KubeletVersion"),
+		); diff != "" {
 			t.Errorf("machine mismatch (-want +got):\n%s", diff)
 		}
 	}
@@ -102,7 +111,7 @@ func TestRemoveMachine(t *testing.T) {
 			testName: {
 				NodeType: api.Master,
 				Size:     "Small",
-				Image:    "test",
+				Image:    api.NewImage("test", "v1.2.3"),
 				ProviderSettings: MachineSettings{
 					ESLocalStorageCapacity: 10,
 				},
@@ -112,7 +121,7 @@ func TestRemoveMachine(t *testing.T) {
 			testName: {
 				NodeType: api.Worker,
 				Size:     "Large",
-				Image:    "test",
+				Image:    api.NewImage("test", "v1.2.3"),
 			},
 		},
 	}

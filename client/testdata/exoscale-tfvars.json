@@ -4,11 +4,17 @@
     "master-0": {
       "node_type": "master",
       "size": "Small",
+      "image": {
+        "name": "testimage"
+      },
       "provider_settings": null
     },
     "worker-0": {
       "node_type": "worker",
       "size": "Extra-large",
+      "image": {
+        "name": "testimage"
+      },
       "provider_settings": {
         "es_local_storage_capacity": 26
       }
@@ -16,6 +22,9 @@
     "worker-1": {
       "node_type": "worker",
       "size": "Large",
+      "image": {
+        "name": "testimage"
+      },
       "provider_settings": {
         "es_local_storage_capacity": 26
       }
@@ -25,11 +34,17 @@
     "master-0": {
       "node_type": "master",
       "size": "Small",
+      "image": {
+        "name": "testimage"
+      },
       "provider_settings": null
     },
     "worker-0": {
       "node_type": "worker",
       "size": "Large",
+      "image": {
+        "name": "testimage"
+      },
       "provider_settings": null
     }
   },

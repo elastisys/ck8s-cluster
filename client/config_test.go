@@ -30,10 +30,16 @@ func TestTFVarsRead(t *testing.T) {
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "Small",
+					Image: &api.Image{
+						Name: "testimage",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "Extra-large",
+					Image: &api.Image{
+						Name: "testimage",
+					},
 					ProviderSettings: &exoscale.MachineSettings{
 						ESLocalStorageCapacity: 26,
 					},
@@ -41,6 +47,9 @@ func TestTFVarsRead(t *testing.T) {
 				"worker-1": {
 					NodeType: api.Worker,
 					Size:     "Large",
+					Image: &api.Image{
+						Name: "testimage",
+					},
 					ProviderSettings: &exoscale.MachineSettings{
 						ESLocalStorageCapacity: 26,
 					},
@@ -50,10 +59,16 @@ func TestTFVarsRead(t *testing.T) {
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "Small",
+					Image: &api.Image{
+						Name: "testimage",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "Large",
+					Image: &api.Image{
+						Name: "testimage",
+					},
 				},
 			},
 			NFSSize:                    "Small",
@@ -69,29 +84,39 @@ func TestTFVarsRead(t *testing.T) {
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "96c7903e-32f0-421d-b6a2-a45c97b15665",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "d430b3cd-0216-43ff-878c-c08689c0001b",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"worker-1": {
 					NodeType: api.Worker,
 					Size:     "572a3b2e-6329-4053-b872-aecb1e70d8a6",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 			},
 			MachinesWC: map[string]*api.Machine{
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "96c7903e-32f0-421d-b6a2-a45c97b15665",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "572a3b2e-6329-4053-b872-aecb1e70d8a6",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 			},
 			MasterAntiAffinityPolicySC: "anti-affinity",
@@ -112,39 +137,53 @@ func TestTFVarsRead(t *testing.T) {
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "ea0dbe3b-f93a-47e0-84e4-b09ec5873bdf",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"worker-1": {
 					NodeType: api.Worker,
 					Size:     "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"loadbalancer-0": {
 					NodeType: api.LoadBalancer,
 					Size:     "51d480b8-2517-4ba8-bfe0-c649ac93eb61",
-					Image:    "3afb071a-ac91-4713-8c86-9fab4e78b863",
+					Image: &api.Image{
+						Name: "3afb071a-ac91-4713-8c86-9fab4e78b863",
+					},
 				},
 			},
 			MachinesWC: map[string]*api.Machine{
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
-					Image:    "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					Image: &api.Image{
+						Name: "3092f981-a271-4f93-add3-fcc8742ceb0e",
+					},
 				},
 				"loadbalancer-0": {
 					NodeType: api.LoadBalancer,
 					Size:     "51d480b8-2517-4ba8-bfe0-c649ac93eb61",
-					Image:    "3afb071a-ac91-4713-8c86-9fab4e78b863",
+					Image: &api.Image{
+						Name: "3afb071a-ac91-4713-8c86-9fab4e78b863",
+					},
 				},
 			},
 			MasterAntiAffinityPolicySC: "anti-affinity",
@@ -168,34 +207,46 @@ func TestTFVarsRead(t *testing.T) {
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "t3.small",
-					Image:    "ami-025fd2f1456a0e2e5",
+					Image: &api.Image{
+						Name: "ami-025fd2f1456a0e2e5",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "t3.xlarge",
-					Image:    "ami-025fd2f1456a0e2e5",
+					Image: &api.Image{
+						Name: "ami-025fd2f1456a0e2e5",
+					},
 				},
 				"worker-1": {
 					NodeType: api.Worker,
 					Size:     "t3.large",
-					Image:    "ami-025fd2f1456a0e2e5",
+					Image: &api.Image{
+						Name: "ami-025fd2f1456a0e2e5",
+					},
 				},
 			},
 			MachinesWC: map[string]*api.Machine{
 				"master-0": {
 					NodeType: api.Master,
 					Size:     "t3.small",
-					Image:    "ami-025fd2f1456a0e2e5",
+					Image: &api.Image{
+						Name: "ami-025fd2f1456a0e2e5",
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
 					Size:     "t3.large",
-					Image:    "ami-025fd2f1456a0e2e5",
+					Image: &api.Image{
+						Name: "ami-025fd2f1456a0e2e5",
+					},
 				},
 				"worker-1": {
 					NodeType: api.Worker,
 					Size:     "t3.large",
-					Image:    "ami-025fd2f1456a0e2e5",
+					Image: &api.Image{
+						Name: "ami-025fd2f1456a0e2e5",
+					},
 				},
 			},
 			PublicIngressCIDRWhitelist: []string{"1.2.3.4/32", "4.3.2.1/32"},

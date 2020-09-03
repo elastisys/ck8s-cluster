@@ -2,9 +2,9 @@ package aws
 
 import "github.com/elastisys/ck8s/api"
 
-var supportedImages = map[string][]string{
+var supportedImages = map[string][]*api.Image{
 	"us-west-1": {
-		"ami-025fd2f1456a0e2e5",
+		api.NewImage("ami-025fd2f1456a0e2e5", "v1.15.11"),
 	},
 }
 
@@ -64,7 +64,7 @@ func (e *CloudProvider) TerraformBackendConfig() *api.TerraformBackendConfig {
 	return backendConfig
 }
 
-func (e *CloudProvider) MachineImages(api.NodeType) []string {
+func (e *CloudProvider) MachineImages(api.NodeType) []*api.Image {
 	// TODO: Add support for multiple regions.
 	return supportedImages["us-west-1"]
 }
