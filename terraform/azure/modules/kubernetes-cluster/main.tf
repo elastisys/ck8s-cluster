@@ -150,8 +150,8 @@ resource "azurerm_network_security_group" "master_sg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "6443"
-    destination_port_range     = "*"
+    source_port_range          = "*"
+    destination_port_range     = "6443"
     source_address_prefixes    = var.api_server_whitelist
     destination_address_prefix = "*"
   }
@@ -162,8 +162,8 @@ resource "azurerm_network_security_group" "master_sg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "22"
-    destination_port_range     = "*"
+    source_port_range          = "*"
+    destination_port_range     = "22"
     source_address_prefixes    = var.public_ingress_cidr_whitelist
     destination_address_prefix = "*"
   }
@@ -311,8 +311,8 @@ resource "azurerm_network_security_group" "worker_sg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_ranges         = ["80", "443"]
-    destination_port_range     = "*"
+    source_port_range          = "*"
+    destination_port_ranges    = ["80", "443"]
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -323,8 +323,8 @@ resource "azurerm_network_security_group" "worker_sg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "22"
-    destination_port_range     = "*"
+    source_port_range          = "*"
+    destination_port_range     = "22"
     source_address_prefixes    = var.public_ingress_cidr_whitelist
     destination_address_prefix = "*"
   }
@@ -335,8 +335,8 @@ resource "azurerm_network_security_group" "worker_sg" {
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "30000-32767"
-    destination_port_range     = "*"
+    source_port_range          = "*"
+    destination_port_range     = "30000-32767"
     source_address_prefixes    = var.nodeport_whitelist
     destination_address_prefix = "*"
   }
