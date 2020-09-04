@@ -32,7 +32,7 @@ data "azurerm_image" "base_os" {
 ## Master
 ##
 
-resource "azurerm_public_ip" "master_pips" {
+resource "azurerm_public_ip" "master" {
   for_each = {
     for name, machine in var.machines :
     name => machine
@@ -47,20 +47,20 @@ resource "azurerm_public_ip" "master_pips" {
 }
 
 # This is needed since the public IPs don't get assiciated before nics are attached
-data "azurerm_public_ip" "master_pips_data" {
+data "azurerm_public_ip" "master" {
   for_each = {
     for name, machine in var.machines :
     name => machine
     if machine.node_type == "master"
   }
 
-  name                = azurerm_public_ip.master_pips[each.key].name
+  name                = azurerm_public_ip.master[each.key].name
   resource_group_name = azurerm_resource_group.main.name
 
   depends_on = [azurerm_virtual_machine.master]
 }
 
-resource "azurerm_network_interface" "master_nics" {
+resource "azurerm_network_interface" "master" {
   for_each = {
     for name, machine in var.machines :
     name => machine
@@ -75,19 +75,19 @@ resource "azurerm_network_interface" "master_nics" {
     name                          = "${var.prefix}-ip-config"
     subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.master_pips[each.key].id
+    public_ip_address_id          = azurerm_public_ip.master[each.key].id
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "master_sec_grp_association" {
+resource "azurerm_network_interface_security_group_association" "master" {
   for_each = {
     for name, machine in var.machines :
     name => machine
     if machine.node_type == "master"
   }
 
-  network_interface_id      = azurerm_network_interface.master_nics[each.key].id
-  network_security_group_id = azurerm_network_security_group.master_sg.id
+  network_interface_id      = azurerm_network_interface.master[each.key].id
+  network_security_group_id = azurerm_network_security_group.master.id
 }
 
 resource "azurerm_virtual_machine" "master" {
@@ -101,7 +101,7 @@ resource "azurerm_virtual_machine" "master" {
 
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
-  network_interface_ids = [azurerm_network_interface.master_nics[each.key].id]
+  network_interface_ids = [azurerm_network_interface.master[each.key].id]
   vm_size               = each.value.size
 
   # Delete the OS disk automatically when deleting the VM
@@ -139,7 +139,7 @@ resource "azurerm_virtual_machine" "master" {
   }
 }
 
-resource "azurerm_network_security_group" "master_sg" {
+resource "azurerm_network_security_group" "master" {
   name                = "${var.prefix}-master-sg"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
@@ -169,7 +169,7 @@ resource "azurerm_network_security_group" "master_sg" {
   }
 }
 
-resource "azurerm_public_ip" "master_lb_pip" {
+resource "azurerm_public_ip" "master_lb" {
   name                = "${var.prefix}-master-lb-pip"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
@@ -183,7 +183,7 @@ resource "azurerm_lb" "master_lb" {
 
   frontend_ip_configuration {
     name                 = "${var.prefix}-master-lb-ip"
-    public_ip_address_id = azurerm_public_ip.master_lb_pip.id
+    public_ip_address_id = azurerm_public_ip.master_lb.id
   }
 }
 
@@ -192,7 +192,7 @@ resource "azurerm_lb" "master_lb" {
 ## Worker
 ##
 
-resource "azurerm_public_ip" "worker_pips" {
+resource "azurerm_public_ip" "worker" {
   for_each = {
     for name, machine in var.machines :
     name => machine
@@ -207,20 +207,20 @@ resource "azurerm_public_ip" "worker_pips" {
 }
 
 # This is needed since the public IPs don't get assiciated before nics are attached
-data "azurerm_public_ip" "worker_pips_data" {
+data "azurerm_public_ip" "worker" {
   for_each = {
     for name, machine in var.machines :
     name => machine
     if machine.node_type == "worker"
   }
 
-  name                = azurerm_public_ip.worker_pips[each.key].name
+  name                = azurerm_public_ip.worker[each.key].name
   resource_group_name = azurerm_resource_group.main.name
 
   depends_on = [azurerm_virtual_machine.worker]
 }
 
-resource "azurerm_network_interface" "worker_nics" {
+resource "azurerm_network_interface" "worker" {
   for_each = {
     for name, machine in var.machines :
     name => machine
@@ -235,19 +235,19 @@ resource "azurerm_network_interface" "worker_nics" {
     name                          = "${var.prefix}-ip-config"
     subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.worker_pips[each.key].id
+    public_ip_address_id          = azurerm_public_ip.worker[each.key].id
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "worker_sec_grp_association" {
+resource "azurerm_network_interface_security_group_association" "worker" {
   for_each = {
     for name, machine in var.machines :
     name => machine
     if machine.node_type == "worker"
   }
 
-  network_interface_id      = azurerm_network_interface.worker_nics[each.key].id
-  network_security_group_id = azurerm_network_security_group.worker_sg.id
+  network_interface_id      = azurerm_network_interface.worker[each.key].id
+  network_security_group_id = azurerm_network_security_group.worker.id
 }
 
 
@@ -262,7 +262,7 @@ resource "azurerm_virtual_machine" "worker" {
 
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
-  network_interface_ids = [azurerm_network_interface.worker_nics[each.key].id]
+  network_interface_ids = [azurerm_network_interface.worker[each.key].id]
   vm_size               = each.value.size
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
@@ -300,7 +300,7 @@ resource "azurerm_virtual_machine" "worker" {
   }
 }
 
-resource "azurerm_network_security_group" "worker_sg" {
+resource "azurerm_network_security_group" "worker" {
   name                = "${var.prefix}-worker-sg"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
@@ -342,7 +342,7 @@ resource "azurerm_network_security_group" "worker_sg" {
   }
 }
 
-resource "azurerm_public_ip" "worker_lb_pip" {
+resource "azurerm_public_ip" "worker_lb" {
   name                = "${var.prefix}-worker-lb-pip"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
@@ -356,7 +356,7 @@ resource "azurerm_lb" "worker_lb" {
 
   frontend_ip_configuration {
     name                 = "${var.prefix}-worker-lb-ip"
-    public_ip_address_id = azurerm_public_ip.worker_lb_pip.id
+    public_ip_address_id = azurerm_public_ip.worker_lb.id
   }
 }
 
@@ -377,5 +377,5 @@ resource "azurerm_dns_a_record" "example" {
   zone_name           = azurerm_dns_zone.dns_zone.name
   resource_group_name = azurerm_resource_group.main.name
   ttl                 = 300
-  records             = [azurerm_public_ip.worker_lb_pip.ip_address]
+  records             = [azurerm_public_ip.worker_lb.ip_address]
 }
