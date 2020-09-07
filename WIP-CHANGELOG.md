@@ -32,6 +32,10 @@
 - Command to list available machine images.
 - Image validation which checks if the Kubelet version is compatible with the
   current control plane version running in the cluster.
+- New Exoscale images:
+  - ck8s-v1.15.12+ck8s0
+  - ck8s-v1.16.14+ck8s0
+  - ck8s-v1.17.11+ck8s0
 
 ### Fixed
 
