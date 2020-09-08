@@ -4,6 +4,7 @@ type CloudProviderType string
 
 const (
 	AWS        CloudProviderType = "aws"
+	Azure      CloudProviderType = "azure"
 	CityCloud  CloudProviderType = "citycloud"
 	Exoscale   CloudProviderType = "exoscale"
 	Safespring CloudProviderType = "safespring"

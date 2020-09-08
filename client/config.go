@@ -172,6 +172,15 @@ func (c *ConfigHandler) TerraformRunnerConfig(
 		case api.WorkloadCluster:
 			tfTarget = "module.workload_cluster"
 		}
+	case api.Azure:
+		tfPath = c.codePath[api.TerraformAzureDir]
+
+		switch c.clusterType {
+		case api.ServiceCluster:
+			tfTarget = "module.service_cluster"
+		case api.WorkloadCluster:
+			tfTarget = "module.workload_cluster"
+		}
 	default:
 		return nil, api.NewUnsupportedCloudProviderError(cloudProvider)
 	}

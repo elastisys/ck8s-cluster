@@ -90,6 +90,12 @@ resource "azurerm_network_interface_security_group_association" "master" {
   network_security_group_id = azurerm_network_security_group.master.id
 }
 
+resource "azurerm_availability_set" "master" {
+  name                = "${var.prefix}-master"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
+
 resource "azurerm_virtual_machine" "master" {
   for_each = {
     for name, machine in var.machines :
@@ -102,6 +108,7 @@ resource "azurerm_virtual_machine" "master" {
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
   network_interface_ids = [azurerm_network_interface.master[each.key].id]
+  availability_set_id   = azurerm_availability_set.master.id
   vm_size               = each.value.size
 
   # Delete the OS disk automatically when deleting the VM
@@ -174,18 +181,66 @@ resource "azurerm_public_ip" "master_lb" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
+  sku                 = "Basic"
 }
 
 resource "azurerm_lb" "master_lb" {
   name                = "${var.prefix}-master-lb"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  sku                 = "Basic"
 
   frontend_ip_configuration {
     name                 = "${var.prefix}-master-lb-ip"
     public_ip_address_id = azurerm_public_ip.master_lb.id
   }
 }
+
+resource "azurerm_lb_backend_address_pool" "master_lb" {
+  resource_group_name = azurerm_resource_group.main.name
+  loadbalancer_id     = azurerm_lb.master_lb.id
+  name                = "${var.prefix}-master-lb-pool"
+}
+
+resource "azurerm_network_interface_backend_address_pool_association" "master_lb" {
+  for_each = azurerm_network_interface.master
+
+  network_interface_id    = azurerm_network_interface.master[each.key].id
+  ip_configuration_name   = "${var.prefix}-ip-config"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.master_lb.id
+}
+
+resource "azurerm_lb_probe" "master_lb" {
+  resource_group_name = azurerm_resource_group.main.name
+  loadbalancer_id     = azurerm_lb.master_lb.id
+  name                = "${var.prefix}-api-server"
+  protocol            = "Tcp"
+  port                = 6443
+}
+
+resource "azurerm_lb_rule" "master_lb" {
+  resource_group_name            = azurerm_resource_group.main.name
+  loadbalancer_id                = azurerm_lb.master_lb.id
+  name                           = "${var.prefix}-api-server"
+  protocol                       = "Tcp"
+  frontend_port                  = 6443
+  backend_port                   = 6443
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.master_lb.id
+  probe_id                       = azurerm_lb_probe.master_lb.id
+  frontend_ip_configuration_name = "${var.prefix}-master-lb-ip"
+}
+
+# resource "azurerm_lb_outbound_rule" "master_lb" {
+#   resource_group_name     = azurerm_resource_group.main.name
+#   loadbalancer_id         = azurerm_lb.master_lb.id
+#   name                    = "OutboundRule"
+#   protocol                = "Tcp"
+#   backend_address_pool_id = azurerm_lb_backend_address_pool.master_lb.id
+
+#   frontend_ip_configuration {
+#     name = "${var.prefix}-master-lb-ip"
+#   }
+# }
 
 #################################################
 ##
