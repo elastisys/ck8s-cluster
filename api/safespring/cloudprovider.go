@@ -7,6 +7,9 @@ import (
 var (
 	supportedCK8SBaseOSImages = []*api.Image{
 		api.NewImage("CK8S BaseOS v0.0.6", "v1.15.11"),
+		api.NewImage("ck8s-v1.15.12+ck8s0", "v1.15.12"),
+		api.NewImage("ck8s-v1.16.14+ck8s0", "v1.16.14"),
+		api.NewImage("ck8s-v1.17.11+ck8s0", "v1.17.11"),
 	}
 
 	supportedImages = map[api.NodeType][]*api.Image{
