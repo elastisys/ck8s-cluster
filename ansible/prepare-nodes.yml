@@ -52,3 +52,22 @@
         owner: root
         group: root
         mode: '0644'
+
+    # TODO read this from config path, maybe save as secret in kubernetes instead
+    - name: Add azure credentials
+      copy:
+        src: files/azure.json
+        dest: /etc/kubernetes/azure.json
+        owner: root
+        group: root
+        mode: '0644'
+      when: cloud_provider is defined and cloud_provider == "azure"
+
+    - name: Add azure config for kubelet
+      copy:
+        src: files/azure.json
+        dest: /etc/kubernetes/kubelet-azure.json
+        owner: root
+        group: root
+        mode: '0644'
+      when: cloud_provider is defined and cloud_provider == "azure"

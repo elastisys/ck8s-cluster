@@ -95,3 +95,12 @@
       command: "kubeadm join --config /etc/kubeadm/kubeadm-join.yaml"
       args:
         creates: /etc/kubernetes/kubelet.conf
+
+    - name: Add azure config for kubelet
+      copy:
+        src: files/azure.json
+        dest: /etc/kubernetes/kubelet-azure.json
+        owner: root
+        group: root
+        mode: '0644'
+      when: cloud_provider is defined and cloud_provider == "azure"

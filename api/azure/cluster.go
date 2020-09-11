@@ -39,6 +39,8 @@ func (e *Cluster) State(
 		PrivateNetworkCIDR: "10.0.10.0/24",
 
 		CalicoMTU: 1480,
+
+		KubeadmInitCloudProvider: "azure",
 	}
 	return &tfOutput, loadState(&tfOutput)
 }
