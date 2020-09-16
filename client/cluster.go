@@ -226,7 +226,7 @@ func (c *ClusterClient) Join(name string) (api.MachineState, error) {
 func (c *ClusterClient) Destroy(deleteRemoteWorkspace bool, kubernetesCleanup bool) error {
 	c.logger.Info("client_destroy")
 
-	// Best effort to clean up volumes and loadbalancer
+	// Best effort to clean up volumes and loadbalancer services
 	if kubernetesCleanup && c.kubectl.IsUp() {
 		if err := c.kubectl.DeleteAllTimeout("persistentvolumeclaims", 5); err != nil {
 			return fmt.Errorf("error deleting persistent volume claims: %w", err)
