@@ -13,6 +13,7 @@ import (
 )
 
 var NodeNotFoundErr = errors.New("kubernetes node not found")
+var ServerVersionMissingErr = errors.New("server version missing in output")
 
 type KubectlConfig struct {
 	KubeconfigPath string
@@ -134,6 +135,10 @@ func (k *Kubectl) ServerVersion() (string, error) {
 
 	if err := k.runner.Background(cmd); err != nil {
 		return "", err
+	}
+
+	if output.ServerVersion == nil {
+		return "", ServerVersionMissingErr
 	}
 
 	return output.ServerVersion.GitVersion, nil
