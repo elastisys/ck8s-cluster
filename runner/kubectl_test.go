@@ -224,7 +224,46 @@ func TestKubectlServerVersion(t *testing.T) {
 	logTest.Diff(t)
 }
 
-func TestKubectlServerVersionInvalidOutput(t *testing.T) {
+func TestKubectlServerVersionMissingServerVersionOutput(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"kubectl_server_version",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := NewCommand(
+		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
+		"KUBECONFIG={} kubectl version -o json",
+	)
+
+	r.Push(&TestCommand{
+		Command: wantCmd,
+		Stdout: []byte(`{
+  "clientVersion": {
+    "major": "1",
+    "minor": "16",
+    "gitVersion": "v1.16.2",
+    "gitCommit": "c97fe5036ef3df2967d086711e6c0c405941e14b",
+    "gitTreeState": "clean",
+    "buildDate": "2019-10-15T19:18:23Z",
+    "goVersion": "go1.12.10",
+    "compiler": "gc",
+    "platform": "linux/amd64"
+  }
+}`),
+	})
+
+	k := NewKubectl(logger, r, testKubectlConfig)
+
+	_, err := k.ServerVersion()
+	if !errors.Is(err, ServerVersionMissingErr) {
+		t.Errorf("expected error '%s', got '%s'", ServerVersionMissingErr, err)
+	}
+
+	logTest.Diff(t)
+}
+
+func TestKubectlServerVersionEmptyOutput(t *testing.T) {
 	logTest, logger := testutil.NewTestLogger([]string{
 		"kubectl_server_version",
 	})
