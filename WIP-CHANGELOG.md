@@ -64,3 +64,4 @@
 - Reduced control plane node sizes on Safespring for dev flavor.
 - Configuration files *(config.sh and secrets.env)* changed from *dotenv* format to *yaml*.
 - Install Kubernetes using the Kubelet version.
+- Bumped SOPS version to 3.6.1

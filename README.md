@@ -18,7 +18,7 @@ Currently we support three cloud providers: Exoscale, Safespring, an CityCloud.
 - [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.19)
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.5-1-a5b5cbe)
-- [sops](https://github.com/mozilla/sops) (tested with 3.5.0)
+- [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
 - [s3cmd](https://s3tools.org/s3cmd) (tested with 2.0.2)
 - [ansible](https://www.ansible.com) (tested with 2.5.1)
 - [go](https://golang.org) (tested with 1.13.8)
@@ -168,14 +168,3 @@ When developing the cli the most convenient way of running the cli is:
 ```
 go run ./cmd/ck8s
 ```
-
-## Known issues
-
-### SOPS exec-[file|env] subcommands does not propagate exit code
-
-SOPS is used to encrypt and decrypt secrets in the CK8S configuration.
-`sops exec-[file|env] [secret-file] [command]` is used to temporarily decrypt secrets and make them available when running a command.
-However, as of writing, in the latest stable version this method does not propagate the exit code to the caller which prevents them from being caught and be handled properly.
-
-To work around this issue, install SOPS from the development branch where a fix has been committed.
-See: https://github.com/mozilla/sops/issues/626

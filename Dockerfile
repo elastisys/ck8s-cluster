@@ -2,14 +2,6 @@ FROM golang:1.14.2-alpine3.11 as builder
 
 RUN apk add --no-cache make git
 
-# TODO: Remove when exit code propagation is released.
-#       See: https://github.com/mozilla/sops/issues/626
-RUN go get go.mozilla.org/sops/v3
-RUN cd $(go env GOPATH)/src/go.mozilla.org/sops/v3 && \
-    git checkout 7f350d81b50926a1a07294b6b8d8bb6ed3428186 && \
-    CGO_ENABLED=0 GOOS=linux go install -a -ldflags '-extldflags "-static"' go.mozilla.org/sops/v3/cmd/sops && \
-    mv $(go env GOPATH)/bin/sops /sops
-
 WORKDIR /ck8s
 COPY . /ck8s
 RUN make build
@@ -20,6 +12,7 @@ ARG ANSIBLE_VERSION="2.5.1+dfsg-1ubuntu0.1"
 ARG KUBECTL_VERSION="v1.15.2"
 ARG S3CMD_VERSION="2.0.2"
 ARG TERRAFORM_VERSION="0.12.19"
+ARG SOPS_VERSION="3.6.1"
 
 RUN  apt-get update && \
      apt-get install -y \
@@ -79,9 +72,8 @@ RUN wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_lin
     mv yq_linux_amd64 /usr/local/bin/yq
 
 # sops
-# TODO: Use release when exit code propagation is released.
-#       See: https://github.com/mozilla/sops/issues/626
-#RUN wget https://github.com/mozilla/sops/releases/download/vX.Y.Z/
-COPY --from=0 /sops /usr/local/bin/sops
+RUN wget https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux && \
+    mv ./sops-v${SOPS_VERSION}.linux /usr/local/bin/sops && \
+    chmod +x /usr/local/bin/sops
 
 COPY --from=0 /ck8s/dist/ck8s_linux_amd64 /usr/local/bin/ckctl
