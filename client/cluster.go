@@ -432,6 +432,16 @@ func (c *ClusterClient) ResetNode(name string) error {
 		return err
 	}
 
+	if machine.NodeType == api.Master {
+		c.logger.Debug("client_node_drain_master_lb_timeout_wait")
+
+		// Wait time based on the longest load balancer health check timeout,
+		// which is CityCloud.
+		// TODO: Find a better solution for this. Could we perhaps force remove
+		// load balancer members?
+		time.Sleep((10*5 + 20*4) * time.Second)
+	}
+
 	return c.kubectl.DeleteNode(name)
 }
 
