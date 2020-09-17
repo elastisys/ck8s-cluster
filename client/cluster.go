@@ -486,11 +486,6 @@ func (c *ClusterClient) RemoveNode(name string) error {
 		return fmt.Errorf("error applying Terraform config: %w", err)
 	}
 
-	// Delete the node from Kubernetes.
-	if nodeExists {
-		c.kubectl.DeleteNode(name)
-	}
-
 	return nil
 }
 
