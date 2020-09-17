@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 	"syscall"
@@ -128,11 +129,27 @@ func (r *StandardRunner) run(
 			return err
 		}
 
+		stdoutTeeReader := io.TeeReader(stdoutPipe, stdout)
+		stderrTeeReader := io.TeeReader(stderrPipe, stderr)
+
 		if err := cmd.OutputHandler(
-			io.TeeReader(stdoutPipe, stdout),
-			io.TeeReader(stderrPipe, stderr),
+			stdoutTeeReader,
+			stderrTeeReader,
 		); err != nil {
 			errorChain = multierror.Append(errorChain, err)
+		}
+
+		if _, err := ioutil.ReadAll(stdoutTeeReader); err != nil {
+			errorChain = multierror.Append(
+				errorChain,
+				fmt.Errorf("error reading remaining stdout: %w", err),
+			)
+		}
+		if _, err := ioutil.ReadAll(stderrTeeReader); err != nil {
+			errorChain = multierror.Append(
+				errorChain,
+				fmt.Errorf("error reading remaining stderr: %w", err),
+			)
 		}
 	} else {
 		executor.SetStdout(stdout)
