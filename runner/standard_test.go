@@ -34,6 +34,7 @@ type StandardRunnerTestCase struct {
 	Background          bool
 	WithOutputHandler   bool
 	OutputHandlerFail   bool
+	OutputHandlerNoRead bool
 	WithExitCodeHandler bool
 	ExitCodeHandlerFail bool
 }
@@ -49,7 +50,7 @@ func TestCommandRunner(t *testing.T) {
 	// }
 	var testCases []StandardRunnerTestCase
 	for exitCode := 0; exitCode <= 2; exitCode++ {
-		for i := 0; i < 32; i++ {
+		for i := 0; i < 64; i++ {
 			testCases = append(testCases, StandardRunnerTestCase{
 				exitCode,
 				((1 << 0) & i) != 0,
@@ -57,13 +58,15 @@ func TestCommandRunner(t *testing.T) {
 				((1 << 2) & i) != 0,
 				((1 << 3) & i) != 0,
 				((1 << 4) & i) != 0,
+				((1 << 5) & i) != 0,
 			})
 		}
 	}
 
 	for _, tc := range testCases {
 		// Skip invalid cases
-		if !tc.WithOutputHandler && tc.OutputHandlerFail {
+		if !tc.WithOutputHandler &&
+			(tc.OutputHandlerFail || tc.OutputHandlerNoRead) {
 			continue
 		} else if !tc.WithExitCodeHandler && tc.ExitCodeHandlerFail {
 			continue
@@ -80,6 +83,9 @@ func TestCommandRunner(t *testing.T) {
 		}
 		if tc.OutputHandlerFail {
 			name += "_OutputHandlerFail"
+		}
+		if tc.OutputHandlerNoRead {
+			name += "_OutputHandlerNoRead"
 		}
 		if tc.WithExitCodeHandler {
 			name += "_WithExitCodeHandler"
@@ -157,22 +163,22 @@ func runStandardRunnerTestCase(t *testing.T, tc StandardRunnerTestCase) {
 		cmd.OutputHandler = func(stdoutPipe, stderrPipe io.Reader) error {
 			logger.Debug(testOutputHandlerLogMsg)
 
-			if _, err := io.Copy(
-				&gotOutputHandlerStdout,
-				stdoutPipe,
-			); err != nil {
-				return err
+			if !tc.OutputHandlerNoRead {
+				if _, err := io.Copy(
+					&gotOutputHandlerStdout,
+					stdoutPipe,
+				); err != nil {
+					return err
+				}
+
+				if _, err := io.Copy(
+					&gotOutputHandlerStderr,
+					stderrPipe,
+				); err != nil {
+					return err
+				}
 			}
 
-			if _, err := io.Copy(
-				&gotOutputHandlerStderr,
-				stderrPipe,
-			); err != nil {
-				return err
-			}
-
-			// TODO: Test "fail early" vs "fail late"?
-			//		 If fail early the runnerError stdout/stderr is different.
 			if tc.OutputHandlerFail {
 				return testOutputHandlerErr
 			}
@@ -233,7 +239,7 @@ func runStandardRunnerTestCase(t *testing.T, tc StandardRunnerTestCase) {
 		}
 	}
 
-	if tc.WithOutputHandler {
+	if tc.WithOutputHandler && !tc.OutputHandlerNoRead {
 		if !bytes.Equal(cmd.Stdout, gotOutputHandlerStdout.Bytes()) {
 			t.Errorf(
 				"output handler stdout mismatch, want: %s, got: %s",
