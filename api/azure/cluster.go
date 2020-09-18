@@ -36,7 +36,7 @@ func (e *Cluster) State(
 		// TODO: This value currently needs to align with what is set in the
 		//		 Terraform code. We should expose this as an outer variable and
 		//		 forward it from here instead.
-		PrivateNetworkCIDR: "10.0.10.0/24",
+		PrivateNetworkCIDR: "10.0.0.0/16",
 
 		CalicoMTU: 1480,
 

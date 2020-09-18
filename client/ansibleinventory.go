@@ -16,7 +16,7 @@ const ansibleInventoryTemplate = `{{ range $Name, $Machine := MachinesByNodeType
 {{ end }}
 
 [all:vars]
-k8s_pod_cidr=192.168.0.0/16
+k8s_pod_cidr=10.0.128.0/17
 k8s_service_cidr=10.96.0.0/12
 
 ansible_user='ubuntu'

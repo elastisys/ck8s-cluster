@@ -35,18 +35,36 @@
         url: https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
         dest: /etc/kubeadm/calico.yaml
         force: "yes"
-      when: initialized is changed
+      when: initialized is changed and cloud_provider is defined and cloud_provider != "azure"
 
     - name: Configure calico mtu
       replace:
         path: /etc/kubeadm/calico.yaml
         regexp: 'veth_mtu:\s"\d+"'
         replace: 'veth_mtu: "{{ calico_mtu }}"'
-      when: initialized is changed
+      when: initialized is changed and cloud_provider is defined and cloud_provider != "azure"
 
     - name: Validate calico file
       shell: 'grep "veth_mtu: \"{{ calico_mtu }}\"" /etc/kubeadm/calico.yaml'
-      when: initialized is changed
+      when: initialized is changed and cloud_provider is defined and cloud_provider != "azure"
+
+    - name: Download calico manifests for azure
+      get_url:
+        url: https://docs.projectcalico.org/{{ calico_version }}/manifests/calico-policy-only.yaml
+        dest: /etc/kubeadm/calico.yaml
+        force: "yes"
+      when: cloud_provider is defined and cloud_provider == "azure"
+
+    - name: Configure calico mtu
+      replace:
+        path: /etc/kubeadm/calico.yaml
+        regexp: '"mtu":\s\d+'
+        replace: '"mtu": {{ calico_mtu }}'
+      when: cloud_provider is defined and cloud_provider == "azure"
+
+    - name: Validate calico file
+      shell: 'grep "\"mtu\": {{ calico_mtu }}" /etc/kubeadm/calico.yaml'
+      when: cloud_provider is defined and cloud_provider == "azure"
 
     - name: Apply calico
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /etc/kubeadm/calico.yaml
@@ -54,7 +72,7 @@
       retries: 15
       delay: 5
       until: result is not failed
-      when: initialized is changed
+      #when: initialized is changed
 
     - name: Force calico to use correct interface
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf patch daemonsets. -n kube-system calico-node --patch "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"calico-node\",\"env\":[{\"name\":\"IP_AUTODETECTION_METHOD\",\"value\":\"can-reach={{ private_network_cidr | ipaddr(-2) | ipaddr('address') }}\"}]}]}}}}"

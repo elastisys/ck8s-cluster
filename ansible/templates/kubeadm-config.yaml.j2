@@ -89,6 +89,8 @@ controllerManager:
       mountPath: "{{ cloud_config }}"
 {% endif %}
 {% endif %}
+{% else %}
+controllerManager: {}
 {% endif %}
 dns:
   type: CoreDNS

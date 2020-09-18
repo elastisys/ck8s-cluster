@@ -176,8 +176,8 @@ spec:
             - "--allocate-node-cidrs=true"
             - "--cloud-config=/etc/kubernetes/azure.json"
             - "--cloud-provider=azure"
-            - "--cluster-cidr=10.0.10.0/24"
-            - "--cluster-name=azure-test-workload-cluster" #TODO parameterize
+            - "--cluster-cidr=10.0.0.0/17"
+            - "--cluster-name=azure-test-service-cluster" #TODO parameterize
             - "--controllers=*,-cloud-node" # disable cloud-node controller
             - "--configure-cloud-routes=true" # "false" for Azure CNI and "true" for other network plugins
             - "--leader-elect=true"
@@ -248,6 +248,12 @@ rules:
 - apiGroups: [""]
   resources: ["nodes"]
   verbs: ["watch","list","get","update"]
+- apiGroups:
+    - ""
+  resources:
+    - nodes/status
+  verbs:
+    - patch
 - apiGroups:
     - extensions
   resourceNames:

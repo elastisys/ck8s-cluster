@@ -15,11 +15,22 @@ resource "azurerm_virtual_network" "main" {
   resource_group_name = azurerm_resource_group.main.name
 }
 
-resource "azurerm_subnet" "internal" {
-  name                 = "internal"
+resource "azurerm_subnet" "main" {
+  name                 = "${var.prefix}-subnet"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = [var.private_network_cidr]
+}
+
+resource "azurerm_route_table" "main" {
+  name                = "${var.prefix}-k8s-routetable"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+resource "azurerm_subnet_route_table_association" "main" {
+  subnet_id      = azurerm_subnet.main.id
+  route_table_id = azurerm_route_table.main.id
 }
 
 data "azurerm_image" "base_os" {
@@ -67,13 +78,14 @@ resource "azurerm_network_interface" "master" {
     if machine.node_type == "master"
   }
 
-  name                = "${var.prefix}-${each.key}-nic"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  name                 = "${var.prefix}-${each.key}-nic"
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  enable_ip_forwarding = true
 
   ip_configuration {
     name                          = "${var.prefix}-ip-config"
-    subnet_id                     = azurerm_subnet.internal.id
+    subnet_id                     = azurerm_subnet.main.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.master[each.key].id
   }
@@ -282,13 +294,14 @@ resource "azurerm_network_interface" "worker" {
     if machine.node_type == "worker"
   }
 
-  name                = "${var.prefix}-${each.key}-nic"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  name                 = "${var.prefix}-${each.key}-nic"
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  enable_ip_forwarding = true
 
   ip_configuration {
     name                          = "${var.prefix}-ip-config"
-    subnet_id                     = azurerm_subnet.internal.id
+    subnet_id                     = azurerm_subnet.main.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.worker[each.key].id
   }
@@ -305,6 +318,11 @@ resource "azurerm_network_interface_security_group_association" "worker" {
   network_security_group_id = azurerm_network_security_group.worker.id
 }
 
+resource "azurerm_availability_set" "worker" {
+  name                = "${var.prefix}-worker"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
 
 resource "azurerm_virtual_machine" "worker" {
   for_each = {
@@ -318,6 +336,7 @@ resource "azurerm_virtual_machine" "worker" {
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
   network_interface_ids = [azurerm_network_interface.worker[each.key].id]
+  availability_set_id   = azurerm_availability_set.worker.id
   vm_size               = each.value.size
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
@@ -413,6 +432,53 @@ resource "azurerm_lb" "worker_lb" {
     name                 = "${var.prefix}-worker-lb-ip"
     public_ip_address_id = azurerm_public_ip.worker_lb.id
   }
+}
+
+resource "azurerm_lb_backend_address_pool" "worker_lb" {
+  resource_group_name = azurerm_resource_group.main.name
+  loadbalancer_id     = azurerm_lb.worker_lb.id
+  name                = "${var.prefix}-worker-lb-pool"
+}
+
+resource "azurerm_network_interface_backend_address_pool_association" "worker_lb" {
+  for_each = azurerm_network_interface.worker
+
+  network_interface_id    = azurerm_network_interface.worker[each.key].id
+  ip_configuration_name   = "${var.prefix}-ip-config"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.worker_lb.id
+}
+
+resource "azurerm_lb_probe" "worker_lb" {
+  resource_group_name = azurerm_resource_group.main.name
+  loadbalancer_id     = azurerm_lb.worker_lb.id
+  name                = "${var.prefix}-http"
+  protocol            = "Http"
+  port                = 80
+  request_path        = "/healtz"
+}
+
+resource "azurerm_lb_rule" "worker_lb_http" {
+  resource_group_name            = azurerm_resource_group.main.name
+  loadbalancer_id                = azurerm_lb.worker_lb.id
+  name                           = "${var.prefix}-http"
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.worker_lb.id
+  probe_id                       = azurerm_lb_probe.worker_lb.id
+  frontend_ip_configuration_name = "${var.prefix}-worker-lb-ip"
+}
+
+resource "azurerm_lb_rule" "worker_lb_https" {
+  resource_group_name            = azurerm_resource_group.main.name
+  loadbalancer_id                = azurerm_lb.worker_lb.id
+  name                           = "${var.prefix}-https"
+  protocol                       = "Tcp"
+  frontend_port                  = 443
+  backend_port                   = 443
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.worker_lb.id
+  probe_id                       = azurerm_lb_probe.worker_lb.id
+  frontend_ip_configuration_name = "${var.prefix}-worker-lb-ip"
 }
 
 #################################################
