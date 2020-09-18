@@ -1,0 +1,9 @@
+cloud_provider_env_vars:
+  username: "{{ lookup('env', 'OS_USERNAME') | default(omit) }}"
+  password: "{{ lookup('env', 'OS_PASSWORD') | default(omit) }}"
+  auth_url: "{{ lookup('env', 'OS_AUTH_URL') | default(omit) }}"
+  tenant_id: "{{ lookup('env', 'OS_PROJECT_ID') | default(omit) }}"
+  domain_name: "{{ lookup('env', 'OS_USER_DOMAIN_NAME') | default(omit) }}"
+  region: "{{ lookup('env', 'OS_REGION_NAME') | default(omit) }}"
+cloud_provider_config: "{{ cloud_provider_vars | default('{}') | from_json | combine(cloud_provider_env_vars) }}"
+calico_version: v3.11

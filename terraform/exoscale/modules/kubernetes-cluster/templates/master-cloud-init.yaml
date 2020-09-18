@@ -1,0 +1,11 @@
+#cloud-config
+write_files:
+  - path: /etc/netplan/ens6.yaml
+    content: |
+      network:
+        version: 2
+        ethernets:
+          ens6:
+            dhcp4: true
+runcmd:
+  - netplan apply

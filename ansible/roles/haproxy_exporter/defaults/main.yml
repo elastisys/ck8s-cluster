@@ -1,0 +1,2 @@
+haproxy_stats_port: 31936
+haproxy_exporter_version: 0.10.0

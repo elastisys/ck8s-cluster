@@ -1,0 +1,139 @@
+{
+  "ansible_inventory_sc": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ck8stest-service-cluster-master-0 ansible_host=54.183.132.152 private_ip=172.16.1.23\n\nck8stest-service-cluster-worker-0 ansible_host=54.241.200.247 private_ip=172.16.1.199\nck8stest-service-cluster-worker-1 ansible_host=54.241.61.156 private_ip=172.16.1.24\n\n\n[all:vars]\nk8s_pod_cidr=192.168.0.0/16\nk8s_service_cidr=10.96.0.0/12\n\nansible_user='ubuntu'\nansible_port=22\n# TODO: move this to ansible.cfg when upgraded to ansible 2.8\nansible_python_interpreter=/usr/bin/python3\n\ncontrol_plane_endpoint='internal-tf-lb-20200624083147709400000007-359165897.us-west-1.elb.amazonaws.com'\npublic_endpoint='tf-lb-20200624083157273500000008-1544241826.us-west-1.elb.amazonaws.com'\ncloud_provider='aws'\ncluster_name='ck8stest-service-cluster'\n\ncalico_mtu='1480'\n\nkubeadm_init_extra_args=''\n\n[masters]\nck8stest-service-cluster-master-0\n\n\n[workers]\nck8stest-service-cluster-worker-0\nck8stest-service-cluster-worker-1\n\n\n\n\n[nodes:children]\nmasters\nworkers\n"
+  },
+  "ansible_inventory_wc": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ck8stest-workload-cluster-master-0 ansible_host=54.241.106.114 private_ip=172.16.1.128\n\nck8stest-workload-cluster-worker-0 ansible_host=54.153.41.224 private_ip=172.16.1.12\nck8stest-workload-cluster-worker-1 ansible_host=18.144.147.194 private_ip=172.16.1.234\n\n\n[all:vars]\nk8s_pod_cidr=192.168.0.0/16\nk8s_service_cidr=10.96.0.0/12\n\nansible_user='ubuntu'\nansible_port=22\n# TODO: move this to ansible.cfg when upgraded to ansible 2.8\nansible_python_interpreter=/usr/bin/python3\n\ncontrol_plane_endpoint='internal-tf-lb-20200624083144672100000005-736439048.us-west-1.elb.amazonaws.com'\npublic_endpoint='tf-lb-20200624083144986100000006-1183550514.us-west-1.elb.amazonaws.com'\ncloud_provider='aws'\ncluster_name='ck8stest-workload-cluster'\n\ncalico_mtu='1480'\n\nkubeadm_init_extra_args=''\n\n[masters]\nck8stest-workload-cluster-master-0\n\n\n[workers]\nck8stest-workload-cluster-worker-0\nck8stest-workload-cluster-worker-1\n\n\n\n\n[nodes:children]\nmasters\nworkers\n"
+  },
+  "sc_master_external_loadbalancer_fqdn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "tf-lb-20200624083157273500000008-1544241826.us-west-1.elb.amazonaws.com"
+  },
+  "sc_master_internal_loadbalancer_fqdn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "internal-tf-lb-20200624083147709400000007-359165897.us-west-1.elb.amazonaws.com"
+  },
+  "sc_master_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "master-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "master-0": {
+        "private_ip": "172.16.1.23",
+        "public_ip": "54.183.132.152"
+      }
+    }
+  },
+  "sc_worker_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "worker-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ],
+        "worker-1": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "worker-0": {
+        "private_ip": "172.16.1.199",
+        "public_ip": "54.241.200.247"
+      },
+      "worker-1": {
+        "private_ip": "172.16.1.24",
+        "public_ip": "54.241.61.156"
+      }
+    }
+  },
+  "wc_master_external_loadbalancer_fqdn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "tf-lb-20200624083144986100000006-1183550514.us-west-1.elb.amazonaws.com"
+  },
+  "wc_master_internal_loadbalancer_fqdn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "internal-tf-lb-20200624083144672100000005-736439048.us-west-1.elb.amazonaws.com"
+  },
+  "wc_master_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "master-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "master-0": {
+        "private_ip": "172.16.1.128",
+        "public_ip": "54.241.106.114"
+      }
+    }
+  },
+  "wc_worker_ips": {
+    "sensitive": false,
+    "type": [
+      "object",
+      {
+        "worker-0": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ],
+        "worker-1": [
+          "object",
+          {
+            "private_ip": "string",
+            "public_ip": "string"
+          }
+        ]
+      }
+    ],
+    "value": {
+      "worker-0": {
+        "private_ip": "172.16.1.12",
+        "public_ip": "54.153.41.224"
+      },
+      "worker-1": {
+        "private_ip": "172.16.1.234",
+        "public_ip": "18.144.147.194"
+      }
+    }
+  }
+}
+

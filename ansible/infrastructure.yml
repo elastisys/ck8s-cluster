@@ -1,0 +1,8 @@
+- hosts: loadbalancers
+  become: yes
+  become_user: root
+  roles:
+    - haproxy
+    - haproxy_exporter
+  tags:
+    - loadbalancer

@@ -1,0 +1,6 @@
+---
+- import_playbook: prepare-nodes.yml
+- import_playbook: initialize-master.yml
+  vars:
+    kubeconfig_path: "{{ kubeconfig_path | default('kubeconfig.yaml') }}"
+- import_playbook: join-cluster.yml

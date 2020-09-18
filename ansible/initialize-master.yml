@@ -1,0 +1,97 @@
+---
+- hosts: masters[0]
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Initialize master
+      command: kubeadm init --config=/etc/kubeadm/kubeadm-config.yaml {{ kubeadm_init_extra_args }}
+      args:
+        creates: /etc/kubernetes/admin.conf
+      register: initialized
+
+    - name: Upload default PSP manifests
+      copy:
+        src: "files/{{ item }}"
+        dest: /etc/kubeadm/{{ item }}
+      loop:
+        - default-privileged-psp.yaml
+        - default-restricted-psp.yaml
+
+    - name: Install default PSP
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f {{ item }}
+      loop:
+        - /etc/kubeadm/default-privileged-psp.yaml
+        - /etc/kubeadm/default-restricted-psp.yaml
+      # Retries are needed here as the loadbalancer will forward requests to unhealthy master nodes
+      # until master[0] is marked as healthy.
+      register: result
+      retries: 15
+      delay: 5
+      until: result is not failed
+
+    - name: Download calico manifests
+      get_url:
+        url: https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
+        dest: /etc/kubeadm/calico.yaml
+        force: "yes"
+      when: initialized is changed
+
+    - name: Configure calico mtu
+      replace:
+        path: /etc/kubeadm/calico.yaml
+        regexp: 'veth_mtu:\s"\d+"'
+        replace: 'veth_mtu: "{{ calico_mtu }}"'
+      when: initialized is changed
+
+    - name: Validate calico file
+      shell: 'grep "veth_mtu: \"{{ calico_mtu }}\"" /etc/kubeadm/calico.yaml'
+      when: initialized is changed
+
+    - name: Apply calico
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /etc/kubeadm/calico.yaml
+      register: result
+      retries: 15
+      delay: 5
+      until: result is not failed
+      when: initialized is changed
+
+    - name: Force calico to use correct interface
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf patch daemonsets. -n kube-system calico-node --patch "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"calico-node\",\"env\":[{\"name\":\"IP_AUTODETECTION_METHOD\",\"value\":\"can-reach={{ private_network_cidr | ipaddr(-2) | ipaddr('address') }}\"}]}]}}}}"
+      when: private_network_cidr is defined
+
+    - name: Getting AWS master nodename
+      command:
+        cmd: curl -s http://169.254.169.254/latest/meta-data/local-hostname
+        warn: false
+      register: master_node_name
+      when: cloud_provider is defined and cloud_provider == "aws"
+
+    - name: Wait for AWS master to become ready
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes {{ master_node_name.stdout }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+      register: master_node_status
+      until: master_node_status.stdout == "True"
+      retries: 30
+      when: cloud_provider is defined and cloud_provider == "aws"
+
+    - name: Wait for master to become ready
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes {{ inventory_hostname }} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+      register: master_node_status
+      until: master_node_status.stdout == "True"
+      retries: 30
+      when: cloud_provider is defined and cloud_provider != "aws"
+
+    - name: Copy kubeconfig to localhost
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ kubeconfig_path }}"
+        flat: yes
+
+    - name: Set public IP in local kubeconfig
+      become: no
+      run_once: yes
+      replace:
+        path: "{{ kubeconfig_path }}"
+        regexp: "https://{{ control_plane_endpoint | default(hostvars[groups.masters.0].private_ip) }}:{{ control_plane_port | default(6443) }}"
+        replace: "https://{{ public_endpoint | default(hostvars[groups.masters.0].ansible_host) }}:6443"
+      delegate_to: localhost

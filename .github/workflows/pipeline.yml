@@ -1,0 +1,18 @@
+name: Exoscale
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - 'pre-release-*'
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+    - name: Run unit tests
+      run: ./pipeline/unit-tests.bash

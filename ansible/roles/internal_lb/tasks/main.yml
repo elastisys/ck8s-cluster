@@ -1,0 +1,48 @@
+- name: Install pip
+  apt:
+    name:
+      - python3-setuptools
+      - virtualenv
+      - python3-pip
+    update_cache: yes
+  async: 600
+  poll: 30
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+
+- name: Create directory for haproxy
+  file:
+    path: /etc/haproxy
+    state: directory
+
+- name: Render haproxy configuration
+  template:
+    src: haproxy-int-lb.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  register: haproxy_config
+
+- name: Create haproxy container as internal load balancer
+  docker_container:
+    name: haproxy-int-lb
+    image: haproxy:{{ haproxy_version }}
+    state: started
+    restart: "{{ haproxy_config is changed }}"
+    restart_policy: always
+    volumes:
+      - /etc/haproxy:/usr/local/etc/haproxy:ro
+    published_ports:
+      - "{{ control_plane_endpoint }}:{{ control_plane_port }}:{{ control_plane_port }}"
+    ## TODO: Upgrade ansible to 2.8 to support healthchecks for docker
+    # healthcheck:
+    #   test: ["CMD", "curl", "--fail", "https://localhost:7443"]
+    #   interval: 10s
+    #   timeout: 2s
+    #   retries: 3
+    #   start_period: 30s
+    ## TODO: Check if it is possible to use networks to specify IP address
+    ## and avoid having to use a non-standard port
+    # network:
+    #   name: some-network
+    #   ipv4_address: x.x.x.x

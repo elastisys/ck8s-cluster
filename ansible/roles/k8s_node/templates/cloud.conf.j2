@@ -1,0 +1,27 @@
+[Global]
+username="{{cloud_provider_config.username}}"
+password="{{cloud_provider_config.password}}"
+auth-url="{{cloud_provider_config.auth_url}}"
+tenant-id="{{cloud_provider_config.tenant_id}}"
+domain-name="{{cloud_provider_config.domain_name}}"
+region="{{cloud_provider_config.region}}"
+
+{% if cloud_provider_config.lb_enabled | default(False) == True %}
+[LoadBalancer]
+use-octavia={{"true" if cloud_provider_config.use_octavia | default(false) else "false"}}
+subnet-id={{cloud_provider_config.lb_subnet_id}}
+floating-network-id={{cloud_provider_config.lb_external_network_id}}
+{% if cloud_provider_config.manage_secgroups | default(false) %}
+; TODO: Currently we allow traffic to all NodePorts, and all traffic within the
+; subnet, so it is not necessary to modify the security groups when new
+; loadbalancers are added. In the future this will probably change and then we
+; may need to let k8s manage the groups.
+; manage-security-groups=true
+; NOTE! This does not work. We seem to be hitting the following:
+; https://github.com/kubernetes/kubernetes/issues/58145
+; My guess is that this was fixed for older versions but doesn't work anymore.
+; The built-in openstack provider is also deprecated which means that this
+; probably has quite low priority.
+; node-security-group={{cloud_provider_config.secgroup_id}}
+{% endif %}
+{% endif %}

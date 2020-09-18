@@ -1,0 +1,54 @@
+---
+- hosts: nodes
+  become: yes
+  become_user: root
+  roles:
+    - k8s_node
+
+- hosts: internal_lb
+  become: yes
+  become_user: root
+  gather_facts: false
+  roles:
+    - internal_lb
+
+- hosts: masters
+  become: yes
+  become_user: root
+  gather_facts: false
+  tasks:
+
+    # TODO: Ideally we would only have to render the kubeadm init config in the
+    #       initialize-master playbook. However, to allow for any master to run
+    #       kubeadm init phase upload-certs we currently render the init config
+    #       on all masters instead.
+    #       Another way to solve this would be to set the cert encryption key
+    #       ourselves.
+    - name: Get Kubeadm version string
+      command: kubeadm version -o json
+      register: kubeadm
+
+    - name: Extract Kubernetes version
+      set_fact:
+        k8s_version: "{{ kubeadm.stdout | from_json | json_query('clientVersion.gitVersion') }}"
+
+    - name: Render kubeadm config
+      template:
+        src: kubeadm-config.yaml.j2
+        dest: /etc/kubeadm/kubeadm-config.yaml
+
+    - name: Create directories for kubernetes and audit logs
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /etc/kubernetes/conf
+        - /var/log/kube-audit
+
+    - name: Add audit policy
+      copy:
+        src: files/audit-policy.yaml
+        dest: /etc/kubernetes/conf/audit-policy.yaml
+        owner: root
+        group: root
+        mode: '0644'

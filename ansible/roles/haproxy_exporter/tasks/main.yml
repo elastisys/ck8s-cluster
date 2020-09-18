@@ -1,0 +1,33 @@
+- name: Download haproxy exporter for prometheus
+  unarchive:
+    src: https://github.com/prometheus/haproxy_exporter/releases/download/v{{ haproxy_exporter_version }}/haproxy_exporter-{{ haproxy_exporter_version }}.linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
+  tags:
+    - haproxy_exporter
+
+- name: Install haproxy_exporter
+  copy:
+    src: /tmp/haproxy_exporter-{{ haproxy_exporter_version }}.linux-amd64/haproxy_exporter
+    dest: /usr/local/bin/haproxy_exporter
+    remote_src: yes
+    mode: u=rwx,g=rwx,o=rx
+  tags:
+    - haproxy_exporter
+
+- name: Create systemd unit for haproxy_exporter
+  template:
+    src: haproxy_exporter.service.j2
+    dest: /etc/systemd/system/haproxy_exporter.service
+  register: haproxy_exporter_unit
+  tags:
+    - haproxy_exporter
+
+- name: Start and enable haproxy_exporter
+  systemd:
+    name: haproxy_exporter
+    state: "{{ haproxy_exporter_unit is changed | ternary('restarted', 'started') }}"
+    enabled: yes
+    daemon_reload: "{{ haproxy_exporter_unit is changed }}"
+  tags:
+    - haproxy_exporter

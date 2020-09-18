@@ -1,0 +1,4 @@
+haproxy_stats_port: 31936
+haproxy_ingress_timeout: "{{ lookup('env','LB_TIMEOUT') or '10m' }}"
+haproxy_global_maxconn: "{{ lookup('env','LB_GLOBAL_MAXCONN') or '5000' }}"
+haproxy_defaults_maxconn: "{{ lookup('env','LB_DEFAULTS_MAXCONN') or '5000' }}"

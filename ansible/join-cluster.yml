@@ -1,0 +1,82 @@
+---
+- hosts: masters
+  gather_facts: false
+  tasks:
+
+    - name: Check if master is active
+      stat:
+        path: /etc/kubernetes/admin.conf
+      register: kubeconfig
+
+    - name: Create master groups based on status
+      group_by: key="{{ 'masters_active' if kubeconfig.stat.exists else 'masters_joining' }}"
+
+    - name: Fail if no active hosts are available
+      fail:
+        msg: No active hosts available
+      when: groups.masters_active is not defined
+
+- hosts: masters_active[0]
+  become: yes
+  become_user: root
+  gather_facts: false
+  tasks:
+
+    - name: Get join token
+      command: kubeadm token create
+      register: string_result
+
+    - name: Store join token
+      set_fact:
+        join_token: "{{ string_result.stdout }}"
+
+    - name: Get CA key hash
+      shell: "openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'"
+      register: string_result
+
+    - name: Store CA key hash
+      set_fact:
+        ca_key_hash: "{{ string_result.stdout }}"
+
+    - name: Upload certificates
+      when: groups.masters | count > 1
+      command: kubeadm init phase upload-certs --config=/etc/kubeadm/kubeadm-config.yaml --upload-certs
+      register: cert_upload
+
+    - name: Store certificate key
+      when: groups.masters | count > 1
+      set_fact:
+        cert_key: "{{ cert_upload.stdout_lines | last }}"
+
+- hosts: masters_joining
+  become: yes
+  become_user: root
+  gather_facts: false
+  serial: 1
+  tasks:
+
+    - name: Render kubeadm join config
+      template:
+        src: kubeadm-join-master.yaml.j2
+        dest: /etc/kubeadm/kubeadm-join-master.yaml
+
+    - name: Join the cluster
+      command: "kubeadm join --config /etc/kubeadm/kubeadm-join-master.yaml"
+      args:
+        creates: /etc/kubernetes/kubelet.conf
+
+- hosts: workers
+  become: yes
+  become_user: root
+  gather_facts: false
+  tasks:
+
+    - name: Render kubeadm join config
+      template:
+        src: kubeadm-join.yaml.j2
+        dest: /etc/kubeadm/kubeadm-join.yaml
+
+    - name: Join the cluster
+      command: "kubeadm join --config /etc/kubeadm/kubeadm-join.yaml"
+      args:
+        creates: /etc/kubernetes/kubelet.conf

@@ -1,0 +1,44 @@
+{
+  "prefix_sc": "",
+  "prefix_wc": "",
+  "machines_sc": {
+    "master-0": {
+      "node_type": "master",
+      "size": "96c7903e-32f0-421d-b6a2-a45c97b15665",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "worker-0": {
+      "node_type": "worker",
+      "size": "d430b3cd-0216-43ff-878c-c08689c0001b",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "worker-1": {
+      "node_type": "worker",
+      "size": "572a3b2e-6329-4053-b872-aecb1e70d8a6",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    }
+  },
+  "machines_wc": {
+    "master-0": {
+      "node_type": "master",
+      "size": "96c7903e-32f0-421d-b6a2-a45c97b15665",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "worker-0": {
+      "node_type": "worker",
+      "size": "572a3b2e-6329-4053-b872-aecb1e70d8a6",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    }
+  },
+  "public_ingress_cidr_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "api_server_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "nodeport_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "master_anti_affinity_policy_sc" :"anti-affinity",
+  "worker_anti_affinity_policy_sc" :"",
+  "master_anti_affinity_policy_wc" :"anti-affinity",
+  "worker_anti_affinity_policy_wc" :"",
+  "aws_dns_zone_id"                :"testAWSDNSZoneID",
+  "aws_dns_role_arn"               :"testAWSDNSRoleARN",
+  "external_network_id"            :"2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c",
+  "external_network_name"          :"ext-net"
+}

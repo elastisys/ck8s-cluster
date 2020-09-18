@@ -1,0 +1,54 @@
+{
+  "prefix_sc": "",
+  "prefix_wc": "",
+  "machines_sc": {
+    "master-0": {
+      "node_type": "master",
+      "size": "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "worker-0": {
+      "node_type": "worker",
+      "size": "ea0dbe3b-f93a-47e0-84e4-b09ec5873bdf",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "worker-1": {
+      "node_type": "worker",
+      "size": "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "loadbalancer-0": {
+      "node_type": "loadbalancer",
+      "size": "51d480b8-2517-4ba8-bfe0-c649ac93eb61",
+      "image": "3afb071a-ac91-4713-8c86-9fab4e78b863"
+    }
+  },
+  "machines_wc": {
+    "master-0": {
+      "node_type": "master",
+      "size": "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "worker-0": {
+      "node_type": "worker",
+      "size": "dc67a9eb-0685-4bb6-9383-a01c717e02e8",
+      "image": "3092f981-a271-4f93-add3-fcc8742ceb0e"
+    },
+    "loadbalancer-0": {
+      "node_type": "loadbalancer",
+      "size": "51d480b8-2517-4ba8-bfe0-c649ac93eb61",
+      "image": "3afb071a-ac91-4713-8c86-9fab4e78b863"
+    }
+  },
+  "public_ingress_cidr_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "api_server_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "nodeport_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "master_anti_affinity_policy_sc" :"anti-affinity",
+  "worker_anti_affinity_policy_sc" :"anti-affinity",
+  "master_anti_affinity_policy_wc" :"anti-affinity",
+  "worker_anti_affinity_policy_wc" :"anti-affinity",
+  "aws_dns_zone_id"                :"testAWSDNSZoneID",
+  "aws_dns_role_arn"               :"testAWSDNSRoleARN",
+  "external_network_id"            :"2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c",
+  "external_network_name"          :"ext-net"
+}

@@ -1,0 +1,109 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: {{ private_ip }}
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  kubeletExtraArgs:
+    node-ip: "{{ private_ip }}"
+    cgroup-driver: "systemd"
+{% if cloud_provider is defined %}
+    cloud-provider: "{{ cloud_provider }}"
+{% if cloud_config is defined %}
+    cloud-config: "{{ cloud_config }}"
+{% endif %}
+{% endif %}
+
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+apiServer:
+{% if public_endpoint is defined or control_plane_endpoint is defined %}
+  certSANs:
+{% endif %}
+{% if public_endpoint is defined %}
+    - "{{ public_endpoint }}"
+{% endif %}
+{% if control_plane_endpoint is defined %}
+    - "{{ control_plane_endpoint }}"
+{% endif %}
+  extraVolumes:
+    - name: "kubernetes-conf"
+      hostPath: "/etc/kubernetes/conf"
+      mountPath: "/etc/kubernetes/conf"
+      readOnly: false
+      pathType: "Directory"
+    - name: "kube-audit"
+      hostPath: "/var/log/kube-audit"
+      mountPath: "/var/log/kube-audit"
+      readOnly: false
+      pathType: "Directory"
+{% if cloud_config is defined %}
+    - name: cloud
+      hostPath: "{{ cloud_config }}"
+      mountPath: "{{ cloud_config }}"
+{% endif %}
+  extraArgs:
+    authorization-mode: "Node,RBAC"
+    oidc-issuer-url: "https://dex.{{ lookup('env','ECK_BASE_DOMAIN') }}"
+    oidc-client-id: "kubelogin"
+    oidc-username-claim: "email"
+    oidc-groups-claim: "groups"
+    audit-policy-file: "/etc/kubernetes/conf/audit-policy.yaml"
+    audit-log-path: "/var/log/kube-audit/kube-apiserver.log"
+    # Increase number of delete workers
+    delete-collection-workers: "3"
+    # Set the level of log output to debug-level
+    v: "4"
+    # Set max age for audit logs
+    audit-log-maxage: "7"
+    enable-admission-plugins: "PodSecurityPolicy,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction"
+{% if cloud_provider is defined %}
+    cloud-provider: "{{ cloud_provider }}"
+{% endif %}
+{% if cloud_config is defined %}
+    cloud-config: "{{ cloud_config }}"
+{% endif %}
+  timeoutForControlPlane: 4m0s
+certificatesDir: /etc/kubernetes/pki
+clusterName: {{ cluster_name }}
+controlPlaneEndpoint: "{{ control_plane_endpoint | default(hostvars[groups.masters.0].private_ip) }}:{{ control_plane_port | default(6443) }}"
+{% if cloud_provider is defined %}
+controllerManager:
+  extraArgs:
+    cloud-provider: "{{ cloud_provider }}"
+{% if cloud_config is defined %}
+    cloud-config: "{{ cloud_config }}"
+  extraVolumes:
+    - name: cloud
+      hostPath: "{{ cloud_config }}"
+      mountPath: "{{ cloud_config }}"
+{% endif %}
+{% else %}
+controllerManager: {}
+{% endif %}
+dns:
+  type: CoreDNS
+etcd:
+  local:
+    dataDir: "/var/lib/etcd"
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:4001"
+imageRepository: k8s.gcr.io
+kubernetesVersion: {{ k8s_version }}
+networking:
+  serviceSubnet: {{ k8s_service_cidr }}
+  podSubnet: {{ k8s_pod_cidr }}
+  dnsDomain: "cluster.local"
+scheduler: {}
+# @todo:
+# private_registries:
+#     - url: harbor.test-gadr.a1ck.io
+#       user: admin
+#       password: BKjLJOz4S64PPaNxamyf
+
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+metricsBindAddress: 0.0.0.0:10249

@@ -1,0 +1,42 @@
+{
+  "region": "us-west-1",
+  "prefix_sc": "",
+  "prefix_wc": "",
+  "machines_sc": {
+    "master-0": {
+      "node_type": "master",
+      "size": "t3.small",
+      "image": "ami-025fd2f1456a0e2e5"
+    },
+    "worker-0": {
+      "node_type": "worker",
+      "size": "t3.xlarge",
+      "image": "ami-025fd2f1456a0e2e5"
+    },
+    "worker-1": {
+      "node_type": "worker",
+      "size": "t3.large",
+      "image": "ami-025fd2f1456a0e2e5"
+    }
+  },
+  "machines_wc": {
+    "master-0": {
+      "node_type": "master",
+      "size": "t3.small",
+      "image": "ami-025fd2f1456a0e2e5"
+    },
+    "worker-0": {
+      "node_type": "worker",
+      "size": "t3.large",
+      "image": "ami-025fd2f1456a0e2e5"
+    },
+    "worker-1": {
+      "node_type": "worker",
+      "size": "t3.large",
+      "image": "ami-025fd2f1456a0e2e5"
+    }
+  },
+  "public_ingress_cidr_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "api_server_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "nodeport_whitelist": ["1.2.3.4/32", "4.3.2.1/32"]
+}
