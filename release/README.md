@@ -3,48 +3,68 @@
 The releases will follow semantic versioning and be handled with git tags.
 https://semver.org/
 
-## Tracked releases
+## Major and minor releases
 
-When ready to cut a new major or minor release create a release branch
-`release-x.y` from the last minor release tag. For example:
+1. To release a major or minor version create a release branch `release-X.Y` from the last minor release tag.
+
 ```bash
-git checkout v0.2.0
-git checkout -b release-0.3
-git push -u origin release-0.3
+git checkout vA.B.0
+git checkout -b release-X.Y
+git push -u origin release-X.Y
 ```
-The rest of the workflow will be handled by a pipeline see
-[Trigger a release](#trigger-a-release).
 
-## Trigger a release
+2. Checkout the branch to cut the release from.
 
-To trigger the release pipeline make sure you have the correct release branch checked out. Then create another branch called `pre-release-<patch|minor|major|version>`.
-If the suffix is `patch`, `minor` or `major` then the version in `version.json` will be bumped. Otherwise the suffix must be a version following the semver standard.
+```bash
+git checkout master
+git pull
+git checkout -b branch_name
+```
 
-When this pre-release branch is pushed a pipeline will be triggered which:
+3. Run the release script.
 
-1. Tests the standard pipeline and creates a `version.json` with the running versions.
-2. Increase the CK8S version in `version.json`
-3. Append what ever is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
-4. Clear `WIP-CHANGELOG.md`
-4. Create a git commit with message `release version vx.y.z`
-5. Create a tag named `vx.y.z`
-6. Creates a pr to the `release-x.y` branch.
+```bash
+./release/release.sh vX.Y.Z
+```
 
-When this is done review the new PR and merge it to finalize the release.
+The release script will:
+* Append what is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
+* Clear `WIP-CHANGELOG.md`
+* Create a git commit with message `Release vX.Y.Z`
+* Create a tag named `vX.Y.Z`
+
+4. Push the tagged commit, create a PR against the release branch and request a review.
+
+```bash
+git push --atomic origin branch_name vX.Y.Z
+```
+
+5. Merge it to finalize the release.
+A [GitHub actions workflow pipeline](.github/workflows/release.yml) will create a GitHub release from the tag.
+
+*GitHub currently does not support merging with fast-forward only.
+Merge the release PR locally and push it instead.*
+
+```bash
+git checkout release-X.Y
+git merge --ff-only branch_name
+git push
+```
 
 ## Patch releases
 
-To create a patch release, do the following:
+1. Create a new branch based on a release branch and commit the patch commits to it.
 
-1. Create a new branch based on a release branch, e.g. `patch/x.y`.
-2. Create another branch (e.g. `my-fix`), also based on the release branch and
-   commit the fixes to it.
-3. Request a code review for `my-fix` and merge it to `patch/x.y`.
-4. Repeat step 2 and 3 if more than one change set should be included in the
-   patch release.
-5. Once all fixes are merged to the `patch/x.y` branch. Create a
-   `pre-release-patch` branch from it and push it to the remote. The normal
-   release process described above then applies.
+```bash
+git checkout release-X.Y
+git pull
+git checkout -b branch_name
+git cherry-pick [some fix in master]
+git add -p file-with-some-new-fixes
+git commit
+```
+
+2. Continue from step 3 in the major/minor release flow.
 
 ## While developing
 

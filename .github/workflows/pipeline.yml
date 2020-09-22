@@ -1,12 +1,9 @@
-name: Exoscale
+name: Master PR
 
 on:
   pull_request:
     branches:
       - master
-  push:
-    branches:
-      - 'pre-release-*'
 
 jobs:
   unit-tests:
