@@ -80,7 +80,45 @@ func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 func Production(clusterType api.ClusterType, clusterName string) api.Cluster {
 	cluster := Default(clusterType, clusterName)
 
-	// TODO
+	cloudProvider := NewCloudProvider()
+
+	master := api.NewMachineFactory(
+		cloudProvider,
+		api.Master,
+		"Standard_D2_v3",
+	).MustBuild()
+
+	workerLargeSC := api.NewMachineFactory(
+		cloudProvider,
+		api.Worker,
+		"Standard_D4_v3",
+	).MustBuild()
+
+	workerWC := api.NewMachineFactory(
+		cloudProvider,
+		api.Worker,
+		"Standard_D4_v3",
+	).MustBuild()
+
+	cluster.tfvars.MachinesSC = map[string]*api.Machine{
+		"master-0": master,
+		"master-1": master,
+		"master-2": master,
+		"worker-0": workerLargeSC,
+		"worker-1": workerLargeSC,
+		"worker-2": workerLargeSC,
+		"worker-3": workerLargeSC,
+	}
+
+	cluster.tfvars.MachinesWC = map[string]*api.Machine{
+		"master-0":      master,
+		"master-1":      master,
+		"master-2":      master,
+		"worker-ck8s-0": workerWC,
+		"worker-0":      workerWC,
+		"worker-1":      workerWC,
+		"worker-2":      workerWC,
+	}
 
 	return cluster
 }
