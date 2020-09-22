@@ -96,10 +96,10 @@
       args:
         creates: /etc/kubernetes/kubelet.conf
 
-    - name: Add azure config for kubelet
-      copy:
-        src: files/azure.json
-        dest: /etc/kubernetes/kubelet-azure.json
+    - name: Render azure config for api-server
+      template:
+        src: azure.json.j2
+        dest: /etc/kubernetes/azure.json
         owner: root
         group: root
         mode: '0644'

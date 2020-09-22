@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -232,14 +233,20 @@ func (c *ClusterClient) Destroy(deleteRemoteWorkspace bool, kubernetesCleanup bo
 			return fmt.Errorf("error deleting persistent volume claims: %w", err)
 		}
 
+		//c.kubectl.DeleteAll("persistentvolumeclaims", "--timeout=5s")
+
 		if err := c.kubectl.DeleteAll("service"); err != nil {
 			return fmt.Errorf("error deleting services: %w", err)
 		}
 
 		// TODO Make smarter that to delete all pods, try to delete only once with pvc
 		if err := c.kubectl.DeleteAll("pod", "--grace-period=60"); err != nil {
-			return fmt.Errorf("error deleting pods: %w", err)
+			fmt.Printf("ERROR MESSAGE: %s\n\n", err.Error())
+			if !strings.Contains(err.Error(), "Timeout") {
+				return fmt.Errorf("error deleting pods: %w", err)
+			}
 		}
+		//c.kubectl.DeleteAll("pod", "--grace-period=60")
 	}
 
 	if err := c.TerraformDestroy(); err != nil {

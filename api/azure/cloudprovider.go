@@ -2,6 +2,11 @@ package azure
 
 import "github.com/elastisys/ck8s/api"
 
+var supportedImages = []string{
+	"ck8s-v1.16.14-ck8s0",
+	"ck8s-v1.17.11-ck8s0",
+}
+
 var clusterFlavorMap = map[api.ClusterFlavor]func(api.ClusterType, string) api.Cluster{
 	FlavorDevelopment: Development,
 	FlavorProduction:  Production,
@@ -11,6 +16,10 @@ type CloudProvider struct{}
 
 func NewCloudProvider() *CloudProvider {
 	return &CloudProvider{}
+}
+
+func (e *CloudProvider) Type() api.CloudProviderType {
+	return api.Azure
 }
 
 func (e *CloudProvider) Flavors() (flavors []api.ClusterFlavor) {
@@ -46,4 +55,12 @@ func (e *CloudProvider) TerraformBackendConfig() *api.TerraformBackendConfig {
 	}
 	backendConfig.Workspaces.Prefix = "ck8s-azure-"
 	return backendConfig
+}
+
+func (e *CloudProvider) MachineImages(api.NodeType) []string {
+	return supportedImages
+}
+
+func (e *CloudProvider) MachineSettings() interface{} {
+	return nil
 }

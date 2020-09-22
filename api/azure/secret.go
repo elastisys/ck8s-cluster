@@ -5,8 +5,8 @@ import (
 )
 
 type AzureSecret struct {
-	api.BaseSecret `mapstructure:",squash"`
+	api.BaseSecret `mapstructure:",squash" yaml:",inline"`
 
-	APIKey    string `mapstructure:"AZURE_KEY" validate:"required"`
-	SecretKey string `mapstructure:"AZURE_SECRET" validate:"required"`
+	ClientID     string `mapstructure:"client_id" yaml:"client_id" validate:"required"`
+	ClientSecret string `mapstructure:"client_secret" yaml:"client_secret" validate:"required"`
 }

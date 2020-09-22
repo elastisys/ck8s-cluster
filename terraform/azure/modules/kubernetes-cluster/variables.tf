@@ -28,7 +28,7 @@ variable "nodeport_whitelist" {
 }
 
 variable "private_network_cidr" {
-  default = "10.0.0.0/16"
+  default = "10.0.10.0/24"
 }
 
 variable "compute_instance_image" {}

@@ -36,7 +36,7 @@ func (e *Cluster) State(
 		// TODO: This value currently needs to align with what is set in the
 		//		 Terraform code. We should expose this as an outer variable and
 		//		 forward it from here instead.
-		PrivateNetworkCIDR: "10.0.0.0/16",
+		PrivateNetworkCIDR: "10.0.10.0/24",
 
 		CalicoMTU: 1480,
 
@@ -80,11 +80,19 @@ func (e *Cluster) TerraformWorkspace() string {
 
 func (e *Cluster) TerraformEnv(sshPublicKey string) map[string]string {
 	env := api.TerraformEnvHelper(&e.config.BaseConfig, sshPublicKey)
-	env["TODO-TF_VAR_exoscale_api_key"] = e.secret.APIKey
-	env["TODO-TF_VAR_exoscale_secret_key"] = e.secret.SecretKey
+	env["TF_VAR_subscription_id"] = e.config.SubscriptionID
+	env["TF_VAR_tenant_id"] = e.config.TenantID
 	return env
 }
 
 func (e *Cluster) AnsibleEnv() map[string]string {
-	return map[string]string{}
+	env := map[string]string{}
+
+	env["AZURE_CLIENT_ID"] = e.secret.ClientID
+	env["AZURE_CLIENT_SECRET"] = e.secret.ClientSecret
+	env["AZURE_TENANT_ID"] = e.config.TenantID
+	env["AZURE_SUBSCRIPTION_ID"] = e.config.SubscriptionID
+	env["AZURE_LOCATION"] = e.config.Location
+
+	return env
 }

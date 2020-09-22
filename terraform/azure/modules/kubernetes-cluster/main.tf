@@ -454,7 +454,7 @@ resource "azurerm_lb_probe" "worker_lb" {
   name                = "${var.prefix}-http"
   protocol            = "Http"
   port                = 80
-  request_path        = "/healtz"
+  request_path        = "/healthz"
 }
 
 resource "azurerm_lb_rule" "worker_lb_http" {
