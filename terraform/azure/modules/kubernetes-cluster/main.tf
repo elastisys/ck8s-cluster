@@ -34,7 +34,9 @@ resource "azurerm_subnet_route_table_association" "main" {
 }
 
 data "azurerm_image" "base_os" {
-  name                = var.compute_instance_image
+  for_each = var.machines
+
+  name                = each.value.image.name
   resource_group_name = "ck8s-base-os-image"
 }
 
@@ -130,7 +132,7 @@ resource "azurerm_virtual_machine" "master" {
   delete_data_disks_on_termination = true
 
   storage_image_reference {
-    id = data.azurerm_image.base_os.id
+    id = data.azurerm_image.base_os[each.key].id
   }
 
   storage_os_disk {
@@ -346,7 +348,7 @@ resource "azurerm_virtual_machine" "worker" {
   delete_data_disks_on_termination = true
 
   storage_image_reference {
-    id = data.azurerm_image.base_os.id
+    id = data.azurerm_image.base_os[each.key].id
   }
 
   storage_os_disk {

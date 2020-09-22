@@ -1,7 +1,5 @@
 variable "location" {
   type = string
-  # TODO Do we want to use this as default?
-  default = "North Europe"
 }
 
 variable "prefix" {}
@@ -10,6 +8,9 @@ variable "machines" {
   type = map(object({
     node_type = string
     size      = string
+    image = object({
+      name = string
+    })
   }))
 }
 
@@ -30,8 +31,6 @@ variable "nodeport_whitelist" {
 variable "private_network_cidr" {
   default = "10.0.10.0/24"
 }
-
-variable "compute_instance_image" {}
 
 ## DNS
 variable "dns_list" {

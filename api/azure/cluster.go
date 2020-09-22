@@ -82,6 +82,7 @@ func (e *Cluster) TerraformEnv(sshPublicKey string) map[string]string {
 	env := api.TerraformEnvHelper(&e.config.BaseConfig, sshPublicKey)
 	env["TF_VAR_subscription_id"] = e.config.SubscriptionID
 	env["TF_VAR_tenant_id"] = e.config.TenantID
+	env["TF_VAR_location"] = e.config.Location
 	return env
 }
 

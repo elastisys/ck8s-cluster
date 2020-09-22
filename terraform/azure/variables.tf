@@ -1,9 +1,15 @@
 variable subscription_id {
-  description = ""
+  description = "Subscription ID to use for the cluster"
   type        = string
 }
+
 variable tenant_id {
-  description = ""
+  description = "Tenant ID to use for the cluster"
+  type        = string
+}
+
+variable location {
+  description = "Location of all resources"
   type        = string
 }
 
@@ -17,16 +23,14 @@ variable prefix_wc {
   default     = ""
 }
 
-variable "compute_instance_image" {
-  default = "CK8S_Base_OS_v0.0.7"
-}
-
 variable machines_sc {
   description = "Service cluster machines"
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
   }))
 }
 
@@ -35,7 +39,9 @@ variable machines_wc {
   type = map(object({
     node_type = string
     size      = string
-    image     = string
+    image = object({
+      name = string
+    })
   }))
 }
 

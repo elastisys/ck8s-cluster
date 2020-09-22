@@ -18,7 +18,7 @@ module "service_cluster" {
 
   machines = var.machines_sc
 
-  compute_instance_image = var.compute_instance_image
+  location = var.location
 
   dns_suffix = "elastisys-azure.com"
   dns_prefix = var.dns_prefix
@@ -46,7 +46,7 @@ module "workload_cluster" {
 
   machines = var.machines_wc
 
-  compute_instance_image = var.compute_instance_image
+  location = var.location
 
   dns_suffix = "elastisys-azure.com"
   dns_prefix = var.dns_prefix
