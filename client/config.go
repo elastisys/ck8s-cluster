@@ -435,5 +435,9 @@ func (c *ConfigHandler) readTerraformBackendConfig() (
 		}
 	}
 
+	if err := api.ValidateBackendConfig(backendConfig); err != nil {
+		return backendConfig, err
+	}
+
 	return backendConfig, nil
 }
