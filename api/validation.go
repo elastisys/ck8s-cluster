@@ -48,3 +48,21 @@ func ValidateCluster(cluster Cluster) error {
 	}
 	return nil
 }
+
+func ValidateBackendConfig(backendConfig TerraformBackendConfig) error {
+	if err := validate.Struct(backendConfig); err != nil {
+		var validationErrors validator.ValidationErrors
+		if errors.As(err, &validationErrors) {
+			var errorChain error
+			for _, err := range validationErrors {
+				errorChain = multierror.Append(
+					errorChain,
+					fmt.Errorf(err.Translate(translator)),
+				)
+			}
+			return errorChain
+		}
+		return err
+	}
+	return nil
+}

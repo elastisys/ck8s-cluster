@@ -91,9 +91,9 @@ func (c ClusterType) String() string {
 }
 
 type TerraformBackendConfig struct {
-	Hostname     string `hcl:"hostname"`
-	Organization string `hcl:"organization"`
+	Hostname     string `hcl:"hostname" validate:"required"`
+	Organization string `hcl:"organization" validate:"required"`
 	Workspaces   struct {
-		Prefix string `hcl:"prefix"`
+		Prefix string `hcl:"prefix" validate:"required"`
 	} `hcl:"workspaces,block"`
 }
