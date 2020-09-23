@@ -228,13 +228,17 @@ func (c *ClusterClient) Destroy(deleteRemoteWorkspace bool, kubernetesCleanup bo
 
 	// Best effort to clean up volumes and loadbalancer
 	if kubernetesCleanup && c.kubectl.IsUp() {
-		c.kubectl.DeleteAll("persistentvolumeclaims", "--timeout=5s")
-
-		// TODO Make smarter that to delete all pods, try to delete only once with pvc
-		c.kubectl.DeleteAll("pod", "--grace-period=60")
+		if err := c.kubectl.DeleteAllTimeout("persistentvolumeclaims", 5); err != nil {
+			return fmt.Errorf("error deleting persistent volume claims: %w", err)
+		}
 
 		if err := c.kubectl.DeleteAll("service"); err != nil {
-			return fmt.Errorf("error deleting persistent volume claims: %w", err)
+			return fmt.Errorf("error deleting services: %w", err)
+		}
+
+		// TODO Make smarter that to delete all pods, try to delete only once with pvc
+		if err := c.kubectl.DeleteAll("pod", "--grace-period=60"); err != nil {
+			return fmt.Errorf("error deleting pods: %w", err)
 		}
 	}
 

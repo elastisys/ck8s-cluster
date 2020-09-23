@@ -48,6 +48,7 @@
   currently happens for the Exoscale provider.
 - Interactive runs with SSH commands (e.g. kubeadm reset) not working properly
   due to stdin being blocked after the SSH session closed.
+- Errors when cleaning up kubernetes on destroy is now handled properly
 
 ### Changed
 

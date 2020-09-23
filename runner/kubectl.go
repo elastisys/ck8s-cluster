@@ -109,6 +109,36 @@ func (k *Kubectl) DeleteAll(resource string, extraArgs ...string) error {
 	return k.runner.Run(k.command(args...))
 }
 
+// DeleteAllTimeout runs `sops exec-file KUBECONFIG 'kubectl delete RESOURCE -A --all --timeout=TIMEOUTs EXTRAARGS...'
+func (k *Kubectl) DeleteAllTimeout(resource string, timeout int, extraArgs ...string) error {
+	k.logger.Debug("kubectl_delete_all_timeout", zap.String("resource", resource))
+	args := append([]string{
+		"delete",
+		resource,
+		"-A",
+		"--all",
+		fmt.Sprintf("--timeout=%ds", timeout),
+	}, extraArgs...)
+
+	cmd := k.command(args...)
+
+	var errorOutput []byte
+	cmd.OutputHandler = func(stdout, stderr io.Reader) error {
+		var err error
+		errorOutput, err = ioutil.ReadAll(stderr)
+		return err
+	}
+	cmd.ExitCodeHandlers[1] = func() error {
+		if !strings.Contains(string(errorOutput), "timed out") {
+			return fmt.Errorf("expected no error or timeout, got non timeout error")
+		}
+
+		return nil
+	}
+
+	return k.runner.Run(cmd)
+}
+
 // DeleteAll runs `sops exec-file KUBECONFIG 'kubectl get --raw /api --request-timeout=2s'
 func (k *Kubectl) IsUp() bool {
 	k.logger.Debug("kubectl_is_up")

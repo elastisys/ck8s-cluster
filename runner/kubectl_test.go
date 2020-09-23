@@ -16,6 +16,7 @@ var (
 	testNodeName        = "node"
 	testFullNodeName    = testKubectlConfig.NodePrefix + "-" + testNodeName
 	testDeleteResource  = "testResource"
+	testDeleteTimeout   = 9
 	testDeleteExtraArgs = "testExtraArg"
 )
 
@@ -139,6 +140,98 @@ func TestKubectlDeleteAll(t *testing.T) {
 
 	if err := k.DeleteAll(testDeleteResource, testDeleteExtraArgs); err != nil {
 		t.Error(err)
+	}
+
+	logTest.Diff(t)
+}
+
+func TestKubectlDeleteAllTimeout(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"kubectl_delete_all_timeout",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := NewCommand(
+		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
+		fmt.Sprintf(
+			"KUBECONFIG={} kubectl delete %s -A --all --timeout=%ds %s",
+			testDeleteResource,
+			testDeleteTimeout,
+			testDeleteExtraArgs,
+		),
+	)
+
+	r.Push(&TestCommand{Command: wantCmd})
+
+	k := NewKubectl(logger, r, testKubectlConfig)
+
+	if err := k.DeleteAllTimeout(testDeleteResource, testDeleteTimeout, testDeleteExtraArgs); err != nil {
+		t.Error(err)
+	}
+
+	logTest.Diff(t)
+}
+
+func TestKubectlDeleteAllTimeoutErrorTimeout(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"kubectl_delete_all_timeout",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := NewCommand(
+		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
+		fmt.Sprintf(
+			"KUBECONFIG={} kubectl delete %s -A --all --timeout=%ds %s",
+			testDeleteResource,
+			testDeleteTimeout,
+			testDeleteExtraArgs,
+		),
+	)
+
+	r.Push(&TestCommand{
+		Command:  wantCmd,
+		Stderr:   []byte(`error: timed out`),
+		ExitCode: 1,
+	})
+
+	k := NewKubectl(logger, r, testKubectlConfig)
+
+	if err := k.DeleteAllTimeout(testDeleteResource, testDeleteTimeout, testDeleteExtraArgs); err != nil {
+		t.Error(err)
+	}
+
+	logTest.Diff(t)
+}
+
+func TestKubectlDeleteAllTimeoutError(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"kubectl_delete_all_timeout",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := NewCommand(
+		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
+		fmt.Sprintf(
+			"KUBECONFIG={} kubectl delete %s -A --all --timeout=%ds %s",
+			testDeleteResource,
+			testDeleteTimeout,
+			testDeleteExtraArgs,
+		),
+	)
+
+	r.Push(&TestCommand{
+		Command:  wantCmd,
+		Stderr:   []byte(`error: some other error`),
+		ExitCode: 1,
+	})
+
+	k := NewKubectl(logger, r, testKubectlConfig)
+
+	if err := k.DeleteAllTimeout(testDeleteResource, testDeleteTimeout, testDeleteExtraArgs); err == nil {
+		t.Errorf("Expected to get an error but didn't get one")
 	}
 
 	logTest.Diff(t)
