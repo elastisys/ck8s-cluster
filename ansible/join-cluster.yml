@@ -99,7 +99,7 @@
     - name: Render azure config for api-server
       template:
         src: azure.json.j2
-        dest: /etc/kubernetes/azure.json
+        dest: /etc/kubernetes/kubelet-azure.json
         owner: root
         group: root
         mode: '0644'
