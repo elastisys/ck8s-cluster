@@ -409,3 +409,31 @@ func (c *ConfigHandler) WriteInfraJSON(
 
 	return nil
 }
+
+func (c *ConfigHandler) readTerraformBackendConfig() (
+	api.TerraformBackendConfig,
+	error,
+) {
+	var backendConfig api.TerraformBackendConfig
+
+	f, err := os.Open(c.configPath[api.TFBackendConfigFile].Path)
+	if err != nil {
+		return backendConfig, fmt.Errorf("error opening file: %w", err)
+	}
+
+	backendConfigBytes, err := ioutil.ReadAll(f)
+	if err != nil {
+		return backendConfig, fmt.Errorf("error reading file: %w", err)
+	}
+
+	if len(backendConfigBytes) > 0 {
+		if err := hclDecode(backendConfigBytes, &backendConfig); err != nil {
+			return backendConfig, fmt.Errorf(
+				"error can't decode terraform backend: %w",
+				err,
+			)
+		}
+	}
+
+	return backendConfig, nil
+}
