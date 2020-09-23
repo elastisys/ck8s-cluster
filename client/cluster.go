@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -674,28 +673,6 @@ func (c *ClusterClient) encryptKubeconfig() error {
 	return nil
 }
 
-func (c *ClusterClient) readTerraformBackendConfig() (api.TerraformBackendConfig, error) {
-	var backendConfig api.TerraformBackendConfig
-
-	f, err := os.Open(c.configHandler.configPath[api.TFBackendConfigFile].Path)
-	if err != nil {
-		return backendConfig, fmt.Errorf("error opening file: %w", err)
-	}
-
-	backendConfigBytes, err := ioutil.ReadAll(f)
-	if err != nil {
-		return backendConfig, fmt.Errorf("error reading file: %w", err)
-	}
-
-	if len(backendConfigBytes) > 0 {
-		if err := hclDecode(backendConfigBytes, &backendConfig); err != nil {
-			return backendConfig, fmt.Errorf("error can't decode terraform backend: %w", err)
-		}
-	}
-
-	return backendConfig, nil
-}
-
 func (c *ClusterClient) terraformRemoteWorkspaceApply() error {
 	c.logger.Debug("client_terraform_remote_workspace_apply")
 
@@ -708,7 +685,7 @@ func (c *ClusterClient) terraformRemoteWorkspaceApply() error {
 		return fmt.Errorf("error initializing TFE workspace: %w", err)
 	}
 
-	backendConfig, err := c.readTerraformBackendConfig()
+	backendConfig, err := c.configHandler.readTerraformBackendConfig()
 	if err != nil {
 		return fmt.Errorf("error reading terraform backend config: %w", err)
 	}
@@ -732,7 +709,7 @@ func (c *ClusterClient) terraformRemoteWorkspaceDestroy() error {
 		return fmt.Errorf("error initializing TFE workspace: %w", err)
 	}
 
-	backendConfig, err := c.readTerraformBackendConfig()
+	backendConfig, err := c.configHandler.readTerraformBackendConfig()
 	if err != nil {
 		return fmt.Errorf("error reading terraform backend config: %w", err)
 	}
