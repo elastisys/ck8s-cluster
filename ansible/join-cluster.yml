@@ -95,3 +95,12 @@
       command: "kubeadm join --config /etc/kubeadm/kubeadm-join.yaml"
       args:
         creates: /etc/kubernetes/kubelet.conf
+
+    - name: Render azure config for api-server
+      template:
+        src: azure.json.j2
+        dest: /etc/kubernetes/kubelet-azure.json
+        owner: root
+        group: root
+        mode: '0644'
+      when: cloud_provider is defined and cloud_provider == "azure"

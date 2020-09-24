@@ -1,10 +1,10 @@
 [Global]
-username="{{cloud_provider_config.username}}"
-password="{{cloud_provider_config.password}}"
-auth-url="{{cloud_provider_config.auth_url}}"
-tenant-id="{{cloud_provider_config.tenant_id}}"
-domain-name="{{cloud_provider_config.domain_name}}"
-region="{{cloud_provider_config.region}}"
+username="{{cloud_provider_config.openstack.username}}"
+password="{{cloud_provider_config.openstack.password}}"
+auth-url="{{cloud_provider_config.openstack.auth_url}}"
+tenant-id="{{cloud_provider_config.openstack.tenant_id}}"
+domain-name="{{cloud_provider_config.openstack.domain_name}}"
+region="{{cloud_provider_config.openstack.region}}"
 
 {% if cloud_provider_config.lb_enabled | default(False) == True %}
 [LoadBalancer]
