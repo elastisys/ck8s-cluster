@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Fetches all tags
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0 HEAD)
@@ -25,4 +27,4 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.VERSION }}
           release_name: ${{ steps.get_version.outputs.VERSION }}
           body: |
-            See [CHANGELOG.md](https://github.com/elastisys/ck8s-cluster/blob/v${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
+            See [CHANGELOG.md](https://github.com/elastisys/ck8s-cluster/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
