@@ -117,8 +117,10 @@ func TestAddMachine(t *testing.T) {
 	firstImageMaster := cloudProvider.MachineImages(api.Master)[0]
 
 	esLocalStorageCapacity := 10
+	diskSize := 50
 	providerSettings := &exoscale.MachineSettings{
 		ESLocalStorageCapacity: esLocalStorageCapacity,
+		DiskSize:               diskSize,
 	}
 
 	for _, testCase := range []struct {
@@ -160,12 +162,28 @@ func TestAddMachine(t *testing.T) {
 			Image:            firstImageMaster,
 			ProviderSettings: providerSettings,
 		},
+		"",
+		api.Master,
+		size,
+		firstImageMaster,
+		map[string]interface{}{
+			"es_local_storage_capacity": esLocalStorageCapacity,
+			"disk_size":                 diskSize,
+		},
+	}, {
+		&api.Machine{
+			NodeType:         api.Master,
+			Size:             size,
+			Image:            firstImageMaster,
+			ProviderSettings: providerSettings,
+		},
 		"master-1",
 		api.Master,
 		size,
 		firstImageMaster,
 		map[string]interface{}{
 			"es_local_storage_capacity": esLocalStorageCapacity,
+			"disk_size":                 diskSize,
 		},
 	}} {
 		logTest, logger := testutil.NewTestLogger([]string{
@@ -295,6 +313,7 @@ func TestCloneMachine(t *testing.T) {
 		Image:    api.NewImage("image", "v1.2.3"),
 		ProviderSettings: &exoscale.MachineSettings{
 			ESLocalStorageCapacity: 10,
+			DiskSize:               50,
 		},
 	}); err != nil {
 		t.Fatal(err)
@@ -331,6 +350,7 @@ func TestCloneMachine(t *testing.T) {
 			Image:    api.NewImage("image", "v1.2.3"),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
+				DiskSize:               50,
 			},
 		},
 		cloneMachineName: {
@@ -339,6 +359,7 @@ func TestCloneMachine(t *testing.T) {
 			Image:    api.NewImage("image", "v1.2.3"),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
+				DiskSize:               50,
 			},
 		},
 	}
@@ -383,6 +404,7 @@ func TestCloneMachineWithImage(t *testing.T) {
 			Image:    api.NewImage("image", image.KubeletVersion.String()),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
+				DiskSize:               50,
 			},
 		},
 	); err != nil {
@@ -423,6 +445,7 @@ func TestCloneMachineWithImage(t *testing.T) {
 			Image:    api.NewImage("image", "v1.2.3"),
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
+				DiskSize:               50,
 			},
 		},
 		cloneMachineName: {
@@ -431,6 +454,7 @@ func TestCloneMachineWithImage(t *testing.T) {
 			Image:    image,
 			ProviderSettings: &exoscale.MachineSettings{
 				ESLocalStorageCapacity: 10,
+				DiskSize:               50,
 			},
 		},
 	}
@@ -508,6 +532,7 @@ func TestCloneMachineUnsupportedImageError(t *testing.T) {
 		Image:    api.NewImage("image", "v1.2.3"),
 		ProviderSettings: &exoscale.MachineSettings{
 			ESLocalStorageCapacity: 10,
+			DiskSize:               50,
 		},
 	}); err != nil {
 		t.Fatal(err)

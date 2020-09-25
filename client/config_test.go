@@ -33,6 +33,9 @@ func TestTFVarsRead(t *testing.T) {
 					Image: &api.Image{
 						Name: "testimage",
 					},
+					ProviderSettings: &exoscale.MachineSettings{
+						DiskSize: 50,
+					},
 				},
 				"worker-0": {
 					NodeType: api.Worker,
@@ -42,6 +45,7 @@ func TestTFVarsRead(t *testing.T) {
 					},
 					ProviderSettings: &exoscale.MachineSettings{
 						ESLocalStorageCapacity: 26,
+						DiskSize:               50,
 					},
 				},
 				"worker-1": {
@@ -52,6 +56,7 @@ func TestTFVarsRead(t *testing.T) {
 					},
 					ProviderSettings: &exoscale.MachineSettings{
 						ESLocalStorageCapacity: 26,
+						DiskSize:               50,
 					},
 				},
 			},
@@ -62,6 +67,7 @@ func TestTFVarsRead(t *testing.T) {
 					Image: &api.Image{
 						Name: "testimage",
 					},
+					ProviderSettings: nil,
 				},
 				"worker-0": {
 					NodeType: api.Worker,
@@ -69,9 +75,11 @@ func TestTFVarsRead(t *testing.T) {
 					Image: &api.Image{
 						Name: "testimage",
 					},
+					ProviderSettings: nil,
 				},
 			},
 			NFSSize:                    "Small",
+			NFSDiskSize:                200,
 			PublicIngressCIDRWhitelist: []string{"1.2.3.4/32", "4.3.2.1/32"},
 			APIServerWhitelist:         []string{"1.2.3.4/32", "4.3.2.1/32"},
 			NodeportWhitelist:          []string{"1.2.3.4/32", "4.3.2.1/32"},

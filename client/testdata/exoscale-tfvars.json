@@ -7,7 +7,9 @@
       "image": {
         "name": "testimage"
       },
-      "provider_settings": null
+      "provider_settings": {
+        "disk_size": 50
+      }
     },
     "worker-0": {
       "node_type": "worker",
@@ -16,7 +18,8 @@
         "name": "testimage"
       },
       "provider_settings": {
-        "es_local_storage_capacity": 26
+        "es_local_storage_capacity": 26,
+        "disk_size": 50
       }
     },
     "worker-1": {
@@ -26,7 +29,8 @@
         "name": "testimage"
       },
       "provider_settings": {
-        "es_local_storage_capacity": 26
+        "es_local_storage_capacity": 26,
+        "disk_size": 50
       }
     }
   },
@@ -49,6 +53,7 @@
     }
   },
   "nfs_size": "Small",
+  "nfs_disk_size": 200,
   "nodeport_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
   "prefix_sc": "",
   "prefix_wc": "",

@@ -53,7 +53,9 @@ func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 		cloudProvider,
 		api.Master,
 		"Small",
-	).MustBuild()
+	).WithProviderSettings(map[string]interface{}{
+		"disk_size": 50,
+	}).MustBuild()
 
 	workerExtraLargeSC := api.NewMachineFactory(
 		cloudProvider,
@@ -63,6 +65,7 @@ func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 		// Match ES_DATA_STORAGE_SIZE in config.sh
 		// Note that this value is in GB while config.sh uses Gi
 		"es_local_storage_capacity": 12,
+		"disk_size":                 50,
 	}).MustBuild()
 
 	workerLargeSC := api.NewMachineFactory(
@@ -73,13 +76,16 @@ func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 		// Match ES_DATA_STORAGE_SIZE in config.sh
 		// Note that this value is in GB while config.sh uses Gi
 		"es_local_storage_capacity": 12,
+		"disk_size":                 50,
 	}).MustBuild()
 
 	workerWC := api.NewMachineFactory(
 		cloudProvider,
 		api.Worker,
 		"Large",
-	).MustBuild()
+	).WithProviderSettings(map[string]interface{}{
+		"disk_size": 50,
+	}).MustBuild()
 
 	cluster.tfvars.MachinesSC = map[string]*api.Machine{
 		"master-0": master,
@@ -92,6 +98,7 @@ func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 		"worker-0": workerWC,
 	}
 
+	cluster.tfvars.NFSDiskSize = 200
 	cluster.tfvars.NFSSize = "Small"
 
 	return cluster
@@ -110,13 +117,17 @@ func Production(clusterType api.ClusterType, clusterName string) api.Cluster {
 		cloudProvider,
 		api.Master,
 		"Medium",
-	).MustBuild()
+	).WithProviderSettings(map[string]interface{}{
+		"disk_size": 50,
+	}).MustBuild()
 
 	workerExtraLargeSC := api.NewMachineFactory(
 		cloudProvider,
 		api.Worker,
 		"Extra-large",
-	).MustBuild()
+	).WithProviderSettings(map[string]interface{}{
+		"disk_size": 50,
+	}).MustBuild()
 
 	workerLargeESSC := api.NewMachineFactory(
 		cloudProvider,
@@ -126,19 +137,24 @@ func Production(clusterType api.ClusterType, clusterName string) api.Cluster {
 		// Match ES_DATA_STORAGE_SIZE in config.sh
 		// Note that this value is in GB while config.sh uses Gi
 		"es_local_storage_capacity": 140,
+		"disk_size":                 200,
 	}).MustBuild()
 
 	workerLargeSC := api.NewMachineFactory(
 		cloudProvider,
 		api.Worker,
 		"Large",
-	).MustBuild()
+	).WithProviderSettings(map[string]interface{}{
+		"disk_size": 50,
+	}).MustBuild()
 
 	workerWC := api.NewMachineFactory(
 		cloudProvider,
 		api.Worker,
 		"Large",
-	).MustBuild()
+	).WithProviderSettings(map[string]interface{}{
+		"disk_size": 50,
+	}).MustBuild()
 
 	cluster.tfvars.MachinesSC = map[string]*api.Machine{
 		"master-0": master,
@@ -161,6 +177,7 @@ func Production(clusterType api.ClusterType, clusterName string) api.Cluster {
 	}
 
 	cluster.tfvars.NFSSize = "Small"
+	cluster.tfvars.NFSDiskSize = 200
 
 	return cluster
 }

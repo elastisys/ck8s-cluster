@@ -14,6 +14,7 @@ const (
 	nameFlag                   = "name"
 	imageFlag                  = "image"
 	esLocalStorageCapacityFlag = "es-local-storage"
+	diskSizeFlag               = "disk-size"
 )
 
 func init() {
@@ -31,6 +32,10 @@ func init() {
 				esLocalStorageCapacityFlag,
 				cmd.Flags().Lookup(esLocalStorageCapacityFlag),
 			)
+			viper.BindPFlag(
+				diskSizeFlag,
+				cmd.Flags().Lookup(diskSizeFlag),
+			)
 		},
 		RunE: withClusterClient(addNode),
 	}
@@ -40,6 +45,11 @@ func init() {
 		esLocalStorageCapacityFlag,
 		0,
 		"set reserved local storage for Elasticsearch (Exoscale only)",
+	)
+	addCmd.Flags().Float64(
+		diskSizeFlag,
+		50,
+		"set disk size (Exoscale only)",
 	)
 	rootCmd.AddCommand(addCmd)
 
@@ -120,14 +130,20 @@ func addNode(
 	cmd *cobra.Command,
 	args []string,
 ) error {
-	var providerSettings map[string]interface{}
+	var providerSettings = map[string]interface{}{
+		"es_local_storage_capacity": 0,
+		"disk_size":                 0,
+	}
 
 	if viper.IsSet(esLocalStorageCapacityFlag) {
-		providerSettings = map[string]interface{}{
-			"es_local_storage_capacity": viper.GetFloat64(
-				esLocalStorageCapacityFlag,
-			),
-		}
+		providerSettings["es_local_storage_capacity"] = viper.GetFloat64(
+			esLocalStorageCapacityFlag,
+		)
+	}
+	if viper.IsSet(diskSizeFlag) {
+		providerSettings["disk_size"] = viper.GetFloat64(
+			diskSizeFlag,
+		)
 	}
 
 	name, err := clusterClient.AddMachine(
