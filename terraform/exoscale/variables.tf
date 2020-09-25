@@ -29,6 +29,7 @@ variable machines_sc {
     })
     provider_settings = object({
       es_local_storage_capacity = number
+      disk_size                 = number
     })
   }))
 }
@@ -43,6 +44,7 @@ variable machines_wc {
     })
     provider_settings = object({
       es_local_storage_capacity = number
+      disk_size                 = number
     })
   }))
 }
@@ -51,6 +53,12 @@ variable nfs_size {
   description = "The size of the nfs machine"
   type        = string
   default     = "Small"
+}
+
+variable nfs_disk_size {
+  description = "The size of the nfs machines disk"
+  type        = number
+  default     = 200
 }
 
 variable ssh_pub_key_sc {

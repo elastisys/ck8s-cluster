@@ -62,7 +62,7 @@ resource "exoscale_compute" "master" {
   display_name    = "${var.prefix}-${each.key}"
   template_id     = data.exoscale_compute_template.os_image[each.key].id
   size            = each.value.size
-  disk_size       = 50
+  disk_size       = each.value.provider_settings == null ? 50 : each.value.provider_settings.disk_size > 10 ? each.value.provider_settings.disk_size : 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
   zone            = var.zone
@@ -81,7 +81,7 @@ resource "exoscale_compute" "worker" {
   display_name    = "${var.prefix}-${each.key}"
   template_id     = data.exoscale_compute_template.os_image[each.key].id
   size            = each.value.size
-  disk_size       = 50
+  disk_size       = each.value.provider_settings == null ? 50 : each.value.provider_settings.disk_size > 10 ? each.value.provider_settings.disk_size : 50
   key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
   zone            = var.zone
@@ -100,7 +100,7 @@ resource "exoscale_compute" "nfs" {
   display_name    = "${var.prefix}-nfs"
   template_id     = data.exoscale_compute_template.ubuntu.id
   size            = var.nfs_size
-  disk_size       = 200
+  disk_size       = var.nfs_disk_size == 0 ? 200 : var.nfs_disk_size
   key_pair        = exoscale_ssh_keypair.ssh_key.name
   state           = "Running"
   zone            = var.zone

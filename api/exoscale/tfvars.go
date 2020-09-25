@@ -8,6 +8,7 @@ import (
 
 type MachineSettings struct {
 	ESLocalStorageCapacity int `json:"es_local_storage_capacity"`
+	DiskSize               int `json:"disk_size"`
 }
 
 type ExoscaleTFVars struct {
@@ -17,7 +18,8 @@ type ExoscaleTFVars struct {
 	MachinesSC map[string]*api.Machine `json:"machines_sc" validate:"required,min=1"`
 	MachinesWC map[string]*api.Machine `json:"machines_wc" validate:"required,min=1"`
 
-	NFSSize string `json:"nfs_size" validate:"required"`
+	NFSSize     string `json:"nfs_size" validate:"required"`
+	NFSDiskSize int    `json:"nfs_disk_size" validate:"required"`
 
 	PublicIngressCIDRWhitelist []string `json:"public_ingress_cidr_whitelist" validate:"required"`
 

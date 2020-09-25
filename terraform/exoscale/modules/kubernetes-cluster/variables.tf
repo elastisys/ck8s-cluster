@@ -17,11 +17,14 @@ variable "machines" {
     })
     provider_settings = object({
       es_local_storage_capacity = number
+      disk_size                 = number
     })
   }))
 }
 
 variable "nfs_size" {}
+
+variable "nfs_disk_size" {}
 
 variable "ssh_pub_key" {}
 

@@ -83,6 +83,9 @@ func TestFlavors(t *testing.T) {
 						NodeType: api.Master,
 						Size:     "Small",
 						Image:    latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-0": {
 						NodeType: api.Worker,
@@ -90,6 +93,7 @@ func TestFlavors(t *testing.T) {
 						Image:    latestImage,
 						ProviderSettings: &MachineSettings{
 							ESLocalStorageCapacity: 12,
+							DiskSize:               50,
 						},
 					},
 					"worker-1": {
@@ -98,6 +102,7 @@ func TestFlavors(t *testing.T) {
 						Image:    latestImage,
 						ProviderSettings: &MachineSettings{
 							ESLocalStorageCapacity: 12,
+							DiskSize:               50,
 						},
 					},
 				},
@@ -106,14 +111,21 @@ func TestFlavors(t *testing.T) {
 						NodeType: api.Master,
 						Size:     "Small",
 						Image:    latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-0": {
 						NodeType: api.Worker,
 						Size:     "Large",
 						Image:    latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 				},
-				NFSSize: "Small",
+				NFSSize:     "Small",
+				NFSDiskSize: 200,
 			},
 		},
 		got: Development(clusterType, clusterName),
@@ -152,24 +164,36 @@ func TestFlavors(t *testing.T) {
 						Size:     "Medium",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"master-1": {
 						NodeType: api.Master,
 						Size:     "Medium",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"master-2": {
 						NodeType: api.Master,
 						Size:     "Medium",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-0": {
 						NodeType: api.Worker,
 						Size:     "Extra-large",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-1": {
 						NodeType: api.Worker,
@@ -178,6 +202,7 @@ func TestFlavors(t *testing.T) {
 						Image: latestImage,
 						ProviderSettings: &MachineSettings{
 							ESLocalStorageCapacity: 140,
+							DiskSize:               200,
 						},
 					},
 					"worker-2": {
@@ -187,6 +212,7 @@ func TestFlavors(t *testing.T) {
 						Image: latestImage,
 						ProviderSettings: &MachineSettings{
 							ESLocalStorageCapacity: 140,
+							DiskSize:               200,
 						},
 					},
 					"worker-3": {
@@ -194,6 +220,9 @@ func TestFlavors(t *testing.T) {
 						Size:     "Large",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 				},
 				MachinesWC: map[string]*api.Machine{
@@ -202,45 +231,67 @@ func TestFlavors(t *testing.T) {
 						Size:     "Medium",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"master-1": {
 						NodeType: api.Master,
 						Size:     "Medium",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"master-2": {
 						NodeType: api.Master,
 						Size:     "Medium",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-ck8s-0": {
 						NodeType: api.Worker,
 						Size:     "Large",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-0": {
 						NodeType: api.Worker,
 						Size:     "Large",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-1": {
 						NodeType: api.Worker,
 						Size:     "Large",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 					"worker-2": {
 						NodeType: api.Worker,
 						Size:     "Large",
 
 						Image: latestImage,
+						ProviderSettings: &MachineSettings{
+							DiskSize: 50,
+						},
 					},
 				},
-				NFSSize: "Small",
+				NFSSize:     "Small",
+				NFSDiskSize: 200,
 			},
 		},
 		got: Production(clusterType, clusterName),

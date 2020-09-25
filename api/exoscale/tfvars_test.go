@@ -18,6 +18,7 @@ func TestAddMachine(t *testing.T) {
 		Image:    api.NewImage("test", "v1.2.3"),
 		ProviderSettings: MachineSettings{
 			ESLocalStorageCapacity: 10,
+			DiskSize:               50,
 		},
 	}
 
@@ -65,6 +66,7 @@ func TestAddMachineWithName(t *testing.T) {
 		Image:    api.NewImage("test", "v1.2.3"),
 		ProviderSettings: MachineSettings{
 			ESLocalStorageCapacity: 10,
+			DiskSize:               50,
 		},
 	}
 
@@ -114,6 +116,7 @@ func TestRemoveMachine(t *testing.T) {
 				Image:    api.NewImage("test", "v1.2.3"),
 				ProviderSettings: MachineSettings{
 					ESLocalStorageCapacity: 10,
+					DiskSize:               50,
 				},
 			},
 		},
@@ -122,6 +125,9 @@ func TestRemoveMachine(t *testing.T) {
 				NodeType: api.Worker,
 				Size:     "Large",
 				Image:    api.NewImage("test", "v1.2.3"),
+				ProviderSettings: MachineSettings{
+					DiskSize: 50,
+				},
 			},
 		},
 	}
