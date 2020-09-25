@@ -1,6 +1,9 @@
 package azure
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/google/uuid"
 
 	"github.com/elastisys/ck8s/api"
@@ -40,8 +43,24 @@ func (e *Cluster) AddMachine(
 	name string,
 	machine *api.Machine,
 ) (string, error) {
+	maxNameLen := nameSettings().maxNameLen
+	minAutoNameLen := nameSettings().minAutoNameLen
+
 	if name == "" {
-		name = uuid.New().String()
+		name = strings.Replace(uuid.New().String(), "-", "", -1)
+
+		if len(api.NameHelper(&e.config.BaseConfig)+"-"+name) > maxNameLen {
+			newNameLen := maxNameLen - len(api.NameHelper(&e.config.BaseConfig)+"-")
+			if newNameLen < minAutoNameLen {
+				return "", fmt.Errorf("environment name too long, cannot autogenerate name")
+			}
+
+			name = name[0:newNameLen]
+		}
+	}
+
+	if len(api.NameHelper(&e.config.BaseConfig)+"-")+len(name) > maxNameLen {
+		return "", fmt.Errorf("machine name cannot be longer than %d characters long", maxNameLen)
 	}
 
 	machines := e.Machines()
