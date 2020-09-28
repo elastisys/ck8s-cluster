@@ -7,19 +7,6 @@ import (
 	"github.com/elastisys/ck8s/api"
 )
 
-type tfOutputFQDNObject struct {
-	Value string `json:"value"`
-}
-
-type tfOutputIPsObject struct {
-	Value map[string]tfOutputIPsValue `json:"value"`
-}
-
-type tfOutputIPsValue struct {
-	PrivateIP string `json:"private_ip"`
-	PublicIP  string `json:"public_ip"`
-}
-
 type tfOutputValue struct {
 	Value string `json:"value"`
 }
@@ -28,15 +15,13 @@ type terraformOutput struct {
 	ClusterType api.ClusterType
 	ClusterName string
 
-	SCMasterIPs tfOutputIPsObject `json:"sc_master_ips"`
-	SCWorkerIPs tfOutputIPsObject `json:"sc_worker_ips"`
-	WCMasterIPs tfOutputIPsObject `json:"wc_master_ips"`
-	WCWorkerIPs tfOutputIPsObject `json:"wc_worker_ips"`
+	SCMasterIPs tfOutputValue `json:"sc_master_ips"`
+	SCWorkerIPs tfOutputValue `json:"sc_worker_ips"`
+	WCMasterIPs tfOutputValue `json:"wc_master_ips"`
+	WCWorkerIPs tfOutputValue `json:"wc_worker_ips"`
 
-	SCControlPlaneExternalLBFQDN tfOutputFQDNObject `json:"sc_control_plane_lb_ip_address"`
-	WCControlPlaneExternalLBFQDN tfOutputFQDNObject `json:"wc_control_plane_lb_ip_address"`
-	SCControlPlaneInternalLBFQDN tfOutputFQDNObject `json:"sc_master_internal_loadbalancer_fqdn"`
-	WCControlPlaneInternalLBFQDN tfOutputFQDNObject `json:"wc_master_internal_loadbalancer_fqdn"`
+	SCControlPlaneLBIPAddress tfOutputValue `json:"sc_control_plane_lb_ip_address"`
+	WCControlPlaneLBIPAddress tfOutputValue `json:"wc_control_plane_lb_ip_address"`
 
 	GlobalBaseDomain tfOutputValue `json:"domain_name"`
 
@@ -60,9 +45,9 @@ func (e *terraformOutput) BaseDomain() string {
 func (e *terraformOutput) ControlPlaneEndpoint() string {
 	switch e.ClusterType {
 	case api.ServiceCluster:
-		return e.SCControlPlaneInternalLBFQDN.Value
+		return e.SCControlPlaneLBIPAddress.Value
 	case api.WorkloadCluster:
-		return e.WCControlPlaneInternalLBFQDN.Value
+		return e.WCControlPlaneLBIPAddress.Value
 	default:
 		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
 	}
@@ -71,9 +56,9 @@ func (e *terraformOutput) ControlPlaneEndpoint() string {
 func (e *terraformOutput) ControlPlanePublicIP() string {
 	switch e.ClusterType {
 	case api.ServiceCluster:
-		return e.SCControlPlaneExternalLBFQDN.Value
+		return e.SCControlPlaneLBIPAddress.Value
 	case api.WorkloadCluster:
-		return e.WCControlPlaneExternalLBFQDN.Value
+		return e.WCControlPlaneLBIPAddress.Value
 	default:
 		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
 	}

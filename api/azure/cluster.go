@@ -38,7 +38,7 @@ func (e *Cluster) State(
 		//		 forward it from here instead.
 		PrivateNetworkCIDR: "10.0.10.0/24",
 
-		CalicoMTU: 1480,
+		CalicoMTU: 1450,
 
 		KubeadmInitCloudProvider: "azure",
 	}
