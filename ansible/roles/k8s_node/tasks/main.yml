@@ -9,5 +9,5 @@
 - name: Render cloud.conf
   when: cloud_config is defined
   template:
-    src: cloud.conf.j2
+    src: openstack-cloud.conf.j2
     dest: "{{ cloud_config }}"
