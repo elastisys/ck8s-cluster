@@ -1,17 +1,13 @@
 #!/bin/bash
 
-# This script simulates the e2e step in a pipeline run.
-
-# This requires you to have a valid terraform token in ~/.terraformrc
-# It also requires a pinentry program that is console based (e.g.
-# pinentry-dmenue will not work).
+# This script simulates an e2e pipeline run.
 #
-# Usage is following:
-# ./simulate.bash <environment name> [docker extra args... ]
+# Usage:
+# ./simulate.bash <tfe organization> <environment name> [docker extra args... ]
 #
 # Pass extra arguments to docker run by passing them to this command. For
 # example if you are using a Terraform credentials helper you could run:
-# ./simulate.bash pipeline-simulation -v ~/.terraform.d:/root/.terraform.d:ro
+# ./simulate.bash orgname pipeline-test -v ~/.terraform.d:/root/.terraform.d:ro
 
 set -eu
 
@@ -29,16 +25,17 @@ log_error() {
 }
 
 usage() {
-  log_error "Usage: ${0} <environment name> [<extra docker args>...]"
+  log_error "Usage: ${0} <tfe organization> <environment name> [<extra docker args>...]"
 }
 
-if [ $# -lt 1 ]; then
+if [ $# -lt 2 ]; then
   usage
   exit 1
 fi
 
-ENVIRONMENT_NAME=${1}
-shift
+TFE_ORGANIZATION=${1}
+ENVIRONMENT_NAME=${2}
+shift 2
 
 GNUPGHOME="${GNUPGHOME:-${HOME}/.gnupg}"
 
@@ -64,7 +61,7 @@ args=(
     -v "${HOME}/.terraformrc":/root/.terraformrc:ro
     -v "${GNUPGHOME}":/root/.gnupg
     -e GNUPGHOME=/root/.gnupg
-    -e GPG_TTY=/dev/pts/0 # TODO Does this work every time? Maybe try programatically figure this out
+    -e GPG_TTY=/dev/pts/0
     -e CK8S_CONFIG_PATH=/ck8s-config
     -e CK8S_PGP_FP="${CK8S_PGP_FP}"
     -e CK8S_LOG_LEVEL="debug"
@@ -76,15 +73,40 @@ docker run -d --name "${docker_name}" ${args[@]} "${docker_image}" sleep 3600
 trap 'docker stop "${docker_name}" && docker rm "${docker_name}"' EXIT
 
 docker_exec() {
-    docker exec -it "${docker_name}" ${@}
+    docker exec -it "${docker_name}" "${@}"
 }
 
-docker_exec ckctl init ${ENVIRONMENT_NAME} exoscale
-docker_exec ./pipeline/configure.bash
-docker_exec ckctl apply --cluster sc
-docker_exec ckctl apply --cluster wc
-docker_exec ckctl status --cluster sc
-docker_exec ckctl status --cluster wc
+docker_exec ./pipeline/init.bash "${ENVIRONMENT_NAME}" exoscale
+
+config_update() {
+    docker_exec \
+        sed -i 's/'"${1}"'\(\s*\)=\(\s*\)'"${2}"'/'"${1}"'\1=\2"'"${3}"'"/' \
+            "/ck8s-config/${4}"
+}
+config_update "organization" '""' "${TFE_ORGANIZATION}" "backend_config.hcl"
+
+secrets_update() {
+    docker_exec sops --set '["'"${1}"'"] "'"${2}"'"' /ck8s-config/secrets.yaml
+}
+secrets_update exoscale_api_key "${EXOSCALE_KEY}"
+secrets_update exoscale_secret_key "${EXOSCALE_SECRET}"
+secrets_update s3_access_key "${EXOSCALE_KEY}"
+secrets_update s3_secret_key "${EXOSCALE_SECRET}"
+
+whitelist_update() {
+    if ! [[ $2 =~ ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$ ]]; then
+        echo "Invalid IP: $2"
+        exit 1
+    fi
+    docker_exec \
+        sed -i ':a;N;$!ba;s/\s*"'"${1}"'": \[[^]]*\]/"'"${1}"'": \["'"${2}"'\/32"\]/g' \
+            /ck8s-config/tfvars.json
+}
+my_ip=$(curl ifconfig.me 2>/dev/null)
+whitelist_update "public_ingress_cidr_whitelist" $my_ip
+whitelist_update "api_server_whitelist" $my_ip
+whitelist_update "nodeport_whitelist" $my_ip
+
+docker_exec ./pipeline/apply.bash
 docker_exec ./pipeline/e2e-tests.bash
-docker_exec ckctl destroy --cluster wc
-docker_exec ckctl destroy --cluster sc --destroy-remote-workspace
+docker_exec ./pipeline/destroy.bash
