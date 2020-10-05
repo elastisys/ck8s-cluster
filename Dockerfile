@@ -9,6 +9,7 @@ RUN make build
 FROM ubuntu:18.04
 
 ARG ANSIBLE_VERSION="2.5.1+dfsg-1ubuntu0.1"
+ARG JQ_VERSION="1.6"
 ARG KUBECTL_VERSION="1.15.2"
 ARG S3CMD_VERSION="2.0.2"
 ARG SOPS_VERSION="3.6.1"
@@ -19,7 +20,7 @@ RUN  apt-get update && \
      apt-get install -y \
          python3-pip wget \
          unzip ssh  \
-         jq curl python3.7 \
+         curl python3.7 \
          ansible="${ANSIBLE_VERSION}" && \
      rm -rf /var/lib/apt/lists/*
 
@@ -52,5 +53,10 @@ RUN wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_lin
 RUN wget https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux && \
     mv ./sops-v${SOPS_VERSION}.linux /usr/local/bin/sops && \
     chmod +x /usr/local/bin/sops
+
+# jq
+RUN wget "https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64" && \
+    chmod +x jq-linux64 && \
+    mv jq-linux64 /usr/local/bin/jq
 
 COPY --from=0 /ck8s/dist/ck8s_linux_amd64 /usr/local/bin/ckctl
