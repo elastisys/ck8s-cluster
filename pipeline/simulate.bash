@@ -53,22 +53,21 @@ docker_image="ckctl:local"
 docker build -t "${docker_image}" "${root}"
 
 args=(
+    -v "${root}/pipeline":/ck8s-cluster-pipeline:ro
     -e CI_EXOSCALE_KEY="${EXOSCALE_KEY}"
     -e CI_EXOSCALE_SECRET="${EXOSCALE_SECRET}"
-    -w /ck8s
-    -v "${root}":/ck8s:ro
     -v "${CK8S_CONFIG_PATH}":/ck8s-config
     -v "${HOME}/.terraformrc":/root/.terraformrc:ro
     -v "${GNUPGHOME}":/root/.gnupg
     -e GNUPGHOME=/root/.gnupg
     -e GPG_TTY=/dev/pts/0
-    -e CK8S_CONFIG_PATH=/ck8s-config
     -e CK8S_PGP_FP="${CK8S_PGP_FP}"
     -e CK8S_LOG_LEVEL="debug"
     "${@}"
 )
 
-docker run -d --name "${docker_name}" "${args[@]}" "${docker_image}" sleep 3600
+docker run -d --name "${docker_name}" "${args[@]}" --entrypoint bash \
+    "${docker_image}" -c "sleep 3600"
 
 trap 'docker stop "${docker_name}" && docker rm "${docker_name}"' EXIT
 
@@ -76,7 +75,7 @@ docker_exec() {
     docker exec -it "${docker_name}" "${@}"
 }
 
-docker_exec ./pipeline/init.bash "${ENVIRONMENT_NAME}" exoscale
+docker_exec /ck8s-cluster-pipeline/init.bash "${ENVIRONMENT_NAME}" exoscale
 
 config_update() {
     docker_exec \
@@ -107,6 +106,6 @@ whitelist_update "public_ingress_cidr_whitelist" "$my_ip"
 whitelist_update "api_server_whitelist" "$my_ip"
 whitelist_update "nodeport_whitelist" "$my_ip"
 
-docker_exec ./pipeline/apply.bash
-docker_exec ./pipeline/e2e-tests.bash
-docker_exec ./pipeline/destroy.bash
+docker_exec /ck8s-cluster-pipeline/apply.bash
+docker_exec /ck8s-cluster-pipeline/e2e-tests.bash
+docker_exec /ck8s-cluster-pipeline/destroy.bash
