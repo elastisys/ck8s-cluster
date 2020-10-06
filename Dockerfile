@@ -65,4 +65,14 @@ RUN wget "https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-l
     chmod +x jq-linux64 && \
     mv jq-linux64 /usr/local/bin/jq
 
+COPY ./ansible /ck8s/ansible
+# TODO: Remove with https://github.com/elastisys/ck8s-cluster/issues/25
+COPY ./scripts/manage-s3-buckets.sh /ck8s/scripts/manage-s3-buckets.sh
+COPY ./terraform /ck8s/terraform
+
+ENV CK8S_CODE_PATH /ck8s
+ENV CK8S_CONFIG_PATH /ck8s-config
+
 COPY --from=0 /ck8s/dist/ck8s_linux_amd64 /usr/local/bin/ckctl
+
+ENTRYPOINT ["/usr/local/bin/ckctl"]
