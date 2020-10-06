@@ -3,7 +3,10 @@ FROM golang:1.14.2-alpine3.11 as builder
 RUN apk add --no-cache make git
 
 WORKDIR /ck8s
-COPY . /ck8s
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+COPY . .
 RUN make build
 
 FROM ubuntu:18.04
