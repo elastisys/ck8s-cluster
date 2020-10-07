@@ -1,0 +1,34 @@
+# Specify users with e-mail or GitHub username.
+
+# Note: if many patterns match the same file, the latest pattern
+# will override the previous ones.
+
+# Default for files with no matching pattern later
+*   @elastisys/gungan
+
+# Ansible/kubeadm
+/ansible/   @lentzi90 @simonklb
+
+# CLI
+go.*        @simonklb @Xartos
+Makefile    @simonklb @Xartos
+/api/       @simonklb @Xartos
+/client/    @simonklb @Xartos
+/cmd/       @simonklb @Xartos
+/runner/    @simonklb @Xartos
+/testutil/  @simonklb @Xartos
+Dockerfile  @simonklb @Xartos
+
+# Pipeline
+/.github/workflows/     @viktor-f @ewnetu
+/pipeline/              @viktor-f @ewnetu
+
+# Tests and linters
+/.pre-commit-config.yaml    @simonklb
+
+# Cloud providers (terraform)
+/terraform/aws*/                @danielharr @arban
+/terraform/citycloud/           @viktor-f
+/terraform/exoscale/            @vanneback @viktor-f
+/terraform/modules/openstack/   @lentzi90 @viktor-f
+/terraform/safespring/          @lentzi90 @viktor-f
