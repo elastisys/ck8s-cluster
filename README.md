@@ -20,7 +20,7 @@ Currently we support three cloud providers: Exoscale, Safespring, an CityCloud.
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
 - [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
 - [s3cmd](https://s3tools.org/s3cmd) (tested with 2.0.2)
-- [ansible](https://www.ansible.com) (tested with 2.5.1)
+- [ansible](https://www.ansible.com) (tested with 2.9.14)
 - [go](https://golang.org) (tested with 1.13.8)
 
 Note that you will need a [BaseOS](https://github.com/elastisys/ck8s-base-vm) VM template available at your cloud provider of choice!

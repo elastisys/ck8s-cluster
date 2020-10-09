@@ -8,7 +8,7 @@ RUN make build
 
 FROM ubuntu:18.04
 
-ARG ANSIBLE_VERSION="2.5.1+dfsg-1ubuntu0.1"
+ARG ANSIBLE_VERSION="2.9.14"
 ARG JQ_VERSION="1.6"
 ARG KUBECTL_VERSION="1.15.2"
 ARG S3CMD_VERSION="2.0.2"
@@ -16,13 +16,15 @@ ARG SOPS_VERSION="3.6.1"
 ARG TERRAFORM_VERSION="0.12.19"
 ARG YQ_VERSION="3.2.1"
 
-RUN  apt-get update && \
-     apt-get install -y \
-         python3-pip wget \
-         unzip ssh  \
-         curl python3.7 \
-         ansible="${ANSIBLE_VERSION}" && \
-     rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt install -y software-properties-common && \
+    add-apt-repository --yes --update ppa:ansible/ansible-2.9 && \
+    apt-get install -y \
+        python3-pip wget \
+        unzip ssh  \
+        curl python3.7 \
+        ansible="${ANSIBLE_VERSION}" && \
+    rm -rf /var/lib/apt/lists/*
 
 # Terraform
 RUN wget "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" && \
