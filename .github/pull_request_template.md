@@ -3,12 +3,16 @@
 **Which issue this PR fixes** *(use the format `fixes #<issue number>(, fixes #<issue_number>, ...)` to automatically close the issue when PR gets merged)*:
 fixes #
 
+**Public facing documentation PR** *(if applicable)*
+<!-- https://github.com/elastisys/compliantkubernetes/pull/ -->
+
 **Special notes for reviewer**:
 
 **Checklist:**
 
 - [ ] Added relevant notes to [WIP-CHANGELOG.md](https://github.com/elastisys/ck8s-cluster/blob/master/WIP-CHANGELOG.md)
 - [ ] Proper commit message prefix on all commits
+- [ ] Updated the [public facing documentation](https://github.com/elastisys/compliantkubernetes)
 - Is this changeset backwards compatible for existing clusters? Applying:
     - [ ] is completely transparent, will not impact the workload in any way.
     - [ ] requires running a migration script.
