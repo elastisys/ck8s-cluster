@@ -15,7 +15,7 @@ Currently we support three cloud providers: Exoscale, Safespring, an CityCloud.
 ### Requirements
 
 - [BaseOS](https://github.com/elastisys/ck8s-base-vm) (tested with 0.0.6)
-- [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.19)
+- [terraform](https://www.terraform.io/downloads.html) (tested with 0.12.29)
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
 - [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
