@@ -64,7 +64,7 @@ func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 	).WithProviderSettings(map[string]interface{}{
 		// Match ES_DATA_STORAGE_SIZE in config.sh
 		// Note that this value is in GB while config.sh uses Gi
-		"es_local_storage_capacity": 12,
+		"es_local_storage_capacity": 20,
 		"disk_size":                 50,
 	}).MustBuild()
 
@@ -75,7 +75,7 @@ func Development(clusterType api.ClusterType, clusterName string) api.Cluster {
 	).WithProviderSettings(map[string]interface{}{
 		// Match ES_DATA_STORAGE_SIZE in config.sh
 		// Note that this value is in GB while config.sh uses Gi
-		"es_local_storage_capacity": 12,
+		"es_local_storage_capacity": 20,
 		"disk_size":                 50,
 	}).MustBuild()
 
