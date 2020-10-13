@@ -44,11 +44,21 @@ func setupClusterClient(
 
 	testRunner := runner.NewTestRunner(t)
 
+	configPath, err := api.NewConfigPath(dir, api.ServiceCluster)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	codePath, err := api.NewCodePath(dir, api.ServiceCluster)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	configHandler := NewConfigHandler(
 		logger,
 		api.ServiceCluster,
-		api.NewConfigPath(dir, api.ServiceCluster),
-		api.NewCodePath(dir, api.ServiceCluster),
+		configPath,
+		codePath,
 	)
 
 	c, err := NewClusterClient(
