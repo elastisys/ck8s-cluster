@@ -92,7 +92,7 @@ func TestFlavors(t *testing.T) {
 						Size:     "Extra-large",
 						Image:    latestImage,
 						ProviderSettings: &MachineSettings{
-							ESLocalStorageCapacity: 12,
+							ESLocalStorageCapacity: 20,
 							DiskSize:               50,
 						},
 					},
@@ -101,7 +101,7 @@ func TestFlavors(t *testing.T) {
 						Size:     "Large",
 						Image:    latestImage,
 						ProviderSettings: &MachineSettings{
-							ESLocalStorageCapacity: 12,
+							ESLocalStorageCapacity: 20,
 							DiskSize:               50,
 						},
 					},
