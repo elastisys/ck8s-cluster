@@ -23,7 +23,8 @@ RUN apt-get update && \
         python3-pip wget \
         unzip ssh  \
         curl python3.7 \
-        ansible="${ANSIBLE_VERSION}" && \
+        ansible="${ANSIBLE_VERSION}" \
+        python-netaddr && \
     rm -rf /var/lib/apt/lists/*
 
 # Terraform
