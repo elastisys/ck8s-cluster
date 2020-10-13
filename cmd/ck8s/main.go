@@ -174,9 +174,15 @@ func newConfigHandler(
 		return nil, err
 	}
 
-	configPath := api.NewConfigPath(configRootPath, clusterType)
+	configPath, err := api.NewConfigPath(configRootPath, clusterType)
+	if err != nil {
+		return nil, fmt.Errorf("error constructing config path: %s", err)
+	}
 
-	codePath := api.NewCodePath(codeRootPath, clusterType)
+	codePath, err := api.NewCodePath(codeRootPath, clusterType)
+	if err != nil {
+		return nil, fmt.Errorf("error constructing code path: %s", err)
+	}
 
 	return client.NewConfigHandler(
 		logger,

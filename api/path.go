@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 type Path struct {
@@ -128,34 +129,52 @@ var relativeCodePaths = CodePath{
 	},
 }
 
-func NewConfigPath(configRootPath string, clusterType ClusterType) ConfigPath {
+func NewConfigPath(
+	configRootPath string,
+	clusterType ClusterType,
+) (ConfigPath, error) {
 	configPath := make(
 		ConfigPath,
 		len(relativeConfigPaths)+
 			len(clusterSpecificRelativeConfigPaths[clusterType]),
 	)
 	for id, p := range relativeConfigPaths {
+		fullPath, err := filepath.Abs(path.Join(configRootPath, p.Path))
+		if err != nil {
+			return nil, err
+		}
 		configPath[id] = Path{
-			Path:   path.Join(configRootPath, p.Path),
+			Path:   fullPath,
 			Format: p.Format,
 		}
 	}
 	for id, p := range clusterSpecificRelativeConfigPaths[clusterType] {
+		fullPath, err := filepath.Abs(path.Join(configRootPath, p.Path))
+		if err != nil {
+			return nil, err
+		}
 		configPath[id] = Path{
-			Path:   path.Join(configRootPath, p.Path),
+			Path:   fullPath,
 			Format: p.Format,
 		}
 	}
-	return configPath
+	return configPath, nil
 }
 
-func NewCodePath(codeRootPath string, clusterType ClusterType) CodePath {
+func NewCodePath(
+	codeRootPath string,
+	clusterType ClusterType,
+) (CodePath, error) {
 	codePath := make(CodePath, len(relativeCodePaths))
 	for id, p := range relativeCodePaths {
+		fullPath, err := filepath.Abs(path.Join(codeRootPath, p.Path))
+		if err != nil {
+			return nil, err
+		}
 		codePath[id] = Path{
-			Path:   path.Join(codeRootPath, p.Path),
+			Path:   fullPath,
 			Format: p.Format,
 		}
 	}
-	return codePath
+	return codePath, nil
 }
