@@ -4,3 +4,4 @@
 
 ### Added
 - Option to specify disk size on exoscale nodes.
+- Netaddr to list of requirements

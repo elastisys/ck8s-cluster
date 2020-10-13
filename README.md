@@ -22,6 +22,7 @@ Currently we support three cloud providers: Exoscale, Safespring, an CityCloud.
 - [s3cmd](https://s3tools.org/s3cmd) (tested with 2.0.2)
 - [ansible](https://www.ansible.com) (tested with 2.9.14)
 - [go](https://golang.org) (tested with 1.13.8)
+- [netaddr](https://pypi.org/project/netaddr/) (tested with 0.7.19-1)
 
 Note that you will need a [BaseOS](https://github.com/elastisys/ck8s-base-vm) VM template available at your cloud provider of choice!
 See the [releases](https://github.com/elastisys/ck8s-base-vm/releases) for available VM images that can be uploaded to the cloud provider.
