@@ -17,11 +17,11 @@ set -eu
 : "${EXOSCALE_SECRET:?Missing EXOSCALE_SECRET}"
 
 log_info() {
-    echo -e "[\e[34mck8\e[0m] ${@}" >&2
+    echo -e "[\e[34mck8\e[0m]" "${@}" >&2
 }
 
 log_error() {
-    echo -e "[\e[31mck8\e[0m] ${@}" >&2
+    echo -e "[\e[31mck8\e[0m]" "${@}" >&2
 }
 
 usage() {
@@ -65,10 +65,10 @@ args=(
     -e CK8S_CONFIG_PATH=/ck8s-config
     -e CK8S_PGP_FP="${CK8S_PGP_FP}"
     -e CK8S_LOG_LEVEL="debug"
-    ${@}
+    "${@}"
 )
 
-docker run -d --name "${docker_name}" ${args[@]} "${docker_image}" sleep 3600
+docker run -d --name "${docker_name}" "${args[@]}" "${docker_image}" sleep 3600
 
 trap 'docker stop "${docker_name}" && docker rm "${docker_name}"' EXIT
 
@@ -103,9 +103,9 @@ whitelist_update() {
             /ck8s-config/tfvars.json
 }
 my_ip=$(curl ifconfig.me 2>/dev/null)
-whitelist_update "public_ingress_cidr_whitelist" $my_ip
-whitelist_update "api_server_whitelist" $my_ip
-whitelist_update "nodeport_whitelist" $my_ip
+whitelist_update "public_ingress_cidr_whitelist" "$my_ip"
+whitelist_update "api_server_whitelist" "$my_ip"
+whitelist_update "nodeport_whitelist" "$my_ip"
 
 docker_exec ./pipeline/apply.bash
 docker_exec ./pipeline/e2e-tests.bash
