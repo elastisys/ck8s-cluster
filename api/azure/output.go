@@ -7,6 +7,15 @@ import (
 	"github.com/elastisys/ck8s/api"
 )
 
+type tfOutputIPsObject struct {
+	Value map[string]tfOutputIPsValue `json:"value"`
+}
+
+type tfOutputIPsValue struct {
+	PrivateIP string `json:"private_ip"`
+	PublicIP  string `json:"public_ip"`
+}
+
 type tfOutputValue struct {
 	Value string `json:"value"`
 }
@@ -15,10 +24,10 @@ type terraformOutput struct {
 	ClusterType api.ClusterType
 	ClusterName string
 
-	SCMasterIPs tfOutputValue `json:"sc_master_ips"`
-	SCWorkerIPs tfOutputValue `json:"sc_worker_ips"`
-	WCMasterIPs tfOutputValue `json:"wc_master_ips"`
-	WCWorkerIPs tfOutputValue `json:"wc_worker_ips"`
+	SCMasterIPs tfOutputIPsObject `json:"sc_master_ips"`
+	SCWorkerIPs tfOutputIPsObject `json:"sc_worker_ips"`
+	WCMasterIPs tfOutputIPsObject `json:"wc_master_ips"`
+	WCWorkerIPs tfOutputIPsObject `json:"wc_worker_ips"`
 
 	SCControlPlaneLBIPAddress tfOutputValue `json:"sc_control_plane_lb_ip_address"`
 	WCControlPlaneLBIPAddress tfOutputValue `json:"wc_control_plane_lb_ip_address"`
@@ -43,14 +52,7 @@ func (e *terraformOutput) BaseDomain() string {
 }
 
 func (e *terraformOutput) ControlPlaneEndpoint() string {
-	switch e.ClusterType {
-	case api.ServiceCluster:
-		return e.SCControlPlaneLBIPAddress.Value
-	case api.WorkloadCluster:
-		return e.WCControlPlaneLBIPAddress.Value
-	default:
-		panic(fmt.Sprintf("invalid cluster type: %s", e.ClusterType))
-	}
+	return "127.0.0.1"
 }
 
 func (e *terraformOutput) ControlPlanePublicIP() string {

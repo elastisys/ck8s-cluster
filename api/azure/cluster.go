@@ -31,7 +31,7 @@ func (e *Cluster) State(
 		ClusterType: e.config.ClusterType,
 		ClusterName: e.Name(),
 
-		ControlPlanePort: 6443,
+		ControlPlanePort: 7443,
 
 		// TODO: This value currently needs to align with what is set in the
 		//		 Terraform code. We should expose this as an outer variable and
@@ -40,7 +40,8 @@ func (e *Cluster) State(
 
 		CalicoMTU: 1450,
 
-		KubeadmInitCloudProvider: "azure",
+		KubeadmInitCloudProvider:          "azure",
+		InternalLoadBalancerAnsibleGroups: []string{"nodes"},
 	}
 	return &tfOutput, loadState(&tfOutput)
 }

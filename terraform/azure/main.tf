@@ -20,8 +20,9 @@ module "service_cluster" {
 
   location = var.location
 
-  dns_suffix = "elastisys-azure.com"
-  dns_prefix = var.dns_prefix
+  dns_resource_group = "elastisys-dns"
+  dns_suffix         = "azure.compliantkubernetes.io"
+  dns_prefix         = var.dns_prefix
   dns_list = [
     "*.ops",
     "grafana",
@@ -48,8 +49,9 @@ module "workload_cluster" {
 
   location = var.location
 
-  dns_suffix = "elastisys-azure.com"
-  dns_prefix = var.dns_prefix
+  dns_resource_group = "elastisys-dns"
+  dns_suffix         = "azure.compliantkubernetes.io"
+  dns_prefix         = var.dns_prefix
   dns_list = [
     "*",
     "prometheus.ops"
