@@ -47,22 +47,22 @@ DATE=$(date +'%Y-%m-%d')
 echo "generating new changelog"
 
 # Split Changelog and Table of contents(TOC) into seperate files
-sed -n '/<!-- BEGIN TOC -->/,/<!-- END TOC -->/{ /<!--/d; p }' ${changelog} > temp-toc.md
-sed '1,/^<!-- END TOC -->$/d' ${changelog} > temp-cl.md
+sed -n '/<!-- BEGIN TOC -->/,/<!-- END TOC -->/{ /<!--/d; p }' "${changelog}" > temp-toc.md
+sed '1,/^<!-- END TOC -->$/d' "${changelog}" > temp-cl.md
 
 # Adding version to changelog
-echo -e "## v${new_version} - ${DATE}\n" | cat - ${wip_changelog} temp-cl.md > temp-cl2.md
+echo -e "## v${new_version} - ${DATE}\n" | cat - "${wip_changelog}" temp-cl.md > temp-cl2.md
 # Adding link to TOC
 echo -e "- [v${new_version}](#v${short_version}---${DATE})" | cat - temp-toc.md > temp-toc2.md
 echo -e "<!-- END TOC -->" >> temp-toc2.md
 echo -e "<!-- BEGIN TOC -->" | cat - temp-toc2.md > temp-toc.md
 echo -e "\n-------------------------------------------------" >> temp-toc.md
 # Creating new changelog
-echo -e "# Compliant Kubernetes changelog" > ${changelog}
-cat temp-toc.md temp-cl2.md >> ${changelog}
+echo -e "# Compliant Kubernetes changelog" > "${changelog}"
+cat temp-toc.md temp-cl2.md >> "${changelog}"
 rm temp*
 # Clearing WIP-CHANGELOG.md
-> ${wip_changelog}
+: > "${wip_changelog}"
 
 git add "${changelog}" "${wip_changelog}"
 git commit -m "Release v${new_version}"

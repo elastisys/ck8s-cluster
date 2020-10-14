@@ -47,4 +47,3 @@ output "sc_lb_subnet_id" {
 output "wc_lb_subnet_id" {
   value = module.workload_cluster.subnet_id
 }
-

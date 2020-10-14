@@ -5,6 +5,7 @@ set -eu -o pipefail
 here="$(dirname "$(readlink -f "$0")")"
 test_path="${here}/test"
 
+# shellcheck disable=SC1090
 source "${here}/common.bash"
 
 # Test ssh and kubectl access

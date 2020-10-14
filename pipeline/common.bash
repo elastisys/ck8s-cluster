@@ -1,7 +1,8 @@
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 
 # Make CK8S_CONFIG_PATH absolute
-export CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
+CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
+export CK8S_CONFIG_PATH
 
 get_my_ip() {
     curl ifconfig.me 2>/dev/null
@@ -17,6 +18,6 @@ whitelist_update() {
         exit 1
     fi
 
-    sed -i ':a;N;$!ba;s/\s*"'"${1}"'": \[[^]]*\]/"'"${1}"'": \["'${2}'\/32"\]/g' \
+    sed -i ':a;N;$!ba;s/\s*"'"${1}"'": \[[^]]*\]/"'"${1}"'": \["'"${2}"'\/32"\]/g' \
       "${CK8S_CONFIG_PATH}/tfvars.json"
 }

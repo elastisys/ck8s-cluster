@@ -17,7 +17,7 @@ module "service_cluster" {
 
   machines = var.machines_sc
 
-  nfs_size = var.nfs_size
+  nfs_size      = var.nfs_size
   nfs_disk_size = var.nfs_disk_size
 
   dns_suffix = "a1ck.io"
@@ -46,7 +46,7 @@ module "workload_cluster" {
 
   machines = var.machines_wc
 
-  nfs_size = var.nfs_size
+  nfs_size      = var.nfs_size
   nfs_disk_size = var.nfs_disk_size
 
   dns_suffix = "a1ck.io"

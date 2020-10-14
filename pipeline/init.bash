@@ -4,4 +4,4 @@
 
 set -e
 
-ckctl init $1 $2
+ckctl init "$1" "$2"

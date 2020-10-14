@@ -12,6 +12,7 @@ set -u
 
 test_type=$1
 here="$(dirname "$(readlink -f "$0")")"
+# shellcheck disable=SC1090
 source "${here}/../../common.bash"
 failures=0
 success=0

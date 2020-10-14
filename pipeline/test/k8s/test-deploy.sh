@@ -6,7 +6,7 @@ here="$(dirname "$(readlink -f "$0")")"
 NAMESPACE="ck8s-integration-test"
 
 kubectl() {
-    ckctl --cluster wc internal kubectl -- ${@}
+    ckctl --cluster wc internal kubectl -- "${@}"
 }
 
 setup_test() {
@@ -66,7 +66,7 @@ test_loadbalancer() {
     do
         external_ip=$(kubectl -n ${NAMESPACE} get svc test \
             -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
-        if [ -z ${external_ip} ]
+        if [ -z "${external_ip}" ]
         then
             echo -n " ${i}"
             sleep 10
@@ -87,6 +87,6 @@ echo "==============================="
 setup_test
 test_deploy
 
-[ "$(yq r ${CK8S_CONFIG_PATH}/config.yaml 'cloud_provider')" = "citycloud" ] && test_loadbalancer
+[ "$(yq r "${CK8S_CONFIG_PATH}/config.yaml" 'cloud_provider')" = "citycloud" ] && test_loadbalancer
 
 cleanup
