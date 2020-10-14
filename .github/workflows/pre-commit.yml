@@ -14,11 +14,11 @@ jobs:
     - name: Install specific version of shellcheck
       run: wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | sudo tar -J -xf - --strip-components=1 -C /usr/local/bin/ --no-anchored shellcheck
       shell: bash
-    - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
       with:
         go-version: '1.13'
     - name: Install goimports
       run: go get golang.org/x/tools/cmd/goimports
     - uses: actions/setup-python@v2
+    - uses: actions/checkout@v2
     - uses: pre-commit/action@v2.0.0
