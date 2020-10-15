@@ -12,6 +12,11 @@ var clusterFlavorMap = map[api.ClusterFlavor]func(api.ClusterType, string) api.C
 	FlavorProduction:  Production,
 }
 
+type nameSettingsStruct struct {
+	maxNameLen     int
+	minAutoNameLen int
+}
+
 type CloudProvider struct{}
 
 func NewCloudProvider() *CloudProvider {
@@ -63,4 +68,11 @@ func (e *CloudProvider) MachineImages(api.NodeType) []*api.Image {
 
 func (e *CloudProvider) MachineSettings() interface{} {
 	return nil
+}
+
+func nameSettings() nameSettingsStruct {
+	return nameSettingsStruct{
+		maxNameLen:     63,
+		minAutoNameLen: 6,
+	}
 }

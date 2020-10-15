@@ -40,3 +40,5 @@ variable "dns_list" {
 variable "dns_suffix" {}
 
 variable "dns_prefix" {}
+
+variable "dns_resource_group" {}

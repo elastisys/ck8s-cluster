@@ -63,8 +63,8 @@
       when: cloud_provider is defined and cloud_provider == "azure"
 
     - name: Render azure config for kubelet
-      template:
-        src: azure.json.j2
+      copy:
+        src: files/azure-kubelet.yaml
         dest: /etc/kubernetes/kubelet-azure.json
         owner: root
         group: root

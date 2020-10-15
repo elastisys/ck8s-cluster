@@ -125,10 +125,7 @@ resource "azurerm_virtual_machine" "master" {
   availability_set_id   = azurerm_availability_set.master.id
   vm_size               = each.value.size
 
-  # Delete the OS disk automatically when deleting the VM
-  delete_os_disk_on_termination = true
-
-  # Delete the data disks automatically when deleting the VM
+  delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = true
 
   storage_image_reference {
@@ -329,10 +326,7 @@ resource "azurerm_virtual_machine" "worker" {
   availability_set_id   = azurerm_availability_set.worker.id
   vm_size               = each.value.size
 
-  # Uncomment this line to delete the OS disk automatically when deleting the VM
-  delete_os_disk_on_termination = true
-
-  # Uncomment this line to delete the data disks automatically when deleting the VM
+  delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = true
 
   storage_image_reference {
@@ -476,17 +470,12 @@ resource "azurerm_lb_rule" "worker_lb_https" {
 ## DNS
 ##
 
-resource "azurerm_dns_zone" "dns_zone" {
-  name                = var.dns_suffix
-  resource_group_name = azurerm_resource_group.main.name
-}
-
 resource "azurerm_dns_a_record" "example" {
   for_each = toset(var.dns_list)
 
   name                = "${each.value}.${var.dns_prefix}"
-  zone_name           = azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_resource_group.main.name
+  zone_name           = var.dns_suffix
+  resource_group_name = var.dns_resource_group
   ttl                 = 300
   records             = [azurerm_public_ip.worker_lb.ip_address]
 }
