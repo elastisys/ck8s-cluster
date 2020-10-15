@@ -1,8 +1,24 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.7.0](#v070---2020-10-15)
 - [v0.6.0](#v060---2020-09-25)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.7.0 - 2020-10-15
+
+### Fixed
+- Support relative config path.
+
+### Changed
+- Upgrade jq to v1.6
+- Upgrade ansible to 2.9.14
+- Changed Terraform version to 0.12.29
+
+### Added
+- Option to specify disk size on exoscale nodes.
+- Netaddr to list of requirements
 
 -------------------------------------------------
 ## v0.6.0 - 2020-09-25
