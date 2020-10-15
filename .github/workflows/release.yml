@@ -18,6 +18,18 @@ jobs:
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0 HEAD)
+      - name: Get the ChangeLog
+        id: get_changelog
+        shell: bash
+        run: |
+          changelog=$(grep -B100 -m2 -- '----' CHANGELOG.md)
+          changelog="${changelog//'%'/'%25'}"
+          changelog="${changelog//$'\n'/'%0A'}"
+          changelog="${changelog//$'\r'/'%0D'}"
+
+          echo "$changelog"
+
+          echo "::set-output name=changelog::$changelog"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -27,4 +39,6 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.VERSION }}
           release_name: ${{ steps.get_version.outputs.VERSION }}
           body: |
+            ${{ steps.get_changelog.outputs.changelog }}
+
             See [CHANGELOG.md](https://github.com/elastisys/ck8s-cluster/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
