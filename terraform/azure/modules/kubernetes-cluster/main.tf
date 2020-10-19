@@ -464,23 +464,3 @@ resource "azurerm_lb_rule" "worker_lb_https" {
   probe_id                       = azurerm_lb_probe.worker_lb.id
   frontend_ip_configuration_name = "${var.prefix}-worker-lb-ip"
 }
-
-#################################################
-##
-## DNS
-##
-
-resource "azurerm_dns_zone" "dns_zone" {
-  name                = var.dns_suffix
-  resource_group_name = azurerm_resource_group.main.name
-}
-
-resource "azurerm_dns_a_record" "cluster_records" {
-  for_each = toset(var.dns_list)
-
-  name                = "${each.value}.${var.dns_prefix}"
-  zone_name           = azurerm_dns_zone.dns_zone.name
-  resource_group_name = azurerm_resource_group.main.name
-  ttl                 = 300
-  records             = [azurerm_public_ip.worker_lb.ip_address]
-}

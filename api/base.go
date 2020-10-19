@@ -10,7 +10,10 @@ type BaseConfig struct {
 
 	EnvironmentName string `mapstructure:"environment_name" yaml:"environment_name" validate:"required"`
 
-	DNSPrefix string `mapstructure:"dns_prefix" yaml:"dns_prefix" validate:"required"`
+	OIDCIssuerURL     string `mapstructure:"oidc_issuer_url" yaml:"oidc_issuer_url" validate:"required"`
+	OIDCClientId      string `mapstructure:"oidc_client_id" yaml:"oidc_client_id" validate:"required"`
+	OIDCUsernameClaim string `mapstructure:"oidc_username_claim" yaml:"oidc_username_claim" validate:"required"`
+	OIDCGroupsClaim   string `mapstructure:"oidc_groups_claim" yaml:"oidc_groups_claim" validate:"required"`
 
 	S3BucketNameElasticsearch string `mapstructure:"s3_es_backup_bucket_name" yaml:"s3_es_backup_bucket_name" validate:"required"`
 	S3BucketNameHarbor        string `mapstructure:"s3_harbor_bucket_name" yaml:"s3_harbor_bucket_name" validate:"required"`
@@ -28,7 +31,10 @@ func DefaultBaseConfig(
 		ClusterType:               clusterType,
 		CloudProviderType:         cloudProviderType,
 		EnvironmentName:           clusterName,
-		DNSPrefix:                 clusterName,
+		OIDCIssuerURL:             "",
+		OIDCClientId:              "kubelogin",
+		OIDCUsernameClaim:         "email",
+		OIDCGroupsClaim:           "groups",
 		S3BucketNameHarbor:        clusterName + "-harbor",
 		S3BucketNameVelero:        clusterName + "-velero",
 		S3BucketNameElasticsearch: clusterName + "-es-backup",

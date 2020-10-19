@@ -51,10 +51,10 @@ apiServer:
 {% endif %}
   extraArgs:
     authorization-mode: "Node,RBAC"
-    oidc-issuer-url: "https://dex.{{ lookup('env','ECK_BASE_DOMAIN') }}"
-    oidc-client-id: "kubelogin"
-    oidc-username-claim: "email"
-    oidc-groups-claim: "groups"
+    oidc-issuer-url: "{{ oidc_issuer_url }}"
+    oidc-client-id: {{ oidc_client_id }}
+    oidc-username-claim: {{ oidc_username_claim }}
+    oidc-groups-claim: {{ oidc_groups_claim }}
     audit-policy-file: "/etc/kubernetes/conf/audit-policy.yaml"
     audit-log-path: "/var/log/kube-audit/kube-apiserver.log"
     # Increase number of delete workers

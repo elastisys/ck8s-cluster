@@ -170,14 +170,6 @@ func (c *ClusterClient) Apply() error {
 		}
 	}
 
-	currentState, err := c.state()
-	if err != nil {
-		return fmt.Errorf("error getting cluster state: %w", err)
-	}
-	c.ansible.AddEnv(map[string]string{
-		"ECK_BASE_DOMAIN": currentState.BaseDomain(),
-	})
-
 	if c.cluster.CloudProvider() == api.Safespring {
 		if err := c.ansible.Infrastructure(); err != nil {
 			return fmt.Errorf("error updating loadbalancer: %w", err)

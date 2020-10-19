@@ -75,6 +75,16 @@ func (e *Cluster) S3Buckets() map[string]string {
 	return api.S3BucketsHelper(&e.config.BaseConfig)
 }
 
+func (e *Cluster) OIDCConfig() map[string]string {
+	config := map[string]string{}
+
+	config["oidc_issuer_url"] = e.config.OIDCIssuerURL
+	config["oidc_client_id"] = e.config.OIDCClientId
+	config["oidc_username_claim"] = e.config.OIDCUsernameClaim
+	config["oidc_groups_claim"] = e.config.OIDCGroupsClaim
+	return config
+}
+
 func (e *Cluster) TerraformWorkspace() string {
 	return e.config.EnvironmentName
 }

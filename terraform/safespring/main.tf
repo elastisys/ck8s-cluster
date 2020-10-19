@@ -23,18 +23,6 @@ module "service_cluster" {
 
   master_anti_affinity_policy = var.master_anti_affinity_policy_sc
   worker_anti_affinity_policy = var.worker_anti_affinity_policy_sc
-
-  dns_prefix = var.dns_prefix
-  dns_list = [
-    "*.ops",
-    "grafana",
-    "harbor",
-    "dex",
-    "kibana",
-    "notary.harbor"
-  ]
-  aws_dns_zone_id  = var.aws_dns_zone_id
-  aws_dns_role_arn = var.aws_dns_role_arn
 }
 
 module "workload_cluster" {
@@ -55,12 +43,4 @@ module "workload_cluster" {
 
   master_anti_affinity_policy = var.master_anti_affinity_policy_wc
   worker_anti_affinity_policy = var.worker_anti_affinity_policy_wc
-
-  dns_prefix = var.dns_prefix
-  dns_list = [
-    "*",
-    "prometheus.ops"
-  ]
-  aws_dns_zone_id  = var.aws_dns_zone_id
-  aws_dns_role_arn = var.aws_dns_role_arn
 }

@@ -37,8 +37,6 @@ func TerraformEnvHelper(
 		otherSSHPublicKeyTFVar = "TF_VAR_ssh_pub_key_sc"
 	}
 	return map[string]string{
-		"TF_VAR_dns_prefix": config.DNSPrefix,
-
 		currentSSHPublicKeyTFVar: sshPublicKey,
 		otherSSHPublicKeyTFVar:   "",
 	}

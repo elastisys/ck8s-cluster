@@ -32,9 +32,6 @@ func Default(
 		Secret: Secret{
 			BaseSecret: *api.DefaultBaseSecret(),
 
-			AWSAccessKeyID:     "changeme",
-			AWSSecretAccessKey: "changeme",
-
 			Username: "changeme",
 			Password: "changeme",
 		},
@@ -42,9 +39,6 @@ func Default(
 			PublicIngressCIDRWhitelist: []string{},
 			APIServerWhitelist:         []string{},
 			NodeportWhitelist:          []string{},
-
-			AWSDNSZoneID:  "changeme",
-			AWSDNSRoleARN: "changeme",
 		},
 	}
 }
@@ -74,6 +68,16 @@ func (e *Cluster) S3Buckets() map[string]string {
 	return api.S3BucketsHelper(&e.Config.BaseConfig)
 }
 
+func (e *Cluster) OIDCConfig() map[string]string {
+	config := map[string]string{}
+
+	config["oidc_issuer_url"] = e.Config.OIDCIssuerURL
+	config["oidc_client_id"] = e.Config.OIDCClientId
+	config["oidc_username_claim"] = e.Config.OIDCUsernameClaim
+	config["oidc_groups_claim"] = e.Config.OIDCGroupsClaim
+	return config
+}
+
 func (e *Cluster) TerraformWorkspace() string {
 	return e.Config.EnvironmentName
 }
@@ -89,9 +93,6 @@ func (e *Cluster) TerraformEnv(sshPublicKey string) map[string]string {
 	env["OS_USER_DOMAIN_NAME"] = e.Config.UserDomainName
 	env["OS_PROJECT_DOMAIN_NAME"] = e.Config.ProjectDomainName
 	env["OS_PROJECT_ID"] = e.Config.ProjectID
-
-	env["AWS_ACCESS_KEY_ID"] = e.Secret.AWSAccessKeyID
-	env["AWS_SECRET_ACCESS_KEY"] = e.Secret.AWSSecretAccessKey
 
 	return env
 }

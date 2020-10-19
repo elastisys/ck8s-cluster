@@ -8,21 +8,6 @@ variable ssh_pub_key_wc {
   type        = string
 }
 
-variable dns_prefix {
-  description = "Prefix name for dns"
-  type        = string
-}
-
-variable aws_dns_zone_id {
-  description = "Id for the AWS DNS zone"
-  type        = string
-}
-
-variable aws_dns_role_arn {
-  description = "AWS role to asume while creating DNS entries"
-  type        = string
-}
-
 variable prefix_sc {
   description = "Prefix for resource names"
   default     = ""

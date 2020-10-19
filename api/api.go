@@ -60,13 +60,13 @@ type Cluster interface {
 	State(ClusterStateLoadFunc) (ClusterState, error)
 
 	S3Buckets() map[string]string
+
+	OIDCConfig() map[string]string
 }
 
 type ClusterState interface {
 	ControlPlanePublicIP() string
 	ControlPlaneEndpoint() string
-
-	BaseDomain() string
 
 	Machines() map[string]MachineState
 

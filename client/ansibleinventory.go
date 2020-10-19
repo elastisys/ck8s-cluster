@@ -47,6 +47,11 @@ cloud_provider_vars='{{ .CloudProviderVars }}'
 {{ end -}}
 cluster_name='{{ .Cluster.Name }}'
 
+oidc_issuer_url='{{ .Cluster.OIDCConfig.oidc_issuer_url }}'
+oidc_client_id='{{ .Cluster.OIDCConfig.oidc_client_id }}'
+oidc_username_claim='{{ .Cluster.OIDCConfig.oidc_username_claim }}'
+oidc_groups_claim='{{ .Cluster.OIDCConfig.oidc_groups_claim }}'
+
 calico_mtu='{{ .State.CalicoMTU }}'
 
 kubeadm_init_extra_args='{{ .State.KubeadmInitExtraArgs }}'

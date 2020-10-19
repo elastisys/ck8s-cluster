@@ -10,11 +10,3 @@ output "worker_ips" {
 output "loadbalancer_ips" {
   value = module.haproxy_lb.instance_ips
 }
-
-output "dns_record_name" {
-  value = module.dns.dns_record_name
-}
-
-output "dns_suffix" {
-  value = module.dns.dns_suffix
-}

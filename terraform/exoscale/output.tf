@@ -11,10 +11,6 @@ output "sc_nfs_ips" {
   value = "${module.service_cluster.nfs_ip_address}"
 }
 
-output "sc_dns_name" {
-  value = "${module.service_cluster.dns_record_name}"
-}
-
 output "sc_ingress_controller_lb_ip_address" {
   value = "${module.service_cluster.ingress_controller_lb_ip_address}"
 }
@@ -35,14 +31,6 @@ output "wc_worker_ips" {
 
 output "wc_nfs_ips" {
   value = "${module.workload_cluster.nfs_ip_address}"
-}
-
-output "wc_dns_name" {
-  value = "${module.workload_cluster.dns_record_name}"
-}
-
-output "domain_name" {
-  value = "${var.dns_prefix}.${module.service_cluster.dns_suffix}"
 }
 
 output "wc_ingress_controller_lb_ip_address" {

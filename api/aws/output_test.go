@@ -40,25 +40,6 @@ func testState(
 	return tfOutput
 }
 
-func TestTerraformOutputBaseDomain(t *testing.T) {
-	testCases := map[api.ClusterType]string{
-		api.ServiceCluster:  "", // TODO This isn't part of aws terraform atm
-		api.WorkloadCluster: "",
-	}
-
-	for clusterType, want := range testCases {
-		tfOutput := testState(t, clusterType, "ck8stest")
-
-		got := tfOutput.BaseDomain()
-		if got != want {
-			t.Errorf(
-				"Base domain mismatch, want: %s, got: %s",
-				want, got,
-			)
-		}
-	}
-}
-
 func TestTerraformOutputControlPlanePublicIP(t *testing.T) {
 	testCases := map[api.ClusterType]string{
 		api.ServiceCluster:  "tf-lb-20200624083157273500000008-1544241826.us-west-1.elb.amazonaws.com",

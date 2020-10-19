@@ -241,12 +241,3 @@ resource "exoscale_ssh_keypair" "ssh_key" {
   name       = "${var.prefix}-ssh-key"
   public_key = trimspace(file(pathexpand(var.ssh_pub_key)))
 }
-
-resource "exoscale_domain_record" "ingress" {
-  for_each = toset(var.dns_list)
-
-  domain      = var.dns_suffix
-  name        = "${each.value}.${var.dns_prefix}"
-  record_type = "A"
-  content     = exoscale_ipaddress.ingress_controller_lb.ip_address
-}

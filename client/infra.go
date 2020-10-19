@@ -11,9 +11,6 @@ import (
 )
 
 type infraClusterStruct struct {
-	DNSName    interface{} `json:"dns_name"`
-	DomainName interface{} `json:"domain_name"`
-
 	LBIPAddress interface{} `json:"loadbalancer_ip_addresses"`
 
 	MasterCount     interface{} `json:"master_count"`
@@ -78,8 +75,6 @@ func (i *infraStruct) updateValues(tfOutput interface{}, clusterType api.Cluster
 	//Prepare for a really ugly parsing (since this is going away this is okey)
 	tfOutputSlice := tfOutput.(map[string]interface{})
 
-	currentCluster.DNSName = getValue(tfOutputSlice, clusterTypeString+"_dns_name")
-	currentCluster.DomainName = getValue(tfOutputSlice, "domain_name")
 	currentCluster.LBIPAddress = getValue(tfOutputSlice, clusterTypeString+"_ingress_controller_lb_ip_address")
 	currentCluster.MasterCount = len(getValue(tfOutputSlice, clusterTypeString+"_master_ips").(map[string]interface{}))
 	currentCluster.MasterIPAddress = getValue(tfOutputSlice, clusterTypeString+"_master_ips")

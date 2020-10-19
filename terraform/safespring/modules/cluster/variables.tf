@@ -48,18 +48,3 @@ variable "worker_anti_affinity_policy" {
   description = "This can be set to 'anti-affinity' to spread out workers on different physical machines, otherwise leave it empty"
   type        = string
 }
-
-# For DNS
-variable "dns_list" {
-  type = list(string)
-}
-
-variable "dns_prefix" {}
-
-variable "aws_dns_zone_id" {
-  type = string
-}
-
-variable "aws_dns_role_arn" {
-  type = string
-}

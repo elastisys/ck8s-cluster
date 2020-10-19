@@ -11,14 +11,6 @@ output "loadbalancer_ips" {
   value = module.octavia_lb.instance_ips
 }
 
-output "dns_record_name" {
-  value = module.dns.dns_record_name
-}
-
-output "dns_suffix" {
-  value = module.dns.dns_suffix
-}
-
 output subnet_id {
   value = module.network.subnet_id
 }
