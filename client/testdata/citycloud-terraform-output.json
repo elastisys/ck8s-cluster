@@ -1,9 +1,4 @@
 {
-  "domain_name": {
-    "sensitive": false,
-    "type": "string",
-    "value": "ck8stest.elastisys.se"
-  },
   "sc_dns_name": {
     "sensitive": false,
     "type": [

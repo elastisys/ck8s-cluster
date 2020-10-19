@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/spf13/viper"
 	"go.mozilla.org/sops/v3/decrypt"
@@ -330,6 +331,11 @@ func (c *ConfigHandler) readConfig() (api.Cluster, error) {
 
 	if err := v.Unmarshal(cluster.Config()); err != nil {
 		return nil, fmt.Errorf("error decoding config: %w", err)
+	}
+
+	oidcIssuerUrlValue := v.GetString("oidc_issuer_url")
+	if !strings.HasPrefix(oidcIssuerUrlValue, "https://") {
+		return nil, fmt.Errorf("oidc_issuer_url must have a valid https URL as value")
 	}
 
 	return cluster, nil

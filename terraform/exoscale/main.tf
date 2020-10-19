@@ -20,17 +20,6 @@ module "service_cluster" {
   nfs_size      = var.nfs_size
   nfs_disk_size = var.nfs_disk_size
 
-  dns_suffix = "a1ck.io"
-  dns_prefix = var.dns_prefix
-  dns_list = [
-    "*.ops",
-    "grafana",
-    "harbor",
-    "kibana",
-    "dex",
-    "notary.harbor"
-  ]
-
   ssh_pub_key = var.ssh_pub_key_sc
 
   public_ingress_cidr_whitelist = var.public_ingress_cidr_whitelist
@@ -48,13 +37,6 @@ module "workload_cluster" {
 
   nfs_size      = var.nfs_size
   nfs_disk_size = var.nfs_disk_size
-
-  dns_suffix = "a1ck.io"
-  dns_prefix = var.dns_prefix
-  dns_list = [
-    "*",
-    "prometheus.ops"
-  ]
 
   ssh_pub_key = var.ssh_pub_key_wc
 

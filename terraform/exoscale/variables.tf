@@ -82,8 +82,3 @@ variable api_server_whitelist {
 variable nodeport_whitelist {
   type = list(string)
 }
-
-variable dns_prefix {
-  description = "Prefix name for dns"
-  type        = string
-}

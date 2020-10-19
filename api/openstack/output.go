@@ -31,8 +31,6 @@ type TerraformOutput struct {
 	SCControlPlaneLBIPs TfOutputIPsObject `json:"sc_loadbalancer_ips"`
 	WCControlPlaneLBIPs TfOutputIPsObject `json:"wc_loadbalancer_ips"`
 
-	GlobalBaseDomain TfOutputValue `json:"domain_name"`
-
 	ControlPlanePort int
 
 	PrivateNetworkCIDR string
@@ -44,10 +42,6 @@ type TerraformOutput struct {
 	CalicoMTU int
 
 	InternalLoadBalancerAnsibleGroups []string
-}
-
-func (e *TerraformOutput) BaseDomain() string {
-	return e.GlobalBaseDomain.Value
 }
 
 func (e *TerraformOutput) ControlPlaneEndpoint() string {

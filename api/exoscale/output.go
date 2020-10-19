@@ -32,8 +32,6 @@ type terraformOutput struct {
 	SCControlPlaneLBIP tfOutputValue `json:"sc_control_plane_lb_ip_address"`
 	WCControlPlaneLBIP tfOutputValue `json:"wc_control_plane_lb_ip_address"`
 
-	GlobalBaseDomain tfOutputValue `json:"domain_name"`
-
 	ControlPlanePort int
 
 	PrivateNetworkCIDR string
@@ -49,10 +47,6 @@ type terraformOutput struct {
 
 func (e *terraformOutput) ControlPlaneEndpoint() string {
 	return "127.0.0.1"
-}
-
-func (e *terraformOutput) BaseDomain() string {
-	return e.GlobalBaseDomain.Value
 }
 
 func (e *terraformOutput) ControlPlanePublicIP() string {

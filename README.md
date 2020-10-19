@@ -135,11 +135,6 @@ These are the values that needs to be provided by you
 * `api_server_whitelist`: IP whitelist of api server
 * `nodeport_whitelist`: IP whitelist of the nodeports (30000-32767)
 
-*Citycloud/Safespring only*
-
-* `aws_dns_zone_id`: The AWS DNS zone ID to use for DNS entries
-* `aws_dns_role_arn`: The AWS role to assume when creating DNS entry
-
 #### `secrets.yaml`
 
 * `s3_access_key`: Access key to S3 (For storing blobs)
@@ -154,15 +149,6 @@ These are the values that needs to be provided by you
 
 * `os_username`: Openstack username
 * `os_password`: Openstack password
-* `aws_access_key_id`: AWS access key ID (for DNS)
-* `aws_secret_access_key`: AWS secret key
-
-### DNS
-
-The domain name will be automatically created with the name `${TF_VAR_dns_prefix}[.ops].a1ck.io` for Exoscale and `${TF_VAR_dns_prefix}[.ops].elastisys.se` for Safespring and Citycloud.
-In Exoscale we use Exoscale's own DNS features while for Safespring and Citycloud we use AWS.
-
-For Safespring and Citycloud the domain can be changed by setting the Terraform variable `aws_dns_zone_id` to an id of another hosted zone in AWS Route 53.
 
 ## Development
 
