@@ -64,7 +64,7 @@ func (a *Ansible) AddEnv(env map[string]string) {
 	}
 }
 
-func (a *Ansible) Infrustructure() error {
+func (a *Ansible) Infrastructure() error {
 	return a.runner.Run(a.playbook(a.config.PlaybookPathInfrastructure))
 }
 
