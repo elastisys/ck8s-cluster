@@ -178,6 +178,9 @@ func decodeMachine(
 	}
 
 	providerSettings := cloudProvider.MachineSettings()
+	if providerSettings == nil {
+		return nil
+	}
 
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		Metadata: nil,
