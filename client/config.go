@@ -241,7 +241,7 @@ func (c *ConfigHandler) AnsibleRunnerConfig(
 		InventoryPath:     c.configPath[api.AnsibleInventoryFile].Path,
 
 		PlaybookPathDeployKubernetes: c.codePath[api.AnsiblePlaybookDeployKubernetesFile].Path,
-		PlaybookPathInfrastructure:   c.codePath[api.AnsiblePlaybookInfrustructureFiles].Path,
+		PlaybookPathInfrastructure:   c.codePath[api.AnsiblePlaybookInfrastructureFiles].Path,
 		PlaybookPathPrepareNodes:     c.codePath[api.AnsiblePlaybookPrepareNodesFile].Path,
 		PlaybookPathJoinCluster:      c.codePath[api.AnsiblePlaybookJoinClusterFile].Path,
 

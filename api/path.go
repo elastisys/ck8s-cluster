@@ -54,7 +54,7 @@ const (
 	AnsiblePlaybookDeployKubernetesFile
 	AnsiblePlaybookPrepareNodesFile
 	AnsiblePlaybookJoinClusterFile
-	AnsiblePlaybookInfrustructureFiles
+	AnsiblePlaybookInfrastructureFiles
 	ManageS3BucketsScriptFile
 	TerraformTFEDir
 	// TODO: Would be nice to get rid of this and only have one single main
@@ -104,7 +104,7 @@ var relativeCodePaths = CodePath{
 	AnsiblePlaybookPrepareNodesFile: {
 		"ansible/prepare-nodes.yml", "yaml",
 	},
-	AnsiblePlaybookInfrustructureFiles: {
+	AnsiblePlaybookInfrastructureFiles: {
 		"ansible/infrastructure.yml", "yaml",
 	},
 	AnsiblePlaybookJoinClusterFile: {

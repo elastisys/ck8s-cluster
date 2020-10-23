@@ -178,10 +178,9 @@ func (c *ClusterClient) Apply() error {
 		"ECK_BASE_DOMAIN": currentState.BaseDomain(),
 	})
 
-	if c.cluster.CloudProvider() == api.Safespring ||
-		c.cluster.CloudProvider() == api.CityCloud {
-		if err := c.ansible.Infrustructure(); err != nil {
-			return fmt.Errorf("error infrastructure: %w", err)
+	if c.cluster.CloudProvider() == api.Safespring {
+		if err := c.ansible.Infrastructure(); err != nil {
+			return fmt.Errorf("error updating loadbalancer: %w", err)
 		}
 	}
 
@@ -217,6 +216,12 @@ func (c *ClusterClient) Join(name string) (api.MachineState, error) {
 
 	if err := c.ansible.JoinCluster(); err != nil {
 		return machineState, fmt.Errorf("error joining cluster: %w", err)
+	}
+
+	if c.cluster.CloudProvider() == api.Safespring {
+		if err := c.ansible.Infrastructure(); err != nil {
+			return machineState, fmt.Errorf("error updating loadbalancer: %w", err)
+		}
 	}
 
 	return machineState, nil
@@ -487,6 +492,12 @@ func (c *ClusterClient) RemoveNode(name string) error {
 	}
 	if err := c.TerraformApply(); err != nil {
 		return fmt.Errorf("error applying Terraform config: %w", err)
+	}
+
+	if c.cluster.CloudProvider() == api.Safespring {
+		if err := c.ansible.Infrastructure(); err != nil {
+			return fmt.Errorf("error updating loadbalancer: %w", err)
+		}
 	}
 
 	return nil
