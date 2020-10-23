@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"strings"
+
 	"github.com/google/uuid"
 
 	"github.com/elastisys/ck8s/api"
@@ -26,7 +28,10 @@ func (e *Cluster) AddMachine(
 	machine *api.Machine,
 ) (string, error) {
 	if name == "" {
-		name = uuid.New().String()
+		// TODO Find the root cause for this issue
+		name = strings.Replace(uuid.New().String(), "-", "", -1)
+		// TODO Create a more dynamic workaround for the too long names
+		name = name[:10]
 	}
 
 	machines := e.Machines()

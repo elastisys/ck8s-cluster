@@ -39,6 +39,8 @@ func (e *Cluster) AddMachine(
 	if name == "" {
 		// TODO Find the root cause for this issue
 		name = strings.Replace(uuid.New().String(), "-", "", -1)
+		// TODO Create a more dynamic workaround for the too long names
+		name = name[:10]
 	}
 
 	machines := e.Machines()
