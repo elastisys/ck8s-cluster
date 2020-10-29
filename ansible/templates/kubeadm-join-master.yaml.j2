@@ -10,9 +10,14 @@ nodeRegistration:
   kubeletExtraArgs:
     node-ip: "{{ private_ip }}"
 {% if cloud_provider is defined %}
+{% if cloud_provider == "azure" %}
+    cloud-provider: external
+    azure-container-registry-config: /etc/kubernetes/kubelet-azure.json
+{% else %}
     cloud-provider: "{{ cloud_provider }}"
 {% if cloud_config is defined %}
     cloud-config: "{{ cloud_config }}"
+{% endif %}
 {% endif %}
 {% endif %}
 controlPlane:

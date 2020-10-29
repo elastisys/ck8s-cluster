@@ -35,6 +35,7 @@ var s3cfgTemplates = map[api.CloudProviderType]string{
 	api.Safespring: openstackS3Template,
 	api.CityCloud:  openstackS3Template,
 	api.AWS:        awsS3Template,
+	api.Azure:      exoscaleS3Template, // Azure doesn't support S3 so we'll use exoscale for now
 }
 
 func renderS3CfgPlaintext(cluster api.Cluster, w io.Writer) error {

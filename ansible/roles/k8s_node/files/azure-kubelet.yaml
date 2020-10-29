@@ -1,0 +1,4 @@
+{
+    "useInstanceMetadata": true,
+    "vmType": "vmss"
+}

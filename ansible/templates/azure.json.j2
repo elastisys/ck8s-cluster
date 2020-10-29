@@ -1,0 +1,19 @@
+{
+    "cloud":"AzurePublicCloud",
+    "tenantId": "{{ cloud_provider_config.azure.tenant_id }}",
+    "aadClientId": "{{ cloud_provider_config.azure.client_id }}",
+    "aadClientSecret": "{{ cloud_provider_config.azure.client_secret }}",
+    "subscriptionId": "{{ cloud_provider_config.azure.subscription_id }}",
+    "resourceGroup": "{{ cluster_name }}-resources",
+    "location": "{{ cloud_provider_config.azure.location }}",
+    "subnetName": "{{ cluster_name }}-subnet",
+    "securityGroupName": "{{ cluster_name }}-master-sg",
+    "vnetName": "{{ cluster_name }}-network",
+    "vnetResourceGroup": "{{ cluster_name }}-resources",
+    "routeTableName": "{{ cluster_name }}-k8s-routetable",
+    "primaryAvailabilitySetName": "{{ cluster_name }}-master",
+    "routeTableResourceGroup": "{{ cluster_name }}-resources",
+    "cloudProviderBackoff": false,
+    "useManagedIdentityExtension": false,
+    "useInstanceMetadata": true
+}

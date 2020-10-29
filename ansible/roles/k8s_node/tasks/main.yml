@@ -9,5 +9,14 @@
 - name: Render cloud.conf
   when: cloud_config is defined
   template:
-    src: cloud.conf.j2
+    src: openstack.conf.j2
     dest: "{{ cloud_config }}"
+
+- name: Render azure config for api-server
+  template:
+    src: azure.json.j2
+    dest: /etc/kubernetes/kubelet-azure.json
+    owner: root
+    group: root
+    mode: '0644'
+  when: cloud_provider is defined and cloud_provider == "azure"

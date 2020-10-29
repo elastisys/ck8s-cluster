@@ -12,6 +12,8 @@ TODO
 
 Currently we support three cloud providers: Exoscale, Safespring, an CityCloud.
 
+We also have some support for Azure but this is not production grade.
+
 ### Requirements
 
 - [BaseOS](https://github.com/elastisys/ck8s-base-vm) (tested with 0.0.6)

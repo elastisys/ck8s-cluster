@@ -56,9 +56,31 @@
       until: result is not failed
       when: initialized is changed
 
+      # Azure doesn't support IP-in-IP so run calico in VXLAN mode
+    - name: Set calico to use VXLAN instead of IP-in-IP
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf patch daemonsets. -n kube-system calico-node --patch "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"calico-node\",\"env\":[{\"name\":\"CALICO_IPV4POOL_IPIP\",\"value\":\"Never\"},{\"name\":\"CALICO_IPV4POOL_VXLAN\",\"value\":\"Always\"}]}]}}}}"
+      when: initialized is changed and cloud_provider is defined and cloud_provider == "azure"
+
     - name: Force calico to use correct interface
       command: kubectl --kubeconfig /etc/kubernetes/admin.conf patch daemonsets. -n kube-system calico-node --patch "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"calico-node\",\"env\":[{\"name\":\"IP_AUTODETECTION_METHOD\",\"value\":\"can-reach={{ private_network_cidr | ipaddr(-2) | ipaddr('address') }}\"}]}]}}}}"
       when: private_network_cidr is defined
+
+    - name: Render azure cloud controller
+      template:
+        src: azure-cloud-controller.yaml.j2
+        dest: /etc/kubeadm/azure-cloud-controller.yaml
+        owner: root
+        group: root
+        mode: '0644'
+      when: initialized is changed and cloud_provider is defined and cloud_provider == "azure"
+
+    - name: Install azure cloud controller
+      command: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /etc/kubeadm/azure-cloud-controller.yaml
+      register: result
+      retries: 15
+      delay: 5
+      until: result is not failed
+      when: initialized is changed and cloud_provider is defined and cloud_provider == "azure"
 
     - name: Getting AWS master nodename
       command:

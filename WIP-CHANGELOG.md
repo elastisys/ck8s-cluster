@@ -1,0 +1,2 @@
+### Added
+- Initial Azure support.

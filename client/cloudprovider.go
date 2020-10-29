@@ -3,6 +3,7 @@ package client
 import (
 	"github.com/elastisys/ck8s/api"
 	"github.com/elastisys/ck8s/api/aws"
+	"github.com/elastisys/ck8s/api/azure"
 	"github.com/elastisys/ck8s/api/citycloud"
 	"github.com/elastisys/ck8s/api/exoscale"
 	"github.com/elastisys/ck8s/api/safespring"
@@ -20,6 +21,8 @@ func CloudProviderFromType(
 		return citycloud.NewCloudProvider(), nil
 	case api.AWS:
 		return aws.NewCloudProvider(), nil
+	case api.Azure:
+		return azure.NewCloudProvider(), nil
 	}
 	return nil, api.NewUnsupportedCloudProviderError(cloudProviderType)
 }
