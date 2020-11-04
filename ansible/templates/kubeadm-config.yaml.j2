@@ -106,11 +106,6 @@ networking:
   podSubnet: {{ k8s_pod_cidr }}
   dnsDomain: "cluster.local"
 scheduler: {}
-# @todo:
-# private_registries:
-#     - url: harbor.test-gadr.a1ck.io
-#       user: admin
-#       password: BKjLJOz4S64PPaNxamyf
 
 ---
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
