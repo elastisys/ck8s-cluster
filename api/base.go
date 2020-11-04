@@ -31,7 +31,7 @@ func DefaultBaseConfig(
 		ClusterType:               clusterType,
 		CloudProviderType:         cloudProviderType,
 		EnvironmentName:           clusterName,
-		OIDCIssuerURL:             "",
+		OIDCIssuerURL:             "set-me",
 		OIDCClientId:              "kubelogin",
 		OIDCUsernameClaim:         "email",
 		OIDCGroupsClaim:           "groups",
