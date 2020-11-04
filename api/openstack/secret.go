@@ -9,7 +9,4 @@ type Secret struct {
 
 	Username string `mapstructure:"os_username" yaml:"os_username" validate:"required"`
 	Password string `mapstructure:"os_password" yaml:"os_password" validate:"required"`
-
-	AWSAccessKeyID     string `mapstructure:"aws_access_key_id" yaml:"aws_access_key_id" validate:"required"`
-	AWSSecretAccessKey string `mapstructure:"aws_secret_access_key" yaml:"aws_secret_access_key" validate:"required"`
 }

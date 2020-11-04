@@ -134,8 +134,6 @@ func TestTFVarsRead(t *testing.T) {
 			NodeportWhitelist:          []string{"1.2.3.4/32", "4.3.2.1/32"},
 			ExternalNetworkID:          "2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c",
 			ExternalNetworkName:        "ext-net",
-			AWSDNSZoneID:               "testAWSDNSZoneID",
-			AWSDNSRoleARN:              "testAWSDNSRoleARN",
 		},
 		got: citycloud.Default(clusterType, ""),
 	}, {
@@ -203,8 +201,6 @@ func TestTFVarsRead(t *testing.T) {
 			NodeportWhitelist:          []string{"1.2.3.4/32", "4.3.2.1/32"},
 			ExternalNetworkID:          "2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c",
 			ExternalNetworkName:        "ext-net",
-			AWSDNSZoneID:               "testAWSDNSZoneID",
-			AWSDNSRoleARN:              "testAWSDNSRoleARN",
 		},
 		got: safespring.Default(clusterType, ""),
 	}, {
