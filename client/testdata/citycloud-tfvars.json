@@ -47,8 +47,6 @@
   "worker_anti_affinity_policy_sc" :"",
   "master_anti_affinity_policy_wc" :"anti-affinity",
   "worker_anti_affinity_policy_wc" :"",
-  "aws_dns_zone_id"                :"testAWSDNSZoneID",
-  "aws_dns_role_arn"               :"testAWSDNSRoleARN",
   "external_network_id"            :"2aec7a99-3783-4e2a-bd2b-bbe4fef97d1c",
   "external_network_name"          :"ext-net"
 }

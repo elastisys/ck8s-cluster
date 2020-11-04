@@ -25,9 +25,6 @@ type TFVars struct {
 	APIServerWhitelist []string `json:"api_server_whitelist" validate:"required"`
 	NodeportWhitelist  []string `json:"nodeport_whitelist" validate:"required"`
 
-	AWSDNSZoneID  string `json:"aws_dns_zone_id" validate:"required"`
-	AWSDNSRoleARN string `json:"aws_dns_role_arn" validate:"required"`
-
 	ExternalNetworkID   string `json:"external_network_id" validate:"required"`
 	ExternalNetworkName string `json:"external_network_name" validate:"required"`
 }
