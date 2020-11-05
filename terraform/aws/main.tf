@@ -27,7 +27,8 @@ module "service_cluster" {
 
   ssh_pub_key = var.ssh_pub_key_sc
 
-  machines = var.machines_sc
+  machines   = var.machines_sc
+  extra_tags = var.extra_tags
 }
 
 module "workload_cluster" {
@@ -43,5 +44,6 @@ module "workload_cluster" {
 
   ssh_pub_key = var.ssh_pub_key_wc
 
-  machines = var.machines_wc
+  machines   = var.machines_wc
+  extra_tags = var.extra_tags
 }
