@@ -59,3 +59,10 @@ variable machines_wc {
     })
   }))
 }
+
+variable extra_tags {
+  default = {
+  }
+  description = "Any extra tags that should be present on each EC2 instance"
+  type        = map(string)
+}

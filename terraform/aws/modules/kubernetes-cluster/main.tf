@@ -366,10 +366,10 @@ resource "aws_instance" "master" {
 
   depends_on = [aws_internet_gateway.gateway]
 
-  tags = {
+  tags = merge({
     Name                                  = "${var.prefix}-${each.key}"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
-  }
+  }, var.extra_tags)
 }
 
 
@@ -404,10 +404,10 @@ resource "aws_instance" "worker" {
 
   depends_on = [aws_internet_gateway.gateway]
 
-  tags = {
+  tags = merge({
     Name                                  = "${var.prefix}-${each.key}"
     "kubernetes.io/cluster/${var.prefix}" = "owned"
-  }
+  }, var.extra_tags)
 }
 
 
