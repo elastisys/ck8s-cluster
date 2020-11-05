@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
 
 	"github.com/elastisys/ck8s/api"
+	"github.com/elastisys/ck8s/api/aws"
 	"github.com/elastisys/ck8s/runner"
 )
 
@@ -411,10 +413,25 @@ func (c *ClusterClient) DrainNode(name string) error {
 func (c *ClusterClient) NodeExists(name string) (bool, error) {
 	c.logger.Info("client_node_exists", zap.String("name", name))
 
-	if err := c.kubectl.NodeExists(name); err != nil {
+	addPrefix := true
+
+	if c.cluster.CloudProvider() == api.AWS {
+		machine, err := c.Machine(name)
+		if err != nil {
+			return false, err
+		}
+
+		privateIPString := strings.Replace(machine.PrivateIP, ".", "-", -1)
+		regionString := c.cluster.TFVars().(*aws.AWSTFVars).Region
+		name = "ip-" + privateIPString + "." + regionString + ".compute.internal"
+		addPrefix = false
+	}
+
+	if err := c.kubectl.NodeExists(name, addPrefix); err != nil {
 		if errors.Is(err, runner.NodeNotFoundErr) {
 			return false, nil
 		}
+
 		return false, err
 	}
 

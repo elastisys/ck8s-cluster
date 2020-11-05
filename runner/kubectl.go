@@ -63,10 +63,13 @@ func (k *Kubectl) Command(args []string) error {
 
 // NodeExists runs `sops exec-file KUBECONFIG 'kubectl get node NAME'` in the
 // background. If the node is not found a NodeNotFoundErr error is returned.
-func (k *Kubectl) NodeExists(name string) error {
+func (k *Kubectl) NodeExists(name string, addPrefix bool) error {
 	k.logger.Debug("kubectl_node_exists")
 
-	cmd := k.command("get", "node", k.fullNodeName(name))
+	if addPrefix {
+		name = k.fullNodeName(name)
+	}
+	cmd := k.command("get", "node", (name))
 
 	// TODO: This assumes a lot about the command output. We should replace
 	// 		 this with a proper Kubernetes client lib implementation ASAP.

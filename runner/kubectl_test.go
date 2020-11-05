@@ -36,7 +36,30 @@ func TestKubectlNodeExists(t *testing.T) {
 
 	k := NewKubectl(logger, r, testKubectlConfig)
 
-	if err := k.NodeExists(testNodeName); err != nil {
+	if err := k.NodeExists(testNodeName, true); err != nil {
+		t.Error(err)
+	}
+
+	logTest.Diff(t)
+}
+
+func TestKubectlNodeExistsPrefixFalse(t *testing.T) {
+	logTest, logger := testutil.NewTestLogger([]string{
+		"kubectl_node_exists",
+	})
+
+	r := NewTestRunner(t)
+
+	wantCmd := NewCommand(
+		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
+		fmt.Sprintf("KUBECONFIG={} kubectl get node %s", testNodeName),
+	)
+
+	r.Push(&TestCommand{Command: wantCmd})
+
+	k := NewKubectl(logger, r, testKubectlConfig)
+
+	if err := k.NodeExists(testNodeName, false); err != nil {
 		t.Error(err)
 	}
 
@@ -59,7 +82,7 @@ func TestKubectlNodeExistsNotFound(t *testing.T) {
 
 	k := NewKubectl(logger, r, testKubectlConfig)
 
-	if err := k.NodeExists(testNodeName); !errors.Is(err, NodeNotFoundErr) {
+	if err := k.NodeExists(testNodeName, true); !errors.Is(err, NodeNotFoundErr) {
 		t.Error("expected NodeNotFoundErr")
 	}
 
