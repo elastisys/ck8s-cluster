@@ -12,6 +12,7 @@
 - Initial Azure support.
 - Added new variables for the Kubernetes api server OIDC config.
 - `extra_tags` support for AWS.
+- Check if cloud provider is AWS so node name tests can be executed
 
 ### Removed
 
