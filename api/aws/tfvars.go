@@ -18,9 +18,10 @@ type AWSTFVars struct {
 	MachinesSC map[string]*api.Machine `json:"machines_sc" validate:"required,min=1"`
 	MachinesWC map[string]*api.Machine `json:"machines_wc" validate:"required,min=1"`
 
-	PublicIngressCIDRWhitelist []string `json:"public_ingress_cidr_whitelist" validate:"required"`
-	APIServerWhitelist         []string `json:"api_server_whitelist" validate:"required"`
-	NodeportWhitelist          []string `json:"nodeport_whitelist" validate:"required"`
+	PublicIngressCIDRWhitelist []string          `json:"public_ingress_cidr_whitelist" validate:"required"`
+	APIServerWhitelist         []string          `json:"api_server_whitelist" validate:"required"`
+	NodeportWhitelist          []string          `json:"nodeport_whitelist" validate:"required"`
+	ExtraTags                  map[string]string `json:"extra_tags"`
 }
 
 func (e *Cluster) AddMachine(

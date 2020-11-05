@@ -11,6 +11,7 @@
 
 - Initial Azure support.
 - Added new variables for the Kubernetes api server OIDC config.
+- `extra_tags` support for AWS.
 
 ### Removed
 
