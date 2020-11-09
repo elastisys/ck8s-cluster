@@ -1,9 +1,32 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.8.0](#v080---2020-11-09)
 - [v0.7.0](#v070---2020-10-15)
 - [v0.6.0](#v060---2020-09-25)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.8.0 - 2020-11-09
+
+
+### Breaking changes
+
+- DNS records must now be managed manually. For safespring and citycloud you must remove the terraform state for the DNS records before upgrading to this version.
+
+### Release notes
+
+- The new OIDC config variables can be added with a migration script for v0.8.0.
+
+### Added
+
+- Initial Azure support.
+- Added new variables for the Kubernetes api server OIDC config.
+
+### Removed
+
+- Removed all DNS creation.
+- Removed the `dns_prefix` config variable.
 
 -------------------------------------------------
 ## v0.7.0 - 2020-10-15
