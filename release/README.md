@@ -24,7 +24,7 @@ git checkout -b branch_name
 3. Run the release script.
 
 ```bash
-./release/release.sh vX.Y.Z
+./release/release.sh X.Y.Z
 ```
 
 The release script will:
