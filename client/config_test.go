@@ -256,6 +256,7 @@ func TestTFVarsRead(t *testing.T) {
 			PublicIngressCIDRWhitelist: []string{"1.2.3.4/32", "4.3.2.1/32"},
 			APIServerWhitelist:         []string{"1.2.3.4/32", "4.3.2.1/32"},
 			NodeportWhitelist:          []string{"1.2.3.4/32", "4.3.2.1/32"},
+			ExtraTags:                  map[string]string{},
 		},
 		got: aws.Default(clusterType, ""),
 	}} {

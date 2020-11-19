@@ -50,5 +50,6 @@
   },
   "public_ingress_cidr_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
   "api_server_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
-  "nodeport_whitelist": ["1.2.3.4/32", "4.3.2.1/32"]
+  "nodeport_whitelist": ["1.2.3.4/32", "4.3.2.1/32"],
+  "extra_tags": {}
 }

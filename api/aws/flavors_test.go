@@ -53,6 +53,7 @@ func TestFlavors(t *testing.T) {
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
 				NodeportWhitelist:          []string{},
+				ExtraTags:                  map[string]string{},
 			},
 		},
 		got: Default(clusterType, clusterName),
@@ -90,6 +91,7 @@ func TestFlavors(t *testing.T) {
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
 				NodeportWhitelist:          []string{},
+				ExtraTags:                  map[string]string{},
 
 				MachinesSC: map[string]*api.Machine{
 					"master-0": {
@@ -163,6 +165,7 @@ func TestFlavors(t *testing.T) {
 				PublicIngressCIDRWhitelist: []string{},
 				APIServerWhitelist:         []string{},
 				NodeportWhitelist:          []string{},
+				ExtraTags:                  map[string]string{},
 
 				MachinesSC: map[string]*api.Machine{
 					"master-0": {
