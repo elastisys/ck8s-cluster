@@ -33,6 +33,7 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 			PublicIngressCIDRWhitelist: []string{},
 			APIServerWhitelist:         []string{},
 			NodeportWhitelist:          []string{},
+			ExtraTags:                  map[string]string{},
 		},
 	}
 }
