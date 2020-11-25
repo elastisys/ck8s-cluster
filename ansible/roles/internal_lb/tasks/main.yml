@@ -1,12 +1,27 @@
 - name: Install pip
-  apt:
-    name:
-      - python3-setuptools
-      - virtualenv
-      - python3-pip
-    update_cache: yes
-  async: 600
-  poll: 30
+  block:
+    - name: Install python tools
+      apt:
+        name:
+          - python3-setuptools
+          - virtualenv
+          - python3-pip
+        update_cache: yes
+      async: 120
+      poll: 5
+  rescue:
+    # The above failed, so we need to cleanup and try again
+    - name: Fix interrupted dpkg
+      command: dpkg --configure -a
+    - name: Install python tools
+      apt:
+        name:
+          - python3-setuptools
+          - virtualenv
+          - python3-pip
+        update_cache: yes
+      async: 120
+      poll: 5
 
 - name: Install Docker Module for Python
   pip:
