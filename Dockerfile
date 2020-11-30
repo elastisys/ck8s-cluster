@@ -11,7 +11,7 @@ RUN make build
 
 FROM ubuntu:18.04
 
-ARG ANSIBLE_VERSION="2.9.14-1ppa~bionic"
+ARG ANSIBLE_VERSION="2.9.*"
 ARG JQ_VERSION="1.6"
 ARG KUBECTL_VERSION="1.15.2"
 ARG S3CMD_VERSION="2.0.2"
@@ -20,7 +20,7 @@ ARG TERRAFORM_VERSION="0.12.29"
 ARG YQ_VERSION="3.2.1"
 
 RUN apt-get update && \
-    apt install -y software-properties-common && \
+    apt-get install -y software-properties-common && \
     add-apt-repository --yes --update ppa:ansible/ansible-2.9 && \
     apt-get install -y \
         python3-pip wget \
