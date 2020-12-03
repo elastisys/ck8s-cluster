@@ -19,8 +19,8 @@ output "instance_ips" {
   value = {
     for key, instance in openstack_compute_instance_v2.instance :
     instance.name => {
-      "private_ip" = openstack_networking_port_v2.port[key].all_fixed_ips.0,
-      "public_ip"  = openstack_compute_floatingip_v2.fip[key].address
+      "private_ip" = contains(keys(openstack_networking_port_v2.port), key) ? openstack_networking_port_v2.port[key].all_fixed_ips.0 : "",
+      "public_ip"  = contains(keys(openstack_compute_floatingip_v2.fip), key) ? openstack_compute_floatingip_v2.fip[key].address : ""
     }
   }
 }
