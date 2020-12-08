@@ -79,12 +79,13 @@ module "service_cluster" {
   pool_id       = vsphere_resource_pool.pool.id
   datastore_id  = data.vsphere_datastore.datastore.id
 
-  folder        = ""
-  guest_id      = data.vsphere_virtual_machine.template.guest_id
-  scsi_type     =data.vsphere_virtual_machine.template.scsi_type
-  network_id    = data.vsphere_network.network.id
-  adapter_type  = data.vsphere_virtual_machine.template.network_interface_types[0]
-  firmware      = var.firmware
+  folder                = ""
+  guest_id              = data.vsphere_virtual_machine.template.guest_id
+  scsi_type             = data.vsphere_virtual_machine.template.scsi_type
+  network_id            = data.vsphere_network.network.id
+  adapter_type          = data.vsphere_virtual_machine.template.network_interface_types[0]
+  firmware              = var.firmware
+  hardware_version      = var.hardware_version
   disk_thin_provisioned = data.vsphere_virtual_machine.template.disks.0.thin_provisioned
 
   template_id   = data.vsphere_virtual_machine.template.id

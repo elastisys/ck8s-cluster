@@ -17,6 +17,7 @@ variable "template_id" {}
 variable "firmware" {}
 variable "folder" {}
 variable "ssh_pub_key" {}
+variable "hardware_version" {}
 
 ## Master ##
 variable "master_count" {}

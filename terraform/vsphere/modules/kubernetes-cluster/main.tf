@@ -12,6 +12,7 @@ resource "vsphere_virtual_machine" "worker" {
   scsi_type           = var.scsi_type
   folder              = var.folder
   firmware            = var.firmware
+  hardware_version    = var.hardware_version
 
   wait_for_guest_net_routable = false
   
@@ -62,6 +63,7 @@ resource "vsphere_virtual_machine" "master" {
   scsi_type           = var.scsi_type
   folder              = var.folder
   firmware            = var.firmware
+  hardware_version    = var.hardware_version
 
   network_interface {
     network_id        = var.network_id

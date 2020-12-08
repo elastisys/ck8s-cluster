@@ -60,6 +60,10 @@ variable "firmware" {
   default = "bios"
 }
 
+variable "hardware_version" {
+  default = "15"
+}
+
 variable "template_name" {
   default = "ubuntu-bionic-18.04-cloudimg-20201125"
 }
