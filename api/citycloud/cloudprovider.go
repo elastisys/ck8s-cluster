@@ -9,6 +9,7 @@ var supportedImages = []*api.Image{
 	api.NewImage("ck8s-v1.15.12+ck8s0", "v1.15.12"),
 	api.NewImage("ck8s-v1.16.14+ck8s0", "v1.16.14"),
 	api.NewImage("ck8s-v1.17.11+ck8s0", "v1.17.11"),
+	api.NewImage("ck8s-v1.18.12+ck8s1", "v1.18.12"),
 }
 
 var clusterFlavorMap = map[api.ClusterFlavor]func(api.ClusterType, string) api.Cluster{
