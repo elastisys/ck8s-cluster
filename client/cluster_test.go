@@ -124,7 +124,8 @@ func TestAddMachine(t *testing.T) {
 
 	latestImageMaster := api.LatestImage(cloudProvider, api.Master)
 	latestImageWorker := api.LatestImage(cloudProvider, api.Master)
-	firstImageMaster := cloudProvider.MachineImages(api.Master)[0]
+	allImages := cloudProvider.MachineImages(api.Master)
+	firstImageMaster := allImages[len(allImages)-2]
 
 	esLocalStorageCapacity := 10
 	diskSize := 50
