@@ -1,10 +1,24 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.9.0](#v090---2020-12-10)
 - [v0.8.0](#v080---2020-11-09)
 - [v0.7.0](#v070---2020-10-15)
 - [v0.6.0](#v060---2020-09-25)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.9.0 - 2020-12-10
+
+### Release notes
+
+- The new default image is  now `ck8s-v1.18.12+ck8s1`.
+
+### Added
+
+- `extra_tags` support for AWS.
+- Check if cloud provider is AWS so node name tests can be executed
+- New version of Kubernetes supported: v1.18.12
 
 -------------------------------------------------
 ## v0.8.0 - 2020-11-09
