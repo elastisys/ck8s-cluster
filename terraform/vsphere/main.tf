@@ -92,3 +92,47 @@ module "service_cluster" {
 
   ssh_pub_key   = var.ssh_pub_key
 }
+
+module "workload_cluster" {
+  source        = "./modules/kubernetes-cluster"
+
+  prefix = local.prefix_wc
+
+  ## Master ##
+  master_count      = "1"
+  master_cores      = "8"
+  master_memory     = "16384"
+  master_disk_size  = "40"
+
+  ## Worker ##
+  worker_count      = "0"
+  worker_cores      = "0"
+  worker_memory     = "0"
+  worker_disk_size  = "0"
+
+  ## Global ##
+
+  # ip_prefix     = "${lookup(var.ip_prefix, "service_cluster")}"
+  ip_prefix                         = var.ip_prefix
+  ip_last_octet_start_number_master = "148"
+  ip_last_octet_start_number_worker = var.ip_last_octet_start_number_worker
+  gateway                           = var.gateway
+  dns_primary                       = var.dns_primary
+  dns_secondary                     = var.dns_secondary
+
+  pool_id       = vsphere_resource_pool.pool.id
+  datastore_id  = data.vsphere_datastore.datastore.id
+
+  folder                = ""
+  guest_id              = data.vsphere_virtual_machine.template.guest_id
+  scsi_type             = data.vsphere_virtual_machine.template.scsi_type
+  network_id            = data.vsphere_network.network.id
+  adapter_type          = data.vsphere_virtual_machine.template.network_interface_types[0]
+  firmware              = var.firmware
+  hardware_version      = var.hardware_version
+  disk_thin_provisioned = data.vsphere_virtual_machine.template.disks.0.thin_provisioned
+
+  template_id   = data.vsphere_virtual_machine.template.id
+
+  ssh_pub_key   = var.ssh_pub_key
+}

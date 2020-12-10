@@ -100,15 +100,13 @@ variable "master_disk_size" {
 
 variable "worker_count" {
   default = "2"
-  # sc = "2"
-  # wc = "1"
 }
 variable "worker_cores" {
   default = 8
 }
 
 variable "worker_memory" {
-  default = 16000
+  default = 16384
 }
 variable "worker_disk_size" {
   default = "40"
