@@ -1,9 +1,10 @@
-name: Master PR
+name: Unit tests
 
 on:
   pull_request:
     branches:
       - master
+      - release-*
 
 jobs:
   unit-tests:
