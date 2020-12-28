@@ -23,7 +23,7 @@ func init() {
 	destroyCmd := &cobra.Command{
 		Use:   "destroy",
 		Short: "Destroy the CK8S cluster",
-		Long:  `The destroy command tears down the CK8S cluster by destroying all Terraform managed cloud resources and all S3 buckets.`,
+		Long:  `The destroy command tears down the CK8S cluster by destroying all Terraform managed cloud resources..`,
 		Args:  NoArgs,
 		RunE:  withClusterClient(destroy),
 	}

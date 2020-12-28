@@ -31,15 +31,12 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 				api.Azure,
 				clusterName,
 			),
-			// TODO change this to azure storage
-			S3RegionAddress: "sos-ch-gva-2.exo.io",
 
 			TenantID:       "changeme",
 			SubscriptionID: "changeme",
 			Location:       "changeme",
 		},
 		secret: AzureSecret{
-			BaseSecret:   *api.DefaultBaseSecret(),
 			ClientID:     "changeme",
 			ClientSecret: "changeme",
 		},

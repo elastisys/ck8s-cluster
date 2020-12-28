@@ -70,10 +70,6 @@ func (e *Cluster) Name() string {
 	return api.NameHelper(&e.config.BaseConfig)
 }
 
-func (e *Cluster) S3Buckets() map[string]string {
-	return api.S3BucketsHelper(&e.config.BaseConfig)
-}
-
 func (e *Cluster) OIDCConfig() map[string]string {
 	config := map[string]string{}
 

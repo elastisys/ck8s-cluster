@@ -21,7 +21,6 @@ We also have some support for Azure but this is not production grade.
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
 - [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
-- [s3cmd](https://s3tools.org/s3cmd) (tested with 2.0.2)
 - [ansible](https://www.ansible.com) (tested with 2.9.14)
 - [go](https://golang.org) (tested with 1.13.8)
 - [netaddr](https://pypi.org/project/netaddr/) (tested with 0.7.19-1)
@@ -136,9 +135,6 @@ These are the values that needs to be provided by you
 * `nodeport_whitelist`: IP whitelist of the nodeports (30000-32767)
 
 #### `secrets.yaml`
-
-* `s3_access_key`: Access key to S3 (For storing blobs)
-* `s3_secret_key`: Secret key to S3
 
 *Exoscale only*
 

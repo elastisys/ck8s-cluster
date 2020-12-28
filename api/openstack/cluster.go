@@ -30,8 +30,6 @@ func Default(
 			UserDomainName:    "changeme",
 		},
 		Secret: Secret{
-			BaseSecret: *api.DefaultBaseSecret(),
-
 			Username: "changeme",
 			Password: "changeme",
 		},
@@ -62,10 +60,6 @@ func (e *Cluster) Name() string {
 	}
 
 	return api.NameHelper(&e.Config.BaseConfig)
-}
-
-func (e *Cluster) S3Buckets() map[string]string {
-	return api.S3BucketsHelper(&e.Config.BaseConfig)
 }
 
 func (e *Cluster) OIDCConfig() map[string]string {

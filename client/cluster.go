@@ -3,7 +3,6 @@ package client
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	"time"
@@ -36,8 +35,6 @@ type ClusterClient struct {
 	kubeconfigPath api.Path
 
 	sops *runner.SOPS
-
-	s3cmd *runner.S3Cmd
 
 	tfe *runner.Terraform
 
@@ -95,12 +92,6 @@ func NewClusterClient(
 			configHandler.SOPSRunnerConfig(),
 		),
 
-		s3cmd: runner.NewS3Cmd(
-			logger,
-			localRunner,
-			configHandler.S3CmdRunnerConfig(cluster),
-		),
-
 		tfe: runner.NewTerraform(
 			logger,
 			localRunner,
@@ -150,10 +141,6 @@ func (c *ClusterClient) Apply() error {
 	c.logger.Info("client_apply")
 
 	if err := c.terraformRemoteWorkspaceApply(); err != nil {
-		return err
-	}
-
-	if err := c.S3Apply(); err != nil {
 		return err
 	}
 
@@ -242,10 +229,6 @@ func (c *ClusterClient) Destroy(deleteRemoteWorkspace bool, kubernetesCleanup bo
 
 	if err := c.TerraformDestroy(); err != nil {
 		return fmt.Errorf("error destroying Terraform resources: %w", err)
-	}
-
-	if err := c.S3Delete(); err != nil {
-		return err
 	}
 
 	if deleteRemoteWorkspace {
@@ -543,39 +526,6 @@ func (c *ClusterClient) MachineImages(
 	return cloudProvider.MachineImages(nodeType), nil
 }
 
-// S3Apply renders the s3cfg file and creates the S3 buckets.
-func (c *ClusterClient) S3Apply() error {
-	c.logger.Info("client_s3_apply")
-
-	if err := c.s3WriteConfig(); err != nil {
-		return err
-	}
-
-	if err := c.s3cmd.Create(); err != nil {
-		return fmt.Errorf("error creating S3 buckets: %w", err)
-	}
-
-	return nil
-}
-
-func (c *ClusterClient) S3Delete() error {
-	c.logger.Debug("client_s3_delete")
-
-	if err := c.s3WriteConfig(); err != nil {
-		return err
-	}
-
-	if err := c.s3cmd.Abort(); err != nil {
-		return fmt.Errorf("error aborting multipart S3 uploads")
-	}
-
-	if err := c.s3cmd.Delete(); err != nil {
-		return fmt.Errorf("error deleting S3 buckets")
-	}
-
-	return nil
-}
-
 // TerraformApply applies the Terraform configuration and updates the Ansible
 // inventory.
 func (c *ClusterClient) TerraformApply() error {
@@ -741,19 +691,6 @@ func (c *ClusterClient) terraformRemoteWorkspaceDestroy() error {
 		"-var", "workspace_name="+backendConfig.Workspaces.Prefix+workspace,
 	); err != nil {
 		return fmt.Errorf("error destroying the remote workspace")
-	}
-
-	return nil
-}
-
-func (c *ClusterClient) s3WriteConfig() error {
-	if err := c.configHandler.WriteS3cfg(
-		c.cluster,
-		func(format string, plain io.Reader, enc io.Writer) error {
-			return c.sops.EncryptStdin(format, format, plain, enc)
-		},
-	); err != nil {
-		return fmt.Errorf("error writing s3cfg: %w", err)
 	}
 
 	return nil

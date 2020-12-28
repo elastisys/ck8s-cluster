@@ -6,6 +6,4 @@ import (
 
 type AWSConfig struct {
 	api.BaseConfig `mapstructure:",squash" yaml:",inline"`
-
-	S3Region string `mapstructure:"s3_region" yaml:"s3_region" validate:"required"`
 }

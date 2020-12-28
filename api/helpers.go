@@ -13,16 +13,6 @@ func NameHelper(config *BaseConfig) string {
 	}
 }
 
-func S3BucketsHelper(config *BaseConfig) map[string]string {
-	return map[string]string{
-		"S3_ES_BACKUP_BUCKET_NAME":  config.S3BucketNameElasticsearch,
-		"S3_HARBOR_BUCKET_NAME":     config.S3BucketNameHarbor,
-		"S3_INFLUX_BUCKET_NAME":     config.S3BucketNameInfluxDB,
-		"S3_SC_FLUENTD_BUCKET_NAME": config.S3BucketNameFluentd,
-		"S3_VELERO_BUCKET_NAME":     config.S3BucketNameVelero,
-	}
-}
-
 func TerraformEnvHelper(
 	config *BaseConfig,
 	sshPublicKey string,

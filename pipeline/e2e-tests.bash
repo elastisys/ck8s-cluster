@@ -13,10 +13,6 @@ source "${here}/common.bash"
 ckctl status --cluster sc
 ckctl status --cluster wc
 
-# Test S3 buckets
-
-"${test_path}/infrastructure/s3-buckets.sh"
-
 # Test whitelisting
 
 "${test_path}/infrastructure/nodeport-whitelist.sh" startup

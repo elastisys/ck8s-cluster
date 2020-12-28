@@ -17,13 +17,8 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 				api.AWS,
 				clusterName,
 			),
-			S3Region: "us-west-1",
 		},
 		secret: AWSSecret{
-			BaseSecret: api.BaseSecret{
-				S3AccessKey: "changeme",
-				S3SecretKey: "changeme",
-			},
 			AWSAccessKeyID:     "changeme",
 			AWSSecretAccessKey: "changeme",
 			DNSAccessKeyID:     "changeme",
