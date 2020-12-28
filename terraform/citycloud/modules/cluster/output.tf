@@ -11,10 +11,10 @@ output "loadbalancer_ips" {
   value = module.octavia_lb.instance_ips
 }
 
-output subnet_id {
+output "subnet_id" {
   value = module.network.subnet_id
 }
 
-output cluster_secgroup_id {
+output "cluster_secgroup_id" {
   value = module.secgroups.cluster_secgroup
 }

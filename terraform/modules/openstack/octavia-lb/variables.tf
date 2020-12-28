@@ -1,12 +1,12 @@
 
-variable subnet_id {}
+variable "subnet_id" {}
 
-variable prefix {
+variable "prefix" {
   type        = string
   description = "Prefix to be used for naming resources in a human readable way"
 }
 
-variable loadbalancer_targets {
+variable "loadbalancer_targets" {
   type = map(object({
     port     = number
     protocol = string
@@ -55,7 +55,7 @@ variable loadbalancer_targets {
   # }
 }
 
-variable external_network_name {
+variable "external_network_name" {
   description = "the name of the external network"
   type        = string
 }
