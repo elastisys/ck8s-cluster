@@ -89,8 +89,6 @@ secrets_update() {
 }
 secrets_update exoscale_api_key "${EXOSCALE_KEY}"
 secrets_update exoscale_secret_key "${EXOSCALE_SECRET}"
-secrets_update s3_access_key "${EXOSCALE_KEY}"
-secrets_update s3_secret_key "${EXOSCALE_SECRET}"
 
 whitelist_update() {
     if ! [[ $2 =~ ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$ ]]; then

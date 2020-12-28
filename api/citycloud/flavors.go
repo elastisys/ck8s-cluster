@@ -36,7 +36,6 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 	cluster.Cluster.Config.IdentityAPIVersion = "3"
 	cluster.Cluster.Config.AuthURL = "https://kna1.citycloud.com:5000"
 	cluster.Cluster.Config.RegionName = "Kna1"
-	cluster.Cluster.Config.S3RegionAddress = "s3-kna1.citycloud.com:8080"
 
 	cluster.Cluster.TFVars.ExternalNetworkID = "fba95253-5543-4078-b793-e2de58c31378"
 	cluster.Cluster.TFVars.ExternalNetworkName = "ext-net"

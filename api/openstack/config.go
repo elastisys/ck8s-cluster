@@ -13,6 +13,4 @@ type Config struct {
 	UserDomainName     string `mapstructure:"os_user_domain_name" yaml:"os_user_domain_name" validate:"required"`
 	ProjectDomainName  string `mapstructure:"os_project_domain_name" yaml:"os_project_domain_name" validate:"required"`
 	ProjectID          string `mapstructure:"os_project_id" yaml:"os_project_id" validate:"required"`
-
-	S3RegionAddress string `mapstructure:"s3_region_address" yaml:"s3_region_address" validate:"required"`
 }

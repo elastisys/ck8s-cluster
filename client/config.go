@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -72,35 +71,6 @@ func (c *ConfigHandler) WriteTFVars(cluster api.Cluster) error {
 	}
 
 	return c.writeTFVars(cluster)
-}
-
-func (c *ConfigHandler) WriteS3cfg(
-	cluster api.Cluster,
-	encryptFn func(format string, plain io.Reader, enc io.Writer) error,
-) error {
-	c.logger.Debug("config_handler_s3cfg_write")
-
-	var s3cfgPlain, s3cfgEnc bytes.Buffer
-
-	s3cfgPath := c.configPath[api.S3CfgFile]
-
-	if err := renderS3CfgPlaintext(cluster, &s3cfgPlain); err != nil {
-		return fmt.Errorf("error rendering plaintext s3cfg: %w", err)
-	}
-
-	if err := encryptFn(s3cfgPath.Format, &s3cfgPlain, &s3cfgEnc); err != nil {
-		return fmt.Errorf("error encrypting s3cfg: %w", err)
-	}
-
-	if err := ioutil.WriteFile(
-		s3cfgPath.Path,
-		s3cfgEnc.Bytes(),
-		0644,
-	); err != nil {
-		return fmt.Errorf("error writing s3cfg: %w", err)
-	}
-
-	return nil
 }
 
 func (c *ConfigHandler) WriteAnsibleInventory(
@@ -249,17 +219,6 @@ func (c *ConfigHandler) AnsibleRunnerConfig(
 		KubeconfigPath: c.configPath[api.KubeconfigFile].Path,
 
 		Env: cluster.AnsibleEnv(),
-	}
-}
-
-func (c *ConfigHandler) S3CmdRunnerConfig(
-	cluster api.Cluster,
-) *runner.S3CmdConfig {
-	return &runner.S3CmdConfig{
-		CloudProviderName:         string(cluster.CloudProvider()),
-		S3cfgPath:                 c.configPath[api.S3CfgFile].Path,
-		ManageS3BucketsScriptPath: c.codePath[api.ManageS3BucketsScriptFile].Path,
-		Buckets:                   cluster.S3Buckets(),
 	}
 }
 

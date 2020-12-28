@@ -14,7 +14,6 @@ FROM ubuntu:18.04
 ARG ANSIBLE_VERSION="2.9.*"
 ARG JQ_VERSION="1.6"
 ARG KUBECTL_VERSION="1.15.2"
-ARG S3CMD_VERSION="2.0.2"
 ARG SOPS_VERSION="3.6.1"
 ARG TERRAFORM_VERSION="0.12.29"
 ARG YQ_VERSION="3.2.1"
@@ -41,15 +40,6 @@ RUN wget "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_V
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
 
-# s3cmd
-RUN wget "https://github.com/s3tools/s3cmd/releases/download/v${S3CMD_VERSION}/s3cmd-${S3CMD_VERSION}.tar.gz" && \
-    tar -zxvf "s3cmd-${S3CMD_VERSION}.tar.gz" && \
-    pip3 install setuptools==45.2.0 && \
-    cd "s3cmd-${S3CMD_VERSION}" && \
-    python3 setup.py install && \
-    cd ../ && \
-    rm "s3cmd-${S3CMD_VERSION}.tar.gz"
-
 # yq
 RUN wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
     chmod +x yq_linux_amd64 && \
@@ -66,8 +56,6 @@ RUN wget "https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-l
     mv jq-linux64 /usr/local/bin/jq
 
 COPY ./ansible /ck8s/ansible
-# TODO: Remove with https://github.com/elastisys/ck8s-cluster/issues/25
-COPY ./scripts/manage-s3-buckets.sh /ck8s/scripts/manage-s3-buckets.sh
 COPY ./terraform /ck8s/terraform
 
 ENV CK8S_CODE_PATH /ck8s

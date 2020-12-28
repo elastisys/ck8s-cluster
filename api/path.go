@@ -45,7 +45,6 @@ const (
 	AnsibleInventoryFile
 	SOPSConfigFile
 	KubeconfigFile
-	S3CfgFile
 	InfraJsonFile
 )
 
@@ -55,7 +54,6 @@ const (
 	AnsiblePlaybookPrepareNodesFile
 	AnsiblePlaybookJoinClusterFile
 	AnsiblePlaybookInfrastructureFiles
-	ManageS3BucketsScriptFile
 	TerraformTFEDir
 	// TODO: Would be nice to get rid of this and only have one single main
 	//		 Terraform module.
@@ -75,7 +73,6 @@ var relativeConfigPaths = ConfigPath{
 	TFEDataDir:          {".state/.terraform-tfe", ""},
 	TFEStateFile:        {".state/terraform-tfe.tfstate", ""},
 	SOPSConfigFile:      {".sops.yaml", "yaml"},
-	S3CfgFile:           {".state/s3cfg.ini", "ini"},
 	InfraJsonFile:       {".state/infra.json", "json"},
 }
 
@@ -109,9 +106,6 @@ var relativeCodePaths = CodePath{
 	},
 	AnsiblePlaybookJoinClusterFile: {
 		"ansible/join-cluster.yml", "yaml",
-	},
-	ManageS3BucketsScriptFile: {
-		"scripts/manage-s3-buckets.sh", "",
 	},
 	TerraformTFEDir: {
 		"terraform/tfe", "",

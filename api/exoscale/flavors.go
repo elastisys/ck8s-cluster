@@ -29,12 +29,10 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 				api.Exoscale,
 				clusterName,
 			),
-			S3RegionAddress: "sos-ch-gva-2.exo.io",
 		},
 		secret: ExoscaleSecret{
-			BaseSecret: *api.DefaultBaseSecret(),
-			APIKey:     "changeme",
-			SecretKey:  "changeme",
+			APIKey:    "changeme",
+			SecretKey: "changeme",
 		},
 		tfvars: ExoscaleTFVars{
 			PublicIngressCIDRWhitelist: []string{},

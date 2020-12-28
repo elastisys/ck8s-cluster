@@ -58,7 +58,6 @@ func Default(clusterType api.ClusterType, clusterName string) *Cluster {
 	cluster.Cluster.Config.IdentityAPIVersion = "3"
 	cluster.Cluster.Config.AuthURL = "https://keystone.api.cloud.ipnett.se/v3"
 	cluster.Cluster.Config.RegionName = "se-east-1"
-	cluster.Cluster.Config.S3RegionAddress = "s3.sto1.safedc.net"
 
 	cluster.Cluster.TFVars.ExternalNetworkID = "71b10496-2617-47ae-abbc-36239f0863bb"
 	cluster.Cluster.TFVars.ExternalNetworkName = "public-v4"
