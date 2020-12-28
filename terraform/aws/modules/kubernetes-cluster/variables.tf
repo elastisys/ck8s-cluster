@@ -1,20 +1,20 @@
-variable prefix {
+variable "prefix" {
   type = string
 }
 
-variable public_ingress_cidr_whitelist {
+variable "public_ingress_cidr_whitelist" {
   type = list(string)
 }
 
-variable api_server_whitelist {
+variable "api_server_whitelist" {
   type = list(string)
 }
 
-variable nodeport_whitelist {
+variable "nodeport_whitelist" {
   type = list(string)
 }
 
-variable aws_region {
+variable "aws_region" {
   description = "AWS region"
   type        = string
 }
@@ -23,7 +23,7 @@ variable "ssh_pub_key" {
   description = "Path to the SSH public key to be used for authentication"
 }
 
-variable machines {
+variable "machines" {
   type = map(object({
     node_type = string
     size      = string
@@ -33,7 +33,7 @@ variable machines {
   }))
 }
 
-variable extra_tags {
+variable "extra_tags" {
   default = {
   }
   description = "Any extra tags that should be present on each EC2 instance"

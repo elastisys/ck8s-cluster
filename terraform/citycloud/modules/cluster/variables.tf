@@ -7,29 +7,29 @@ variable "ssh_pub_key" {
   type        = string
 }
 
-variable public_ingress_cidr_whitelist {
-  type = list
+variable "public_ingress_cidr_whitelist" {
+  type = list(string)
 }
 
-variable api_server_whitelist {
-  type = list
+variable "api_server_whitelist" {
+  type = list(string)
 }
 
-variable nodeport_whitelist {
-  type = list
+variable "nodeport_whitelist" {
+  type = list(string)
 }
 
-variable external_network_id {
+variable "external_network_id" {
   description = "the id of the external network"
   type        = string
 }
 
-variable external_network_name {
+variable "external_network_name" {
   description = "the name of the external network"
   type        = string
 }
 
-variable machines {
+variable "machines" {
   type = map(object({
     node_type = string
     size      = string

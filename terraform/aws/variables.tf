@@ -1,46 +1,46 @@
-variable region {
+variable "region" {
   default = "us-west-1"
 }
 
-variable aws_access_key {
+variable "aws_access_key" {
   description = "AWS API access key"
   type        = string
 }
 
-variable aws_secret_key {
+variable "aws_secret_key" {
   description = "AWS API secret key"
   type        = string
 }
 
-variable public_ingress_cidr_whitelist {
+variable "public_ingress_cidr_whitelist" {
   type = list(string)
 }
 
-variable api_server_whitelist {
+variable "api_server_whitelist" {
   type = list(string)
 }
 
-variable nodeport_whitelist {
+variable "nodeport_whitelist" {
   type = list(string)
 }
 
-variable prefix_sc {
+variable "prefix_sc" {
   type = string
 }
 
-variable prefix_wc {
+variable "prefix_wc" {
   type = string
 }
 
-variable ssh_pub_key_sc {
+variable "ssh_pub_key_sc" {
   type = string
 }
 
-variable ssh_pub_key_wc {
+variable "ssh_pub_key_wc" {
   type = string
 }
 
-variable machines_sc {
+variable "machines_sc" {
   type = map(object({
     node_type = string
     size      = string
@@ -50,7 +50,7 @@ variable machines_sc {
   }))
 }
 
-variable machines_wc {
+variable "machines_wc" {
   type = map(object({
     node_type = string
     size      = string
@@ -60,7 +60,7 @@ variable machines_wc {
   }))
 }
 
-variable extra_tags {
+variable "extra_tags" {
   default = {
   }
   description = "Any extra tags that should be present on each EC2 instance"

@@ -7,7 +7,7 @@ variable "security_group_ids" {
   type = list(string)
 }
 
-variable machines {
+variable "machines" {
   type = map(object({
     size = string
     image = object({
@@ -16,7 +16,7 @@ variable machines {
   }))
 }
 
-variable external_network_name {
+variable "external_network_name" {
   description = "the name of the external network"
   type        = string
 }
