@@ -65,7 +65,7 @@ variable "hardware_version" {
 }
 
 variable "template_name" {
-  default = "ubuntu-bionic-18.04-cloudimg-20201125"
+  default = "ubuntu-focal-20.04-cloudimg-20201210"
 }
 
 variable "prefix_sc" {
