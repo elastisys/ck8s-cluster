@@ -7,6 +7,17 @@ ssh_authorized_keys:
 - ${ssh_pub_key}
 
 write_files:
+- path: /etc/netplan/20-internal-network.yaml
+  content: |
+    network:
+      version: 2
+      ethernets:
+        "lo:0":
+          match:
+            name: lo
+          dhcp4: false
+          addresses:
+          - 172.17.0.100/32
 - path: /etc/netplan/10-user-network.yaml
   content: |
     network:
@@ -20,9 +31,88 @@ write_files:
           nameservers:
             addresses:
             - ${dns} # Set DNS ip address here
+- path: /usr/bin/initconfig.sh
+  content: |
+    #!/bin/bash
+
+    sleep 10
+    clear
+    echo "
+
+
+
+    InitConfig
+
+    "
+    docker run --rm -it \
+            -v /var/lib/cloud/instance:/workdir \
+            mikefarah/yq:3 \
+            yq r user-data.txt network.ip | tr '\r' '\n' > /home/ubuntu/ip.txt
+    docker run --rm -it \
+            -v /var/lib/cloud/instance:/workdir \
+            mikefarah/yq:3 \
+            yq r user-data.txt network.gw | tr '\r' '\n' > /home/ubuntu/gw.txt
+    docker run --rm -it \
+            -v /var/lib/cloud/instance:/workdir \
+            mikefarah/yq:3 \
+            yq r user-data.txt network.dns | tr '\r' '\n' > /home/ubuntu/dns.txt
+    docker run --rm -it \
+            -v /var/lib/cloud/instance:/workdir \
+            mikefarah/yq:3 \
+            yq r user-data.txt glasswall.domain | tr '\r' '\n' > /home/ubuntu/domain.txt
+    docker run --rm -it \
+            -v /var/lib/cloud/instance:/workdir \
+            mikefarah/yq:3 \
+            yq r user-data.txt glasswall.service-cluster | tr '\r' '\n' > /home/ubuntu/service-cluster.txt
+    ipaddr=$(cat /home/ubuntu/ip.txt)
+    gateway=$(cat /home/ubuntu/gw.txt)
+    dns=$(cat /home/ubuntu/dns.txt)
+    echo "
+    network:
+      version: 2
+      ethernets:
+        ens192:
+          dhcp4: false #true to use dhcp
+          addresses:
+          - $ipaddr
+          gateway4: $gateway
+          nameservers:
+            addresses: [ $dns ]
+    " > /etc/netplan/10-user-network.yaml
+    netplan apply
+    exit
+
+- path: /etc/systemd/system/initconfig.service
+  content: |
+    [Unit]
+    Description=InitConfig
+
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/bin/openvt -s -w /usr/bin/initconfig.sh
+
+    RemainAfterExit=yes
+    TimeoutSec=0
+
+    # Output needs to appear in instance console output
+    StandardOutput=journal+console
+
+    [Install]
+    WantedBy=cloud-init.target
 
 runcmd:
   - netplan apply
   - sleep 5
   - ifconfig -a
-  - route -n
+  - route -n  
+  - chmod a+r /var/lib/cloud/instance/user-data.txt
+  - chmod 755 /usr/bin/initconfig.sh
+
+network:
+  ip: ${ip}
+  gw: ${gw}
+  dns: ${dns}
+
+glasswall:
+  domain: glasswall-ck8s-proxy.com
+  service-cluster: ops.glasswall-ck8s-proxy.com
