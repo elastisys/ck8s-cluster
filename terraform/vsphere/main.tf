@@ -100,9 +100,9 @@ module "workload_cluster" {
 
   ## Master ##
   master_count      = "1"
-  master_cores      = "8"
-  master_memory     = "16384"
-  master_disk_size  = "40"
+  master_cores      = "4"
+  master_memory     = "5120"
+  master_disk_size  = "10"
 
   ## Worker ##
   worker_count      = "0"
