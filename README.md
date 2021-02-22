@@ -1,8 +1,8 @@
-Elastisys Compliant Kubernetes Cluster
+ ⚠️ Deprecated - Elastisys Compliant Kubernetes Cluster
 ======================================
 
-**NOTE: This project is in alpha stage and is actively developed.
-Therefore the API may change in backwards-incompatible ways.**
+As of Feb 22, 2021, this repo is no longer actively maintained.
+This repo has been superseded by [compliantkubernetes-kubespray](https://github.com/elastisys/compliantkubernetes-kubespray).
 
 ## Overview
 
