@@ -1,5 +1,5 @@
 variable region {
-  default = "us-west-1"
+  default = "eu-west-1"
 }
 
 variable aws_access_key {
@@ -24,33 +24,15 @@ variable nodeport_whitelist {
   type = list(string)
 }
 
-variable prefix_sc {
+variable prefix {
   type = string
 }
 
-variable prefix_wc {
+variable ssh_pub_key {
   type = string
 }
 
-variable ssh_pub_key_sc {
-  type = string
-}
-
-variable ssh_pub_key_wc {
-  type = string
-}
-
-variable machines_sc {
-  type = map(object({
-    node_type = string
-    size      = string
-    image = object({
-      name = string
-    })
-  }))
-}
-
-variable machines_wc {
+variable machines {
   type = map(object({
     node_type = string
     size      = string

@@ -17,11 +17,11 @@ variable "ip_prefix" {
 }
 
 variable "ip_last_octet_start_number_master" {
-  default = "145"
+  default = "153"
 }
 
 variable "ip_last_octet_start_number_worker" {
-  default = "146"
+  default = "154"
 }
 
 variable "gateway" {
@@ -65,7 +65,7 @@ variable "hardware_version" {
 }
 
 variable "template_name" {
-  default = "ubuntu-focal-20.04-cloudimg-20201210"
+  default = "ubuntu-bionic-18.04-cloudimg-20201125"
 }
 
 variable "prefix_sc" {
@@ -85,11 +85,11 @@ variable "master_count" {
   default = "1"
 }
 variable "master_cores" {
-  default = 2
+  default = 4
 }
 
 variable "master_memory" {
-  default = 4096
+  default = 8192
 }
 
 variable "master_disk_size" {
@@ -99,15 +99,15 @@ variable "master_disk_size" {
 ## Worker ##
 
 variable "worker_count" {
-  default = "2"
+  default = "1"
 }
 variable "worker_cores" {
-  default = 8
+  default = 16
 }
 
 variable "worker_memory" {
-  default = 16384
+  default = 24576
 }
 variable "worker_disk_size" {
-  default = "40"
+  default = "100"
 }

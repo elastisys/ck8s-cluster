@@ -100,8 +100,8 @@ module "workload_cluster" {
 
   ## Master ##
   master_count      = "1"
-  master_cores      = "4"
-  master_memory     = "5120"
+  master_cores      = "24"
+  master_memory     = "32768"
   master_disk_size  = "10"
 
   ## Worker ##
@@ -114,7 +114,7 @@ module "workload_cluster" {
 
   # ip_prefix     = "${lookup(var.ip_prefix, "service_cluster")}"
   ip_prefix                         = var.ip_prefix
-  ip_last_octet_start_number_master = "148"
+  ip_last_octet_start_number_master = "149"
   ip_last_octet_start_number_worker = var.ip_last_octet_start_number_worker
   gateway                           = var.gateway
   dns_primary                       = var.dns_primary
