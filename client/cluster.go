@@ -652,7 +652,10 @@ func (c *ClusterClient) terraformRemoteWorkspaceApply() error {
 	}
 
 	if err := c.tfe.Init(); err != nil {
-		return fmt.Errorf("error initializing TFE workspace: %w", err)
+		c.logger.Warn("Initialization of terraform remote workspace failed, retrying...")
+		if err := c.tfe.Init(); err != nil {
+			return fmt.Errorf("error initializing TFE workspace: %w", err)
+		}
 	}
 
 	backendConfig, err := c.configHandler.readTerraformBackendConfig()
