@@ -22,3 +22,13 @@ repos:
   rev: 2.1.4
   hooks:
     - id: shellcheck
+- repo: local
+  hooks:
+    - id: avoid-short-arguments
+      name: avoid-short-arguments
+      description: >-
+        Prevent usage of short arguments, which significantly hamper
+        readability and compatibility.
+      language: pygrep
+      entry: '[ "][-]A'
+      files: '^.*$'

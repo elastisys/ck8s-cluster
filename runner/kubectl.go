@@ -105,20 +105,20 @@ func (k *Kubectl) DeleteNode(name string) error {
 	return k.runner.Run(k.command("delete", "node", k.fullNodeName(name)))
 }
 
-// DeleteAll runs `sops exec-file KUBECONFIG 'kubectl delete RESOURCE -A --all EXTRAARGS...'
+// DeleteAll runs `sops exec-file KUBECONFIG 'kubectl delete RESOURCE --all-namespaces --all EXTRAARGS...'
 func (k *Kubectl) DeleteAll(resource string, extraArgs ...string) error {
 	k.logger.Debug("kubectl_delete_all", zap.String("resource", resource))
-	args := append([]string{"delete", resource, "-A", "--all"}, extraArgs...)
+	args := append([]string{"delete", resource, "--all-namespaces", "--all"}, extraArgs...)
 	return k.runner.Run(k.command(args...))
 }
 
-// DeleteAllTimeout runs `sops exec-file KUBECONFIG 'kubectl delete RESOURCE -A --all --timeout=TIMEOUTs EXTRAARGS...'
+// DeleteAllTimeout runs `sops exec-file KUBECONFIG 'kubectl delete RESOURCE --all-namespaces --all --timeout=TIMEOUTs EXTRAARGS...'
 func (k *Kubectl) DeleteAllTimeout(resource string, timeout int, extraArgs ...string) error {
 	k.logger.Debug("kubectl_delete_all_timeout", zap.String("resource", resource))
 	args := append([]string{
 		"delete",
 		resource,
-		"-A",
+		"--all-namespaces",
 		"--all",
 		fmt.Sprintf("--timeout=%ds", timeout),
 	}, extraArgs...)

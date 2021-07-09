@@ -151,7 +151,7 @@ func TestKubectlDeleteAll(t *testing.T) {
 	wantCmd := NewCommand(
 		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
 		fmt.Sprintf(
-			"KUBECONFIG={} kubectl delete %s -A --all %s",
+			"KUBECONFIG={} kubectl delete %s --all-namespaces --all %s",
 			testDeleteResource,
 			testDeleteExtraArgs,
 		),
@@ -178,7 +178,7 @@ func TestKubectlDeleteAllTimeout(t *testing.T) {
 	wantCmd := NewCommand(
 		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
 		fmt.Sprintf(
-			"KUBECONFIG={} kubectl delete %s -A --all --timeout=%ds %s",
+			"KUBECONFIG={} kubectl delete %s --all-namespaces --all --timeout=%ds %s",
 			testDeleteResource,
 			testDeleteTimeout,
 			testDeleteExtraArgs,
@@ -206,7 +206,7 @@ func TestKubectlDeleteAllTimeoutErrorTimeout(t *testing.T) {
 	wantCmd := NewCommand(
 		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
 		fmt.Sprintf(
-			"KUBECONFIG={} kubectl delete %s -A --all --timeout=%ds %s",
+			"KUBECONFIG={} kubectl delete %s --all-namespaces --all --timeout=%ds %s",
 			testDeleteResource,
 			testDeleteTimeout,
 			testDeleteExtraArgs,
@@ -238,7 +238,7 @@ func TestKubectlDeleteAllTimeoutError(t *testing.T) {
 	wantCmd := NewCommand(
 		"sops", "exec-file", testKubectlConfig.KubeconfigPath,
 		fmt.Sprintf(
-			"KUBECONFIG={} kubectl delete %s -A --all --timeout=%ds %s",
+			"KUBECONFIG={} kubectl delete %s --all-namespaces --all --timeout=%ds %s",
 			testDeleteResource,
 			testDeleteTimeout,
 			testDeleteExtraArgs,
